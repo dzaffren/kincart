@@ -9,8 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "db:up": "node scripts/migrate.mjs up",
-    "db:down": "node scripts/migrate.mjs down"
+    "db:up": "node --env-file-if-exists=.env.local scripts/migrate.mjs up",
+    "db:down": "node --env-file-if-exists=.env.local scripts/migrate.mjs down"
   },
   "dependencies": {
     "next": "16.4.0",
