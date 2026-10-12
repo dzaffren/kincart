@@ -19,3 +19,14 @@ it("writes a fresh check on every call", async () => {
     expect(second.checkedAt.getTime()).toBeGreaterThanOrEqual(first.checkedAt.getTime());
   }
 });
+
+it("says not configured when there is no DATABASE_URL", async () => {
+  expect(await checkDatabase("")).toEqual({ state: "not configured" });
+});
+
+it("says not reachable when the database refuses connections", async () => {
+  expect(await checkDatabase("postgres://u:p@127.0.0.1:1/x")).toEqual({
+    state: "not reachable",
+    reason: "ECONNREFUSED",
+  });
+});

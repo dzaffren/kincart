@@ -16,3 +16,18 @@ it("shows both rails up and the build", () => {
   expect(html).toContain("<dt>PayPal sandbox</dt><dd>connected</dd>");
   expect(html).toContain("<dt>Build</dt><dd><code>a1b2c3d</code></dd>");
 });
+
+it("shows the database as not reachable, in bold, without the error detail", () => {
+  const html = renderToStaticMarkup(
+    <StatusView
+      database={{ state: "not reachable", reason: "ECONNREFUSED 127.0.0.1:1" }}
+      paypal={{ state: "connected" }}
+      build="a1b2c3d"
+    />,
+  );
+
+  expect(html).toContain('<dt>Database</dt><dd class="fail">not reachable</dd>');
+  expect(html).toContain("<dt>PayPal sandbox</dt><dd>connected</dd>");
+  expect(html).not.toContain("ECONNREFUSED");
+  expect(html).not.toContain("127.0.0.1");
+});
