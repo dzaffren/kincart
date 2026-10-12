@@ -8,12 +8,13 @@ export type DatabaseResult =
 export async function checkDatabase(url = process.env.DATABASE_URL): Promise<DatabaseResult> {
   if (!url) return { state: "not configured" };
 
-  const client = new Client({
-    connectionString: url,
-    connectionTimeoutMillis: 5000,
-    query_timeout: 5000,
-  });
+  let client: Client | undefined;
   try {
+    client = new Client({
+      connectionString: url,
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000,
+    });
     await client.connect();
     const { rows } = await client.query<{ id: string; checked_at: Date }>(
       "INSERT INTO status_checks DEFAULT VALUES RETURNING id, checked_at",
@@ -22,7 +23,7 @@ export async function checkDatabase(url = process.env.DATABASE_URL): Promise<Dat
   } catch (error) {
     return { state: "not reachable", reason: reasonOf(error) };
   } finally {
-    await client.end().catch(() => {});
+    await client?.end().catch(() => {});
   }
 }
 

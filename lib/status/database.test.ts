@@ -30,3 +30,10 @@ it("says not reachable when the database refuses connections", async () => {
     reason: "ECONNREFUSED",
   });
 });
+
+it("says not reachable when DATABASE_URL is malformed", async () => {
+  expect(await checkDatabase("postgres://u:p@db.example:5432x/x")).toEqual({
+    state: "not reachable",
+    reason: "ERR_INVALID_URL",
+  });
+});
