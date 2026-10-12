@@ -24,6 +24,7 @@ export async function checkPaypal(
       signal: AbortSignal.timeout(5000),
     });
     if (response.ok) return { state: "connected" };
+    if (response.status === 401) return { state: "keys rejected" };
     return { state: "not reachable", reason: `HTTP ${response.status}` };
   } catch (error) {
     return { state: "not reachable", reason: error instanceof Error ? error.name : String(error) };
