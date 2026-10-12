@@ -225,7 +225,8 @@ Vercel builds every push straight away but only puts it on the production URL on
 
 | File | What changes | Why |
 | ---- | ------------ | --- |
-| `package.json`, `pnpm-lock.yaml` | `create-next-app` with TypeScript, App Router and ESLint, no Tailwind (`/design-system` decides styling). Adds `pg`, `@types/pg`, `vitest`, `@playwright/test`. Scripts: `dev`, `build`, `start`, `lint`, `test`, `test:e2e`, `db:up`, `db:down`. `"packageManager": "pnpm@9.0.0"`, `"engines": {"node": "24.x"}` | all; D7 pin |
+| `package.json`, `pnpm-lock.yaml` | `create-next-app` with TypeScript, App Router and ESLint, no Tailwind (`/design-system` decides styling). Adds `pg`, `@types/pg`, `vitest`, `@playwright/test`. Scripts: `dev`, `build`, `start`, `lint`, `test`, `test:e2e`, `db:up`, `db:down`; `db:up` and `db:down` read `.env.local` with `node --env-file-if-exists`. `"packageManager": "pnpm@9.0.0"`, `"engines": {"node": "24.x"}` | all; D7 pin |
+| `tsconfig.json`, `eslint.config.mjs`, `next.config.ts` | `create-next-app` defaults, except `next.config.ts` drops its `cacheComponents` and `partialPrefetching` defaults, which nothing here uses | all |
 | `app/layout.tsx` | `lang="en"`, title "Shop-together", no web fonts | 1 |
 | `app/page.tsx` | redirects to `/status`, replacing the sample page | 1: no boilerplate on the live URL |
 | `app/status/page.tsx` | server component, rendered per request (`await connection()`). Runs `checkDatabase` and `checkPaypal` with `Promise.all`, reads `buildLabel`, logs one line, renders `StatusView` | 1 to 4 |
@@ -238,8 +239,8 @@ Vercel builds every push straight away but only puts it on the production URL on
 | `db/migrations/0001_status_checks.up.sql`, `.down.sql` | create and drop `status_checks` | 1, 2 |
 | `scripts/migrate.mjs` | `up` runs every `*.up.sql` in order, each written to be safe to rerun. `down` runs only the highest-numbered `*.down.sql`. Plain Node with `pg`, so no TypeScript runner is needed | 1, 2, reverse path |
 | `scripts/migrate.test.ts` | up, down, up against the test database | reverse path |
-| `playwright.config.ts`, `e2e/status.spec.ts` | `webServer: pnpm build && pnpm start`; Chromium at 390×844; the one e2e | 1, 2 |
-| `vitest.config.ts` | node environment, automatic JSX, excludes `e2e/` | — |
+| `playwright.config.ts`, `e2e/status.spec.ts` | `webServer: pnpm build && pnpm start`, ready when port 3000 opens (a URL probe follows the `/` redirect); Chromium at 390×844; the one e2e | 1, 2 |
+| `vitest.config.mts` | node environment, excludes `e2e/`, runs files one at a time (the migrate test drops the table the database test writes to), loads `.env.local` when present | — |
 | `.github/workflows/ci.yml` | `test` job on every push and pull request: Node 24, pnpm, `postgres:17` service, `db:up`, `lint`, `test`, Playwright Chromium, with `PAYPAL_CLIENT_ID`/`PAYPAL_CLIENT_SECRET` from repo secrets and `VERCEL_GIT_COMMIT_SHA=${{ github.sha }}`. `migrate` job on `main` only, `needs: test`, runs `db:up` with the `NEON_DATABASE_URL` secret | 5 |
 | `.env.example` | `DATABASE_URL`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, empty | README |
 | `LICENSE` | MIT, 2026, Dzafran Bustaman | rules; D8 |
@@ -248,7 +249,7 @@ Vercel builds every push straight away but only puts it on the production URL on
 
 Reusing: nothing. The repo is empty.
 
-Set by hand at `/build` (dashboards, not files): Vercel project linked to the GitHub repo; Neon via the Vercel marketplace, which sets `DATABASE_URL`; PayPal keys in Vercel env (Production) and GitHub secrets; "Automatically expose System Environment Variables" on; Deployment Checks requiring `test` and `migrate`; a Neon `dev` branch for `.env.local`.
+Set by hand at `/build` (dashboards, not files): Vercel project linked to the GitHub repo; Neon via the Vercel marketplace, which sets `DATABASE_URL`; PayPal keys in Vercel env (Production) and GitHub secrets; "Automatically expose System Environment Variables" on; Deployment Checks requiring `test` and `migrate`. Local development uses a Postgres 17 container or a Neon connection string in `.env.local` (README Setup).
 
 ### Data
 
@@ -297,7 +298,7 @@ Not added: an ORM, the PayPal SDK, a logger, an env-validation library, a migrat
 | 5 Red build stays off live | manual, once at `/build`: Vercel Deployment Checks lists `test` and `migrate` as required | — |
 | Reverse path | `scripts/migrate.test.ts`: up, down, up | `pnpm test` |
 
-`pnpm test` needs `DATABASE_URL`: the Postgres container in CI, and the Neon `dev` branch locally.
+`pnpm test` needs `DATABASE_URL`: the Postgres container in CI, and `.env.local` locally.
 
 **E2E:** `e2e/status.spec.ts`. It opens `/status` at 390×844, checks all three lines, reloads, and sees the check number go up.
 
