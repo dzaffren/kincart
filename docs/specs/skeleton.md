@@ -318,42 +318,7 @@ Single chunk. The scaffold, lockfile and config are shared by every file, and th
 
 ### Decisions to record
 
-```
-## D10 · 2026-10-12 · Vercel Deployment Checks gate production
-
-Why: scenario 5 needs a red build kept off the live URL; Deployment Checks hold promotion until chosen GitHub Actions pass, and the Git integration keeps VERCEL_GIT_COMMIT_SHA for the Build line.
-Rejected: deploying from GitHub Actions with the Vercel CLI (a Vercel token in GitHub secrets, and the commit has to be passed in by hand).
-Source: docs/specs/skeleton.md
-Status: active
-
-## D11 · 2026-10-12 · Migrations run from GitHub Actions after tests pass
-
-Why: the production schema should change only after the test job is green on main.
-Rejected: running migrations in Vercel's build step (runs before the checks pass, and on every preview build).
-Source: docs/specs/skeleton.md
-Status: active
-
-## D12 · 2026-10-12 · pg over TCP and plain SQL migrations, no ORM
-
-Why: one table; pg talks to Neon from Vercel and to CI's plain Postgres container alike.
-Rejected: Neon's serverless HTTP driver (needs Neon's proxy, so CI's Postgres container can't serve it), Drizzle ORM (a dependency one table doesn't justify).
-Source: docs/specs/skeleton.md
-Status: active
-
-## D13 · 2026-10-12 · CI tests run against a Postgres container
-
-Why: no database secret is needed for tests, and every run starts from an empty database.
-Rejected: a Neon branch per CI run (another secret, and an extra setup step per run).
-Source: docs/specs/skeleton.md
-Status: active
-
-## D14 · 2026-10-12 · PayPal token check uses plain fetch; SDK waits for approve-and-pay
-
-Why: the skeleton makes one call, POST /v1/oauth2/token.
-Rejected: @paypal/paypal-server-sdk now (no orders or vault in this slice).
-Source: docs/specs/skeleton.md
-Status: active
-```
+Recorded as D10, D11, D12, D13, D14.
 
 ## Open items
 
