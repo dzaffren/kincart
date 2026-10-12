@@ -19,3 +19,22 @@ Nothing shipped yet
 - [Changelog](CHANGELOG.md)
 
 <!-- zuko:end -->
+
+## Setup
+
+You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker.
+
+1. `pnpm install`
+2. Copy `.env.example` to `.env.local` and fill it in.
+   - `DATABASE_URL`: a Neon connection string, or a local Postgres:
+
+     ```
+     docker run -d --name shop-together-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=shop_together -p 5432:5432 postgres:17
+     ```
+
+     with `DATABASE_URL=postgres://postgres:postgres@localhost:5432/shop_together`.
+   - `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`: a sandbox app from developer.paypal.com, under Apps & Credentials.
+3. `pnpm db:up` creates the tables.
+4. `pnpm dev`, then open http://localhost:3000/status.
+
+Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, since it expects `connected`).
