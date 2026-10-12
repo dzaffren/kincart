@@ -58,7 +58,7 @@ flowchart LR
     G[merge to main on GitHub] -- "commit e4f5a6b" --> CI[GitHub Actions: Vitest + Playwright]
     CI -- "green" --> VD[Vercel production deploy]
     CI -- "red" --> X[no deploy; live site keeps a1b2c3d]
-    VD -- "Build: e4f5a6b" --> L["https://shop-together.vercel.app/status"]
+    VD -- "Build: e4f5a6b" --> L["https://kincart.vercel.app/status"]
 ```
 
 A commit reaches the live URL only after its tests pass. A red run leaves the last green build in place.
@@ -67,7 +67,7 @@ A commit reaches the live URL only after its tests pass. A red run leaves the la
 
 ```gherkin
 Scenario: Both rails are up
-  Given the app is live at https://shop-together.vercel.app with its Neon database and PayPal sandbox keys set
+  Given the app is live at https://kincart.vercel.app with its Neon database and PayPal sandbox keys set
   And the live build is commit a1b2c3d
   When a judge opens /status on a phone 390 pixels wide
   Then the page shows "Database: OK, check #42 at 14:03"
