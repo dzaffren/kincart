@@ -131,6 +131,12 @@ it("reports unknown when PayPal fails or doesn't answer, since the money may hav
   expect(await charge("1j970427g9944212v", glasses, 15)).toEqual({ state: "unknown", reason: "TimeoutError" });
 });
 
+it("reports unknown when PayPal says OK but its answer can't be read, since the money may have moved", async () => {
+  stubPaypal(() => new Response('{"id":"5KD18823TL0094410","status":"COMP', { status: 201 }));
+
+  expect(await charge("1j970427g9944212v", glasses, 17)).toEqual({ state: "unknown", reason: "SyntaxError" });
+});
+
 it("reports refused when the keys are rejected, since no order was sent", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => new Response('{"error":"invalid_client"}', { status: 401 })));
 

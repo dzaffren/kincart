@@ -69,7 +69,13 @@ export async function charge(vaultId: string, item: Item, requestId: number): Pr
   }
 
   if (response.status >= 500) return { state: "unknown", reason: `HTTP ${response.status}` };
-  const body = await response.json().catch(() => ({}));
+  let body;
+  try {
+    body = await response.json();
+  } catch (error) {
+    if (response.ok) return { state: "unknown", reason: reasonOf(error) };
+    body = {};
+  }
   if (!response.ok) return { state: "refused", reason: issueOf(body) ?? `HTTP ${response.status}` };
 
   const capture = body.purchase_units?.[0]?.payments?.captures?.[0];
