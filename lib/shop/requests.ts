@@ -1,11 +1,15 @@
 import { Client } from "pg";
+import type { Option, Search } from "./find";
 import type { Item } from "./items";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
 
+export type Source = { shop: string; url: string; reason: string };
+
 export type PurchaseRequest = {
   id: number;
   item: Item;
+  found: Source | null;
   status: RequestStatus;
   askedAt: Date;
   answeredAt: Date | null;
@@ -29,7 +33,19 @@ type Row = {
   paypal_order_id: string | null;
   paypal_capture_id: string | null;
   failure_reason: string | null;
+  shop: string | null;
+  listing_url: string | null;
+  reason: string | null;
 };
+
+export type SavedSearch = {
+  words: string;
+  outcome: Search["outcome"] | "retry";
+  options: Option[];
+  searchedAt: Date;
+};
+
+const DEFAULT_LIMIT_CENTS = 5000;
 
 export async function getVault(): Promise<string | null> {
   const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = 1");
@@ -50,11 +66,46 @@ export async function latest(): Promise<PurchaseRequest | null> {
 }
 
 // A second ask while one is open hits purchase_requests_one_open and is dropped.
-export async function ask(item: Item): Promise<void> {
+export async function ask(item: Item, source?: Source): Promise<void> {
   await query(
-    `INSERT INTO purchase_requests (item_id, item_name, amount_cents) VALUES ($1, $2, $3)
+    `INSERT INTO purchase_requests (item_id, item_name, amount_cents, shop, listing_url, reason)
+     VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT DO NOTHING`,
-    [item.id, item.name, item.cents],
+    [item.id, item.name, item.cents, source?.shop ?? null, source?.url ?? null, source?.reason ?? null],
+  );
+}
+
+export async function getSearch(): Promise<SavedSearch | null> {
+  const rows = await query<{ words: string; outcome: SavedSearch["outcome"]; listings: Option[]; searched_at: Date }>(
+    "SELECT words, outcome, listings, searched_at FROM rose_search WHERE id = 1",
+  );
+  const row = rows[0];
+  return row ? { words: row.words, outcome: row.outcome, options: row.listings, searchedAt: row.searched_at } : null;
+}
+
+export async function saveSearch(words: string, result: Search | { outcome: "retry" }): Promise<void> {
+  await query(
+    `INSERT INTO rose_search (id, words, outcome, listings) VALUES (1, $1, $2, $3)
+     ON CONFLICT (id) DO UPDATE
+     SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, searched_at = now()`,
+    [words, result.outcome, JSON.stringify(result.outcome === "options" ? result.options : [])],
+  );
+}
+
+export async function clearSearch(): Promise<void> {
+  await query("DELETE FROM rose_search");
+}
+
+export async function getLimit(): Promise<number> {
+  const rows = await query<{ cents: number }>("SELECT cents FROM price_limit WHERE id = 1");
+  return rows[0]?.cents ?? DEFAULT_LIMIT_CENTS;
+}
+
+export async function setLimit(cents: number): Promise<void> {
+  await query(
+    `INSERT INTO price_limit (id, cents) VALUES (1, $1)
+     ON CONFLICT (id) DO UPDATE SET cents = EXCLUDED.cents, set_at = now()`,
+    [cents],
   );
 }
 
@@ -119,6 +170,7 @@ function toRequest(row: Row): PurchaseRequest {
   return {
     id: Number(row.id),
     item: { id: row.item_id, name: row.item_name, cents: row.amount_cents },
+    found: row.shop && row.listing_url && row.reason ? { shop: row.shop, url: row.listing_url, reason: row.reason } : null,
     status: row.status,
     askedAt: row.asked_at,
     answeredAt: row.answered_at,

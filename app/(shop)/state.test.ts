@@ -11,6 +11,7 @@ function request(status: RequestStatus, item = glasses): PurchaseRequest {
   return {
     id: 12,
     item,
+    found: null,
     status,
     askedAt,
     answeredAt: status === "waiting" ? null : answeredAt,
