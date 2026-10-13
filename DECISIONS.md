@@ -143,3 +143,31 @@ Why: PayPal's approval page may stop a robot and would need the sandbox account'
 Rejected: driving PayPal's login page in CI (robot checks, and a password in GitHub secrets).
 Source: docs/specs/approve-and-pay.md
 Status: active
+
+## D21 · 2026-10-13 · Search products with Channel3, over plain fetch
+
+Why: one call returns real US listings with price, shop, link, photo and sizes in 1.8 s (spike, find-and-explain O4); Channel3 is a hackathon sponsor.
+Rejected: an AI agent browsing shop websites (minutes per search, shops block it, and prices read off pages can be wrong), `@channel3/sdk` (a dependency for one endpoint).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D22 · 2026-10-13 · Claude Haiku 5.5 reads and explains, in two fixed steps
+
+Why: 9.9 s for a whole Find and about $0.0005 a search in the spike (find-and-explain O11); picking 3 of 10 listings and writing short sentences is light work. Called with plain fetch, like D17.
+Rejected: Sonnet 5.5 and Opus 5.5 (slower, and 17 to 33 times the cost), an agent loop that may search again (no scenario needs it, and it adds 3 to 5 s), `@anthropic-ai/sdk` (a dependency for one endpoint).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D23 · 2026-10-13 · Rose's current search lives in Neon, and Ask Sam reads the pick from it
+
+Why: the page redraws every 3 s (D19), and the price charged must come from the server, never the form.
+Rejected: carrying the listings in the form (Rose's browser could change a price), signing them in hidden fields (more code than one row).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D24 · 2026-10-13 · CI's e2e calls Channel3 and Claude for real
+
+Why: no test-only layer, matching D20; results vary, so the e2e checks the shape of what comes back (find-and-explain O12).
+Rejected: recorded replies behind a test-only switch (more code, and the real path only checked by hand).
+Source: docs/specs/find-and-explain.md
+Status: active
