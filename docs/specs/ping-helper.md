@@ -73,12 +73,12 @@ Scenario Outline: Turning notifications on
     | person | phone                            | what they do                              | message                                                                                                   |
     | Sam    | an Android phone in Chrome                   | taps "Turn on notifications", then Allow  | On. Your phone will buzz when Rose asks for something. |
     | Sam    | an Android phone in Chrome                   | taps "Turn on notifications", then Block  | Blocked on this phone. To get them, allow notifications for this site in your browser's settings. Until then, keep this page open. |
-    | Rose   | an iPhone (iOS 16.4+) in Safari              | nothing yet                               | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open Shop-together from your Home Screen and turn them on there. |
+    | Rose   | an iPhone (iOS 16.4+) in Safari              | nothing yet                               | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open KinCart from your Home Screen and turn them on there. |
     | Rose   | an iPhone on iOS 15, opened from the Home Screen | nothing yet                           | This browser can't show notifications. Keep this page open to see when Sam answers. |
 
 Scenario: Rose turns notifications on from the iPhone Home Screen
   Given Rose has added their page to the Home Screen on an iPhone with iOS 16.4 or later
-  When Rose taps the Shop-together icon
+  When Rose taps the KinCart icon
   Then Rose's own page opens, not the status page
   When Rose taps "Turn on notifications", then Allow
   Then Rose's page says "On. Your phone will buzz when Sam answers."
@@ -157,7 +157,7 @@ The section sits on each person's resting screens, and each notification opens t
 | couldn't turn on | as off | the button, and red under it: "Couldn't turn them on. Try again in a minute." |
 | on | On. Your phone will buzz when Rose asks for something. (Rose: when Sam answers) | none |
 | blocked | Blocked on this phone. To get them, allow notifications for this site in your browser's settings. Until then, keep this page open. | none |
-| iPhone, not from the Home Screen | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open Shop-together from your Home Screen and turn them on there. | none |
+| iPhone, not from the Home Screen | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open KinCart from your Home Screen and turn them on there. | none |
 | not supported | This browser can't show notifications. Keep this page open to see when Rose asks for something. (Rose: when Sam answers) | none |
 
 Sam's "Nothing to approve" line drops "Keep this page open."; the section now says when that applies.
@@ -173,7 +173,15 @@ The notifications:
 
 The item name goes in the text, not the title, because Android shows one line of title and listing names run long.
 
-The app icon on the Home Screen and beside each notification is not in the design system yet (O8). It goes through `/design-system` before this pause closes.
+The app icon is KinCart's tick cart, from the logo kit (`docs/design/logo/kit/`, guidelines in `guidelines.md`). The Home Screen name is "KinCart", seven letters, so iPhone shows it whole.
+
+| Where | File in `kit/web/` |
+| ----- | ------------------ |
+| iPhone Home Screen | `apple-touch-icon.png`, 180px, opaque |
+| Android Home Screen | `icon-192.png`, `icon-512.png`, and `maskable-512.png` for the circle crop |
+| Beside each notification | `icon-192.png` |
+| Android's status bar | `badge-96.png`, white on transparent |
+| Browser tab | `favicon.ico`, `favicon.svg` |
 
 Checked: no sideways scroll at 320px; light and dark both rendered. No new colour pairs: the section uses the price limit's label, muted text, divider and error colours. The button is 56px tall and the focus ring shows on it. The text line is a polite live region, so a screen reader hears "On." when it changes.
 
@@ -197,7 +205,7 @@ Craft checks: a one-line "notification settings" prompt gives a bell icon, a tog
 | O6 | Assuming the notification shows the item and price, on the lock screen too. Anyone who sees Sam's phone sees what Rose is buying; phones can hide notification text on the lock screen in their own settings | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O7 | Both links opened on one phone, as when you test alone: does each person get their own notifications there? | question | spec p1 | spec p3 | Open | — |
 
-| O8 | The design system has no app icon. The iPhone Home Screen and the notifications need one; without it iPhone uses a screenshot of the page | flag | spec p2 | /design-system | Open | Add one to the system, chosen 2026-10-13 |
+| O8 | The design system has no app icon. The iPhone Home Screen and the notifications need one; without it iPhone uses a screenshot of the page | flag | spec p2 | /design-system | Resolved | The KinCart logo kit, `docs/design/logo/kit/`: a tick on two wheels, white on the violet tile, with every Home Screen, notification and badge size. Wired in at this slice's build. 2026-10-14 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

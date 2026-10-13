@@ -29,7 +29,7 @@ export function NotifySection({ who, state, turnOn }: Props) {
           {state.kind === "blocked" &&
             "Blocked on this phone. To get them, allow notifications for this site in your browser's settings. Until then, keep this page open."}
           {state.kind === "home screen first" &&
-            "On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open Shop-together from your Home Screen and turn them on there."}
+            "On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open KinCart from your Home Screen and turn them on there."}
           {state.kind === "not supported" && `This browser can't show notifications. Keep this page open to see when ${when}.`}
         </p>
       </div>
