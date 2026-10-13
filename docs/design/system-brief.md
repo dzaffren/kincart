@@ -29,8 +29,9 @@ older users, on a phone, a few times a month
                               → 18px body, 16px floor, 56px buttons, roomy 4px scale
 "clear"                       → Atkinson Hyperlegible Next; all text 7:1 contrast (AAA)
 "steady"                      → borders, not shadows; 8/12px radius; no bounce easing
-"kind", never "childish"      → warm neutrals; a helper's No shows in neutral, not red
-OK / No is the core action    → one accent, green: go, yes, done
+"kind", never "childish"      → a helper's No shows in neutral, not red
+OK / No is the core action    → one accent, deep blue: the next step
+picked at the direction test  → deep blue on cool greys; green only for "Paid", so it never looks like a button
 Stripe Checkout               → label above every field, error under it, amount stays on screen
 Monzo                         → 40px amount style with tabular figures
 motion ceiling: tier 1        → 120 / 180 / 240ms, ease-out; no scroll or 3D tokens
@@ -79,25 +80,27 @@ Steps grow by about 1.25. The amount jumps to 40 so it is read first.
 
 ## Colour
 
-One accent. Neutrals are warm. Every text pair is 7:1 or better; every control edge is 3:1 or better. All values are hex, which works on older phones (see assumptions).
+One accent, deep blue. Neutrals are cool greys. Every text pair is 7:1 or better; every control edge is 3:1 or better. All values are hex, which works on older phones (see assumptions).
 
 | Token          | Light     | Dark      | Use                                     | Checked                                    |
 | -------------- | --------- | --------- | --------------------------------------- | ------------------------------------------ |
-| `bg`           | `#FAF8F5` | `#151412` | Page                                    |                                            |
-| `surface`      | `#FFFFFF` | `#1F1D1A` | Cards, inputs, the modal                |                                            |
-| `sunken`       | `#F2EEE8` | `#100F0D` | Summary bar behind the amount           |                                            |
-| `text`         | `#1D1B18` | `#F4F1EC` | Body and headings                       | 14.7+ / 12.3+ on every background          |
-| `muted`        | `#4D4741` | `#C4BDB3` | Secondary text                          | 7.9+ / 9.0+                                |
-| `line`         | `#E2DCD3` | `#36322D` | Dividers and card edges you can't tap   | decorative only                            |
-| `control`      | `#857D73` | `#80786E` | Edges of inputs and tappable cards      | 3.8+ / 3.9+                                |
-| `accent`       | `#17603F` | `#6FCB9C` | Primary button fill: go, yes, done      | 7.1+ / 8.6+ against the page               |
-| `on-accent`    | `#FFFFFF` | `#0B1F15` | Text on the accent                      | 7.6 / 8.8                                  |
-| `accent-press` | `#124F33` | `#8AD8B0` | Button pressed                          | 9.6 / 10.3 with `on-accent`                |
-| `accent-soft`  | `#E4F0E8` | `#1B3127` | Approved and paid backgrounds           |                                            |
-| `accent-text`  | `#145A3A` | `#86D6AC` | "Approved", "Paid" on `accent-soft`     | 7.0 / 8.1                                  |
+| `bg`           | `#F7F8FA` | `#0F1217` | Page                                    |                                            |
+| `surface`      | `#FFFFFF` | `#181C23` | Cards, inputs, the modal                |                                            |
+| `sunken`       | `#EEF1F5` | `#0A0C10` | Summary bar behind the amount           |                                            |
+| `text`         | `#14181F` | `#EEF1F6` | Body and headings                       | 15.1+ / 12.2+ on every background          |
+| `muted`        | `#464D59` | `#B7BECA` | Secondary text                          | 7.5+ / 9.1+                                |
+| `line`         | `#DDE2E9` | `#2C323C` | Dividers and card edges you can't tap   | decorative only                            |
+| `control`      | `#7A8291` | `#747C8A` | Edges of inputs and tappable cards      | 3.6+ / 4.0+                                |
+| `accent`       | `#1F4BAA` | `#8FB0F2` | Primary button fill: the next step      | 7.4+ / 7.8+ against the page               |
+| `on-accent`    | `#FFFFFF` | `#0B1630` | Text on the accent                      | 7.9 / 8.2                                  |
+| `accent-press` | `#183C8A` | `#A9C2F5` | Button pressed                          | 10.2 / 10.0 with `on-accent`               |
+| `accent-soft`  | `#E6EDF9` | `#18243D` | The option you picked                   |                                            |
+| `accent-text`  | `#1A4199` | `#A3BEF4` | Text on `accent-soft`                   | 7.9+ / 8.2+                                |
+| `success`      | `#145A3A` | `#86D6AC` | "Approved", "Paid"                      | 7.0+ / 8.0+                                |
+| `success-soft` | `#E4F0E8` | `#1B3127` | Approved and paid backgrounds           |                                            |
 | `danger`       | `#8E241B` | `#FF9C90` | Errors: payment failed, bad input       | 7.4+ / 7.6+                                |
 | `danger-soft`  | `#FBE9E6` | `#3A1D1A` | Error background                        |                                            |
-| `wait`         | `#6A4008` | `#F2C27A` | "Waiting for your helper"               | 7.6+ / 8.9+                                |
+| `wait`         | `#6A4008` | `#F2C27A` | "Waiting for your helper"               | 7.9+ / 8.8+                                |
 | `wait-soft`    | `#FBF0DA` | `#33270F` | Waiting background                      |                                            |
 
 A helper's No uses `muted` on `sunken` with plain words. It is not an error, so it is not red.
