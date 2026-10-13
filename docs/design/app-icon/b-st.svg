@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
-  <title>st ligature</title>
-  <g fill="none" stroke="#111" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"/>
-    <path d="M152 120 H206"/>
-  </g>
-</svg>

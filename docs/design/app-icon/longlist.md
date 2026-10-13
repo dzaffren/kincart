@@ -1,20 +1,35 @@
-Word map
-- together -> pair, linked, ligature (letters joined), lean on, side by side, two halves, tin-can phone
-- Rose asks -> words, a note, a list line, a raised hand
-- Sam says OK -> tick, nod, signature, stamp
-- from afar -> two phones, a string between, a signal
-- no passwords -> the key stays with Rose; approval opens it
-- clear, steady, kind; never flashy, cluttered, childish
+# Longlist — Shop-together
 
-Longlist (one line each), score 1-5: idea / distinct / simple / relevant / 16px
-1  Lean-on tick: a tick in two pieces, the short one leaning on the long one: it takes both of you.   4/4/5/5/5
-2  st ligature: one line writes s and t and joins them, the old printer's sign for letters held together. 5/5/3/4/2
-3  Across two phones: one tick cut through two phones side by side: one OK, two phones.             4/4/3/5/3
-4  Tin-can phone: two cans, and the string between them makes the tick.                              4/4/2/4/1
-5  Signature: an S that finishes in a tick, the way Sam signs off.                                  3/3/3/4/2
-6  Keyhole OK: a keyhole whose slot is a tick: an OK opens it, not a password.                       4/3/4/4/3 (security cliche)
-7  Envelope flap: the flap's fold is a tick.                                                        3/2/4/3/4 (reads as mail)
-8  List line: the last line of a list rises into a tick.                                            3/2/4/4/3 (reads as to-do)
-9  Nod: a head tipping forward, the gesture of yes.                                                 3/4/3/3/2
-10 Pair (tried): a tick with two heads.                                                             dropped, read as dots
-Build: 1, 2, 3.
+## Word map
+
+```
+shop          → bag, basket, tag, list, receipt, parcel, counter
+together      → two, pair, &, link, ligature, hand in hand, side by side, bridge
+older relative → reading glasses, armchair, teacup, letter, landline, cane
+helper says OK → nod, tick, signature, stamp
+from afar     → phone, tin-can phone, string, letter
+no passwords  → key, keyhole, door, trust
+clear, steady, kind → glasses (clear), level (steady), open arm (kind)
+```
+
+Intersections: "together" × "OK" → an ampersand that ends in a tick. "older" × "clear" × "two" → reading glasses. "shop" × "older" → the h of shop drawn as an armchair. "shop" × "together" → the two words joined where they meet, at p and t.
+
+## Concepts (score: idea / distinct / simple / relevant / 16px, out of 5)
+
+| # | Type | One line | Score |
+| - | ---- | -------- | ----- |
+| 1 | Letterform | An ampersand, Rose & Sam, whose leg ends in the OK | 5 4 4 5 4 |
+| 2 | Pictorial | Browline reading glasses: two lenses on one frame | 4 3 4 5 3 — a tick bridge was tried and crowded the lenses |
+| 3 | Wordmark | The p of shop and the t of together hold hands where the hyphen was | 4 4 4 4 3 — built, read as a typo at the hyphen |
+| 11 | Wordmark | The h in shop is an armchair: shop without leaving your chair | 5 4 4 5 4 |
+| 4 | Letterform | A t, for together, whose foot is the OK | 3 3 4 4 4 |
+| 5 | Pictorial | A tin-can phone: the string between the cans is the tick | 5 4 2 4 1 |
+| 6 | Pictorial | A key whose bit is a tick | 3 3 4 2 3 — fights the "no passwords" promise |
+| 7 | Letterform | An st ligature: one line writes s and t and joins them | 4 4 3 4 2 |
+| 8 | Letterform | An S of two halves meeting in the middle | 2 3 5 3 5 — shown, turned down |
+| 9 | Abstract | Two phones with one tick across them | 3 2 3 4 3 — read as a checkbox |
+| 10 | Abstract | A tick in two pieces, one for each person | 2 2 5 3 5 — read as a broken tick |
+
+Built: 1, 2, 3 and 11. Shown: 1, 11 and 2, the strongest three and three different mark types.
+
+Library check (`search_library.py --subject` ampersand, glasses, lens, ligature, check, chair, letter h): one plain ampersand glyph (`ampersand.svg`); glasses only as worn by mascots, plus pink sunglasses (`awesome.svg`); ligatures as two-letter monograms (`unito`, `symfony`) and one wordmark ligature (`upwork`). No chairs or furniture at all; letter-h marks are an H in a hexagon, a folded H, an offset H and a winged H. None ends an ampersand in a tick, draws an h as a chair, or frames two lenses as two people. Marlow & Finch, one of the skill's examples, uses a pictorial ampersand; ours differs in its tick leg.

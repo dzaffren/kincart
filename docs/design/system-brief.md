@@ -149,14 +149,15 @@ Home Screens and notification shades ignore the page's dark mode
 
 One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. Two new colour tokens, `icon-tile` (#5B3AA0) and `icon-mark` (#FFFFFF): the light `accent` and `on-accent` pair, held fixed because the icon never follows dark mode.
 
-Concepts for the pause B test, made with the logo-design skill's process: a word map, a scored longlist (`docs/design/app-icon/longlist.md`), black first, tested at 64, 32 and 16px and beside real marks (Gatsby, Zendesk, Patreon) at the same size. Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
+Concepts for the pause B test, made with the logo-design skill's full process: the brief (`docs/design/app-icon/brief.md`), a word map and scored longlist (`longlist.md`), black first, each locked up with a lowercase wordmark outlined from Atkinson Hyperlegible Next Bold, audited, and tested at 16 to 256px, one-colour, reversed, mirrored, rotated and on a shelf of payments marks. Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
 
-| Concept | The idea in one line | What could sink it |
-| ------- | -------------------- | ------------------ |
-| A · And | An ampersand, Rose & Sam, whose last stroke is the OK | At 16px the tick foot reads as part of the "&", not as a tick |
-| B · st | One line writes s and t and joins them, the old printer's sign for letters held together | The s is the weaker letter, and the swash crowds Android's circle crop |
+| Concept | Type | The idea in one line | What could sink it |
+| ------- | ---- | -------------------- | ------------------ |
+| A · And | Letterform | An ampersand, Rose & Sam, whose leg ends in the OK | At 16px the tick reads as part of the "&" |
+| B · Armchair | Wordmark | The h in shop is an armchair: shop without leaving your chair | Alone on the tile it's an h, which isn't the first letter; turned upside down it looks like a 4 |
+| C · Glasses | Pictorial | Browline reading glasses, two lenses on one frame | Wide and thin at 32px; glasses also mean "eyewear shop" |
 
-Round 1 (a speech bubble with a tick, an S of two halves, a price tag with a tick) was turned down at pause B: stock pairings and a letter. Before it, a tick in a bubble, two overlapping circles (Mastercard's mark) and a plain "S" were replaced. Dropped from round 2's longlist after drawing: a tick in two pieces (read as a broken tick), one tick cut through two phones (read as a checkbox), a tick with two heads (read as a tick with dots).
+Earlier rounds, turned down: a speech bubble with a tick, an S of two halves and a price tag with a tick (stock pairings and a letter); an ampersand and an st ligature drawn as thin single-line glyphs (looked typed, not drawn, and came without a wordmark); a tick in a bubble, two overlapping circles (Mastercard's mark) and a plain S.
 
 Rejected before testing: a shopping cart or bag, with or without a tick or heart. It is the first thing a one-line "family shopping app icon" prompt draws.
 

@@ -80,17 +80,14 @@
   fill: var(--color-icon-tile);
 }
 
-.icon-stroke {
-  fill: none;
-  stroke: var(--color-icon-mark);
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.icon-fill {
+  fill: var(--color-icon-mark);
 }
 
 .icon-badge .icon-tile {
   display: none;
 }
 
-.icon-badge .icon-stroke {
-  stroke: currentColor;
+.icon-badge .icon-fill {
+  fill: currentColor;
 }
