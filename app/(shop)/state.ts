@@ -1,13 +1,46 @@
-import type { PurchaseRequest } from "../../lib/shop/requests";
+import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
 import type { Receipt } from "./ui";
 
-type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean };
+type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean; emptyFind?: boolean };
 
-export function roseState(vault: string | null, request: PurchaseRequest | null, params: RoseParams): RoseState {
+type SearchOn = { saved: SavedSearch | null; limitCents: number };
+
+export function roseState(
+  vault: string | null,
+  request: PurchaseRequest | null,
+  params: RoseParams,
+  search?: SearchOn,
+): RoseState {
   if (!vault) return { kind: "not linked", cancelled: params.cancelled ?? false };
+  if (!search) return fixedListState(request, params);
 
+  if (request?.status === "waiting" || request?.status === "paying") {
+    return { kind: "waiting", item: request.item, askedAt: request.askedAt, shop: request.found?.shop };
+  }
+
+  const current = search.saved && (!request || search.saved.searchedAt > request.askedAt) ? search.saved : null;
+  const { limitCents } = search;
+  if (current?.outcome === "options") {
+    return { kind: "options", limitCents, words: current.words, listings: current.options, error: params.pickMissing ?? false };
+  }
+  if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
+    return { kind: "paid", receipt: receiptOf(request) };
+  }
+  const outcome =
+    !current && (request?.status === "declined" || request?.status === "failed")
+      ? { kind: request.status, item: request.item }
+      : undefined;
+  const problem = params.emptyFind
+    ? "empty"
+    : current?.outcome === "retry"
+      ? undefined
+      : current?.outcome;
+  return { kind: "ask", limitCents, words: current?.words, outcome, problem };
+}
+
+function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {
   const pick: RoseState = { kind: "pick", error: params.pickMissing ?? false };
   if (!request) return pick;
   switch (request.status) {
@@ -28,7 +61,13 @@ export function samState(request: PurchaseRequest | null): SamState {
   switch (request.status) {
     case "waiting":
     case "paying":
-      return { kind: "request", item: request.item, askedAt: request.askedAt, busy: request.status === "paying" };
+      return {
+        kind: "request",
+        item: request.item,
+        askedAt: request.askedAt,
+        busy: request.status === "paying",
+        found: request.found ?? undefined,
+      };
     case "paid":
       return { kind: "paid", receipt: receiptOf(request) };
     case "failed":

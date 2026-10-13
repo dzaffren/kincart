@@ -1,24 +1,43 @@
+import { useId } from "react";
 import type { Item } from "../../lib/shop/items";
+import type { Source } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, Notice, ReceiptCard, RELATIVE, Summary, type Receipt } from "./ui";
+import { money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
 
 export type SamState =
   | { kind: "nothing"; declined?: Item }
-  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean }
+  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source }
   | { kind: "paid"; receipt: Receipt }
   | { kind: "failed"; item: Item };
 
-type Props = { state: SamState; answer?: (formData: FormData) => void | Promise<void> };
+export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
 
-export function SamView({ state, answer }: Props) {
+type Action = (formData: FormData) => void | Promise<void>;
+
+type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action };
+
+export function SamView({ state, answer, limit, setLimit }: Props) {
   if (state.kind === "request") {
+    const { found } = state;
     return (
       <div className="screen">
-        <h1>
-          {RELATIVE} would like {state.item.name}
-        </h1>
-        <Summary cents={state.item.cents} note={`Paid from ${RELATIVE}'s PayPal if you say OK.`} />
+        <h1>{found ? `${RELATIVE} would like this` : `${RELATIVE} would like ${state.item.name}`}</h1>
+        <Summary
+          title={found && state.item.name}
+          cents={state.item.cents}
+          note={`${found ? `From ${found.shop}. ` : ""}Paid from ${RELATIVE}'s PayPal if you say OK.`}
+        />
+        {found && (
+          <div className="heading">
+            <p>
+              <strong>Why it fits:</strong> {found.reason}
+            </p>
+            <a className="link" href={found.url} target="_blank" rel="noopener noreferrer">
+              See it on {found.shop}
+            </a>
+          </div>
+        )}
         <p className="small">
           Asked at <LocalTime at={state.askedAt} format="clock" />.
         </p>
@@ -40,29 +59,38 @@ export function SamView({ state, answer }: Props) {
     );
   }
 
+  return (
+    <div className="screen">
+      <SamOutcome state={state} />
+      {limit && <LimitForm limit={limit} setLimit={setLimit} />}
+    </div>
+  );
+}
+
+function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }) {
   if (state.kind === "paid") {
     return (
-      <div className="screen">
+      <>
         <h1>Paid from {RELATIVE}&apos;s PayPal</h1>
         <ReceiptCard receipt={state.receipt} />
         <p className="small">{RELATIVE} sees this receipt too.</p>
-      </div>
+      </>
     );
   }
 
   if (state.kind === "failed") {
     return (
-      <div className="screen">
+      <>
         <h1>Payment didn&apos;t go through</h1>
         <Notice tone="danger">
           Nothing was taken from {RELATIVE}&apos;s PayPal for {state.item.name}. {RELATIVE} can ask again.
         </Notice>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="screen">
+    <>
       {state.declined && (
         <Notice tone="neutral">
           You said no to {state.declined.name}. {RELATIVE} can see that.
@@ -72,6 +100,51 @@ export function SamView({ state, answer }: Props) {
         <h1>Nothing to approve</h1>
         <p className="lead">When {RELATIVE} asks for something, it shows up here. Keep this page open.</p>
       </div>
-    </div>
+    </>
+  );
+}
+
+function LimitForm({ limit, setLimit }: { limit: Limit; setLimit?: Action }) {
+  const inputId = useId();
+  const hintId = useId();
+  const errorId = useId();
+  return (
+    <form className="stack limit" action={setLimit}>
+      <div className="heading">
+        <label className="field-label" htmlFor={inputId}>
+          Price limit
+        </label>
+        <p className="small" id={hintId}>
+          {RELATIVE} is only shown items at or under this price.
+        </p>
+      </div>
+      <div className="limit-row">
+        <span className="money-input">
+          <span aria-hidden="true">$</span>
+          <input
+            className="field-input"
+            id={inputId}
+            name="limit"
+            inputMode="numeric"
+            defaultValue={limit.cents / 100}
+            aria-describedby={limit.error ? `${hintId} ${errorId}` : hintId}
+            aria-invalid={limit.error || undefined}
+          />
+        </span>
+        <Button type="submit" kind="secondary" busy={limit.busy} busyLabel="Saving…">
+          Save
+        </Button>
+      </div>
+      {limit.error && (
+        <p className="field-error" id={errorId}>
+          Pick a whole-dollar amount from $5 to $500.
+        </p>
+      )}
+      {limit.saved && (
+        <p className="small" role="status">
+          Saved. {RELATIVE}&apos;s next search stays at {wholeDollars(limit.cents)} or less.
+        </p>
+      )}
+    </form>
   );
 }

@@ -1,31 +1,29 @@
 import { expect, test, type Page } from "@playwright/test";
-import pg from "pg";
+import type { Option } from "../lib/shop/find";
+import { ITEMS } from "../lib/shop/items";
+import { reset as resetTables, sql } from "./db";
 
 const rose = process.env.ROSE_LINK_TOKEN ?? "";
 const sam = process.env.SAM_LINK_TOKEN ?? "";
 const savedPaypal = process.env.PAYPAL_E2E_VAULT_ID ?? "";
 
-async function sql(text: string, params: unknown[] = []) {
-  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
-  await client.connect();
-  try {
-    return (await client.query(text, params)).rows;
-  } finally {
-    await client.end();
-  }
-}
+// Rose's search is seeded with the three fixed items, so these tests run the same every time and call no AI.
+const fixedThree: Option[] = ITEMS.map((item) => ({
+  ...item,
+  shop: "target.com",
+  url: "https://www.target.com/",
+  what: `${item.name}.`,
+  why: "It is what Rose asked for.",
+  watch: "Check the pack before you buy.",
+}));
 
-async function reset(paypal: string | null) {
-  await sql("TRUNCATE purchase_requests");
-  await sql("DELETE FROM paypal_vault");
-  if (paypal) await sql("INSERT INTO paypal_vault (payment_token) VALUES ($1)", [paypal]);
-}
+const reset = (paypal: string | null) => resetTables(paypal, { words: "something I need", options: fixedThree });
 
 const heading = (page: Page) => page.getByRole("heading", { level: 1 });
 
 async function roseAsksFor(page: Page, item: RegExp) {
   await page.goto(`/r/${rose}`);
-  await expect(heading(page)).toHaveText("What would you like?");
+  await expect(heading(page)).toHaveText("Which one would you like?");
   await page.getByRole("radio", { name: item }).check();
   await page.getByRole("button", { name: "Ask Sam" }).click();
   await expect(heading(page)).toHaveText("Waiting for Sam");
@@ -44,7 +42,7 @@ test("Rose asks, Sam says OK, both see one receipt", async ({ page, context }) =
   await expect(heading(samPage)).toHaveText("Nothing to approve");
 
   await page.goto(`/r/${rose}`);
-  await expect(page.getByText("PayPal linked.")).toBeVisible();
+  await expect(heading(page)).toHaveText("Which one would you like?");
   const glasses = page.getByRole("radio", { name: /Reading glasses, \+2\.00/ });
   await glasses.check();
   await page.waitForTimeout(4000);
@@ -52,7 +50,8 @@ test("Rose asks, Sam says OK, both see one receipt", async ({ page, context }) =
   await page.getByRole("button", { name: "Ask Sam" }).click();
   await expect(heading(page)).toHaveText("Waiting for Sam");
 
-  await expect(heading(samPage)).toHaveText("Rose would like Reading glasses, +2.00", { timeout: 5000 });
+  await expect(heading(samPage)).toHaveText("Rose would like this", { timeout: 5000 });
+  await expect(samPage.getByText("Reading glasses, +2.00")).toBeVisible();
   const secondTab = await context.newPage();
   await secondTab.goto(`/h/${sam}`);
   const ok = (tab: Page) => tab.getByRole("button", { name: "OK, pay $18.99" });
@@ -77,7 +76,7 @@ test("Sam says no and nothing is charged", async ({ page, context }) => {
   await reset(savedPaypal);
   await page.goto(`/r/${rose}`);
   await page.getByRole("button", { name: "Ask Sam" }).click();
-  await expect(page.getByText("Pick one of the three first.")).toBeVisible();
+  await expect(page.getByText("Pick one first.")).toBeVisible();
 
   await roseAsksFor(page, /AA batteries, pack of 8/);
   const samPage = await context.newPage();
@@ -87,7 +86,7 @@ test("Sam says no and nothing is charged", async ({ page, context }) => {
   await expect(heading(samPage)).toHaveText("Nothing to approve");
   await expect(samPage.getByText("You said no to AA batteries, pack of 8. Rose can see that.")).toBeVisible();
   await expect(page.getByText("Sam said no to AA batteries, pack of 8.")).toBeVisible({ timeout: 5000 });
-  await expect(page.getByRole("radio")).toHaveCount(3);
+  await expect(heading(page)).toHaveText("What do you need?");
   expect(await sql("SELECT status, paypal_order_id FROM purchase_requests")).toEqual([
     { status: "declined", paypal_order_id: null },
   ]);
@@ -104,7 +103,7 @@ test("a refused charge takes nothing and lets Rose ask again", async ({ page, co
   await expect(heading(samPage)).toHaveText("Payment didn't go through", { timeout: 15000 });
   await expect(samPage.getByText("Nothing was taken from Rose's PayPal for Weekly pill organiser.")).toBeVisible();
   await expect(page.getByText("Payment didn't go through. Nothing was taken.")).toBeVisible({ timeout: 5000 });
-  await expect(page.getByRole("radio")).toHaveCount(3);
+  await expect(heading(page)).toHaveText("What do you need?");
 });
 
 test("Rose links PayPal from the first screen", async ({ page }) => {

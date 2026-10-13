@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { ITEMS } from "../../lib/shop/items";
-import type { PurchaseRequest, RequestStatus } from "../../lib/shop/requests";
+import type { PurchaseRequest, RequestStatus, SavedSearch } from "../../lib/shop/requests";
 import { roseState, samState } from "./state";
 
 const [glasses, pills, batteries] = ITEMS;
@@ -11,6 +11,7 @@ function request(status: RequestStatus, item = glasses): PurchaseRequest {
   return {
     id: 12,
     item,
+    found: null,
     status,
     askedAt,
     answeredAt: status === "waiting" ? null : answeredAt,
@@ -64,4 +65,92 @@ it("shows Sam nothing, a request, the payment in progress, or the outcome", () =
   expect(samState(request("paid"))).toEqual({ kind: "paid", receipt });
   expect(samState(request("failed", pills))).toEqual({ kind: "failed", item: pills });
   expect(samState(request("declined", batteries))).toEqual({ kind: "nothing", declined: batteries });
+});
+
+const strap = {
+  id: "prod_9Wz4hY",
+  name: "Adjustable Wide Slippers with Hook-and-Loop Strap",
+  cents: 3250,
+  shop: "amazon.com",
+  url: "https://www.amazon.com/dp/B0C7WIDE21",
+  what: "Wide slippers that open across the top and close with a strap.",
+  why: "You open them right up to put them on, then press the strap shut.",
+  watch: "They're a wide fit, so they may feel loose on a narrow foot.",
+};
+const words = "warm slippers that are easy to put on, size 8";
+const searchedAt = new Date("2026-10-20T10:20:00Z");
+const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" ? [strap] : []): SavedSearch => ({
+  words,
+  outcome,
+  options,
+  searchedAt,
+});
+const on = (search: SavedSearch | null = null, limitCents = 5000) => ({ saved: search, limitCents });
+
+it("shows Rose the request box with Sam's limit once search is on, and the error after an empty Find", () => {
+  expect(roseState(vault, null, {}, on())).toEqual({ kind: "ask", limitCents: 5000 });
+  expect(roseState(vault, null, { emptyFind: true }, on(null, 3000))).toEqual({
+    kind: "ask",
+    limitCents: 3000,
+    problem: "empty",
+  });
+});
+
+it("shows Rose the current search's options, with the error after Ask Sam without a pick", () => {
+  expect(roseState(vault, null, {}, on(saved("options")))).toEqual({
+    kind: "options",
+    limitCents: 5000,
+    words,
+    listings: [strap],
+    error: false,
+  });
+  expect(roseState(vault, null, { pickMissing: true }, on(saved("options")))).toMatchObject({ error: true });
+});
+
+it("keeps Rose's words in the box when a search found nothing, too much, a list, or Rose tries again", () => {
+  expect(roseState(vault, null, {}, on(saved("nothing found")))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words,
+    problem: "nothing found",
+  });
+  expect(roseState(vault, null, {}, on(saved("over limit")))).toMatchObject({ problem: "over limit", words });
+  expect(roseState(vault, null, {}, on(saved("several")))).toMatchObject({ problem: "several", words });
+  expect(roseState(vault, null, {}, on(saved("retry")))).toEqual({ kind: "ask", limitCents: 5000, words });
+});
+
+it("shows a search newer than the paid request instead of the receipt, and not an older one", () => {
+  const paid = request("paid");
+  expect(roseState(vault, paid, {}, on(saved("options")))).toMatchObject({ kind: "options" });
+  expect(roseState(vault, paid, {}, on({ ...saved("options"), searchedAt: new Date("2026-10-20T10:00:00Z") }))).toEqual({
+    kind: "paid",
+    receipt,
+  });
+  expect(roseState(vault, paid, { askAgain: true }, on())).toEqual({ kind: "ask", limitCents: 5000 });
+});
+
+it("shows Rose the box under Sam's no, and the shop while waiting", () => {
+  expect(roseState(vault, request("declined", batteries), {}, on())).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    outcome: { kind: "declined", item: batteries },
+  });
+  const waiting = { ...request("waiting", strap), found: { shop: strap.shop, url: strap.url, reason: strap.why } };
+  expect(roseState(vault, waiting, {}, on())).toEqual({
+    kind: "waiting",
+    item: strap,
+    askedAt,
+    shop: "amazon.com",
+  });
+});
+
+it("shows Sam where a found item comes from and why it fits", () => {
+  const found = { shop: strap.shop, url: strap.url, reason: strap.why };
+  expect(samState({ ...request("waiting", strap), found })).toEqual({
+    kind: "request",
+    item: strap,
+    askedAt,
+    busy: false,
+    found,
+  });
 });

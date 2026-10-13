@@ -2,7 +2,21 @@ import pg from "pg";
 import { beforeAll, beforeEach, expect, it } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
-import { ask, claim, decline, getVault, latest, record, saveVault, stuck } from "./requests";
+import {
+  ask,
+  claim,
+  clearSearch,
+  decline,
+  getLimit,
+  getSearch,
+  getVault,
+  latest,
+  record,
+  saveSearch,
+  saveVault,
+  setLimit,
+  stuck,
+} from "./requests";
 
 const [glasses, pills, batteries] = ITEMS;
 
@@ -21,7 +35,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit");
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
@@ -98,4 +112,56 @@ it("finds a charge left paying for over 15 seconds, and not a fresh one", async 
 
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${id}`);
   expect((await stuck())?.id).toBe(id);
+});
+
+const strap = {
+  id: "prod_9Wz4hY",
+  name: "Adjustable Wide Slippers with Hook-and-Loop Strap",
+  cents: 3250,
+  shop: "amazon.com",
+  url: "https://www.amazon.com/dp/B0C7WIDE21",
+  imageUrl: "https://cdn.trychannel3.com/prod_9Wz4hY",
+  what: "Wide slippers that open across the top and close with a strap.",
+  why: "You open them right up to put them on, then press the strap shut.",
+  watch: "They're a wide fit, so they may feel loose on a narrow foot.",
+};
+
+it("records an ask from a search with the shop, the link and the reason it fits", async () => {
+  await ask(strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+
+  expect(await latest()).toMatchObject({
+    item: { id: "prod_9Wz4hY", name: "Adjustable Wide Slippers with Hook-and-Loop Strap", cents: 3250 },
+    found: { shop: "amazon.com", url: "https://www.amazon.com/dp/B0C7WIDE21", reason: strap.why },
+  });
+
+  await sql("TRUNCATE purchase_requests");
+  await ask(glasses);
+  expect((await latest())?.found).toBeNull();
+});
+
+it("keeps Rose's one current search until the next one or a clear", async () => {
+  expect(await getSearch()).toBeNull();
+
+  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  expect(await getSearch()).toMatchObject({
+    words: "warm slippers that are easy to put on, size 8",
+    outcome: "options",
+    options: [strap],
+  });
+
+  await saveSearch("milk, bread and eggs", { outcome: "several" });
+  expect(await getSearch()).toMatchObject({ words: "milk, bread and eggs", outcome: "several", options: [] });
+
+  await clearSearch();
+  expect(await getSearch()).toBeNull();
+});
+
+it("keeps Sam's price limit, $50 until Sam sets one", async () => {
+  expect(await getLimit()).toBe(5000);
+
+  await setLimit(3000);
+  expect(await getLimit()).toBe(3000);
+
+  await expect(setLimit(300)).rejects.toThrow();
+  expect(await getLimit()).toBe(3000);
 });

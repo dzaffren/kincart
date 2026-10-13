@@ -37,6 +37,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 2 | `find-and-explain` | The relative types what they need in plain words. AI pulls real listings, shows three, and explains each one plainly. Their pick goes into slice 1's approval, replacing the fixed list. | Brings the AI the rules require. |
 | 3 | `ping-helper` | A new request reaches your phone as a notification, so you don't have to keep the page open. | Only if time is left. Makes "approve from afar" real on video. |
 | 4 | `ask-by-voice` | The relative says what they need instead of typing it. | Only if time is left. Needs slice 2's request box. |
+| 5 | `basket` | The relative asks for several things at once, such as groceries. You approve the list once and one total is charged. | Only if time is left. Found at `/spec find-and-explain`: a request is one item today. |
 
 ## Not doing
 
