@@ -1,27 +1,16 @@
-import { useId, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import type { Item } from "../../lib/shop/items";
+import { LocalTime } from "./LocalTime";
 
 export const RELATIVE = "Rose";
 export const HELPER = "Sam";
 
-export type Item = { id: string; name: string; cents: number };
 export type Receipt = { item: Item; paidAt: Date; transactionId: string };
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-const clock = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
-const dayAndClock = new Intl.DateTimeFormat("en-US", {
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-});
 
 export function money(cents: number): string {
   return usd.format(cents / 100);
-}
-
-export function time(at: Date): string {
-  return clock.format(at);
 }
 
 export function Notice({ tone, children }: { tone: "wait" | "danger" | "neutral"; children: ReactNode }) {
@@ -48,29 +37,11 @@ export function ReceiptCard({ receipt }: { receipt: Receipt }) {
       <p className="receipt-status">Paid</p>
       <p className="amount">{money(receipt.item.cents)}</p>
       <p>{receipt.item.name}</p>
-      <p className="receipt-detail">{dayAndClock.format(receipt.paidAt)}</p>
+      <p className="receipt-detail">
+        <LocalTime at={receipt.paidAt} format="day" />
+      </p>
       <p className="receipt-detail">PayPal transaction {receipt.transactionId}</p>
     </div>
-  );
-}
-
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  kind?: "primary" | "secondary";
-  busy?: string;
-};
-
-export function Button({ kind = "primary", busy, children, ...props }: ButtonProps) {
-  return (
-    <button className={`button button-${kind}`} aria-disabled={busy ? true : undefined} {...props}>
-      {busy ? (
-        <>
-          <span className="spinner" aria-hidden="true" />
-          {busy}
-        </>
-      ) : (
-        children
-      )}
-    </button>
   );
 }
 

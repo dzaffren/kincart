@@ -199,6 +199,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
+  text-decoration: none;
   cursor: pointer;
   transition: transform var(--motion-fast) var(--ease-out);
 }

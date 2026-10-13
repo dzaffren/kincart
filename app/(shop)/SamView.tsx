@@ -1,4 +1,7 @@
-import { Button, money, Notice, ReceiptCard, RELATIVE, Summary, time, type Item, type Receipt } from "./ui";
+import type { Item } from "../../lib/shop/items";
+import { Button } from "./Button";
+import { LocalTime } from "./LocalTime";
+import { money, Notice, ReceiptCard, RELATIVE, Summary, type Receipt } from "./ui";
 
 export type SamState =
   | { kind: "nothing"; declined?: Item }
@@ -6,7 +9,9 @@ export type SamState =
   | { kind: "paid"; receipt: Receipt }
   | { kind: "failed"; item: Item };
 
-export function SamView({ state }: { state: SamState }) {
+type Props = { state: SamState; answer?: (formData: FormData) => void | Promise<void> };
+
+export function SamView({ state, answer }: Props) {
   if (state.kind === "request") {
     return (
       <div className="screen">
@@ -14,13 +19,15 @@ export function SamView({ state }: { state: SamState }) {
           {RELATIVE} would like {state.item.name}
         </h1>
         <Summary cents={state.item.cents} note={`Paid from ${RELATIVE}'s PayPal if you say OK.`} />
-        <p className="small">Asked at {time(state.askedAt)}.</p>
-        <form className="stack">
+        <p className="small">
+          Asked at <LocalTime at={state.askedAt} format="clock" />.
+        </p>
+        <form className="stack" action={answer}>
           {state.busy ? (
-            <Button type="submit" busy="Paying…" />
+            <Button type="submit" busy busyLabel="Paying…" />
           ) : (
             <>
-              <Button type="submit" name="answer" value="ok">
+              <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
                 OK, pay {money(state.item.cents)}
               </Button>
               <Button type="submit" name="answer" value="no" kind="secondary">

@@ -1,5 +1,8 @@
 import { useId } from "react";
-import { Button, HELPER, ItemPicker, Notice, ReceiptCard, Summary, time, type Item, type Receipt } from "./ui";
+import type { Item } from "../../lib/shop/items";
+import { Button } from "./Button";
+import { LocalTime } from "./LocalTime";
+import { HELPER, ItemPicker, Notice, ReceiptCard, Summary, type Receipt } from "./ui";
 
 export type RoseState =
   | { kind: "not linked"; cancelled?: boolean; busy?: boolean }
@@ -13,7 +16,11 @@ export type RoseState =
   | { kind: "waiting"; item: Item; askedAt: Date }
   | { kind: "paid"; receipt: Receipt };
 
-export function RoseView({ state, items }: { state: RoseState; items: Item[] }) {
+type Action = (formData: FormData) => void | Promise<void>;
+
+type Props = { state: RoseState; items: Item[]; link?: Action; ask?: Action };
+
+export function RoseView({ state, items, link, ask }: Props) {
   const headingId = useId();
 
   if (state.kind === "not linked") {
@@ -27,8 +34,8 @@ export function RoseView({ state, items }: { state: RoseState; items: Item[] }) 
               : `You do this once. After that, you pick what you need, ${HELPER} says OK, and your PayPal pays. No passwords to share.`}
           </p>
         </div>
-        <form>
-          <Button type="submit" busy={state.busy ? "Opening PayPal…" : undefined}>
+        <form action={link}>
+          <Button type="submit" busy={state.busy} busyLabel="Opening PayPal…">
             Link PayPal
           </Button>
         </form>
@@ -41,7 +48,8 @@ export function RoseView({ state, items }: { state: RoseState; items: Item[] }) 
       <div className="screen">
         <h1>Waiting for {HELPER}</h1>
         <Notice tone="wait">
-          Asked at {time(state.askedAt)}. This page changes by itself when {HELPER} answers.
+          Asked at <LocalTime at={state.askedAt} format="clock" />. This page changes by itself when {HELPER}{" "}
+          answers.
         </Notice>
         <Summary title={state.item.name} cents={state.item.cents} />
       </div>
@@ -53,11 +61,9 @@ export function RoseView({ state, items }: { state: RoseState; items: Item[] }) 
       <div className="screen">
         <h1>{HELPER} said OK. It&apos;s paid.</h1>
         <ReceiptCard receipt={state.receipt} />
-        <form>
-          <Button type="submit" kind="secondary">
-            Ask for something else
-          </Button>
-        </form>
+        <a className="button button-secondary" href="?ask=1">
+          Ask for something else
+        </a>
       </div>
     );
   }
@@ -76,9 +82,9 @@ export function RoseView({ state, items }: { state: RoseState; items: Item[] }) 
         <h1 id={headingId}>What would you like?</h1>
         <p className="small">PayPal linked. Nothing is paid until {HELPER} says OK.</p>
       </div>
-      <form className="stack">
+      <form className="stack" action={ask}>
         <ItemPicker items={items} labelledBy={headingId} picked={state.picked} error={state.error} />
-        <Button type="submit" busy={state.busy ? `Asking ${HELPER}…` : undefined}>
+        <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
           Ask {HELPER}
         </Button>
       </form>

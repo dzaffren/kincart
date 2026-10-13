@@ -1,14 +1,14 @@
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { ITEMS } from "../../../../lib/shop/items";
 import { BrokenLinkView } from "../../BrokenLinkView";
 import { RoseView } from "../../RoseView";
 import { SamView } from "../../SamView";
-import type { Item, Receipt } from "../../ui";
+import type { Receipt } from "../../ui";
 import "./preview.css";
 
-const glasses: Item = { id: "glasses", name: "Reading glasses, +2.00", cents: 1899 };
-const pills: Item = { id: "pills", name: "Weekly pill organiser", cents: 1250 };
-const batteries: Item = { id: "batteries", name: "AA batteries, pack of 8", cents: 999 };
-const items = [glasses, pills, batteries];
+const items = ITEMS;
+const [glasses, pills, batteries] = ITEMS;
 
 const askedAt = new Date("2026-10-20T10:15:00");
 const receipt: Receipt = {
@@ -18,6 +18,8 @@ const receipt: Receipt = {
 };
 
 export default function ApproveAndPayPreview() {
+  if (process.env.VERCEL_ENV === "production") notFound();
+
   return (
     <main className="preview">
       <header className="preview-header">
