@@ -5,3 +5,4 @@
 - Tick "Save payment methods" on the PayPal sandbox app before calling the vault
 - Run next typegen after adding a route, before tsc
 - Make PayPal-Request-Id unique across databases, not just within one
+- Write path parameters as <token> in specs, not {token}

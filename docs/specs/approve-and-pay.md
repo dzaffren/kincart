@@ -1,6 +1,6 @@
 # Approve and pay
 
-**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** skeleton; the design system (D15)
@@ -353,7 +353,7 @@ Not added: the PayPal SDK (D17), a connection pool, a people table, webhooks, a 
 | -------------------- | ----------------------------------------------------------------------------- |
 | **Load**             | Two people, a few requests a day. While a page is on screen it re-renders every 3 s: one page render and two small queries. |
 | **Breaks first**     | Neon's free compute-hours, again. A tab left visible keeps Neon awake: about 6 of the 100 free hours a month for each day it stays open (O8). Polling stops when the tab is hidden or the phone sleeps. Fix if it bites: stop refreshing after 15 quiet minutes. |
-| **Security surface** | Anyone holding Rose's link can link a PayPal and ask. Anyone holding Sam's link can approve one open request at a time, for at most $18.99 of sandbox money (O3). Every action and route re-checks the token, compared in constant time. The amount comes from `ITEMS`, never from the form. A request ID only acts on a `waiting` row. Server actions reject cross-origin posts (Next.js checks the Origin header). Secrets: the PayPal pair and both link tokens (Vercel env); the PayPal pair and `PAYPAL_E2E_VAULT_ID` (GitHub secrets). Stored: the vault ID, and per request the item, amount, times, and PayPal order and capture IDs. No names, emails or card details. Logs never include the vault ID or a link token. |
+| **Security surface** | Anyone holding Rose's link can link a PayPal and ask. Anyone holding Sam's link can approve one open request at a time, for at most $18.99 of sandbox money (O3). Every action and route re-checks the token, compared in constant time. The amount comes from `ITEMS`, never from the form. A request ID only acts on a `waiting` row. Server actions reject cross-origin posts (Next.js checks the Origin header). Secrets: the PayPal pair and both link tokens (Vercel env); the PayPal pair and `PAYPAL_E2E_VAULT_ID` (GitHub secrets). Stored: the vault ID, and per request the item, amount, times, and PayPal order and capture IDs. No names, emails or card details. The app's own log lines never include the vault ID or a link token, but Vercel's request log records each page address, token included; only the project's owner can read it. |
 | **Proof it works**   | One Vercel log line per payment: `purchase id=12 item=glasses status=paid capture=7BM91101S1572292D`, or `status=failed reason=PERMISSION_DENIED`. One per link: `paypal link status=linked` or `status=failed reason=…`. In PayPal, the US sandbox business account's activity lists the payment. |
 | **Rollout**          | No flag. The pages only answer to the two link tokens; with them unset, every link says it doesn't work, which is the off switch. Rollback: revert on `main`; Deployment Checks promote the revert (D10). Schema: `pnpm db:down` against Neon. |
 

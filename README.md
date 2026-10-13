@@ -21,6 +21,7 @@ Used by older shoppers and the relative who helps them pay online.
 ## Features
 
 - A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live.
+- Rose links their sandbox PayPal once and picks one of three items. Sam taps OK or No on their own phone, and an OK charges Rose's saved PayPal and shows both of them a receipt.
 
 ## Docs
 
