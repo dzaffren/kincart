@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Updated:** 2026-10-13 by /ship skeleton
+**Status:** Active · **Updated:** 2026-10-13 by /ship skeleton (shipped)
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -28,7 +28,7 @@ Used by older shoppers and the relative who helps them pay online.
 
 | Slice    | Status | What it does                                                                                                  | Page                   |
 | -------- | ------ | ------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| skeleton | Built  | A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live. | docs/specs/skeleton.md |
+| skeleton | Shipped | A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live. | docs/specs/skeleton.md |
 
 ## More
 

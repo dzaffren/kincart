@@ -20,7 +20,7 @@ Used by older shoppers and the relative who helps them pay online.
 
 ## Features
 
-Nothing shipped yet
+- A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live.
 
 ## Docs
 
