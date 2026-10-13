@@ -17,6 +17,8 @@
   --color-danger-soft: #FBE9E6;
   --color-wait: #6A4008;
   --color-wait-soft: #FBF0DA;
+  --color-icon-tile: #5B3AA0;
+  --color-icon-mark: #FFFFFF;
 }
 
 @media (prefers-color-scheme: dark) {

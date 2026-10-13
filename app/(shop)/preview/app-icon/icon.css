@@ -1,0 +1,117 @@
+.icon-note {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-8);
+}
+
+.icon-shot {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.icon-shot figcaption {
+  font: var(--type-small);
+  color: var(--color-muted);
+}
+
+.icon {
+  display: block;
+  border-radius: 22%;
+}
+
+.icon-large {
+  width: calc(var(--space-16) * 3);
+  height: calc(var(--space-16) * 3);
+}
+
+.icon-home {
+  width: var(--space-16);
+  height: var(--space-16);
+}
+
+.icon-circle {
+  border-radius: 0;
+  clip-path: circle(40%);
+}
+
+.icon-walls {
+  display: flex;
+}
+
+.icon-wall {
+  padding: var(--space-6);
+}
+
+.icon-wall-pale {
+  background: var(--color-sunken);
+}
+
+.icon-wall-deep {
+  background: var(--color-text);
+}
+
+.icon-strip {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: var(--radius-control);
+  font: var(--type-small);
+}
+
+.icon-badge {
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: 0;
+}
+
+.icon-tile {
+  fill: var(--color-icon-tile);
+}
+
+.icon-mark {
+  fill: var(--color-icon-mark);
+}
+
+.icon-ring {
+  fill: none;
+  stroke: var(--color-icon-mark);
+  stroke-width: 8;
+}
+
+.icon-cut {
+  fill: none;
+  stroke: black;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-letter {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 68px;
+}
+
+.icon-badge .icon-tile {
+  display: none;
+}
+
+.icon-badge .icon-mark {
+  fill: currentColor;
+}
+
+.icon-badge .icon-ring {
+  stroke: currentColor;
+}

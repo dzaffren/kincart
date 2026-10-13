@@ -147,7 +147,7 @@ Home Screens and notification shades ignore the page's dark mode
 | App icon (Android) | 192 and 512 PNG, maskable | the tile, the mark inside the middle 80% circle | Android Home Screen, the large icon in a notification |
 | Badge | 96 × 96 PNG, white on transparent | the mark alone | Android's status bar and the small icon in a notification; Android draws only its shape |
 
-One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. No new colour tokens: the tile is `accent` and the mark is `on-accent`, both light values.
+One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. Two new colour tokens, `icon-tile` (#5B3AA0) and `icon-mark` (#FFFFFF): the light `accent` and `on-accent` pair, held fixed because the icon never follows dark mode.
 
 Directions for the pause B test, three marks drawn at 60px and 180px:
 
