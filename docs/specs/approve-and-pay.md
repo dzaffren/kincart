@@ -395,36 +395,7 @@ No new dependencies, so the lockfile doesn't change. B codes against A's signatu
 
 ### Decisions to record
 
-```
-## D17 · 2026-10-13 · PayPal calls use plain fetch, not the server SDK
-
-Why: approve-and-pay makes four REST calls (token, setup token, payment token, order), each proven with curl in the vault spike; the /status token check already uses fetch the same way.
-Rejected: @paypal/paypal-server-sdk (a dependency for four calls, and its vault support is unchecked).
-Supersedes: D14
-Source: docs/specs/approve-and-pay.md
-Status: active
-
-## D18 · 2026-10-13 · One secret link each for Rose and Sam, no sign-in
-
-Why: two fixed demo people moving sandbox money only; a link opens on a phone with no account to make (O3).
-Rejected: a link plus a 4-digit PIN (one more step on Sam's screen and in the video), real sign-in (the most hours, and judges would need accounts).
-Source: docs/specs/approve-and-pay.md
-Status: active
-
-## D19 · 2026-10-13 · Pages re-render every 3 s while on screen
-
-Why: a request or an answer must show on the other phone within 5 s without a reload (scenarios 2 to 4); router.refresh() re-renders from Neon with no new dependency.
-Rejected: reload by hand (a pull-to-refresh at every step of the video), server-sent events (a Vercel function held open for every open page).
-Source: docs/specs/approve-and-pay.md
-Status: active
-
-## D20 · 2026-10-13 · The e2e starts from an already-saved PayPal
-
-Why: PayPal's approval page may stop a robot and would need the sandbox account's password in GitHub; a saved vault ID in a GitHub secret still lets the e2e make a real sandbox charge end to end.
-Rejected: driving PayPal's login page in CI (robot checks, and a password in GitHub secrets).
-Source: docs/specs/approve-and-pay.md
-Status: active
-```
+Recorded as D17, D18, D19, D20.
 
 ## Open items
 
