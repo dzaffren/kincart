@@ -71,22 +71,22 @@ Scenario Outline: Turning notifications on
 
   Examples:
     | person | phone                            | what they do                              | message                                                                                                   |
-    | Sam    | an Android phone in Chrome       | taps "Turn on notifications", then Allow  | Notifications are on. Your phone will buzz when Rose asks for something.                                  |
-    | Sam    | an Android phone in Chrome       | taps "Turn on notifications", then Block  | Notifications are blocked on this phone. Allow them for this site in your browser settings, or keep this page open. |
-    | Rose   | an iPhone (iOS 16.4+) in Safari  | nothing yet                               | To get notifications on iPhone: tap Share, then Add to Home Screen, then open Shop-together from your Home Screen. |
-    | Rose   | an iPhone in Firefox             | nothing yet                               | This browser can't show notifications. Keep this page open to see Sam's answer.                         |
+    | Sam    | an Android phone in Chrome                   | taps "Turn on notifications", then Allow  | On. Your phone will buzz when Rose asks for something. |
+    | Sam    | an Android phone in Chrome                   | taps "Turn on notifications", then Block  | Blocked on this phone. To get them, allow notifications for this site in your browser's settings. Until then, keep this page open. |
+    | Rose   | an iPhone (iOS 16.4+) in Safari              | nothing yet                               | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open Shop-together from your Home Screen and turn them on there. |
+    | Rose   | an iPhone on iOS 15, opened from the Home Screen | nothing yet                           | This browser can't show notifications. Keep this page open to see when Sam answers. |
 
 Scenario: Rose turns notifications on from the iPhone Home Screen
   Given Rose has added their page to the Home Screen on an iPhone with iOS 16.4 or later
   When Rose taps the Shop-together icon
   Then Rose's own page opens, not the status page
   When Rose taps "Turn on notifications", then Allow
-  Then Rose's page says "Notifications are on. Your phone will buzz when Sam answers."
+  Then Rose's page says "On. Your phone will buzz when Sam answers."
 
 Scenario: Rose asks, and Sam's phone buzzes with the page closed
   Given Sam turned notifications on, closed Sam's page and locked the phone
   When Rose picks "Dearfoams Women's Fireside Slipper" at $24.99 and taps "Ask Sam"
-  Then within 10 seconds Sam's phone shows "Rose would like Dearfoams Women's Fireside Slipper" with "$24.99. Tap to see it and say OK or No."
+  Then within 10 seconds Sam's phone shows "Rose would like something" with "Dearfoams Women's Fireside Slipper, $24.99. Tap to see it and say OK or No."
   When Sam taps the notification
   Then Sam's page opens on that request, with "OK, pay $24.99" and "No"
 
@@ -131,17 +131,73 @@ Scenario: A phone that stopped accepting notifications changes nothing else
 - Notifications through the PayPal app: no slice planned. In PayPal itself, these pings would be PayPal app notifications and none of the web push setup would exist. This slice is a stand-in for the hackathon, and the video and README say so.
 - Asking by voice: slice 4, `ask-by-voice`.
 
+## Interface
+
+A Notifications section joins both pages, under a divider like Sam's price limit. It is composed from the system's existing pieces; the notifications themselves are drawn by the phone, so only their words are designed here.
+
+```mermaid
+flowchart LR
+    SAMREST["Sam: Nothing to approve / Paid / Failed"] -- "section above Price limit" --> N1[Notifications]
+    ROSE["Rose: What do you need? / Waiting for Sam"] -- "section at the bottom" --> N2[Notifications]
+    NS["Sam's phone: Rose would like something"] -- "tap" --> REQ["Sam: Rose would like this"]
+    NR["Rose's phone: Sam said OK / no"] -- "tap" --> OUT["Rose: receipt or notice"]
+```
+
+The section sits on each person's resting screens, and each notification opens the screen that answers it.
+
+| Page | Screens with the section | Not on |
+| ---- | ------------------------ | ------ |
+| Sam  | Nothing to approve, Paid, Payment didn't go through: under the outcome, above Price limit | the request screen, where OK and No stay the only actions |
+| Rose | What do you need? (and the fixed list when Find is off), Waiting for Sam: at the bottom | Link PayPal, the options, the receipt |
+
+| State | Text under "Notifications" | Control |
+| ----- | -------------------------- | ------- |
+| off | Turn them on to get a buzz when Rose asks for something, even with this page closed. (Rose: when Sam answers) | "Turn on notifications", secondary button |
+| turning on | as off | the button shows the spinner and "Turning on…" while the phone asks |
+| couldn't turn on | as off | the button, and red under it: "Couldn't turn them on. Try again in a minute." |
+| on | On. Your phone will buzz when Rose asks for something. (Rose: when Sam answers) | none |
+| blocked | Blocked on this phone. To get them, allow notifications for this site in your browser's settings. Until then, keep this page open. | none |
+| iPhone, not from the Home Screen | On iPhone, add this page to your Home Screen first: tap Share, then Add to Home Screen. Then open Shop-together from your Home Screen and turn them on there. | none |
+| not supported | This browser can't show notifications. Keep this page open to see when Rose asks for something. (Rose: when Sam answers) | none |
+
+Sam's "Nothing to approve" line drops "Keep this page open."; the section now says when that applies.
+
+The notifications:
+
+| To | When | Title | Text | Tapping it opens |
+| -- | ---- | ----- | ---- | ---------------- |
+| Sam | Rose taps Ask Sam | Rose would like something | Dearfoams Women's Fireside Slipper, $24.99. Tap to see it and say OK or No. | Sam's page, on the request |
+| Rose | Sam's OK is paid | Sam said OK | Dearfoams Women's Fireside Slipper is paid: $24.99. Tap to see the receipt. | Rose's page, on the receipt |
+| Rose | Sam taps No | Sam said no | Sam said no to Dearfoams Women's Fireside Slipper. Nothing was taken. | Rose's page, with "Sam said no to…" |
+| Rose | the payment fails | Payment didn't go through | Sam said OK, but the payment didn't go through. Nothing was taken. | Rose's page, with "Payment didn't go through" |
+
+The item name goes in the text, not the title, because Android shows one line of title and listing names run long.
+
+The app icon on the Home Screen and beside each notification is not in the design system yet (O8). It goes through `/design-system` before this pause closes.
+
+Checked: no sideways scroll at 320px; light and dark both rendered. No new colour pairs: the section uses the price limit's label, muted text, divider and error colours. The button is 56px tall and the focus ring shows on it. The text line is a polite live region, so a screen reader hears "On." when it changes.
+
+Craft checks: a one-line "notification settings" prompt gives a bell icon, a toggle switch and a custom "Allow notifications?" pop-up. Here there is no toggle, because the phone owns turning it off; the button says what it does, and every state that can't turn on says what to do instead. Against Stripe: each refusal names what happened and the next step, and the error sits under the button it belongs to.
+
+**Motion tier:** 1, as approve-and-pay. Nothing new moves: "Turning on…" turns the existing spinner.
+
+**Components used:** Button (secondary, busy), and from tokens as in the price limit: `field-label`, `small`, `field-error` and the divider. `NotifySection` is composed from these, like `LimitForm`. Design system: the Claude Design project `shop-together` (2b71c794), tokens in `docs/design/design-system/tokens/` (D15).
+
+**Preview:** http://localhost:3000/preview/ping-helper with `pnpm dev`. It answers 404 in production.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
 | -- | ---- | ---- | --------- | ----- | ------ | ------ |
 | O1 | On iPhone, the Home Screen icon opens the person's own secret link (not `/` or `/status`), and web push works from there. Only a real iPhone with iOS 16.4+ can show it | unproven | spec p1 | poc | Open | — |
-| O2 | Which phones can you test on? "Both must work" needs an iPhone with iOS 16.4+ and an Android phone in hand, or the missing one ships untested | question | spec p1 | user | Open | — |
-| O3 | Assuming a notification within 10 seconds of the tap is good enough. Delivery goes through Apple's and Google's push services, which this app doesn't control | assumption | spec p1 | user | Open | — |
-| O4 | Assuming every phone a person turned notifications on for gets them, with no limit on how many | assumption | spec p1 | user | Open | — |
+| O2 | Which phones can you test on? "Both must work" needs an iPhone with iOS 16.4+ and an Android phone in hand, or the missing one ships untested | question | spec p1 | user | Resolved | Both, an iPhone and an Android phone. Each path gets checked by hand before the video. 2026-10-13 |
+| O3 | Assuming a notification within 10 seconds of the tap is good enough. Delivery goes through Apple's and Google's push services, which this app doesn't control | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
+| O4 | Assuming every phone a person turned notifications on for gets them, with no limit on how many | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O5 | Playwright's browser can get a push subscription and receive a push in CI. Its Chromium is an open-source build and may have no push service | unproven | spec p1 | spec p3 | Open | — |
-| O6 | Assuming the notification shows the item and price, on the lock screen too. Anyone who sees Sam's phone sees what Rose is buying; phones can hide notification text on the lock screen in their own settings | assumption | spec p1 | user | Open | — |
+| O6 | Assuming the notification shows the item and price, on the lock screen too. Anyone who sees Sam's phone sees what Rose is buying; phones can hide notification text on the lock screen in their own settings | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O7 | Both links opened on one phone, as when you test alone: does each person get their own notifications there? | question | spec p1 | spec p3 | Open | — |
+
+| O8 | The design system has no app icon. The iPhone Home Screen and the notifications need one; without it iPhone uses a screenshot of the page | flag | spec p2 | /design-system | Open | Add one to the system, chosen 2026-10-13 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
