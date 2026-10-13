@@ -95,9 +95,9 @@ Scenario: Nothing under Sam's limit
   And Rose's words are still in the box
 
 Scenario: Sam sets the price limit
-  Given Sam's page shows "Price limit: $50"
-  When Sam changes it to $30 and saves
-  Then Sam's page shows "Price limit: $30"
+  Given Sam's page shows the price limit at $50
+  When Sam changes it to $30 and taps Save
+  Then Sam's page says "Saved. Rose's next search stays at $30 or less."
   And Rose's next search shows only listings at $30 or less
 ```
 
@@ -119,6 +119,39 @@ Scenario: Sam sets the price limit
 - A real order with the shop. Sandbox money only (shape O9). No later slice.
 - More than three options, or "show more". No later slice.
 - Remembering past searches. No later slice.
+
+## Interface
+
+Rose's request box replaces approve-and-pay's pick screen. The options reuse its radio cards, with the listing's price, photo and explanation inside. Sam's approval adds "Why it fits" and a link to the listing, and a price limit field sits under Sam's other screens.
+
+| Who | State | Heading | What's on it |
+| --- | ----- | ------- | ------------ |
+| Rose | asking | What do you need? | Hint: "Say it the way you'd tell Sam. For example: warm slippers that are easy to put on, size 8."; a 3-line box; Find; "Sam's limit is $50 an item. Nothing is paid until Sam says OK." |
+| Rose | Find with an empty box | What do you need? | red under the box: "Type what you need first." |
+| Rose | looking | What do you need? | the box locked with Rose's words; Find becomes "Looking…" with the spinner |
+| Rose | options | Which one would you like? | For "warm slippers that are easy to put on, size 8"; up to three radio cards, each with the name, "$24.99 at walmart.com", the photo with what and why beside it, and "Good to know:" with the catch; Ask Sam; Try other words |
+| Rose | fewer than three | Which one would you like? | adds "Only 2 found at $30 or less." |
+| Rose | Ask Sam with no pick | Which one would you like? | red under the cards: "Pick one first." |
+| Rose | nothing found | What do you need? | grey notice: "Couldn't find that. Try different words."; Rose's words still in the box |
+| Rose | nothing under the limit | What do you need? | grey notice: "Nothing under $30 for that. Try different words, or ask Sam to raise the limit." |
+| Rose | waiting | Waiting for Sam | as approve-and-pay, plus "From amazon.com" |
+| Rose | Sam said no, or the charge failed | What do you need? | approve-and-pay's notices, above the box |
+| Sam | request | Rose would like this | the name, $32.50 at 40px, "From amazon.com. Paid from Rose's PayPal if you say OK."; "Why it fits: …"; "See it on amazon.com", opening in a new tab; asked time; OK, pay $32.50; No |
+| Sam | nothing, paid or failed | as approve-and-pay | under a divider: "Price limit" with "Rose is only shown items at or under this price.", a $ field holding 50, and Save |
+| Sam | limit saved | as approve-and-pay | "Saved. Rose's next search stays at $30 or less." |
+| Sam | limit out of range | as approve-and-pay | red under the field: "Pick a whole-dollar amount from $5 to $500." |
+
+"Nothing found" and "nothing under the limit" are grey, not red: nothing is broken, and the brief keeps red for real failures. The photo is the listing's first one, 64px, with a 1px border, on the `sunken` colour while it loads; a listing with no photo shows none. Its alt text is empty because the name sits right next to it.
+
+Checked: no sideways scroll at 320px and 390px; light and dark both rendered. New colour pairs: the listing link 9.0:1 light and 11.3:1 dark; the shop name on a picked card 7.3:1 and 8.8:1; field edges 3.6:1 and 4.5:1. The focus ring shows on the box, the limit field, the link and the cards, and the link is 48px tall.
+
+Craft checks: a one-line "AI product picker" prompt gives star ratings, a sparkle "AI picks" badge and "Buy now" buttons. Here there is no badge, the explanation is plain text with a "Good to know" catch, and the only next step is Ask Sam. Against Stripe Checkout: the heading labels the box, the hint gives an example, and the empty-box error sits under the box and says what to do. Against Monzo: Sam's amount stays at 40px, with plain wording around it.
+
+**Motion tier:** 1, as approve-and-pay. Nothing new moves: notices rise and fade as before, and "Looking…" turns the spinner.
+
+**Components used:** the design system is tokens only. From approve-and-pay: Button, Notice, Summary, ReceiptCard and the radio option cards. Composed from tokens here: the text box and limit field (`control.height`, `control` edge, `radius.control`), the listing card (an option card with a photo), and the text link (`accent-text`, `target.min`).
+
+**Preview:** http://localhost:3000/preview/find-and-explain with `pnpm dev`. It answers 404 in production. The listings are written examples and grey squares stand in for photos; real results replace both at /build.
 
 ## Open items
 

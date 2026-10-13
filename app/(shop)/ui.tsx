@@ -7,10 +7,16 @@ export const HELPER = "Sam";
 
 export type Receipt = { item: Item; paidAt: Date; transactionId: string };
 
+export type Listing = Item & { shop: string; url: string; imageUrl?: string; what: string; why: string; watch: string };
+
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 export function money(cents: number): string {
   return usd.format(cents / 100);
+}
+
+export function wholeDollars(cents: number): string {
+  return `$${Math.floor(cents / 100)}`;
 }
 
 export function Notice({ tone, children }: { tone: "wait" | "danger" | "neutral"; children: ReactNode }) {
@@ -77,6 +83,58 @@ export function ItemPicker({ items, labelledBy, picked, error }: PickerProps) {
       {error && (
         <p className="field-error" id={errorId}>
           Pick one of the three first.
+        </p>
+      )}
+    </>
+  );
+}
+
+type ListingPickerProps = {
+  listings: Listing[];
+  labelledBy: string;
+  picked?: string;
+  error?: boolean;
+};
+
+export function ListingPicker({ listings, labelledBy, picked, error }: ListingPickerProps) {
+  const errorId = useId();
+  return (
+    <>
+      <fieldset className="options" aria-labelledby={labelledBy} aria-describedby={error ? errorId : undefined}>
+        {listings.map((listing) => (
+          <label className="option" key={listing.id}>
+            <input
+              className="option-input"
+              type="radio"
+              name="listing"
+              value={listing.id}
+              defaultChecked={listing.id === picked}
+            />
+            <span className="option-body listing">
+              <span className="option-ring" aria-hidden="true" />
+              <span className="listing-title">
+                <span className="listing-name">{listing.name}</span>
+                <span>
+                  <span className="option-price">{money(listing.cents)}</span>{" "}
+                  <span className="small">at {listing.shop}</span>
+                </span>
+              </span>
+              <span className="listing-text">
+                {listing.imageUrl && <img className="listing-photo" src={listing.imageUrl} alt="" />}
+                <span>
+                  {listing.what} {listing.why}
+                </span>
+                <span>
+                  <strong>Good to know:</strong> {listing.watch}
+                </span>
+              </span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      {error && (
+        <p className="field-error" id={errorId}>
+          Pick one first.
         </p>
       )}
     </>
