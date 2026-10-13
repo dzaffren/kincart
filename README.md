@@ -47,10 +47,11 @@ You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker
      with `DATABASE_URL=postgres://postgres:postgres@localhost:5432/shop_together`.
    - `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`: a sandbox app from developer.paypal.com, under Apps & Credentials. Make it with a **US** sandbox business account and tick **Save payment methods** under its features, or saving Rose's PayPal fails with `NOT_AUTHORIZED`.
    - `ROSE_LINK_TOKEN` and `SAM_LINK_TOKEN`: two long random strings (the command is in `.env.example`). They are the only key to each person's page.
+   - `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY`: an API key from the Claude Console and a free one from trychannel3.com. They turn on Rose's Find; with either unset, Rose picks from a fixed list of three items.
 3. `pnpm db:up` creates the tables.
 4. `pnpm dev`, then open:
    - http://localhost:3000/status to check the database and PayPal.
    - `http://localhost:3000/r/<ROSE_LINK_TOKEN>` as Rose. Tap Link PayPal and log in as a US **personal** sandbox account, in a private window so no other PayPal login carries over.
    - `http://localhost:3000/h/<SAM_LINK_TOKEN>` as Sam.
 
-Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, and `PAYPAL_E2E_VAULT_ID`). The e2e makes real sandbox charges against a saved PayPal. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.
+Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, `PAYPAL_E2E_VAULT_ID`, and the Claude and Channel3 keys; stop `pnpm dev` first). The e2e makes real sandbox charges against a saved PayPal, and real Channel3 searches and Claude calls. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.
