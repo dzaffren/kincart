@@ -1,6 +1,7 @@
 # Design system brief
 
 **Status:** Approved · 2026-10-13 · /design-system pause A
+**Extension:** App icon · Draft · 2026-10-13 · for ping-helper (O8)
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
@@ -124,6 +125,40 @@ Only `transform` and `opacity` move. Colour changes and focus rings are instant.
 
 Cards sit flat with a 1px `line` border. Only the modal lifts: `0 8px 24px rgb(0 0 0 / 0.16)` over a `rgb(0 0 0 / 0.4)` scrim.
 
+## App icon
+
+The system has no mark today: no app icon, no favicon, no manifest. Ping-helper needs one in three places: the iPhone Home Screen, the Android Home Screen, and beside each notification. Without it, iPhone uses a screenshot of the page as the Home Screen icon.
+
+```
+on a Home Screen among 20+ apps, seen at about 60px
+                              → one bold mark on a filled tile; no word inside the tile
+older eyes                    → strokes at least 8% of the tile wide; nothing thin enough to vanish at 60px
+"clear, steady, kind", never "childish"
+                              → flat `accent` tile, one `on-accent` mark; no gradient, shadow or mascot
+clear of PayPal               → violet tile, never blue; no letter P, no wallet
+Home Screens and notification shades ignore the page's dark mode
+                              → one fixed version: light `accent` #5B3AA0 with white, 8.2:1
+"never an icon without a word" → it always sits beside a word: the name under it on the Home Screen, the title in a notification
+```
+
+| File | Size | What's on it | Shows on |
+| ---- | ---- | ------------ | -------- |
+| Home Screen icon (iPhone) | 180 × 180 PNG, no transparency (iPhone fills it black) | the tile edge to edge, the mark at about 60% | iPhone Home Screen |
+| App icon (Android) | 192 and 512 PNG, maskable | the tile, the mark inside the middle 80% circle | Android Home Screen, the large icon in a notification |
+| Badge | 96 × 96 PNG, white on transparent | the mark alone | Android's status bar and the small icon in a notification; Android draws only its shape |
+
+One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. No new colour tokens: the tile is `accent` and the mark is `on-accent`, both light values.
+
+Directions for the pause B test, three marks drawn at 60px and 180px:
+
+| Mark | Why it might fit | What could sink it |
+| ---- | ---------------- | ------------------ |
+| A tick inside a speech bubble | The app's whole loop: Rose asks, Sam says OK | Could read as a chat app or a "verified" badge |
+| Two overlapping circles | Two people, one purchase | Close to a generic "teams" logo |
+| "S" in Atkinson Hyperlegible Next Bold | Ties the icon to the type that carries the system | A letter tile is the most common app icon there is |
+
+Rejected before testing: a shopping cart or bag, with or without a tick or heart. It is the first thing a one-line "family shopping app icon" prompt draws.
+
 ## Never
 
 - An icon without a word next to it.
@@ -144,6 +179,7 @@ Confirm or correct these with the brief.
 | Dark mode required, following the phone's setting                                   | Craft floor, and `/status` already does both                       |
 | Oldest phone: 320px wide, iOS 15.4 or Chrome 100                                    | A relative's phone may be a few years old; so hex, not `oklch()`  |
 | Icons from Lucide (`lucide-react`, a new dependency, added when a slice needs one)  | The repo has no icon set; craft bans emojis                        |
+| The name under the Home Screen icon is "Shop-together", as the page title is today. iPhone may cut a 13-letter name to "Shop-toget…"; unchecked until pause B on your iPhone | The brief left the name open; this is the name the app already uses |
 
 ## Glossary
 
@@ -152,3 +188,5 @@ Confirm or correct these with the brief.
 - **Tier 1** — the motion level: small reactions to a tap or focus, no choreography.
 - **`oklch()`** — a newer CSS colour format; phones older than iOS 15.4 can't read it.
 - **Lucide** — an open-source icon set with a React package.
+- **Maskable icon** — an Android app icon with its mark kept inside the middle 80%, so Android can crop the tile to a circle or a rounded square without cutting the mark.
+- **Badge** — the small one-colour icon Android shows in the status bar for a notification. Android uses only its shape, not its colours.
