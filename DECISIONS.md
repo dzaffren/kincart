@@ -178,3 +178,10 @@ Why: one shape says both halves of the product, the helper's OK and the shopping
 Rejected: the K of KinCart on two wheels (20 of 25), a kiss-lock coin purse (20 of 25, 2 of 5 at 16px), the i's dot in the K's arms (read as "K."), a C in the K's arms (too wide to sit near-square), a pull-along trolley (read as luggage), and the earlier Shop-together icon rounds (an ampersand with a tick leg, an armchair h, browline glasses and before).
 Source: docs/design/logo/brief.md
 Status: active
+
+## D26 · 2026-10-14 · The push e2e runs in Playwright's Firefox
+
+Why: headless Firefox with a persistent profile received a real push through Mozilla's push service in 337 ms (ping-helper O5). No headless Chromium build can subscribe.
+Rejected: Playwright's Chromium and Google Chrome (no push service in the headless shell, and subscribing hangs in full Chromium and Chrome; a normal Playwright context is incognito, where Chrome refuses push), faking the push with DevTools' `deliverPushMessage` (never proves our server sent anything).
+Source: docs/specs/ping-helper.md
+Status: active
