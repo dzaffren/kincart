@@ -1,6 +1,6 @@
 # Design system brief
 
-**Status:** Draft · 2026-10-13 · /design-system pause A
+**Status:** Approved · 2026-10-13 · /design-system pause A
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
