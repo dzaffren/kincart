@@ -1,5 +1,7 @@
 # Design brief — KinCart
 
+**Chosen:** A · Tick cart, 2026-10-14. Final files and usage in `kit/`.
+
 **Summary**: an older relative asks for something in plain words, and a family helper approves and pays from their own phone, so nobody hands over a password.
 **Audience**: older shoppers on their own phone, and the family member who helps. They meet the mark as a Home Screen icon, beside a notification, in a browser tab and at the top of each page.
 **Brand adjectives**: clear, steady, kind   **Avoid feeling**: flashy, cluttered, childish (from the design system brief)
