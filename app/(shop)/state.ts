@@ -15,7 +15,7 @@ export function roseState(vault: string | null, request: PurchaseRequest | null,
     case "paying":
       return { kind: "waiting", item: request.item, askedAt: request.askedAt };
     case "paid":
-      return params.askAgain ? pick : { kind: "paid", receipt: receiptOf(request) };
+      return params.askAgain || params.pickMissing ? pick : { kind: "paid", receipt: receiptOf(request) };
     case "declined":
       return { ...pick, outcome: { kind: "declined", item: request.item } };
     case "failed":

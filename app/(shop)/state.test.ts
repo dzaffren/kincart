@@ -41,6 +41,7 @@ it("shows Rose a waiting request, including while it's being paid", () => {
 it("shows Rose the receipt until Rose asks for something else", () => {
   expect(roseState(vault, request("paid"), {})).toEqual({ kind: "paid", receipt });
   expect(roseState(vault, request("paid"), { askAgain: true })).toEqual({ kind: "pick", error: false });
+  expect(roseState(vault, request("paid"), { pickMissing: true })).toEqual({ kind: "pick", error: true });
 });
 
 it("shows Rose the items under Sam's no or a failed payment", () => {
