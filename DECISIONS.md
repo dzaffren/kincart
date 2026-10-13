@@ -100,3 +100,10 @@ Why: the skeleton makes one call, POST /v1/oauth2/token.
 Rejected: @paypal/paypal-server-sdk now (no orders or vault in this slice).
 Source: docs/specs/skeleton.md
 Status: active
+
+## D15 · 2026-10-13 · Atkinson Hyperlegible Next on cool greys, one violet accent
+
+Why: the relative is older and the app shows names and amounts, so I, l and 1 must stay distinct; violet was picked from eight palettes at the direction test, and at hue 259° the OK button can't be mistaken for PayPal's blues (198–225°); every text pair reaches 7:1 in light and dark.
+Rejected: green (first draft, changed at the direction test; it also clashed with green "Paid"), deep blue #1F4BAA (hue 221°, next to PayPal navy at 219°), ultramarine on cool greys or warm paper, slate, plum, deep teal and ink (shown at the direction test, not picked), system font (I, l and 1 look alike in SF and Roboto), Inter (the default a generated UI reaches for).
+Source: docs/design/system-brief.md
+Status: active
