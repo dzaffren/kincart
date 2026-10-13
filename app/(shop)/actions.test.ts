@@ -2,8 +2,8 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
-import { ask, getLimit, getSearch, latest, saveSearch, saveVault } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, startLink, tryAgain } from "./actions";
+import { ask, getLimit, getSearch, latest, saveSearch, saveVault, subscriptionsFor } from "../../lib/shop/requests";
+import { answer, askSam, find, setLimit, startLink, subscribe, tryAgain } from "./actions";
 
 const [glasses] = ITEMS;
 const rose = "rose-link-4f9c2a7e";
@@ -22,11 +22,14 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit");
+  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
   await client.end();
   await saveVault("1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
   vi.stubEnv("SAM_LINK_TOKEN", sam);
+  vi.stubEnv("VAPID_PUBLIC_KEY", "vapid-test-public-key");
+  vi.stubEnv("VAPID_PRIVATE_KEY", "vapid-test-private-key");
+  vi.stubEnv("VAPID_SUBJECT", "https://kincart.vercel.app");
   vi.stubGlobal("fetch", vi.fn());
 });
 
@@ -140,4 +143,31 @@ it("saves Sam's limit in whole dollars from $5 to $500, and refuses anything els
     expect(await redirectOf(setLimit(sam, form({ limit })))).toBe(`/h/${sam}?limit=invalid`);
   }
   expect(await getLimit()).toBe(3000);
+});
+
+const keys = {
+  p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
+  auth: "tBHItJI5svbpez7KI4CCXg",
+};
+const samPhone = { endpoint: "https://fcm.googleapis.com/fcm/send/dX9k2Lq0wE4:APA91bH7", expirationTime: null, keys };
+const rosePhone = { endpoint: "https://web.push.apple.com/QGuQyavXutnMH8Ig", expirationTime: null, keys };
+
+it("saves the phone that turned notifications on, for Sam's link and for Rose's", async () => {
+  expect(await subscribe(sam, samPhone)).toBe(true);
+  expect(await subscribe(rose, rosePhone)).toBe(true);
+
+  expect(await subscriptionsFor("sam")).toEqual([{ endpoint: samPhone.endpoint, ...keys }]);
+  expect(await subscriptionsFor("rose")).toEqual([{ endpoint: rosePhone.endpoint, ...keys }]);
+});
+
+it("refuses a phone from a made-up link, one it can't trust, or any while notifications are off", async () => {
+  expect(await subscribe("not-a-real-link", samPhone)).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, endpoint: "http://fcm.googleapis.com/fcm/send/dX9k2Lq0wE4" })).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, endpoint: "https://attacker.example/collect" })).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, keys: { p256dh: "not base64url!", auth: keys.auth } })).toBe(false);
+
+  vi.stubEnv("VAPID_PRIVATE_KEY", "");
+  expect(await subscribe(sam, samPhone)).toBe(false);
+
+  expect(await subscriptionsFor("sam")).toEqual([]);
 });

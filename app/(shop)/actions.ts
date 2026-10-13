@@ -7,6 +7,7 @@ import { findItem } from "../../lib/shop/items";
 import { pay } from "../../lib/shop/pay";
 import { createSetupToken } from "../../lib/shop/paypal";
 import { whoIs } from "../../lib/shop/people";
+import { parseSubscription, pushOn } from "../../lib/shop/push";
 import {
   ask,
   claim,
@@ -16,6 +17,7 @@ import {
   getSearch,
   getVault,
   saveSearch,
+  saveSubscription,
   setLimit as saveLimit,
 } from "../../lib/shop/requests";
 
@@ -92,6 +94,14 @@ export async function setLimit(token: string, formData: FormData): Promise<void>
   if (!Number.isInteger(dollars) || dollars < 5 || dollars > 500) redirect(`/h/${token}?limit=invalid`);
   await saveLimit(dollars * 100);
   redirect(`/h/${token}?limit=saved`);
+}
+
+export async function subscribe(token: string, json: unknown): Promise<boolean> {
+  const person = whoIs(token);
+  const subscription = parseSubscription(json);
+  if (!person || !subscription || !pushOn()) return false;
+  await saveSubscription(person, subscription);
+  return true;
 }
 
 async function origin(): Promise<string> {

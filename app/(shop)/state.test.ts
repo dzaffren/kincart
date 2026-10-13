@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { ITEMS } from "../../lib/shop/items";
 import type { PurchaseRequest, RequestStatus, SavedSearch } from "../../lib/shop/requests";
-import { roseState, samState } from "./state";
+import { notifyState, roseState, samState, type NotifyEnv } from "./state";
 
 const [glasses, pills, batteries] = ITEMS;
 const askedAt = new Date("2026-10-20T10:15:00Z");
@@ -153,4 +153,40 @@ it("shows Sam where a found item comes from and why it fits", () => {
     busy: false,
     found,
   });
+});
+
+const android: NotifyEnv = {
+  hasServiceWorker: true,
+  hasPushManager: true,
+  isIPhone: false,
+  standalone: false,
+  permission: "default",
+  subscribed: false,
+};
+
+it("offers notifications on a phone that can take them, and says when they're on or blocked", () => {
+  expect(notifyState(android)).toEqual({ kind: "off" });
+  expect(notifyState({ ...android, permission: "granted", subscribed: true })).toEqual({ kind: "on" });
+  expect(notifyState({ ...android, permission: "denied" })).toEqual({ kind: "blocked" });
+});
+
+it("offers them again when the phone holds no subscription, even with permission still granted", () => {
+  expect(notifyState({ ...android, permission: "granted" })).toEqual({ kind: "off" });
+});
+
+it("sends an iPhone in Safari to the Home Screen first, and turns them on from there", () => {
+  const safari: NotifyEnv = { ...android, hasPushManager: false, isIPhone: true };
+  expect(notifyState(safari)).toEqual({ kind: "home screen first" });
+
+  const homeScreen: NotifyEnv = { ...safari, hasPushManager: true, standalone: true };
+  expect(notifyState(homeScreen)).toEqual({ kind: "off" });
+  expect(notifyState({ ...homeScreen, permission: "granted", subscribed: true })).toEqual({ kind: "on" });
+});
+
+it("says a browser without web push can't show them, including iOS 15 from the Home Screen", () => {
+  expect(notifyState({ ...android, isIPhone: true, standalone: true, hasPushManager: false })).toEqual({
+    kind: "not supported",
+  });
+  expect(notifyState({ ...android, hasServiceWorker: false, hasPushManager: false })).toEqual({ kind: "not supported" });
+  expect(notifyState({ ...android, hasPushManager: false })).toEqual({ kind: "not supported" });
 });
