@@ -77,6 +77,7 @@ Steps grow by about 1.25. The amount jumps to 40 so it is read first.
 | `target.min`                                    | 48px                         | Smallest thing you can tap                  |
 | `radius.control` / `radius.surface`             | 8px / 12px                   | Buttons and inputs / cards and the modal    |
 | `border.width`                                  | 1px                          | Every border                                |
+| `border.selected`                               | 2px                          | A picked option card and radio rings        |
 | `focus.ring`                                    | 3px solid `text`, 2px offset | Every focusable thing                       |
 
 ## Colour
@@ -113,6 +114,7 @@ A helper's No uses `muted` on `sunken` with plain words. It is not an error, so 
 | `motion.fast` | 120ms                       | Press: the button shrinks to 98%      |
 | `motion.base` | 180ms                       | A hover or selected tint fading in    |
 | `motion.slow` | 240ms                       | Banner, toast and modal enter or exit |
+| `motion.loading` | 900ms                    | One spinner turn; one skeleton pulse  |
 | `ease.out`    | `cubic-bezier(0.2, 0, 0, 1)` | Things arriving                      |
 | `ease.in`     | `cubic-bezier(0.4, 0, 1, 1)` | Things leaving                       |
 
