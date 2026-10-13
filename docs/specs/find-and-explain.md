@@ -160,7 +160,7 @@ Craft checks: a one-line "AI product picker" prompt gives star ratings, a sparkl
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
 | -- | ---- | ---- | --------- | ----- | ------ | ------ |
-| O1 | Which AI model, and what a demo's worth of calls costs (from shape O6) | question | shape | user | Open | — |
+| O1 | Which AI model, and what a demo's worth of calls costs (from shape O6) | question | shape | user | Resolved | Claude Haiku 5.5 (`claude-haiku-5-5`), in two fixed steps: read Rose's words into a search, then pick up to three and explain them. At $0.10 in and $0.50 out per million tokens, a search of about 5,500 tokens in and 550 out costs about $0.001, so 200 demo searches cost about $0.20 (estimate, before the spike). Rejected: Sonnet 5.5 (about $0.017 a search, slower) and Opus 5.5 (about $0.033, slowest), and letting the AI search a second time (no scenario needs it, and it adds 3 to 5 seconds). Agreed 2026-10-13 |
 | O2 | Whose listings and which currency. Channel3 search is US-first (from shape O7) | question | shape | user | Resolved | US listings in US dollars, matching approve-and-pay's US sandbox accounts and USD (approve-and-pay O4). Confirmed with pause 1 approval, 2026-10-13 |
 | O3 | Link tokens sit in the page address, so they appear in Vercel's request log on every refresh and in PayPal's return address when Rose links | flag | spec p1 | user | Accepted risk | Only the project owner can read Vercel's logs, PayPal doesn't publish return addresses, and the money is sandbox only. Change both tokens on Vercel after recording the demo video, since a video or screenshot showing the address bar would expose them. A cookie-based fix was drafted as approve-and-pay v2 and dropped as not worth the hours. Agreed 2026-10-13 |
 | O4 | Channel3's search returns real US listings with a name, price, photo, link and enough detail to explain them, within the 1,000 free searches a month | unproven | spec p1 | spec p3 | Open | — |
@@ -170,6 +170,8 @@ Craft checks: a one-line "AI product picker" prompt gives star ratings, a sparkl
 | O8 | Assuming 15 seconds is acceptable for results, with "Looking…" shown meanwhile | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O9 | The shape rules out spend limits. Is Sam's price limit one? | question | spec p1 | user | Resolved | No. It only caps what Rose is shown; Sam still approves every purchase, and nothing is ever approved automatically. Sam sets it on Sam's page, $50 by default. Agreed 2026-10-13 |
 | O10 | Rose may type a list, such as groceries, but a request is one item, one price and one charge | question | spec p2 | user | Resolved | One thing at a time: the AI spots a list and Rose sees "One thing at a time for now. What would you like first?". A `basket` slice (several items, one OK, one total) goes after slice 4, only if time is left. Agreed 2026-10-13 |
+| O11 | Reading Rose's words with Haiku, one Channel3 search, and Haiku picking and explaining finish within 15 seconds (O8) | unproven | spec p3 | poc | Open | — |
+| O12 | CI's e2e calls Channel3 and Claude for real, as it already does PayPal (D20) | question | spec p3 | user | Resolved | Real calls. Results change from run to run, so the e2e checks the shape: up to three options, each at or under the limit, each explained. A Channel3 or Claude outage turns CI red until it is rerun. Rejected: recorded replies behind a test-only switch. Agreed 2026-10-13 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
