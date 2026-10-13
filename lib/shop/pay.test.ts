@@ -62,7 +62,7 @@ it("charges Rose's saved PayPal and records the receipt", async () => {
   await saveVault("1j970427g9944212v");
   stubOrders(completed);
 
-  await pay(await claimedGlasses());
+  expect(await pay(await claimedGlasses())).toBe("paid");
 
   expect(await latest()).toMatchObject({ status: "paid", captureId: "7BM91101S1572292D" });
   expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^purchase id=\d+ item=glasses status=paid capture=7BM91101S1572292D$/));
@@ -73,11 +73,12 @@ it("leaves an unknown charge paying, then settles it with the same request id", 
   const fetch = stubOrders(() => new Response("", { status: 503 }), completed);
   const request = await claimedGlasses();
 
-  await pay(request);
+  expect(await pay(request)).toBe("unknown");
   expect((await latest())?.status).toBe("paying");
+  expect(await settleStuck()).toBeNull();
 
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${request.id}`);
-  await settleStuck();
+  expect(await settleStuck()).toMatchObject({ request: { id: request.id, item: glasses }, result: "paid" });
   expect((await latest())?.status).toBe("paid");
 
   const ids = (fetch.mock.calls as unknown as [string, RequestInit][])
@@ -108,7 +109,7 @@ it("sends a new request id when a fresh database reuses a request's number", asy
 it("fails the request when no PayPal is saved, without calling PayPal", async () => {
   const fetch = stubOrders();
 
-  await pay(await claimedGlasses());
+  expect(await pay(await claimedGlasses())).toBe("refused");
 
   expect(await latest()).toMatchObject({ status: "failed", failureReason: "not linked" });
   expect(fetch).not.toHaveBeenCalled();
