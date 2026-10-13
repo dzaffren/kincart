@@ -1,6 +1,6 @@
 # Approve and pay
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** skeleton; the design system (D15)
@@ -292,6 +292,7 @@ The PayPal secret and the vault ID never reach a phone. A phone only gets what i
 | `app/(shop)/ui.tsx`, `RoseView.tsx`, `SamView.tsx` | `Item` imported from `lib/shop/items.ts`; forms take the actions; times use `LocalTime`; "Ask for something else" becomes a link to `?ask=1` | 1 to 5 |
 | `app/(shop)/preview/approve-and-pay/page.tsx` | `notFound()` when `VERCEL_ENV` is `production` | agreed at pause 3 |
 | `e2e/approve-and-pay.spec.ts` | the e2e; see Test plan. It resets both tables with `pg` before each test, and seeds `paypal_vault` from `PAYPAL_E2E_VAULT_ID` | 1 to 5 |
+| `playwright.config.ts` | loads `.env.local` when present, as `vitest.config.mts` does, so the e2e can reach the database and read the link tokens. Missed by the plan; added at `/build` | e2e |
 | `.github/workflows/ci.yml` | `test` job env: `ROSE_LINK_TOKEN: ci-rose-link`, `SAM_LINK_TOKEN: ci-sam-link` (they guard only CI's throwaway database), and `PAYPAL_E2E_VAULT_ID` from secrets | e2e |
 | `.env.example`, `README.md` | the two link tokens and how to make them (`openssl rand -base64 32`); how to open each person's link; the US sandbox app and "Save payment methods" (learning) | setup |
 
@@ -360,7 +361,7 @@ Not added: the PayPal SDK (D17), a connection pool, a people table, webhooks, a 
 
 | Scenario | Test | Command |
 | -------- | ---- | ------- |
-| 1 Link PayPal | `lib/shop/paypal.test.ts`: setup and payment token calls, `fetch` stubbed. `app/(shop)/state.test.ts`: no vault gives "not linked"; `?cancelled=1` gives "cancelled". `e2e/approve-and-pay.spec.ts`: with no vault, Rose's page says "Link your PayPal to start"; `?cancelled=1` says "PayPal isn't linked yet". PayPal's own page is checked by hand once at `/build` (O6) | `pnpm test`, `pnpm test:e2e` |
+| 1 Link PayPal | `lib/shop/paypal.test.ts`: setup and payment token calls, `fetch` stubbed. `app/(shop)/state.test.ts`: no vault gives "not linked"; `?cancelled=1` gives "cancelled". `app/(shop)/r/[token]/linked/route.test.ts`: the return route saves the PayPal from the cookie, and says not linked when PayPal refuses or the cookie is gone. `e2e/approve-and-pay.spec.ts`: with no vault, Rose's page says "Link your PayPal to start"; `?cancelled=1` says "PayPal isn't linked yet". PayPal's own page is checked by hand once at `/build` (O6) | `pnpm test`, `pnpm test:e2e` |
 | 2 OK and paid | e2e (below), against real PayPal sandbox | `pnpm test:e2e` |
 | 3 Sam says no | e2e: Rose asks for AA batteries, Sam taps No, Rose sees "Sam said no to AA batteries, pack of 8" within 5 s, Sam sees "Nothing to approve", and the row has no order ID | `pnpm test:e2e` |
 | 4 Charge fails | e2e: seeds the vault with `e2e-not-a-real-token`; PayPal answers 403; both pages show the failure, and Rose sees the items again. `lib/shop/paypal.test.ts`: 4xx gives `refused`, 5xx and timeout give `unknown` | `pnpm test:e2e`, `pnpm test` |
