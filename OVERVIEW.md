@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Updated:** 2026-10-13 by /ship approve-and-pay
+**Status:** Active · **Updated:** 2026-10-13 by /ship approve-and-pay (shipped)
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -32,7 +32,7 @@ Used by older shoppers and the relative who helps them pay online.
 | Slice    | Status | What it does                                                                                                  | Page                   |
 | -------- | ------ | ------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | skeleton | Shipped | A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live. | docs/specs/skeleton.md |
-| approve-and-pay | Built | Rose links their sandbox PayPal once and picks one of three items. Sam taps OK or No on their own phone, and an OK charges Rose's saved PayPal and shows both of them a receipt. | docs/specs/approve-and-pay.md |
+| approve-and-pay | Shipped | Rose links their sandbox PayPal once and picks one of three items. Sam taps OK or No on their own phone, and an OK charges Rose's saved PayPal and shows both of them a receipt. | docs/specs/approve-and-pay.md |
 
 ## More
 
