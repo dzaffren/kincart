@@ -7,6 +7,17 @@
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
 
+## Install and run
+
+| Task    | Command         |
+| ------- | --------------- |
+| install | `pnpm install`  |
+| migrate | `pnpm db:up`    |
+| run     | `pnpm dev`      |
+| test    | `pnpm test`     |
+| e2e     | `pnpm test:e2e` |
+| lint    | `pnpm lint`     |
+
 ## Features
 
 Nothing shipped yet
