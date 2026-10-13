@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Tag: a price tag that says OK</title>
+  <defs>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+      <rect width="256" height="256" fill="#fff"/>
+      <circle cx="128" cy="62" r="15" fill="#000"/>
+      <path d="M92 158 L118 184 L166 130" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g id="symbol" mask="url(#cut)">
+    <path d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z" fill="#111" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+</svg>

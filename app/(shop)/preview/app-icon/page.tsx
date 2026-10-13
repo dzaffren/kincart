@@ -5,44 +5,68 @@ import "./icon.css";
 
 type Mark = { name: string; note: string; draw: (id: string) => ReactNode };
 
+// Each mark is drawn on a 256 canvas; fit scales and centres it to about 62% of the tile.
 const marks: Mark[] = [
   {
-    name: "Tick in a speech bubble",
-    note: "Rose asks, Sam says OK.",
+    name: "A · Reply",
+    note: "The ask comes back with an OK. Clearest at 16px; also the closest to a stock chat icon.",
     draw: (id) => (
       <>
-        <mask id={id}>
-          <rect width="100" height="100" fill="white" />
-          <path className="icon-cut" d="M38 45 L46 53 L62 37" />
+        <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+          <rect width="256" height="256" fill="white" />
+          <path className="icon-cut" strokeWidth="28" d="M86 124 L114 152 L172 94" />
         </mask>
+        <g transform={fit(0.78, 130, 126)}>
+          <path
+            className="icon-mark"
+            mask={`url(#${id})`}
+            d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"
+          />
+        </g>
+      </>
+    ),
+  },
+  {
+    name: "B · Halves",
+    note: "An S of two halves, one for each of you, that meet in the middle. The most ownable; the least literal.",
+    draw: () => (
+      <g transform={fit(0.84, 128, 128)}>
         <path
           className="icon-mark"
-          mask={`url(#${id})`}
-          d="M34 24 H66 A12 12 0 0 1 78 36 V54 A12 12 0 0 1 66 66 H46 L30 78 L34 66 A12 12 0 0 1 22 54 V36 A12 12 0 0 1 34 24 Z"
+          d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"
         />
-      </>
+        <path
+          className="icon-mark"
+          d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"
+        />
+      </g>
     ),
   },
   {
-    name: "Two overlapping circles",
-    note: "Two people, one purchase.",
-    draw: () => (
+    name: "C · Tag",
+    note: "A price tag that says OK. Reads as shopping at once; close to a stock \"verified price\" icon.",
+    draw: (id) => (
       <>
-        <circle className="icon-ring" cx="39" cy="50" r="17" />
-        <circle className="icon-ring" cx="61" cy="50" r="17" />
+        <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+          <rect width="256" height="256" fill="white" />
+          <circle cx="128" cy="62" r="15" fill="black" />
+          <path className="icon-cut" strokeWidth="28" d="M92 158 L118 184 L166 130" />
+        </mask>
+        <g transform={fit(0.75, 128, 128)}>
+          <path
+            className="icon-solid"
+            mask={`url(#${id})`}
+            d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z"
+          />
+        </g>
       </>
-    ),
-  },
-  {
-    name: "S in Atkinson Hyperlegible Next Bold",
-    note: "The system's type, as a letter tile.",
-    draw: () => (
-      <text className="icon-mark icon-letter" x="50" y="50" textAnchor="middle" dominantBaseline="central">
-        S
-      </text>
     ),
   },
 ];
+
+function fit(scale: number, cx: number, cy: number): string {
+  return `translate(${128 - scale * cx} ${128 - scale * cy}) scale(${scale})`;
+}
 
 export default function AppIconPreview() {
   if (process.env.VERCEL_ENV === "production") notFound();
@@ -50,7 +74,7 @@ export default function AppIconPreview() {
   return (
     <main className="preview">
       <header className="preview-header">
-        <h1>App icon: three marks</h1>
+        <h1>App icon: three concepts</h1>
         <p>
           Each mark at 192px, on a Home Screen at 64px on two wallpapers, cropped to Android&apos;s smallest circle, and
           as the 24px badge beside a notification. Corners are rounded the way iPhone rounds them. The tile and the mark
@@ -94,8 +118,8 @@ export default function AppIconPreview() {
 
 function Icon({ className, draw, id }: { className: string; draw: Mark["draw"]; id: string }) {
   return (
-    <svg className={`icon ${className}`} viewBox="0 0 100 100" aria-hidden="true">
-      <rect className="icon-tile" width="100" height="100" />
+    <svg className={`icon ${className}`} viewBox="0 0 256 256" aria-hidden="true">
+      <rect className="icon-tile" width="256" height="256" />
       {draw(id)}
     </svg>
   );

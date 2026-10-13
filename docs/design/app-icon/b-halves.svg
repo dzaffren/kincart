@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Halves: an S of two halves that meet</title>
+  <g id="symbol" fill="#111">
+    <path d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"/>
+    <path d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"/>
+  </g>
+</svg>

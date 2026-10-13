@@ -149,13 +149,15 @@ Home Screens and notification shades ignore the page's dark mode
 
 One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. Two new colour tokens, `icon-tile` (#5B3AA0) and `icon-mark` (#FFFFFF): the light `accent` and `on-accent` pair, held fixed because the icon never follows dark mode.
 
-Directions for the pause B test, three marks drawn at 60px and 180px:
+Concepts for the pause B test, made with the logo-design skill's process (research, a word map, black first, tested at 64, 32 and 16px). Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
 
-| Mark | Why it might fit | What could sink it |
-| ---- | ---------------- | ------------------ |
-| A tick inside a speech bubble | The app's whole loop: Rose asks, Sam says OK | Could read as a chat app or a "verified" badge |
-| Two overlapping circles | Two people, one purchase | Close to a generic "teams" logo |
-| "S" in Atkinson Hyperlegible Next Bold | Ties the icon to the type that carries the system | A letter tile is the most common app icon there is |
+| Concept | The idea in one line | What could sink it |
+| ------- | -------------------- | ------------------ |
+| A · Reply | A speech bubble with the tick cut out: the ask comes back with an OK | The closest to a stock chat or "approved" icon |
+| B · Halves | An S of two separate halves, one for each person, that meet in the middle | Less literal: it says "Shop-together", not "approve" |
+| C · Tag | A price tag with the tick cut out: shopping, approved | Close to a stock "verified price" icon |
+
+An earlier round (a tick in a bubble, two overlapping circles, a plain "S") was replaced. Two overlapping circles is Mastercard's mark, and a plain S is a stock letter tile. "Two people make a tick" was tried and dropped: at 64px it read as a tick with two dots.
 
 Rejected before testing: a shopping cart or bag, with or without a tick or heart. It is the first thing a one-line "family shopping app icon" prompt draws.
 

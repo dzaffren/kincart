@@ -84,34 +84,29 @@
   fill: var(--color-icon-mark);
 }
 
-.icon-ring {
-  fill: none;
+.icon-solid {
+  fill: var(--color-icon-mark);
   stroke: var(--color-icon-mark);
-  stroke-width: 8;
+  stroke-width: 12;
+  stroke-linejoin: round;
 }
 
 .icon-cut {
   fill: none;
   stroke: black;
-  stroke-width: 8;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.icon-letter {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 68px;
 }
 
 .icon-badge .icon-tile {
   display: none;
 }
 
-.icon-badge .icon-mark {
+.icon-badge .icon-mark,
+.icon-badge .icon-solid {
   fill: currentColor;
 }
 
-.icon-badge .icon-ring {
+.icon-badge .icon-solid {
   stroke: currentColor;
 }
