@@ -1,0 +1,252 @@
+/* The design system's fonts.css loads from Google; here next/font serves the same family from our own domain. */
+:root {
+  color-scheme: light dark;
+  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--type-body);
+}
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-text);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
+
+.screen {
+  box-sizing: border-box;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--page-inline) var(--space-12);
+  display: grid;
+  gap: var(--space-6);
+}
+
+.screen h1 {
+  font: var(--type-heading);
+  margin: 0;
+}
+
+.screen p {
+  margin: 0;
+}
+
+.heading {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.lead {
+  color: var(--color-muted);
+}
+
+.small {
+  font: var(--type-small);
+  color: var(--color-muted);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.notice {
+  padding: var(--space-4);
+  border-radius: var(--radius-surface);
+  animation: enter var(--motion-slow) var(--ease-out);
+}
+
+.notice[data-tone="wait"] {
+  background: var(--color-wait-soft);
+  color: var(--color-wait);
+}
+
+.notice[data-tone="danger"] {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.notice[data-tone="neutral"] {
+  background: var(--color-sunken);
+  color: var(--color-muted);
+}
+
+.summary {
+  padding: var(--space-4);
+  background: var(--color-sunken);
+  border-radius: var(--radius-surface);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.summary-title {
+  font: var(--type-title);
+}
+
+.amount {
+  font: var(--type-amount);
+  font-variant-numeric: tabular-nums;
+}
+
+.receipt {
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-success-soft);
+  border-radius: var(--radius-surface);
+  display: grid;
+  gap: var(--space-1);
+  animation: enter var(--motion-slow) var(--ease-out);
+}
+
+.receipt-status {
+  font: var(--type-title);
+  color: var(--color-success);
+}
+
+.receipt-detail {
+  font: var(--type-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.options {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.option {
+  display: block;
+  position: relative;
+  cursor: pointer;
+}
+
+.option-input {
+  position: absolute;
+  opacity: 0;
+}
+
+.option-body {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-control);
+  border-radius: var(--radius-surface);
+}
+
+.option-input:checked + .option-body {
+  /* the 2px selected edge eats 1px of padding, so nothing moves */
+  padding: calc(var(--space-3) - var(--border-selected) + var(--border-width))
+    calc(var(--space-4) - var(--border-selected) + var(--border-width));
+  border: var(--border-selected) solid var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.option-input:focus-visible + .option-body {
+  outline: var(--focus-ring-width) solid var(--color-text);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.option-ring {
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: var(--border-selected) solid var(--color-control);
+  border-radius: 50%;
+}
+
+.option-input:checked + .option-body .option-ring {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 var(--space-1) var(--color-accent-soft);
+}
+
+.option-price {
+  font: var(--type-button);
+  font-variant-numeric: tabular-nums;
+}
+
+.field-error {
+  color: var(--color-danger);
+}
+
+.button {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-6);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-control);
+  font: var(--type-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button[aria-disabled="true"] {
+  cursor: default;
+  transform: none;
+}
+
+.button-primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.button-primary:active {
+  background: var(--color-accent-press);
+}
+
+.button-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-control);
+}
+
+.spinner {
+  box-sizing: border-box;
+  width: 1em;
+  height: 1em;
+  border: var(--border-selected) solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin var(--motion-loading) linear infinite;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

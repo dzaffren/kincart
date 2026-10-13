@@ -1,4 +1,7 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
+
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 export default defineConfig({
   testDir: "e2e",

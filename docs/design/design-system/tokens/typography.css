@@ -1,0 +1,9 @@
+:root {
+  --type-amount: 700 40px/44px var(--font-sans);
+  --type-heading: 700 28px/34px var(--font-sans);
+  --type-title: 600 22px/28px var(--font-sans);
+  --type-body: 400 18px/28px var(--font-sans);
+  --type-button: 600 18px/28px var(--font-sans);
+  --type-small: 400 16px/24px var(--font-sans);
+  --type-code: 400 16px/24px var(--font-mono);
+}

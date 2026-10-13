@@ -1,0 +1,25 @@
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --page-inline: 24px;
+  --page-max: 480px;
+  --control-height: 56px;
+  --target-min: 48px;
+
+  --radius-control: 8px;
+  --radius-surface: 12px;
+  --border-width: 1px;
+  --border-selected: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.16);
+  --scrim: rgb(0 0 0 / 0.4);
+}

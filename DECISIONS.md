@@ -99,4 +99,47 @@ Status: active
 Why: the skeleton makes one call, POST /v1/oauth2/token.
 Rejected: @paypal/paypal-server-sdk now (no orders or vault in this slice).
 Source: docs/specs/skeleton.md
+Status: superseded by D17
+
+## D15 · 2026-10-13 · Atkinson Hyperlegible Next on cool greys, one violet accent
+
+Why: the relative is older and the app shows names and amounts, so I, l and 1 must stay distinct; violet was picked from eight palettes at the direction test, and at hue 259° the OK button can't be mistaken for PayPal's blues (198–225°); every text pair reaches 7:1 in light and dark.
+Rejected: green (first draft, changed at the direction test; it also clashed with green "Paid"), deep blue #1F4BAA (hue 221°, next to PayPal navy at 219°), ultramarine on cool greys or warm paper, slate, plum, deep teal and ink (shown at the direction test, not picked), system font (I, l and 1 look alike in SF and Roboto), Inter (the default a generated UI reaches for).
+Source: docs/design/system-brief.md
+Status: active
+
+## D16 · 2026-10-13 · Save Rose's PayPal in PayPal's vault (v3)
+
+Why: the spike saved a personal sandbox account once and charged it $18.99 later with no buyer present (capture 7BM91101S1572292D); a repeat with the same PayPal-Request-Id returned the same capture.
+Rejected: Billing Agreements v1 (also worked in the spike, but PayPal lists it as deprecated), Sam paying from their own PayPal (the O2 fallback; the money would come from Sam, not Rose).
+Source: docs/specs/approve-and-pay.md
+Status: active
+
+## D17 · 2026-10-13 · PayPal calls use plain fetch, not the server SDK
+
+Why: approve-and-pay makes four REST calls (token, setup token, payment token, order), each proven with curl in the vault spike; the /status token check already uses fetch the same way.
+Rejected: @paypal/paypal-server-sdk (a dependency for four calls, and its vault support is unchecked).
+Supersedes: D14
+Source: docs/specs/approve-and-pay.md
+Status: active
+
+## D18 · 2026-10-13 · One secret link each for Rose and Sam, no sign-in
+
+Why: two fixed demo people moving sandbox money only; a link opens on a phone with no account to make (O3).
+Rejected: a link plus a 4-digit PIN (one more step on Sam's screen and in the video), real sign-in (the most hours, and judges would need accounts).
+Source: docs/specs/approve-and-pay.md
+Status: active
+
+## D19 · 2026-10-13 · Pages re-render every 3 s while on screen
+
+Why: a request or an answer must show on the other phone within 5 s without a reload (scenarios 2 to 4); router.refresh() re-renders from Neon with no new dependency.
+Rejected: reload by hand (a pull-to-refresh at every step of the video), server-sent events (a Vercel function held open for every open page).
+Source: docs/specs/approve-and-pay.md
+Status: active
+
+## D20 · 2026-10-13 · The e2e starts from an already-saved PayPal
+
+Why: PayPal's approval page may stop a robot and would need the sandbox account's password in GitHub; a saved vault ID in a GitHub secret still lets the e2e make a real sandbox charge end to end.
+Rejected: driving PayPal's login page in CI (robot checks, and a password in GitHub secrets).
+Source: docs/specs/approve-and-pay.md
 Status: active

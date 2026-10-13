@@ -38,3 +38,10 @@ next-env.d.ts
 
 # zuko visual pages
 docs/specs/.pages/
+
+# design-sync
+ds-bundle/
+.ds-sync/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

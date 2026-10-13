@@ -1,0 +1,29 @@
+@import "./tokens/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/motion.css";
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--type-body);
+}
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-text);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
