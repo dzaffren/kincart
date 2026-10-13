@@ -1,6 +1,6 @@
 # Ping helper
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** approve-and-pay, find-and-explain
@@ -262,10 +262,10 @@ The push services only ever see ciphertext. Our server stores each phone's endpo
 | ---- | ------------ | --- |
 | `db/migrations/0004_push_subscriptions.up.sql`, `.down.sql` | New table, below. Down drops it | 1, 5 |
 | `scripts/migrate.test.ts:28` | The up, down, up test also checks `push_subscriptions` | reverse path |
-| `lib/shop/requests.ts:69` | `ask()` returns `true` when it inserted a row (`RETURNING id`), `false` when the one-open index dropped it. New: `saveSubscription(person, sub)` upserts on `endpoint`; `subscriptionsFor(person)`; `forgetSubscription(endpoint)`. All through the existing `query()` | 3, 4, 5 |
+| `lib/shop/requests.ts:69` | `ask()` returns `true` when it inserted a row (`RETURNING id`), `false` when the one-open index dropped it. `decline()` returns the declined request instead of `true`, so Rose's ping can name the item (O12). New: `saveSubscription(person, sub)` upserts on `endpoint`; `subscriptionsFor(person)`; `forgetSubscription(endpoint)`. All through the existing `query()` | 3, 4, 5 |
 | `lib/shop/push.ts` (new) | `pushOn()`: all three VAPID variables set. `publicKey()`. `parseSubscription(json)`: `https` only, host must end in `googleapis.com`, `push.services.mozilla.com`, `push.apple.com` or `notify.windows.com`, and `p256dh`/`auth` must be base64url. `notify(person, {title, body})`: returns at once if `!pushOn()`; sends to every saved phone in parallel with `web-push` (TTL 3600 s, urgency high, 5 s timeout); deletes rows that answer 404 or 410; never throws; logs `push to=sam phones=1 sent=1 gone=0 failed=0` | 3, 4, 5 |
 | `lib/shop/pay.ts:4`, `:17` | `pay()` returns its result, `paid`, `refused` or `unknown`, instead of nothing. `settleStuck()` returns `{ request, result }` when it settled one | 4 |
-| `app/(shop)/pings.ts` (new) | Pure `ping(kind, item)` → `{ to, title, body }` for `asked`, `paid`, `declined` and `failed`, using `RELATIVE`, `HELPER` and `money()` from `ui.tsx`. The words are the notification table in Interface | 3, 4 |
+| `app/(shop)/pings.ts` (new) | Pure `ping(kind, item)` → `{ to, title, body }` for `asked`, `paid`, `declined` and `failed`, using `RELATIVE`, `HELPER` and `money()` from `ui.tsx`. The words are the notification table in Interface. Also `sendPing(kind, item)`, the one `after(() => notify(…))`, and `sendPayment(result, item)`, shared by `answer` and both pages (O12) | 3, 4 |
 | `app/(shop)/actions.ts:59` | `askSam`: when `ask()` returns `true`, `after(() => notify("sam", ping("asked", item)))` | 3 |
 | `app/(shop)/actions.ts:77` | `answer`: after a decline, `ping("declined")` to Rose; after `pay()`, `ping("paid")` or `ping("failed")`, and nothing on `unknown` | 4 |
 | `app/(shop)/actions.ts` | New `subscribe(token, json)`: `whoIs(token)` picks the person, `parseSubscription` checks the JSON, `saveSubscription` stores it; returns `true` or `false`, no redirect | 1, 5 |
@@ -275,11 +275,11 @@ The push services only ever see ciphertext. Our server stores each phone's endpo
 | `public/sw.js` (new) | `push`: `showNotification(title, { body, icon: "/icon-192.png", badge: "/badge-96.png" })`. `notificationclick`: focus an open window at `registration.scope`, else `clients.openWindow(registration.scope)`. No fetch handler, so nothing is cached | 3, 4 |
 | `app/(shop)/manifest/[token]/route.ts` (new) | `GET /manifest/<token>`: 404 unless `whoIs(token)`; else `name` and `short_name` "KinCart", `start_url` and `scope` the person's link, `display: standalone`, icons `icon-192`, `icon-512`, `maskable-512` | 2 |
 | `app/(shop)/r/[token]/page.tsx:22`, `h/[token]/page.tsx:19` | `generateMetadata`: `manifest: /manifest/<token>`, `appleWebApp: { capable: true, title: "KinCart" }`. Pass `notify={<NotifyControl … />}` when `pushOn()`. When `settleStuck()` settles a payment, `after()` pings Rose | 1, 2, 4 |
-| `app/favicon.ico`, `app/apple-icon.png`, `public/icon-192.png`, `icon-512.png`, `maskable-512.png`, `badge-96.png` | Copied from `docs/design/logo/kit/web/`. Next's file conventions add the favicon and apple-touch-icon links to every page | 2, 3 |
+| `app/favicon.ico`, `app/apple-icon.png`, `app/icon.svg` (O12), `public/icon-192.png`, `icon-512.png`, `maskable-512.png`, `badge-96.png` | Copied from `docs/design/logo/kit/web/`. Next's file conventions add the favicon and apple-touch-icon links to every page | 2, 3 |
 | `package.json`, `pnpm-lock.yaml` | Add `web-push` (D27) | 3, 4 |
 | `.env.example:21` | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, made with `pnpm exec web-push generate-vapid-keys`. With any unset, the Notifications section is hidden | rollout |
 | `e2e/db.ts:15` | `reset()` also clears `push_subscriptions` | e2e |
-| `e2e/ping-helper.spec.ts` (new) | The one e2e below, in a persistent Firefox profile (D26) | 1, 3, 4 |
+| `e2e/ping-helper.spec.ts` (new) | The one e2e below, in a persistent Firefox profile (D26) with `dom.push.serverURL` and `dom.push.connection.enabled` set (O11) | 1, 3, 4 |
 | `.github/workflows/ci.yml:45` | Install `chromium firefox`; pass the three VAPID secrets | e2e |
 | `README.md` | Setup: the VAPID keys and the iPhone Home Screen step. One line: in PayPal itself these would be PayPal app notifications (Scope, Out) | Scope |
 
@@ -394,6 +394,8 @@ Recorded as D27, D28, D29, D30.
 | O8 | The design system has no app icon. The iPhone Home Screen and the notifications need one; without it iPhone uses a screenshot of the page | flag | spec p2 | /design-system | Resolved | The KinCart logo kit, `docs/design/logo/kit/`: a tick on two wheels, white on the violet tile, with every Home Screen, notification and badge size. Wired in at this slice's build. 2026-10-14 |
 | O9 | CI's e2e sends a real push through Mozilla's push service; an outage turns CI red until rerun | flag | spec p3 | user | Accepted risk | Same trade as D24's real Channel3 and Claude calls; it proves the real send on every push (D30). Agreed 2026-10-14 |
 | O10 | Encrypt and sign pushes with the `web-push` package, or by hand with `node:crypto` | question | spec p3 | user | Resolved | `web-push`: one dependency against about 100 lines of crypto that only a real push proves (D27). Agreed 2026-10-14 |
+| O11 | O5's answer named only `dom.push.serverURL`. Playwright's Firefox (build 1555) also sets `dom.push.connection.enabled` to false, and with it off `pushManager.subscribe` fails with "Error retrieving push subscription" even in a persistent profile | flag | build | build | Resolved | The e2e sets both prefs; the push then arrives through Mozilla in under 10 s. 2026-10-14 |
+| O12 | The Changes table missed three things the build needed: `decline()` returning the declined request (Rose's "Sam said no" ping names the item), one shared place for `after(() => notify(…))` used by `answer` and both pages' stuck-payment check, and `app/icon.svg` for the browser tab the Interface lists | flag | build | build | Resolved | `decline()` returns the request like `claim()`; `pings.ts` holds `sendPing` and `sendPayment` next to `ping()`; `app/icon.svg` is the kit's `favicon.svg`. Changes table updated. 2026-10-14 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
