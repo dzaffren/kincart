@@ -2,8 +2,8 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
-import { pay } from "./pay";
-import { ask, claim, latest, saveVault, stuck } from "./requests";
+import { pay, settleStuck } from "./pay";
+import { ask, claim, latest, saveVault } from "./requests";
 
 const glasses = ITEMS[0];
 
@@ -77,7 +77,7 @@ it("leaves an unknown charge paying, then settles it with the same request id", 
   expect((await latest())?.status).toBe("paying");
 
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${request.id}`);
-  await pay((await stuck())!);
+  await settleStuck();
   expect((await latest())?.status).toBe("paid");
 
   const ids = (fetch.mock.calls as unknown as [string, RequestInit][])

@@ -1,5 +1,5 @@
 import { charge } from "./paypal";
-import { getVault, record, type PurchaseRequest } from "./requests";
+import { getVault, record, stuck, type PurchaseRequest } from "./requests";
 
 export async function pay(request: PurchaseRequest): Promise<void> {
   const vaultId = await getVault();
@@ -12,4 +12,9 @@ export async function pay(request: PurchaseRequest): Promise<void> {
   else console.log(`${line} status=${result.state === "refused" ? "failed" : "unknown"} reason=${result.reason}`);
 
   if (result.state !== "unknown") await record(request.id, result);
+}
+
+export async function settleStuck(): Promise<void> {
+  const request = await stuck();
+  if (request) await pay(request);
 }
