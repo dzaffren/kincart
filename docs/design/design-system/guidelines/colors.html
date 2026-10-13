@@ -1,0 +1,54 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colours</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  main { max-width: var(--page-max); padding: var(--space-8) var(--page-inline); }
+  h1 { font: var(--type-heading); margin: 0 0 var(--space-2); }
+  h2 { font: var(--type-title); margin: var(--space-8) 0 var(--space-3); }
+  p { margin: 0; color: var(--color-muted); }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  li { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-3); align-items: center; }
+  .swatch { width: 40px; height: 40px; box-sizing: border-box; border-radius: var(--radius-control); border: var(--border-width) solid var(--color-control); }
+  .name { display: block; font: var(--type-button); }
+  .meta { display: block; font: var(--type-small); color: var(--color-muted); }
+</style>
+</head>
+<body>
+<main>
+<h1>Colours</h1>
+<p>One violet accent for the next step. Green only for “Paid”. Every text pair is 7:1 or better and every control edge 3:1, in light and dark. The page follows the phone’s setting.</p>
+
+<h2>Surfaces and text</h2>
+<ul>
+<li><span class="swatch" style="background: var(--color-bg)"></span><span><span class="name">bg</span><span class="meta">#F7F8FA / #0F1217 · Page</span></span></li>
+<li><span class="swatch" style="background: var(--color-surface)"></span><span><span class="name">surface</span><span class="meta">#FFFFFF / #181C23 · Cards, inputs</span></span></li>
+<li><span class="swatch" style="background: var(--color-sunken)"></span><span><span class="name">sunken</span><span class="meta">#EEF1F5 / #0A0C10 · Behind the amount; a helper’s “no”</span></span></li>
+<li><span class="swatch" style="background: var(--color-text)"></span><span><span class="name">text</span><span class="meta">#14181F / #EEF1F6 · 15.1+ / 12.2+</span></span></li>
+<li><span class="swatch" style="background: var(--color-muted)"></span><span><span class="name">muted</span><span class="meta">#464D59 / #B7BECA · 7.5+ / 9.1+</span></span></li>
+<li><span class="swatch" style="background: var(--color-line)"></span><span><span class="name">line</span><span class="meta">#DDE2E9 / #2C323C · Dividers, edges you can’t tap</span></span></li>
+<li><span class="swatch" style="background: var(--color-control)"></span><span><span class="name">control</span><span class="meta">#7A8291 / #747C8A · Edges of inputs and tappable cards, 3.6+ / 4.0+</span></span></li>
+</ul>
+
+<h2>Accent</h2>
+<ul>
+<li><span class="swatch" style="background: var(--color-accent)"></span><span><span class="name">accent</span><span class="meta">#5B3AA0 / #C3B2F0 · Primary button: the next step</span></span></li>
+<li><span class="swatch" style="background: var(--color-accent-press)"></span><span><span class="name">accent-press</span><span class="meta">#4A2E85 / #D3C6F4 · Button pressed</span></span></li>
+<li><span class="swatch" style="background: var(--color-on-accent)"></span><span><span class="name">on-accent</span><span class="meta">#FFFFFF / #1E1240 · Text on the accent, 8.2 / 9.0</span></span></li>
+<li><span class="swatch" style="background: var(--color-accent-soft)"></span><span><span class="name">accent-soft</span><span class="meta">#F0ECFA / #221A3A · The option you picked</span></span></li>
+<li><span class="swatch" style="background: var(--color-accent-text)"></span><span><span class="name">accent-text</span><span class="meta">#4F3290 / #CFC1F4 · Text on accent-soft, quiet buttons</span></span></li>
+</ul>
+
+<h2>Status</h2>
+<ul>
+<li><span class="swatch" style="background: var(--color-success)"></span><span><span class="name">success / success-soft</span><span class="meta">#145A3A on #E4F0E8 / #86D6AC on #1B3127 · Approved, paid</span></span></li>
+<li><span class="swatch" style="background: var(--color-wait)"></span><span><span class="name">wait / wait-soft</span><span class="meta">#6A4008 on #FBF0DA / #F2C27A on #33270F · Waiting for the helper</span></span></li>
+<li><span class="swatch" style="background: var(--color-danger)"></span><span><span class="name">danger / danger-soft</span><span class="meta">#8E241B on #FBE9E6 / #FF9C90 on #3A1D1A · Real failures only</span></span></li>
+</ul>
+</main>
+</body>
+</html>

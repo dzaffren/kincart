@@ -1,0 +1,46 @@
+<!-- @dsCard group="Spacing" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space and size</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  main { max-width: var(--page-max); padding: var(--space-8) var(--page-inline); }
+  h1 { font: var(--type-heading); margin: 0 0 var(--space-2); }
+  h2 { font: var(--type-title); margin: var(--space-8) 0 var(--space-3); }
+  p { margin: 0; color: var(--color-muted); }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+  li { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-3); align-items: center; font: var(--type-small); }
+  .bar { height: 16px; border-radius: 2px; background: var(--color-accent); }
+  .box { box-sizing: border-box; border: var(--border-width) solid var(--color-control); background: var(--color-surface); }
+</style>
+</head>
+<body>
+<main>
+<h1>Space and size</h1>
+<p>A 4px scale. Related things sit close; unrelated things sit visibly apart. Screens have 24px side padding.</p>
+
+<h2>Scale</h2>
+<ul>
+<li><span>space.1 · 4</span><span class="bar" style="width: var(--space-1)"></span></li>
+<li><span>space.2 · 8</span><span class="bar" style="width: var(--space-2)"></span></li>
+<li><span>space.3 · 12</span><span class="bar" style="width: var(--space-3)"></span></li>
+<li><span>space.4 · 16</span><span class="bar" style="width: var(--space-4)"></span></li>
+<li><span>space.6 · 24</span><span class="bar" style="width: var(--space-6)"></span></li>
+<li><span>space.8 · 32</span><span class="bar" style="width: var(--space-8)"></span></li>
+<li><span>space.12 · 48</span><span class="bar" style="width: var(--space-12)"></span></li>
+<li><span>space.16 · 64</span><span class="bar" style="width: var(--space-16)"></span></li>
+</ul>
+
+<h2>Sizes and corners</h2>
+<ul>
+<li><span>control.height · 56</span><span class="box" style="height: var(--control-height); border-radius: var(--radius-control)"></span></li>
+<li><span>target.min · 48</span><span class="box" style="width: var(--target-min); height: var(--target-min); border-radius: var(--radius-control)"></span></li>
+<li><span>radius.surface · 12</span><span class="box" style="height: 64px; border-radius: var(--radius-surface)"></span></li>
+<li><span>border.selected · 2</span><span class="box" style="height: 56px; border-radius: var(--radius-surface); border: var(--border-selected) solid var(--color-accent); background: var(--color-accent-soft)"></span></li>
+</ul>
+</main>
+</body>
+</html>

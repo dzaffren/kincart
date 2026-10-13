@@ -1,0 +1,40 @@
+<!-- @dsCard group="Motion" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  main { max-width: var(--page-max); padding: var(--space-8) var(--page-inline); }
+  h1 { font: var(--type-heading); margin: 0 0 var(--space-2); }
+  p { margin: 0 0 var(--space-6); color: var(--color-muted); }
+  dl { margin: 0 0 var(--space-8); display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-4); font: var(--type-small); }
+  dt { font-weight: 600; }
+  dd { margin: 0; color: var(--color-muted); }
+  button {
+    width: 100%; height: var(--control-height); padding: 0 var(--space-6);
+    border: var(--border-width) solid var(--color-accent); border-radius: var(--radius-control);
+    background: var(--color-accent); color: var(--color-on-accent); font: var(--type-button); cursor: pointer;
+    transition: transform var(--motion-fast) var(--ease-out);
+  }
+  button:active { transform: scale(0.98); background: var(--color-accent-press); border-color: var(--color-accent-press); }
+</style>
+</head>
+<body>
+<main>
+<h1>Motion</h1>
+<p>Tier 1: small reactions to a tap or focus. Only transform and opacity move. Colour changes and focus rings are instant. Under reduced motion nothing moves, and the state still changes by colour and words.</p>
+<dl>
+<dt>motion.fast · 120ms</dt><dd>Press: the button shrinks to 98%</dd>
+<dt>motion.base · 180ms</dt><dd>A hover or selected tint fading in</dd>
+<dt>motion.slow · 240ms</dt><dd>Banner, toast and modal enter or exit</dd>
+<dt>motion.loading · 900ms</dt><dd>One spinner turn; one skeleton pulse</dd>
+<dt>ease.out</dt><dd>cubic-bezier(0.2, 0, 0, 1), things arriving</dd>
+<dt>ease.in</dt><dd>cubic-bezier(0.4, 0, 1, 1), things leaving</dd>
+</dl>
+<button type="button">Press and hold me</button>
+</main>
+</body>
+</html>
