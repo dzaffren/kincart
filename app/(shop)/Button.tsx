@@ -13,13 +13,13 @@ export function Button({ kind = "primary", busy, busyLabel, name, value, childre
   const { pending, data } = useFormStatus();
   const pressed = pending && (!name || data?.get(name) === value);
   const showBusy = busy || pressed;
+  if (pending && !pressed) return null;
   return (
     <button
       className={`button button-${kind}`}
       name={name}
       value={value}
       aria-disabled={showBusy || undefined}
-      disabled={pending && !pressed}
       {...props}
     >
       {showBusy ? (

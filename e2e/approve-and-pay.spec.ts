@@ -99,6 +99,7 @@ test("a refused charge takes nothing and lets Rose ask again", async ({ page, co
   const samPage = await context.newPage();
   await samPage.goto(`/h/${sam}`);
   await samPage.getByRole("button", { name: "OK, pay $12.50" }).click();
+  await expect(samPage.getByRole("button")).toHaveText(["Paying…"]);
 
   await expect(heading(samPage)).toHaveText("Payment didn't go through", { timeout: 15000 });
   await expect(samPage.getByText("Nothing was taken from Rose's PayPal for Weekly pill organiser.")).toBeVisible();
