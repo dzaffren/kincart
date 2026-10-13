@@ -1,6 +1,6 @@
 # Find and explain
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** approve-and-pay
@@ -155,6 +155,222 @@ Craft checks: a one-line "AI product picker" prompt gives star ratings, a sparkl
 **Components used:** the design system is tokens only. From approve-and-pay: Button, Notice, Summary, ReceiptCard and the radio option cards. Composed from tokens here: the text box and limit field (`control.height`, `control` edge, `radius.control`), the listing card (an option card with a photo), and the text link (`accent-text`, `target.min`).
 
 **Preview:** http://localhost:3000/preview/find-and-explain with `pnpm dev`. It answers 404 in production. The listings are written examples and grey squares stand in for photos; real results replace both at /build.
+
+## Technical plan
+
+### Approach
+
+Rose's Find is a server action that runs `find(words, limit)` in `lib/shop/find.ts`. Haiku reads Rose's words and says whether they are one product, a list or not a product, and gives a search query for a product. Two Channel3 searches then run at once, one with Sam's limit and one without. Haiku picks up to three listings from the limited set, writes what, why and one catch for each, and says whether the thing Rose asked for exists above the limit (O13). Haiku only ever names listings by ID. Names, prices, shops, links and photos come from Channel3's data, so a price is never AI-written.
+
+The result is saved as Rose's one current search in Neon, so the 3-second refresh (D19) redraws it. Ask Sam reads the picked listing from that saved search, never from the form, and stores a request with the shop, link and reason. Sam's OK, `pay()` and the receipt are approve-and-pay's, unchanged. Sam's limit is one row in Neon, $50 until it is set.
+
+The off switch: with `ANTHROPIC_API_KEY` or `CHANNEL3_API_KEY` unset, Rose's page shows approve-and-pay's fixed list, as it does today.
+
+Relies on: D12 (pg and plain SQL), D16 and D17 (PayPal over plain fetch), D18 (secret links), D19 (refresh every 3 s), D20 (the e2e charges a saved PayPal), and the drafted D21 to D24.
+
+```mermaid
+flowchart TB
+    subgraph phone["Rose's and Sam's phones"]
+        RV["RoseView: box, options"]
+        SV["SamView: request, limit"]
+    end
+    subgraph server["Next.js on Vercel"]
+        ACT["app/(shop)/actions.ts: find, askSam, tryAgain, setLimit"]
+        FIND["lib/shop/find.ts"]
+        AI["lib/shop/ai.ts"]
+        SRCH["lib/shop/search.ts"]
+        REQ["lib/shop/requests.ts"]
+    end
+    RV -- "words, picked listing id" --> ACT
+    SV -- "OK, No, limit" --> ACT
+    ACT -- "words and limit" --> FIND
+    FIND -- "words, then listings" --> AI
+    FIND -- "query, max price" --> SRCH
+    AI -- "POST /v1/messages" --> CL[Claude Haiku 5.5]
+    SRCH -- "POST /v1/search" --> C3[Channel3]
+    ACT -- "search, request, limit rows" --> REQ
+    REQ -- "plain SQL over TCP" --> DB[(Neon)]
+```
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's page
+    participant A as find action
+    participant H as Haiku
+    participant C as Channel3
+    participant D as Neon
+    R->>A: words "warm slippers that are easy to put on, size 8"
+    A->>D: read Sam's limit ($50)
+    A->>H: read the words
+    H-->>A: product, query "warm slippers easy to put on size 8"
+    par under the limit
+        A->>C: search, max_price 50
+    and without the limit
+        A->>C: search
+    end
+    C-->>A: 10 listings each
+    A->>H: words, listings under $50 by id, titles and prices above it
+    H-->>A: picks [id, what, why, watch], aboveLimit
+    A->>D: save Rose's search: up to 3 listings from Channel3's data
+    A-->>R: redirect, the page shows the options
+```
+
+```mermaid
+flowchart LR
+    W["Rose's words (her own text)"] -- "user message" --> H[Haiku]
+    L["Listing text from shops (untrusted)"] -- "inside the prompt" --> H
+    H -- "ids and plain text only" --> F[find.ts]
+    C3[Channel3 data] -- "name, price, shop, link, photo" --> F
+    F -- "ids checked, prices checked against the limit" --> DB[(rose_search)]
+    DB -- "picked listing, read on the server" --> RQ[(purchase_requests)]
+```
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `db/migrations/0003_find_and_explain.up.sql`, `.down.sql` | add `shop`, `listing_url` and `reason` to `purchase_requests`, nullable; create `rose_search` (one row: words, outcome, listings as `jsonb`, time) and `price_limit` (one row: cents, 500 to 50000) | 1 to 5; reverse path |
+| `lib/shop/search.ts` (new) | `type Listing`, moved here from `app/(shop)/ui.tsx`. `searchListings(query, maxCents?)`: `POST /v1/search` with `x-api-key`, `limit: 10`, `filters.price.max_price`, 5 s timeout, the `fetch` and `AbortSignal.timeout` pattern of `lib/status/paypal.ts:9`. Maps each product's first `USD`, `InStock` offer to a listing, with the description cut to 300 characters plus its sizes and attributes for the AI; skips the rest | 1, 3, 4 |
+| `lib/shop/ai.ts` (new) | `readNeed(words)` gives `{ kind, query }`; `choose(words, under, above)` gives `{ picks: [{ id, what, why, watch }], aboveLimit }`. Plain `fetch` to `POST https://api.anthropic.com/v1/messages`, `claude-haiku-5-5`, `output_config: { effort: "low", format: json_schema }`, 10 s timeout | 1, 3, 4 |
+| `lib/shop/find.ts` (new) | `find(words, limitCents)`: `readNeed`; for a list, `several`; for a non-product, `nothing found`; else both searches with `Promise.all`, then `choose`. Keeps picks whose id is in the limited set and whose price is within the limit, at most 3. No picks: `over limit` when `aboveLimit`, else `nothing found`. Any error: `nothing found`. Logs one line | 1, 3, 4 |
+| `lib/shop/requests.ts:53` | `ask(listing)` also stores `shop`, `listing_url` and `reason` (the AI's `why`); `PurchaseRequest` gains them, null on fixed-list rows. New `getSearch`, `saveSearch`, `clearSearch`, `getLimit` (5000 when unset) and `setLimit`, using `query` at `lib/shop/requests.ts:104` | 2, 5 |
+| `lib/shop/*.test.ts` | Vitest; see Test plan | 1 to 5 |
+| `scripts/migrate.test.ts` | the up, down, up test also checks 0003's tables and columns | reverse path |
+| `app/(shop)/actions.ts` | `find(token, formData)`: Rose only; empty words redirect to `?problem=empty`; runs `find` with `getLimit()`, `saveSearch`, redirects. `askSam` at `app/(shop)/actions.ts:33`: with search on, the picked id is looked up in `getSearch()`, so the price is the server's; no pick redirects to `?pick=missing`; then `ask(listing)` and `clearSearch`. `tryAgain(token)`: keeps the words and drops the listings. `setLimit(token, formData)`: Sam only; a whole number from 5 to 500 is saved, anything else redirects to `?limit=invalid` | 1 to 5 |
+| `app/(shop)/state.ts:8` | `roseState` also takes the saved search, the limit and whether search is on. A search newer than the latest request shows its options or problem; with search off, today's fixed list. `samState` passes the shop, link and reason as `found` | 1 to 5, off switch |
+| `app/(shop)/r/[token]/page.tsx`, `h/[token]/page.tsx` | Rose's page reads the saved search and the limit, and passes `find`, `askSam` and `tryAgain`; `maxDuration = 30`, since Find takes about 10 s. Sam's page reads the limit, passes `setLimit` and shows `?limit=saved` or `invalid` | 1 to 5 |
+| `app/(shop)/RoseView.tsx`, `SamView.tsx`, `ui.tsx` | pause 2's screens, wired to the actions. "Try other words" becomes a form calling `tryAgain`. The photo stays a plain `<img>` with the lint rule turned off on that line: a 64 px photo from Channel3's CDN gains nothing from Vercel's image optimizer. After a rejected limit, the field shows the saved limit with the error under it | 1 to 5 |
+| `app/(shop)/preview/find-and-explain/page.tsx` | imports `Listing` from `lib/shop/search.ts` | pause 2 |
+| `e2e/find-and-explain.spec.ts` (new) | the e2e; see Test plan | 1 to 5 |
+| `e2e/approve-and-pay.spec.ts` | seeds Rose's search with three fixed listings in `rose_search`, so it stays the same every run and makes no AI calls; "Pick one first." replaces "Pick one of the three first." | approve-and-pay still holds |
+| `.github/workflows/ci.yml` | `test` job env: `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY` from secrets | e2e (O12) |
+| `.env.example`, `README.md` | the two keys and where to get them | setup |
+
+Reusing: the per-call `pg` client and `query` in `lib/shop/requests.ts`, the `fetch` with `AbortSignal.timeout` pattern from `lib/status/paypal.ts`, approve-and-pay's request, claim, `pay()` and receipt path, `whoIs` for every action, and pause 2's views.
+
+### Data
+
+```mermaid
+erDiagram
+    purchase_requests {
+        bigint id PK
+        text item_id "Channel3 product id"
+        text item_name
+        integer amount_cents
+        text shop "new, nullable"
+        text listing_url "new, nullable"
+        text reason "new, nullable"
+        text status
+    }
+    rose_search {
+        smallint id PK "always 1"
+        text words
+        text outcome "options, nothing found, over limit, several, retry"
+        jsonb listings "up to 3"
+        timestamptz searched_at
+    }
+    price_limit {
+        smallint id PK "always 1"
+        integer cents "500 to 50000"
+        timestamptz set_at
+    }
+```
+
+**Migration:** expand only. Three nullable columns and two new tables; nothing existing is rewritten, and approve-and-pay's rows keep working with the new columns empty. Nothing to backfill or switch.
+**Reverse:** `0003_find_and_explain.down.sql` drops `price_limit` and `rose_search`, then the three columns. `scripts/migrate.test.ts` runs up, down, up.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `lib/shop/search.ts` | scenario 1: real listings, from Channel3 (D21) |
+| `lib/shop/ai.ts` | scenarios 1 and 3: reading Rose's words and explaining the options (D22) |
+| `lib/shop/find.ts` | scenario 4 needs both searches and the AI's verdict combined, and scenario 3 needs every failure to end as "Couldn't find that" in one place |
+| `rose_search` table | the page redraws every 3 s (D19), and Ask Sam must take the price from the server, not the form (D23) |
+| `price_limit` table | scenario 5 |
+| `shop`, `listing_url`, `reason` columns | scenario 2: Sam sees the shop, the link and the reason; Rose's waiting screen shows the shop |
+| The two API keys as the off switch | rollback without a revert; the fixed-list code already exists |
+| A second, unfiltered search | scenario 4, because the price filter never comes back empty (O13) |
+
+No SDK: Channel3 and Claude are one endpoint each, called with plain `fetch` like PayPal (D17).
+
+### Non-functionals
+
+|                      |    |
+| -------------------- | -- |
+| **Load**             | A few Finds a day. Each is 2 Haiku calls and 2 Channel3 searches, about 10 s and $0.0005 (O11) |
+| **Breaks first**     | Channel3's free tier, at 2 searches a Find (O14). Rose then sees "Couldn't find that" and the log says `reason=channel3 429`. The fix: drop the unfiltered search, losing "Nothing under $X", or a paid plan |
+| **Security surface** | Anyone with Rose's link can run Finds, about $0.0005 each plus Channel3 quota, as with O3. Anyone with Sam's link can set the limit, checked as a whole number from 5 to 500 on the server. Rose's words reach Haiku as her own text. Listing text from shops is untrusted and sits inside the prompt: a crafted listing can change which listings Haiku picks and how it words them, but names, prices, shops and links come from Channel3's data by ID, picked IDs are checked against the limited set, and prices against the limit. React escapes all text; only `https` links and photos from Channel3 are rendered, links with `rel="noopener noreferrer"`. Secrets: `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY` in Vercel, GitHub and `.env.local`. Stored: Rose's latest words and up to three listings, and per request the shop, link and reason. Logs never hold Rose's words, a key or a link token |
+| **Proof it works**   | One Vercel log line per Find: `find outcome=options listings=3 ms=9870`, or `find outcome=nothing reason=anthropic 529 ms=10012`. Then approve-and-pay's `purchase id=… status=paid capture=…` |
+| **Rollout**          | The off switch is either key unset: Rose's page shows approve-and-pay's fixed list. Rollback: unset `CHANNEL3_API_KEY` on Vercel and redeploy, or revert on `main`; Deployment Checks promote it (D10). Schema: `pnpm db:down` against Neon |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 Rose asks and sees options | `lib/shop/search.test.ts`: request shape (`x-api-key`, `max_price`, `limit`), mapping to listings, skipping offers that aren't `USD` or `InStock`. `lib/shop/ai.test.ts`: request shape (model, `output_config`) and parsing. `lib/shop/find.test.ts` (`fetch` stubbed): three listings come out with Channel3's names and prices, even when Haiku's text says otherwise; an id Haiku made up is dropped. e2e below | `pnpm test`, `pnpm test:e2e` |
+| 2 Pick, and Sam checks | `lib/shop/requests.test.ts`: `ask(listing)` stores the shop, link and reason. `app/(shop)/actions.test.ts`: `askSam` takes the price from the saved search, not the form. `app/(shop)/state.test.ts`: `samState` passes `found`. e2e below | `pnpm test`, `pnpm test:e2e` |
+| 3 Nothing to show | `lib/shop/find.test.ts`: no listings, a non-product, a list, a Haiku timeout or 5xx, a Channel3 error. e2e: "milk, bread and eggs" shows "One thing at a time for now. What would you like first?" | `pnpm test`, `pnpm test:e2e` |
+| 4 Nothing under the limit | `lib/shop/find.test.ts`: no picks with `aboveLimit` gives `over limit`; a pick above the limit is dropped | `pnpm test` |
+| 5 Sam sets the limit | `lib/shop/requests.test.ts`: $50 when unset, then saved. `app/(shop)/actions.test.ts`: 30 is saved; 3 and "abc" are refused; Rose's link can't set it. e2e: Sam saves $30, and Rose's page says "Sam's limit is $30 an item." | `pnpm test`, `pnpm test:e2e` |
+| Off switch | `app/(shop)/state.test.ts`: with search off, the fixed list | `pnpm test` |
+| Reverse path | `scripts/migrate.test.ts`: up, down, up, with 0003 | `pnpm test` |
+
+`pnpm test:e2e` now also needs `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY`: CI secrets, or `.env.local`. Stop `pnpm dev` first (learning).
+
+**E2E:** `e2e/find-and-explain.spec.ts`, test "Rose finds slippers, Sam checks the listing and pays". At 390×844 it seeds the saved PayPal and a $50 limit. Rose types "warm slippers that are easy to put on, size 8" and taps Find. Within 20 s the page shows one to three options, each priced at $50 or less and each with "Good to know". Rose picks the first and taps Ask Sam. Sam's page shows "Why it fits" and a "See it on" link starting `https://`; Sam taps OK, and both pages show the same receipt. Real Channel3, Haiku and PayPal sandbox calls on every run (O12, D20).
+
+### Chunks
+
+| Chunk | Scenarios | Files owned |
+| ----- | --------- | ----------- |
+| A | 1 to 5: data, search and AI | `db/migrations/0003_*`, `lib/shop/**`, `scripts/migrate.test.ts` |
+| B | 1 to 5: pages and wiring | `app/(shop)/**`, `e2e/find-and-explain.spec.ts`, `e2e/approve-and-pay.spec.ts`, `.github/workflows/ci.yml`, `.env.example`, `README.md` |
+
+`type Listing` moves to `lib/shop/search.ts`, owned by A; B imports it. No new dependencies, so the lockfile doesn't change.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Haiku picks something that isn't the thing asked for, such as a tablet case for "a tablet" | It may pick nothing and say the thing exists above the limit (O13); Sam sees the reason and the real listing before OK |
+| Haiku's text claims something the listing doesn't say | The prompt forbids prices and says to use only the listing's own details; the price shown is always Channel3's; Sam checks the link |
+| Explanations read poorly in Haiku's words | The model is one constant in `lib/shop/ai.ts`; Sonnet 5.5 is the fallback (D22) |
+| A Channel3 or Claude outage turns CI red and holds deploys (D10) | Rerun the job; accepted with O12 |
+| Channel3's free quota runs out (O14) | "Couldn't find that" plus the log line; drop the unfiltered search if it bites |
+| Find runs past Vercel's time limit for the page | `maxDuration = 30` on Rose's page; the spike took 9.9 s |
+
+### Decisions to record
+
+```
+## D21 · 2026-10-13 · Search products with Channel3, over plain fetch
+
+Why: one call returns real US listings with price, shop, link, photo and sizes in 1.8 s (spike, find-and-explain O4); Channel3 is a hackathon sponsor.
+Rejected: an AI agent browsing shop websites (minutes per search, shops block it, and prices read off pages can be wrong), `@channel3/sdk` (a dependency for one endpoint).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D22 · 2026-10-13 · Claude Haiku 5.5 reads and explains, in two fixed steps
+
+Why: 9.9 s for a whole Find and about $0.0005 a search in the spike (find-and-explain O11); picking 3 of 10 listings and writing short sentences is light work. Called with plain fetch, like D17.
+Rejected: Sonnet 5.5 and Opus 5.5 (slower, and 17 to 33 times the cost), an agent loop that may search again (no scenario needs it, and it adds 3 to 5 s), `@anthropic-ai/sdk` (a dependency for one endpoint).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D23 · 2026-10-13 · Rose's current search lives in Neon, and Ask Sam reads the pick from it
+
+Why: the page redraws every 3 s (D19), and the price charged must come from the server, never the form.
+Rejected: carrying the listings in the form (Rose's browser could change a price), signing them in hidden fields (more code than one row).
+Source: docs/specs/find-and-explain.md
+Status: active
+
+## D24 · 2026-10-13 · CI's e2e calls Channel3 and Claude for real
+
+Why: no test-only layer, matching D20; results vary, so the e2e checks the shape of what comes back (find-and-explain O12).
+Rejected: recorded replies behind a test-only switch (more code, and the real path only checked by hand).
+Source: docs/specs/find-and-explain.md
+Status: active
+```
 
 ## Open items
 
