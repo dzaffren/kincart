@@ -378,35 +378,7 @@ Shared files (`package.json`, the lockfile) belong to chunk A only. B and C buil
 
 ### Decisions to record
 
-```
-## D27 · 2026-10-14 · Send pushes with the web-push package
-
-Why: every push must be encrypted (RFC 8291) and signed (VAPID); `web-push` does both in one call and delivered in both spikes (ping-helper O1, O5).
-Rejected: hand-rolled ECDH, HKDF, AES-GCM and ES256 signing with `node:crypto` (about 100 lines of crypto that only a real push proves right), a hosted push service such as OneSignal or Firebase Cloud Messaging (another account and SDK for two people).
-Source: docs/specs/ping-helper.md
-Status: active
-
-## D28 · 2026-10-14 · One manifest and one service-worker scope per secret link
-
-Why: the Home Screen icon must open the person's own link (O1), and Rose's and Sam's links on one phone each need their own subscription (O7).
-Rejected: one site-wide manifest (its `start_url` can't hold a secret link, so the icon would open `/` and land on `/status`), one service worker for the whole site (both links on one phone would share a single subscription).
-Source: docs/specs/ping-helper.md
-Status: active
-
-## D29 · 2026-10-14 · Pushes go out after the response, with Next's after()
-
-Why: an ask or a payment never waits on a push service (ping-helper scenario 5).
-Rejected: awaiting the sends inside the action (a slow push service would hold Rose's or Sam's tap), a queue (no push takes more than a second).
-Source: docs/specs/ping-helper.md
-Status: active
-
-## D30 · 2026-10-14 · CI's e2e sends a real push through Mozilla's push service
-
-Why: it proves our server's encrypted, signed send end to end on every push, matching D20 and D24.
-Rejected: running the push e2e by hand only (CI would never catch a broken notification).
-Source: docs/specs/ping-helper.md
-Status: active
-```
+Recorded as D27, D28, D29, D30.
 
 ## Open items
 
