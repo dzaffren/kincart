@@ -6,7 +6,10 @@ import { forgetSubscription, subscriptionsFor, type Subscription } from "./reque
 export type Ping = { title: string; body: string };
 
 // Our server POSTs to whatever endpoint a link holder saves, so only these push services are trusted.
-const PUSH_SERVICES = ["googleapis.com", "push.services.mozilla.com", "push.apple.com", "notify.windows.com"];
+// Matched on the raw string, host in plain letters, digits, dots and hyphens: web-push sends with Node's
+// older URL parser, which reads a host like "attacker.example{.fcm.googleapis.com" as attacker.example.
+const PUSH_SERVICE =
+  /^https:\/\/([a-z0-9-]+\.)*(googleapis\.com|push\.services\.mozilla\.com|push\.apple\.com|notify\.windows\.com)\//;
 const BASE64URL = /^[A-Za-z0-9_-]+=*$/;
 
 export function pushOn(): boolean {
@@ -20,10 +23,7 @@ export function publicKey(): string {
 export function parseSubscription(json: unknown): Subscription | null {
   const { endpoint, keys } = (json ?? {}) as { endpoint?: unknown; keys?: { p256dh?: unknown; auth?: unknown } };
   const { p256dh, auth } = keys ?? {};
-  if (typeof endpoint !== "string" || !URL.canParse(endpoint)) return null;
-  const { protocol, hostname } = new URL(endpoint);
-  const known = PUSH_SERVICES.some((host) => hostname === host || hostname.endsWith(`.${host}`));
-  if (protocol !== "https:" || !known) return null;
+  if (typeof endpoint !== "string" || !PUSH_SERVICE.test(endpoint)) return null;
   if (typeof p256dh !== "string" || !BASE64URL.test(p256dh)) return null;
   if (typeof auth !== "string" || !BASE64URL.test(auth)) return null;
   return { endpoint, p256dh, auth };

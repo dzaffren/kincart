@@ -140,6 +140,10 @@ it("trusts a subscription only from a known push service, over https, with well-
     { endpoint: "https://fcm.googleapis.com.attacker.example/send", keys },
     { endpoint: "https://notgoogleapis.com/fcm/send", keys },
     { endpoint: "https://169.254.169.254/latest/meta-data", keys },
+    // web-push sends with Node's older URL parser, which ends these hosts at attacker.example.
+    { endpoint: "https://attacker.example{.fcm.googleapis.com/send", keys },
+    { endpoint: "https://attacker.example%2e.fcm.googleapis.com/send", keys },
+    { endpoint: "https://fcm.googleapis.com:8443/fcm/send/dX9k2Lq0wE4", keys },
     { endpoint: "not a url", keys },
     { endpoint: samAndroid.endpoint, keys: { p256dh: "not base64url!", auth: keys.auth } },
     { endpoint: samAndroid.endpoint, keys: { p256dh: keys.p256dh, auth: "" } },
