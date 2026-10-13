@@ -400,3 +400,5 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Price limit**: the most one item may cost. Sam sets it, and Rose is never shown anything above it.
 - **Sandbox**: PayPal's test environment. Fake accounts, fake money, real API.
 - **e2e**: end-to-end, one test that walks the whole slice as a user would.
+- **Backfill**: filling a new column or table from the data already there, before the code switches to read it. Not needed here: the new columns start empty.
+- **Lockfile**: the file that pins the exact version of every dependency (`pnpm-lock.yaml`). This slice adds no dependency, so it doesn't change.
