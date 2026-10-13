@@ -6,6 +6,8 @@ if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 export default defineConfig({
   testDir: "e2e",
   forbidOnly: !!process.env.CI,
+  // The approve-and-pay and find-and-explain specs reset the same tables, so they can't run side by side.
+  workers: 1,
   use: {
     baseURL: "http://localhost:3000",
   },

@@ -1,0 +1,26 @@
+import pg from "pg";
+import type { Option } from "../lib/shop/find";
+
+export async function sql(text: string, params: unknown[] = []) {
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    return (await client.query(text, params)).rows;
+  } finally {
+    await client.end();
+  }
+}
+
+export async function reset(paypal: string | null, search?: { words: string; options: Option[] }) {
+  await sql("TRUNCATE purchase_requests");
+  await sql("DELETE FROM paypal_vault");
+  await sql("DELETE FROM rose_search");
+  await sql("DELETE FROM price_limit");
+  if (paypal) await sql("INSERT INTO paypal_vault (payment_token) VALUES ($1)", [paypal]);
+  if (search) {
+    await sql("INSERT INTO rose_search (words, outcome, listings) VALUES ($1, 'options', $2)", [
+      search.words,
+      JSON.stringify(search.options),
+    ]);
+  }
+}
