@@ -30,9 +30,9 @@ older users, on a phone, a few times a month
 "clear"                       → Atkinson Hyperlegible Next; all text 7:1 contrast (AAA)
 "steady"                      → borders, not shadows; 8/12px radius; no bounce easing
 "kind", never "childish"      → a helper's No shows in neutral, not red
-OK / No is the core action    → one accent, deep blue: the next step
-picked at the direction test  → deep blue on cool greys; green only for "Paid", so it never looks like a button
-clear of PayPal's blues       → accent at hue 237° (ultramarine); PayPal's sit at 198–225°
+OK / No is the core action    → one accent, violet: the next step
+picked at the direction test  → violet on cool greys, from eight palettes; green only for "Paid", so it never looks like a button
+clear of PayPal's blues       → accent at hue 259°; PayPal's sit at 198–225°
 Stripe Checkout               → label above every field, error under it, amount stays on screen
 Monzo                         → 40px amount style with tabular figures
 motion ceiling: tier 1        → 120 / 180 / 240ms, ease-out; no scroll or 3D tokens
@@ -81,7 +81,7 @@ Steps grow by about 1.25. The amount jumps to 40 so it is read first.
 
 ## Colour
 
-One accent, deep blue. Neutrals are cool greys. Every text pair is 7:1 or better; every control edge is 3:1 or better. All values are hex, which works on older phones (see assumptions).
+One accent, violet. Neutrals are cool greys. Every text pair is 7:1 or better; every control edge is 3:1 or better. All values are hex, which works on older phones (see assumptions).
 
 | Token          | Light     | Dark      | Use                                     | Checked                                    |
 | -------------- | --------- | --------- | --------------------------------------- | ------------------------------------------ |
@@ -92,11 +92,11 @@ One accent, deep blue. Neutrals are cool greys. Every text pair is 7:1 or better
 | `muted`        | `#464D59` | `#B7BECA` | Secondary text                          | 7.5+ / 9.1+                                |
 | `line`         | `#DDE2E9` | `#2C323C` | Dividers and card edges you can't tap   | decorative only                            |
 | `control`      | `#7A8291` | `#747C8A` | Edges of inputs and tappable cards      | 3.6+ / 4.0+                                |
-| `accent`       | `#3A3FA6` | `#A8ADF2` | Primary button fill: the next step      | 8.0+ / 8.0+ against the page               |
-| `on-accent`    | `#FFFFFF` | `#10133A` | Text on the accent                      | 8.6 / 8.4                                  |
-| `accent-press` | `#2C3086` | `#C0C4F6` | Button pressed                          | 11.2 / 10.6 with `on-accent`               |
-| `accent-soft`  | `#ECEDFA` | `#1E2142` | The option you picked                   |                                            |
-| `accent-text`  | `#33379A` | `#B6BAF5` | Text on `accent-soft`                   | 8.3+ / 8.3+                                |
+| `accent`       | `#5B3AA0` | `#C3B2F0` | Primary button fill: the next step      | 7.7+ / 8.9+ against the page               |
+| `on-accent`    | `#FFFFFF` | `#1E1240` | Text on the accent                      | 8.2 / 9.0                                  |
+| `accent-press` | `#4A2E85` | `#D3C6F4` | Button pressed                          | 10.4 / 10.8 with `on-accent`               |
+| `accent-soft`  | `#F0ECFA` | `#221A3A` | The option you picked                   |                                            |
+| `accent-text`  | `#4F3290` | `#CFC1F4` | Text on `accent-soft`                   | 8.2+ / 9.8+                                |
 | `success`      | `#145A3A` | `#86D6AC` | "Approved", "Paid"                      | 7.0+ / 8.0+                                |
 | `success-soft` | `#E4F0E8` | `#1B3127` | Approved and paid backgrounds           |                                            |
 | `danger`       | `#8E241B` | `#FF9C90` | Errors: payment failed, bad input       | 7.4+ / 7.6+                                |
