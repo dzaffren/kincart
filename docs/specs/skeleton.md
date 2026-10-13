@@ -70,7 +70,7 @@ Scenario: Both rails are up
   Given the app is live at https://kincart.vercel.app with its Neon database and PayPal sandbox keys set
   And the live build is commit a1b2c3d
   When a judge opens /status on a phone 390 pixels wide
-  Then the page shows "Database: OK, check #42 at 14:03"
+  Then the page shows "Database: OK, check #42 at 14:03 UTC"
   And it shows "PayPal sandbox: connected"
   And it shows "Build: a1b2c3d"
   And nothing on the page scrolls sideways
