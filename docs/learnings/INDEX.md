@@ -6,3 +6,4 @@
 - Run next typegen after adding a route, before tsc
 - Make PayPal-Request-Id unique across databases, not just within one
 - Write path parameters as <token> in specs, not {token}
+- Stop pnpm dev before running the e2e
