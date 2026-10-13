@@ -24,6 +24,18 @@ const soldOut = {
   offers: [{ ...slippers.offers[0], availability: "OutOfStock" }],
 };
 
+const free = {
+  ...slippers,
+  id: "prod_0Fr3eE",
+  offers: [{ ...slippers.offers[0], price: { price: 0, currency: "USD" } }],
+};
+
+const underACent = {
+  ...slippers,
+  id: "prod_1Hc5tP",
+  offers: [{ ...slippers.offers[0], price: { price: 0.004, currency: "USD" } }],
+};
+
 const inPounds = {
   ...slippers,
   id: "prod_3Rt8mN",
@@ -45,8 +57,10 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-it("searches Channel3 under the limit and keeps in-stock US-dollar listings", async () => {
-  const fetch = stubChannel3(() => Response.json({ products: [slippers, soldOut, inPounds], next_page_token: null }));
+it("searches Channel3 under the limit and keeps in-stock US-dollar listings that cost something", async () => {
+  const fetch = stubChannel3(() =>
+    Response.json({ products: [slippers, soldOut, inPounds, free, underACent], next_page_token: null }),
+  );
 
   expect(await searchListings("warm slippers easy to put on size 8", 5000)).toEqual([
     {

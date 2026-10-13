@@ -30,15 +30,14 @@ export async function searchListings(query: string, maxCents?: number): Promise<
 function toFound(product: Product): Found[] {
   const offer = product.offers?.find((o) => o.price?.currency === "USD" && o.availability === "InStock");
   const price = offer?.price?.price;
-  if (!product.id || !product.title || !offer?.domain || !offer.url?.startsWith("https://") || typeof price !== "number") {
-    return [];
-  }
+  const cents = typeof price === "number" ? Math.round(price * 100) : 0;
+  if (!product.id || !product.title || !offer?.domain || !offer.url?.startsWith("https://") || cents < 1) return [];
   const image = product.images?.[0]?.url;
   return [
     {
       id: product.id,
       name: product.title,
-      cents: Math.round(price * 100),
+      cents,
       shop: offer.domain,
       url: offer.url,
       imageUrl: image?.startsWith("https://") ? image : undefined,
