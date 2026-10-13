@@ -24,6 +24,10 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/shop_together
       PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
       PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+      PAYPAL_E2E_VAULT_ID: ${{ secrets.PAYPAL_E2E_VAULT_ID }}
+      # These links only guard CI's throwaway database.
+      ROSE_LINK_TOKEN: ci-rose-link
+      SAM_LINK_TOKEN: ci-sam-link
       VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7
