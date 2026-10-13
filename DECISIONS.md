@@ -171,3 +171,10 @@ Why: no test-only layer, matching D20; results vary, so the e2e checks the shape
 Rejected: recorded replies behind a test-only switch (more code, and the real path only checked by hand).
 Source: docs/specs/find-and-explain.md
 Status: active
+
+## D25 · 2026-10-14 · KinCart's mark is a tick on two wheels: the helper's OK carries the shopping
+
+Why: one shape says both halves of the product, the helper's OK and the shopping; it scored 23 of 25 on the logo longlist and holds at 16px with its small cut, white on the violet tile (docs/design/logo/kit/).
+Rejected: the K of KinCart on two wheels (20 of 25), a kiss-lock coin purse (20 of 25, 2 of 5 at 16px), the i's dot in the K's arms (read as "K."), a C in the K's arms (too wide to sit near-square), a pull-along trolley (read as luggage), and the earlier Shop-together icon rounds (an ampersand with a tick leg, an armchair h, browline glasses and before).
+Source: docs/design/logo/brief.md
+Status: active

@@ -1,7 +1,7 @@
 # Design system brief
 
 **Status:** Approved · 2026-10-13 · /design-system pause A
-**Extension:** App icon · Draft · 2026-10-13 · for ping-helper (O8)
+**Extension:** App icon · Approved · 2026-10-14 · for ping-helper (O8)
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
@@ -149,17 +149,7 @@ Home Screens and notification shades ignore the page's dark mode
 
 One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. Two new colour tokens, `icon-tile` (#5B3AA0) and `icon-mark` (#FFFFFF): the light `accent` and `on-accent` pair, held fixed because the icon never follows dark mode.
 
-Concepts for the pause B test, made with the logo-design skill's full process: the brief (`docs/design/app-icon/brief.md`), a word map and scored longlist (`longlist.md`), black first, each locked up with a lowercase wordmark outlined from Atkinson Hyperlegible Next Bold, audited, and tested at 16 to 256px, one-colour, reversed, mirrored, rotated and on a shelf of payments marks. Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
-
-| Concept | Type | The idea in one line | What could sink it |
-| ------- | ---- | -------------------- | ------------------ |
-| A · And | Letterform | An ampersand, Rose & Sam, whose leg ends in the OK | At 16px the tick reads as part of the "&" |
-| B · Armchair | Wordmark | The h in shop is an armchair: shop without leaving your chair | Alone on the tile it's an h, which isn't the first letter; turned upside down it looks like a 4 |
-| C · Glasses | Pictorial | Browline reading glasses, two lenses on one frame | Wide and thin at 32px; glasses also mean "eyewear shop" |
-
-Earlier rounds, turned down: a speech bubble with a tick, an S of two halves and a price tag with a tick (stock pairings and a letter); an ampersand and an st ligature drawn as thin single-line glyphs (looked typed, not drawn, and came without a wordmark); a tick in a bubble, two overlapping circles (Mastercard's mark) and a plain S.
-
-Rejected before testing: a shopping cart or bag, with or without a tick or heart. It is the first thing a one-line "family shopping app icon" prompt draws.
+**Chosen:** KinCart's tick cart, a tick on two wheels: the helper's OK carries the shopping. Brief, longlist and concepts in `docs/design/logo/`; the masters, every size above and the usage rules in `docs/design/logo/kit/` (`guidelines.md`). The earlier Shop-together icon rounds were not carried over (D25).
 
 ## Never
 
@@ -181,7 +171,7 @@ Confirm or correct these with the brief.
 | Dark mode required, following the phone's setting                                   | Craft floor, and `/status` already does both                       |
 | Oldest phone: 320px wide, iOS 15.4 or Chrome 100                                    | A relative's phone may be a few years old; so hex, not `oklch()`  |
 | Icons from Lucide (`lucide-react`, a new dependency, added when a slice needs one)  | The repo has no icon set; craft bans emojis                        |
-| The name under the Home Screen icon is "Shop-together", as the page title is today. iPhone may cut a 13-letter name to "Shop-toget…"; unchecked until pause B on your iPhone | The brief left the name open; this is the name the app already uses |
+| The name under the Home Screen icon is "KinCart", seven letters, so iPhone shows it whole | The logo kit names the product KinCart |
 
 ## Glossary
 
