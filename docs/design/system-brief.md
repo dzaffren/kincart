@@ -32,6 +32,7 @@ older users, on a phone, a few times a month
 "kind", never "childish"      → a helper's No shows in neutral, not red
 OK / No is the core action    → one accent, deep blue: the next step
 picked at the direction test  → deep blue on cool greys; green only for "Paid", so it never looks like a button
+clear of PayPal's blues       → accent at hue 237° (ultramarine); PayPal's sit at 198–225°
 Stripe Checkout               → label above every field, error under it, amount stays on screen
 Monzo                         → 40px amount style with tabular figures
 motion ceiling: tier 1        → 120 / 180 / 240ms, ease-out; no scroll or 3D tokens
@@ -91,11 +92,11 @@ One accent, deep blue. Neutrals are cool greys. Every text pair is 7:1 or better
 | `muted`        | `#464D59` | `#B7BECA` | Secondary text                          | 7.5+ / 9.1+                                |
 | `line`         | `#DDE2E9` | `#2C323C` | Dividers and card edges you can't tap   | decorative only                            |
 | `control`      | `#7A8291` | `#747C8A` | Edges of inputs and tappable cards      | 3.6+ / 4.0+                                |
-| `accent`       | `#1F4BAA` | `#8FB0F2` | Primary button fill: the next step      | 7.4+ / 7.8+ against the page               |
-| `on-accent`    | `#FFFFFF` | `#0B1630` | Text on the accent                      | 7.9 / 8.2                                  |
-| `accent-press` | `#183C8A` | `#A9C2F5` | Button pressed                          | 10.2 / 10.0 with `on-accent`               |
-| `accent-soft`  | `#E6EDF9` | `#18243D` | The option you picked                   |                                            |
-| `accent-text`  | `#1A4199` | `#A3BEF4` | Text on `accent-soft`                   | 7.9+ / 8.2+                                |
+| `accent`       | `#3A3FA6` | `#A8ADF2` | Primary button fill: the next step      | 8.0+ / 8.0+ against the page               |
+| `on-accent`    | `#FFFFFF` | `#10133A` | Text on the accent                      | 8.6 / 8.4                                  |
+| `accent-press` | `#2C3086` | `#C0C4F6` | Button pressed                          | 11.2 / 10.6 with `on-accent`               |
+| `accent-soft`  | `#ECEDFA` | `#1E2142` | The option you picked                   |                                            |
+| `accent-text`  | `#33379A` | `#B6BAF5` | Text on `accent-soft`                   | 8.3+ / 8.3+                                |
 | `success`      | `#145A3A` | `#86D6AC` | "Approved", "Paid"                      | 7.0+ / 8.0+                                |
 | `success-soft` | `#E4F0E8` | `#1B3127` | Approved and paid backgrounds           |                                            |
 | `danger`       | `#8E241B` | `#FF9C90` | Errors: payment failed, bad input       | 7.4+ / 7.6+                                |
