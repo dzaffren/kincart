@@ -30,7 +30,7 @@ export type RoseState =
       limitCents: number;
       words?: string;
       outcome?: Outcome;
-      problem?: "empty" | "nothing found" | "over limit";
+      problem?: "empty" | "nothing found" | "over limit" | "several";
       busy?: boolean;
     }
   | {
@@ -94,6 +94,9 @@ export function RoseView({ state, items, link, ask, find }: Props) {
         <OutcomeNotice outcome={state.outcome} />
         {state.problem === "nothing found" && (
           <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>
+        )}
+        {state.problem === "several" && (
+          <Notice tone="neutral">One thing at a time for now. What would you like first?</Notice>
         )}
         {state.problem === "over limit" && (
           <Notice tone="neutral">

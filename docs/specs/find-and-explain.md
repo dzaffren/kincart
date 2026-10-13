@@ -79,14 +79,15 @@ Scenario: Rose picks one, and Sam checks it before paying
 Scenario Outline: Nothing to show
   Given Rose's PayPal is linked
   When Rose types <words> and taps Find, and <what happens>
-  Then Rose sees "Couldn't find that. Try different words."
+  Then Rose sees "<message>"
   And Rose's words are still in the box
 
   Examples:
-    | words                               | what happens                          |
-    | "a left-handed teapot for a cat"    | the search returns no listings        |
-    | "what time is it in Ohio"           | there is no product to look for       |
-    | "warm slippers, size 8"             | the AI service doesn't answer         |
+    | words                            | what happens                     | message                                                   |
+    | "a left-handed teapot for a cat" | the search returns no listings   | Couldn't find that. Try different words.                  |
+    | "what time is it in Ohio"        | there is no product to look for  | Couldn't find that. Try different words.                  |
+    | "warm slippers, size 8"          | the AI service doesn't answer    | Couldn't find that. Try different words.                  |
+    | "milk, bread and eggs"           | it is a list of several things   | One thing at a time for now. What would you like first?   |
 
 Scenario: Nothing under Sam's limit
   Given Sam's limit is $30
@@ -110,13 +111,14 @@ Scenario: Sam sets the price limit
 - Rose picks one and taps Ask Sam, as in approve-and-pay. The request keeps the name, price, listing link and reason as Rose saw them, and Sam's OK charges that price.
 - Sam's page shows the item, price, the AI's one-line reason and a link to the real listing, then OK or No as in approve-and-pay.
 - Sam's page has a price limit Sam can change. It is $50 until Sam changes it.
-- "Couldn't find that. Try different words." when the search finds nothing or the AI fails, and "Nothing under $X" when everything found costs more than the limit. Rose's words stay in the box.
+- "Couldn't find that. Try different words." when the search finds nothing or the AI fails, "Nothing under $X" when everything found costs more than the limit, and "One thing at a time for now. What would you like first?" when Rose types a list. Rose's words stay in the box.
 
 **Out:**
 - Rose setting their own limit. Sam sets it (O9).
 - Asking by voice: slice 4, `ask-by-voice`.
 - A notification on Sam's phone: slice 3, `ping-helper`.
 - A real order with the shop. Sandbox money only (shape O9). No later slice.
+- A list of several things in one ask, such as groceries, approved once and paid as one total: a later `basket` slice, only if time is left (shape O10).
 - More than three options, or "show more". No later slice.
 - Remembering past searches. No later slice.
 
@@ -133,6 +135,7 @@ Rose's request box replaces approve-and-pay's pick screen. The options reuse its
 | Rose | fewer than three | Which one would you like? | adds "Only 2 found at $30 or less." |
 | Rose | Ask Sam with no pick | Which one would you like? | red under the cards: "Pick one first." |
 | Rose | nothing found | What do you need? | grey notice: "Couldn't find that. Try different words."; Rose's words still in the box |
+| Rose | a list of several things | What do you need? | grey notice: "One thing at a time for now. What would you like first?" |
 | Rose | nothing under the limit | What do you need? | grey notice: "Nothing under $30 for that. Try different words, or ask Sam to raise the limit." |
 | Rose | waiting | Waiting for Sam | as approve-and-pay, plus "From amazon.com" |
 | Rose | Sam said no, or the charge failed | What do you need? | approve-and-pay's notices, above the box |
@@ -166,6 +169,7 @@ Craft checks: a one-line "AI product picker" prompt gives star ratings, a sparkl
 | O7 | A listing's price can change between Rose's search and Sam's OK. Sam pays the price Rose saw, because no real order is placed | flag | spec p1 | user | Accepted risk | No real order reaches the shop, so the charge only has to match what Rose and Sam saw. Agreed with pause 1 approval, 2026-10-13 |
 | O8 | Assuming 15 seconds is acceptable for results, with "Looking…" shown meanwhile | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O9 | The shape rules out spend limits. Is Sam's price limit one? | question | spec p1 | user | Resolved | No. It only caps what Rose is shown; Sam still approves every purchase, and nothing is ever approved automatically. Sam sets it on Sam's page, $50 by default. Agreed 2026-10-13 |
+| O10 | Rose may type a list, such as groceries, but a request is one item, one price and one charge | question | spec p2 | user | Resolved | One thing at a time: the AI spots a list and Rose sees "One thing at a time for now. What would you like first?". A `basket` slice (several items, one OK, one total) goes after slice 4, only if time is left. Agreed 2026-10-13 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

@@ -102,6 +102,12 @@ export default function FindAndExplainPreview() {
               items={[]}
             />
           </Frame>
+          <Frame label="A shopping list (scenario 3)">
+            <RoseView
+              state={{ kind: "ask", limitCents: 5000, words: "milk, bread and eggs", problem: "several" }}
+              items={[]}
+            />
+          </Frame>
           <Frame label="Nothing under $30 (scenario 4)">
             <RoseView
               state={{ kind: "ask", limitCents: 3000, words: "a tablet for video calls", problem: "over limit" }}
