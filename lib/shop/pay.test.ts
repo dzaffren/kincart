@@ -88,6 +88,16 @@ it("leaves an unknown charge paying, then settles it with the same request id", 
   expect(ids).toEqual([key, key]);
 });
 
+it("reports a payment only from the call that recorded it, so two overlapping settles ping Rose once", async () => {
+  await saveVault("1j970427g9944212v");
+  stubOrders(completed, completed);
+  const request = await claimedGlasses();
+
+  expect(await pay(request)).toBe("paid");
+  expect(await pay(request)).toBe("unknown");
+  expect((await latest())?.status).toBe("paid");
+});
+
 it("sends a new request id when a fresh database reuses a request's number", async () => {
   await saveVault("1j970427g9944212v");
   const fetch = stubOrders(completed, completed);

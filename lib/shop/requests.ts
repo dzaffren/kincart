@@ -132,20 +132,20 @@ export async function claim(id: number): Promise<PurchaseRequest | null> {
   return rows[0] ? toRequest(rows[0]) : null;
 }
 
-export async function record(id: number, outcome: Outcome): Promise<void> {
-  if (outcome.state === "paid") {
-    await query(
-      `UPDATE purchase_requests SET status = 'paid', paypal_order_id = $2, paypal_capture_id = $3
-       WHERE id = $1 AND status = 'paying'`,
-      [id, outcome.orderId, outcome.captureId],
-    );
-  } else {
-    await query(
-      `UPDATE purchase_requests SET status = 'failed', failure_reason = $2
-       WHERE id = $1 AND status = 'paying'`,
-      [id, outcome.reason],
-    );
-  }
+export async function record(id: number, outcome: Outcome): Promise<boolean> {
+  const rows =
+    outcome.state === "paid"
+      ? await query(
+          `UPDATE purchase_requests SET status = 'paid', paypal_order_id = $2, paypal_capture_id = $3
+           WHERE id = $1 AND status = 'paying' RETURNING id`,
+          [id, outcome.orderId, outcome.captureId],
+        )
+      : await query(
+          `UPDATE purchase_requests SET status = 'failed', failure_reason = $2
+           WHERE id = $1 AND status = 'paying' RETURNING id`,
+          [id, outcome.reason],
+        );
+  return rows.length === 1;
 }
 
 export async function stuck(): Promise<PurchaseRequest | null> {
