@@ -112,12 +112,13 @@ it("says it couldn't find anything when nothing fits at any price", async () => 
 });
 
 it("asks for one thing at a time for a list, and searches for nothing that isn't a product", async () => {
-  const fetch = stubServices({ need: { kind: "list", query: "milk bread eggs" } });
+  const list = stubServices({ need: { kind: "list", query: "milk bread eggs" } });
   expect(await find("milk, bread and eggs", 5000)).toEqual({ outcome: "several" });
+  expect(searches(list)).toBe(0);
 
-  stubServices({ need: { kind: "not a product", query: "" } });
+  const notAProduct = stubServices({ need: { kind: "not a product", query: "time in Ohio" } });
   expect(await find("what time is it in Ohio", 5000)).toEqual({ outcome: "nothing found" });
-  expect(searches(fetch)).toBe(0);
+  expect(searches(notAProduct)).toBe(0);
 });
 
 it("says it couldn't find anything when Haiku or Channel3 fails, and logs why", async () => {
