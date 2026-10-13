@@ -8,6 +8,7 @@ import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { getLimit, latest } from "../../../../lib/shop/requests";
 import { answer, setLimit } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
+import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
 import { SamView } from "../../SamView";
 import { samState } from "../../state";
@@ -25,7 +26,8 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
 
   const query = await searchParams;
 
-  await settleStuck();
+  const settled = await settleStuck();
+  if (settled) sendPayment(settled.result, settled.request.item);
   const [request, limitCents] = await Promise.all([latest(), searchOn() ? getLimit() : null]);
   const limit =
     limitCents === null

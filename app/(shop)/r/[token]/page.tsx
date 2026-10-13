@@ -9,6 +9,7 @@ import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { getLimit, getSearch, getVault, latest } from "../../../../lib/shop/requests";
 import { askSam, find, startLink, tryAgain } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
+import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
 import { RoseView } from "../../RoseView";
 import { roseState } from "../../state";
@@ -28,7 +29,8 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
   if (whoIs(token) !== "rose") notFound();
   const query = await searchParams;
 
-  await settleStuck();
+  const settled = await settleStuck();
+  if (settled) sendPayment(settled.result, settled.request.item);
   const on = searchOn();
   const [vault, request, saved, limitCents] = await Promise.all([
     getVault(),
