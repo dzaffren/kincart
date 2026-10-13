@@ -7,15 +7,18 @@ import {
   claim,
   clearSearch,
   decline,
+  forgetSubscription,
   getLimit,
   getSearch,
   getVault,
   latest,
   record,
   saveSearch,
+  saveSubscription,
   saveVault,
   setLimit,
   stuck,
+  subscriptionsFor,
 } from "./requests";
 
 const [glasses, pills, batteries] = ITEMS;
@@ -35,7 +38,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
@@ -55,9 +58,9 @@ it("records an ask as waiting, with the item's name and price copied in", async 
   });
 });
 
-it("ignores a second ask while one is still open", async () => {
-  await ask(glasses);
-  await ask(batteries);
+it("ignores a second ask while one is still open, and says which ask made a request", async () => {
+  expect(await ask(glasses)).toBe(true);
+  expect(await ask(batteries)).toBe(false);
 
   expect((await latest())?.item.id).toBe("glasses");
 });
@@ -68,14 +71,14 @@ it("lets only the first OK claim a request", async () => {
 
   expect((await claim(id))?.status).toBe("paying");
   expect(await claim(id)).toBeNull();
-  expect(await decline(id)).toBe(false);
+  expect(await decline(id)).toBeNull();
 });
 
 it("declines a waiting request, after which Rose can ask again", async () => {
   await ask(batteries);
   const { id } = (await latest())!;
 
-  expect(await decline(id)).toBe(true);
+  expect(await decline(id)).toMatchObject({ id, item: batteries, status: "declined" });
   expect((await latest())?.status).toBe("declined");
 
   await ask(pills);
@@ -164,4 +167,28 @@ it("keeps Sam's price limit, $50 until Sam sets one", async () => {
 
   await expect(setLimit(300)).rejects.toThrow();
   expect(await getLimit()).toBe(3000);
+});
+
+const samPhone = {
+  endpoint: "https://fcm.googleapis.com/fcm/send/dX9k2Lq0wE4:APA91bH7",
+  p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
+  auth: "tBHItJI5svbpez7KI4CCXg",
+};
+const rosePhone = {
+  endpoint: "https://web.push.apple.com/QGuQyavXutnMH8Ig",
+  p256dh: "BOVFfCoBB_N3lMHGrNTmFkzcTQKRhbVpzA2D5cNZRRyiAFTTrVrBwJkj5d8xLxLBNjYqGmQ7gT0nEDpVh3o0Wcc",
+  auth: "8eDyX_uCN0XRhSbY5hs7Hg",
+};
+
+it("keeps each phone once under the person who turned it on, until it's forgotten", async () => {
+  await saveSubscription("sam", samPhone);
+  await saveSubscription("sam", { ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" });
+  await saveSubscription("rose", rosePhone);
+
+  expect(await subscriptionsFor("sam")).toEqual([{ ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" }]);
+  expect(await subscriptionsFor("rose")).toEqual([rosePhone]);
+
+  await forgetSubscription(samPhone.endpoint);
+  expect(await subscriptionsFor("sam")).toEqual([]);
+  expect(await subscriptionsFor("rose")).toEqual([rosePhone]);
 });

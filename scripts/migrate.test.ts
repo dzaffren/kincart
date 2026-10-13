@@ -28,21 +28,23 @@ async function columnExists(table: string, column: string) {
 
 it("migrates up, back down, and up again", async () => {
   await migrate("up", url);
-  for (const table of ["status_checks", "paypal_vault", "purchase_requests", "rose_search", "price_limit"]) {
+  for (const table of [
+    "status_checks",
+    "paypal_vault",
+    "purchase_requests",
+    "rose_search",
+    "price_limit",
+    "push_subscriptions",
+  ]) {
     expect(await tableExists(table)).toBe(true);
   }
   expect(await columnExists("purchase_requests", "listing_url")).toBe(true);
 
   await migrate("down", url);
-  expect(await tableExists("rose_search")).toBe(false);
-  expect(await tableExists("price_limit")).toBe(false);
-  expect(await columnExists("purchase_requests", "shop")).toBe(false);
-  expect(await columnExists("purchase_requests", "listing_url")).toBe(false);
-  expect(await columnExists("purchase_requests", "reason")).toBe(false);
-  expect(await tableExists("purchase_requests")).toBe(true);
+  expect(await tableExists("push_subscriptions")).toBe(false);
+  expect(await tableExists("rose_search")).toBe(true);
+  expect(await columnExists("purchase_requests", "reason")).toBe(true);
 
   await migrate("up", url);
-  expect(await tableExists("rose_search")).toBe(true);
-  expect(await tableExists("price_limit")).toBe(true);
-  expect(await columnExists("purchase_requests", "reason")).toBe(true);
+  expect(await tableExists("push_subscriptions")).toBe(true);
 });

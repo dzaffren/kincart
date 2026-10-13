@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import type { Option, Search } from "./find";
 import type { Item } from "./items";
+import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
 
@@ -38,6 +39,8 @@ type Row = {
   reason: string | null;
 };
 
+export type Subscription = { endpoint: string; p256dh: string; auth: string };
+
 export type SavedSearch = {
   words: string;
   outcome: Search["outcome"] | "retry";
@@ -66,13 +69,15 @@ export async function latest(): Promise<PurchaseRequest | null> {
 }
 
 // A second ask while one is open hits purchase_requests_one_open and is dropped.
-export async function ask(item: Item, source?: Source): Promise<void> {
-  await query(
+export async function ask(item: Item, source?: Source): Promise<boolean> {
+  const rows = await query(
     `INSERT INTO purchase_requests (item_id, item_name, amount_cents, shop, listing_url, reason)
      VALUES ($1, $2, $3, $4, $5, $6)
-     ON CONFLICT DO NOTHING`,
+     ON CONFLICT DO NOTHING
+     RETURNING id`,
     [item.id, item.name, item.cents, source?.shop ?? null, source?.url ?? null, source?.reason ?? null],
   );
+  return rows.length === 1;
 }
 
 export async function getSearch(): Promise<SavedSearch | null> {
@@ -109,13 +114,13 @@ export async function setLimit(cents: number): Promise<void> {
   );
 }
 
-export async function decline(id: number): Promise<boolean> {
-  const rows = await query(
+export async function decline(id: number): Promise<PurchaseRequest | null> {
+  const rows = await query<Row>(
     `UPDATE purchase_requests SET status = 'declined', answered_at = now()
-     WHERE id = $1 AND status = 'waiting' RETURNING id`,
+     WHERE id = $1 AND status = 'waiting' RETURNING *`,
     [id],
   );
-  return rows.length === 1;
+  return rows[0] ? toRequest(rows[0]) : null;
 }
 
 export async function claim(id: number): Promise<PurchaseRequest | null> {
@@ -150,6 +155,24 @@ export async function stuck(): Promise<PurchaseRequest | null> {
      ORDER BY id LIMIT 1`,
   );
   return rows[0] ? toRequest(rows[0]) : null;
+}
+
+export async function saveSubscription(person: Person, subscription: Subscription): Promise<void> {
+  await query(
+    `INSERT INTO push_subscriptions (person, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)
+     ON CONFLICT (endpoint) DO UPDATE SET person = EXCLUDED.person, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth`,
+    [person, subscription.endpoint, subscription.p256dh, subscription.auth],
+  );
+}
+
+export async function subscriptionsFor(person: Person): Promise<Subscription[]> {
+  return query<Subscription>("SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE person = $1 ORDER BY id", [
+    person,
+  ]);
+}
+
+export async function forgetSubscription(endpoint: string): Promise<void> {
+  await query("DELETE FROM push_subscriptions WHERE endpoint = $1", [endpoint]);
 }
 
 async function query<T>(text: string, params: unknown[] = []): Promise<T[]> {
