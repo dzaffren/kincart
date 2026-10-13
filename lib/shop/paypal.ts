@@ -119,6 +119,6 @@ function issueOf(body: { name?: string; details?: { issue?: string }[] }): strin
   return body.details?.[0]?.issue ?? body.name;
 }
 
-function reasonOf(error: unknown): string {
+export function reasonOf(error: unknown): string {
   return error instanceof Error ? (error.name === "Error" ? error.message : error.name) : String(error);
 }
