@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import type { Option } from "../../lib/shop/find";
 import type { Item } from "../../lib/shop/items";
 import { Button } from "./Button";
@@ -47,9 +47,17 @@ export type RoseState =
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { state: RoseState; items: Item[]; link?: Action; ask?: Action; find?: Action; tryAgain?: Action };
+type Props = {
+  state: RoseState;
+  items: Item[];
+  link?: Action;
+  ask?: Action;
+  find?: Action;
+  tryAgain?: Action;
+  notify?: ReactNode;
+};
 
-export function RoseView({ state, items, link, ask, find, tryAgain }: Props) {
+export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -83,6 +91,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain }: Props) {
           answers.
         </Notice>
         <Summary title={state.item.name} cents={state.item.cents} note={state.shop && `From ${state.shop}`} />
+        {notify}
       </div>
     );
   }
@@ -134,6 +143,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain }: Props) {
         <p className="small">
           {HELPER}&apos;s limit is {limit} an item. Nothing is paid until {HELPER} says OK.
         </p>
+        {notify}
       </div>
     );
   }
@@ -197,6 +207,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain }: Props) {
           Ask {HELPER}
         </Button>
       </form>
+      {notify}
     </div>
   );
 }
