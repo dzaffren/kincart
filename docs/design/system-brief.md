@@ -106,13 +106,13 @@ A helper's No uses `muted` on `sunken` with plain words. It is not an error, so 
 
 | Token         | Value                       | Use                                   |
 | ------------- | --------------------------- | ------------------------------------- |
-| `motion.fast` | 120ms                       | Press and hover                       |
-| `motion.base` | 180ms                       | Focus ring, colour changes            |
+| `motion.fast` | 120ms                       | Press: the button shrinks to 98%      |
+| `motion.base` | 180ms                       | A hover or selected tint fading in    |
 | `motion.slow` | 240ms                       | Banner, toast and modal enter or exit |
 | `ease.out`    | `cubic-bezier(0.2, 0, 0, 1)` | Things arriving                      |
 | `ease.in`     | `cubic-bezier(0.4, 0, 1, 1)` | Things leaving                       |
 
-Only `transform` and `opacity` move. Under `prefers-reduced-motion: reduce` every duration is 0ms and the state still changes by colour and words.
+Only `transform` and `opacity` move. Colour changes and focus rings are instant. Under `prefers-reduced-motion: reduce` every duration is 0ms and the state still changes by colour and words.
 
 ## Depth
 
