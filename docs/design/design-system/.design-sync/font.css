@@ -1,0 +1,4 @@
+/* In the app, next/font sets --font-atkinson on <html>; shop.css builds --font-sans from it. */
+:root {
+  --font-atkinson: "Atkinson Hyperlegible Next";
+}

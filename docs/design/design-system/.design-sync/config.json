@@ -2,5 +2,30 @@
   "projectId": "2b71c794-c2ae-49b8-adf1-f81fbf17a0f6",
   "shape": "package",
   "pkg": "shop-together",
-  "readmeHeader": ".design-sync/conventions.md"
+  "globalName": "ShopTogether",
+  "readmeHeader": ".design-sync/conventions.md",
+  "srcDir": "app/(shop)",
+  "tsconfig": "tsconfig.json",
+  "componentSrcMap": {
+    "Button": "app/(shop)/Button.tsx",
+    "Notice": "app/(shop)/ui.tsx",
+    "Summary": "app/(shop)/ui.tsx",
+    "ReceiptCard": "app/(shop)/ui.tsx",
+    "ItemPicker": "app/(shop)/ui.tsx",
+    "ListingPicker": "app/(shop)/ui.tsx"
+  },
+  "guidelinesGlob": [
+    "docs/design/design-system/guidelines/*.html"
+  ],
+  "libOverrides": {
+    "docs.mjs": "guidelinesGlob also copies the .html foundation pages"
+  },
+  "dtsPropsFor": {
+    "Button": "/** primary is the one next step on a screen; secondary is everything else. Default primary. */\n  kind?: \"primary\" | \"secondary\";\n  /** Shows a spinner and busyLabel, and sets aria-disabled. */\n  busy?: boolean;\n  /** Text shown while busy, e.g. \"Paying…\". Falls back to children. */\n  busyLabel?: string;\n  children?: React.ReactNode;\n  type?: \"button\" | \"submit\" | \"reset\";\n  name?: string;\n  value?: string;\n  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;\n  /** Plus every other native <button> attribute. */\n  [attribute: string]: unknown;",
+    "Notice": "/** wait = waiting for the helper; danger = a real failure; neutral = a helper said no, or nothing found. */\n  tone: \"wait\" | \"danger\" | \"neutral\";\n  children: React.ReactNode;",
+    "Summary": "/** Item name, shown above the amount. */\n  title?: string;\n  /** Amount in US cents; rendered as $29.99. */\n  cents: number;\n  /** One short line under the amount, e.g. \"From amazon.com\". */\n  note?: string;",
+    "ReceiptCard": "receipt: { item: { id: string; name: string; cents: number }; paidAt: Date; transactionId: string };",
+    "ItemPicker": "/** Prices are in US cents. */\n  items: { id: string; name: string; cents: number }[];\n  /** id of the heading that names the choice. */\n  labelledBy: string;\n  /** id of the item checked at first. */\n  picked?: string;\n  /** Shows \"Pick one of the three first.\" under the list. */\n  error?: boolean;",
+    "ListingPicker": "/** Prices are in US cents. what, why and watch are one sentence each. */\n  listings: { id: string; name: string; cents: number; shop: string; url: string; imageUrl?: string; what: string; why: string; watch: string }[];\n  /** id of the heading that names the choice. */\n  labelledBy: string;\n  /** id of the listing checked at first. */\n  picked?: string;\n  /** Shows \"Pick one first.\" under the list. */\n  error?: boolean;"
+  }
 }
