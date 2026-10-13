@@ -85,7 +85,7 @@ it("charges the saved PayPal once per request id and reports the capture", async
     ),
   );
 
-  expect(await charge("1j970427g9944212v", glasses, 12)).toEqual({
+  expect(await charge("1j970427g9944212v", glasses, "purchase-12-1792491300000")).toEqual({
     state: "paid",
     orderId: "3BP30887MC6972056",
     captureId: "7BM91101S1572292D",
@@ -93,7 +93,7 @@ it("charges the saved PayPal once per request id and reports the capture", async
 
   const [url, init] = apiCall(fetch);
   expect(url).toBe("https://api-m.sandbox.paypal.com/v2/checkout/orders");
-  expect((init.headers as Record<string, string>)["PayPal-Request-Id"]).toBe("purchase-12");
+  expect((init.headers as Record<string, string>)["PayPal-Request-Id"]).toBe("purchase-12-1792491300000");
   const body = JSON.parse(String(init.body));
   expect(body.intent).toBe("CAPTURE");
   expect(body.purchase_units[0].amount).toEqual({ currency_code: "USD", value: "18.99" });
@@ -103,7 +103,7 @@ it("charges the saved PayPal once per request id and reports the capture", async
 it("reports refused when PayPal says no, with PayPal's reason", async () => {
   stubPaypal(() => json({ name: "NOT_AUTHORIZED", details: [{ issue: "PERMISSION_DENIED" }] }, 403));
 
-  expect(await charge("e2e-not-a-real-token", glasses, 13)).toEqual({ state: "refused", reason: "PERMISSION_DENIED" });
+  expect(await charge("e2e-not-a-real-token", glasses, "purchase-13-1792491300000")).toEqual({ state: "refused", reason: "PERMISSION_DENIED" });
 });
 
 it("reports refused when the order comes back with a declined capture", async () => {
@@ -118,27 +118,27 @@ it("reports refused when the order comes back with a declined capture", async ()
     ),
   );
 
-  expect(await charge("1j970427g9944212v", glasses, 14)).toEqual({ state: "refused", reason: "capture DECLINED" });
+  expect(await charge("1j970427g9944212v", glasses, "purchase-14-1792491300000")).toEqual({ state: "refused", reason: "capture DECLINED" });
 });
 
 it("reports unknown when PayPal fails or doesn't answer, since the money may have moved", async () => {
   stubPaypal(() => new Response("", { status: 500 }));
-  expect(await charge("1j970427g9944212v", glasses, 15)).toEqual({ state: "unknown", reason: "HTTP 500" });
+  expect(await charge("1j970427g9944212v", glasses, "purchase-15-1792491300000")).toEqual({ state: "unknown", reason: "HTTP 500" });
 
   stubPaypal(() => {
     throw new DOMException("The operation timed out.", "TimeoutError");
   });
-  expect(await charge("1j970427g9944212v", glasses, 15)).toEqual({ state: "unknown", reason: "TimeoutError" });
+  expect(await charge("1j970427g9944212v", glasses, "purchase-15-1792491300000")).toEqual({ state: "unknown", reason: "TimeoutError" });
 });
 
 it("reports unknown when PayPal says OK but its answer can't be read, since the money may have moved", async () => {
   stubPaypal(() => new Response('{"id":"5KD18823TL0094410","status":"COMP', { status: 201 }));
 
-  expect(await charge("1j970427g9944212v", glasses, 17)).toEqual({ state: "unknown", reason: "SyntaxError" });
+  expect(await charge("1j970427g9944212v", glasses, "purchase-17-1792491300000")).toEqual({ state: "unknown", reason: "SyntaxError" });
 });
 
 it("reports refused when the keys are rejected, since no order was sent", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => new Response('{"error":"invalid_client"}', { status: 401 })));
 
-  expect(await charge("1j970427g9944212v", glasses, 16)).toEqual({ state: "refused", reason: "token HTTP 401" });
+  expect(await charge("1j970427g9944212v", glasses, "purchase-16-1792491300000")).toEqual({ state: "refused", reason: "token HTTP 401" });
 });

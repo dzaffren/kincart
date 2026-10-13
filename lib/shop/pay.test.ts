@@ -83,7 +83,26 @@ it("leaves an unknown charge paying, then settles it with the same request id", 
   const ids = (fetch.mock.calls as unknown as [string, RequestInit][])
     .filter(([url]) => url.endsWith("/v2/checkout/orders"))
     .map(([, init]) => (init.headers as Record<string, string>)["PayPal-Request-Id"]);
-  expect(ids).toEqual([`purchase-${request.id}`, `purchase-${request.id}`]);
+  const key = `purchase-${request.id}-${request.askedAt.getTime()}`;
+  expect(ids).toEqual([key, key]);
+});
+
+it("sends a new request id when a fresh database reuses a request's number", async () => {
+  await saveVault("1j970427g9944212v");
+  const fetch = stubOrders(completed, completed);
+
+  await sql("TRUNCATE purchase_requests RESTART IDENTITY");
+  const first = await claimedGlasses();
+  await pay(first);
+  await sql("TRUNCATE purchase_requests RESTART IDENTITY");
+  const second = await claimedGlasses();
+  await pay(second);
+
+  const ids = (fetch.mock.calls as unknown as [string, RequestInit][])
+    .filter(([url]) => url.endsWith("/v2/checkout/orders"))
+    .map(([, init]) => (init.headers as Record<string, string>)["PayPal-Request-Id"]);
+  expect(second.id).toBe(first.id);
+  expect(ids[1]).not.toBe(ids[0]);
 });
 
 it("fails the request when no PayPal is saved, without calling PayPal", async () => {

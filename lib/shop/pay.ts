@@ -4,7 +4,7 @@ import { getVault, record, stuck, type PurchaseRequest } from "./requests";
 export async function pay(request: PurchaseRequest): Promise<void> {
   const vaultId = await getVault();
   const result = vaultId
-    ? await charge(vaultId, request.item, request.id)
+    ? await charge(vaultId, request.item, `purchase-${request.id}-${request.askedAt.getTime()}`)
     : ({ state: "refused", reason: "not linked" } as const);
 
   const line = `purchase id=${request.id} item=${request.item.id}`;

@@ -36,7 +36,7 @@ export async function createPaymentToken(setupTokenId: string): Promise<string> 
   return body.id;
 }
 
-export async function charge(vaultId: string, item: Item, requestId: number): Promise<ChargeResult> {
+export async function charge(vaultId: string, item: Item, requestKey: string): Promise<ChargeResult> {
   let token: string;
   try {
     token = await accessToken();
@@ -51,7 +51,7 @@ export async function charge(vaultId: string, item: Item, requestId: number): Pr
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        "PayPal-Request-Id": `purchase-${requestId}`,
+        "PayPal-Request-Id": requestKey,
         Prefer: "return=representation",
       },
       body: JSON.stringify({

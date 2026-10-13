@@ -187,7 +187,7 @@ Craft checks: a one-line "approve a purchase" prompt gives a card with a shadow,
 
 ### Approach
 
-Rose's and Sam's pages are server components at `/r/[token]` and `/h/[token]`. Each one reads the saved PayPal and the latest request from Neon, maps them to one state, and renders the pause 2 view. Taps are server actions. Linking uses PayPal's vault, as the spike did (D16): a setup token, Rose's approval, then a payment token saved in one row. Sam's OK claims the request with one conditional `UPDATE`, so only one tab can win (scenario 5). Then it charges the saved PayPal with `PayPal-Request-Id` set to the request's ID, so a retry can't charge twice. A small client component calls `router.refresh()` every 3 seconds while the page is on screen, which is how each phone sees the other's change within 5 seconds.
+Rose's and Sam's pages are server components at `/r/[token]` and `/h/[token]`. Each one reads the saved PayPal and the latest request from Neon, maps them to one state, and renders the pause 2 view. Taps are server actions. Linking uses PayPal's vault, as the spike did (D16): a setup token, Rose's approval, then a payment token saved in one row. Sam's OK claims the request with one conditional `UPDATE`, so only one tab can win (scenario 5). Then it charges the saved PayPal with `PayPal-Request-Id` set to the request's ID and ask time, so a retry can't charge twice and a fresh database's request 1 can't get an old request 1's answer. A small client component calls `router.refresh()` every 3 seconds while the page is on screen, which is how each phone sees the other's change within 5 seconds.
 
 Relies on: D2, D3, D4, D5, D6, D7, D10, D11, D12, D13, D15, D16, D17, D18, D19, D20
 
@@ -225,7 +225,7 @@ sequenceDiagram
     S->>A: answer=ok, request 12
     A->>D: UPDATE purchase_requests SET status='paying' WHERE id=12 AND status='waiting' RETURNING *
     D-->>A: 1 row (a second tab gets 0 rows and just re-renders)
-    A->>P: POST /v2/checkout/orders, vault_id, $18.99, PayPal-Request-Id purchase-12
+    A->>P: POST /v2/checkout/orders, vault_id, $18.99, PayPal-Request-Id purchase-12-<ask time>
     P-->>A: COMPLETED, capture 7BM91101S1572292D
     A->>D: UPDATE status='paid', order and capture ids
     A-->>S: re-render: receipt
@@ -339,7 +339,7 @@ The two tables don't reference each other: there is one relative and one saved P
 | `purchase_requests` table | scenarios 2 to 5: a request crosses two phones and many page loads |
 | unique partial index | O5: one waiting request, held by the database rather than by a read-then-write race |
 | conditional `UPDATE` claim | scenario 5: two tabs tapping OK charge once |
-| `PayPal-Request-Id` = request ID, and the `stuck()` retry | scenarios 4 and 5: a function cut off mid-charge must neither charge twice nor stay unpaid with no receipt |
+| `PayPal-Request-Id` = request ID and ask time, and the `stuck()` retry | scenarios 4 and 5: a function cut off mid-charge must neither charge twice nor stay unpaid with no receipt |
 | `setup_token` cookie | scenario 1: the return route needs the setup token without trusting PayPal's query parameters |
 | `Refresher` | scenarios 2 to 4: within 5 s on the other phone (D19) |
 | `LocalTime` | scenario 2's receipt: the server's UTC time would be wrong on both phones |
