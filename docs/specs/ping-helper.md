@@ -128,6 +128,7 @@ Scenario: A phone that stopped accepting notifications changes nothing else
 - A reminder when Sam hasn't answered: no slice planned.
 - A Turn off button: no slice planned. The phone's own notification settings turn it off.
 - Email or text messages: no slice planned (D1).
+- Notifications through the PayPal app: no slice planned. In PayPal itself, these pings would be PayPal app notifications and none of the web push setup would exist. This slice is a stand-in for the hackathon, and the video and README say so.
 - Asking by voice: slice 4, `ask-by-voice`.
 
 ## Open items
