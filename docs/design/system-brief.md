@@ -149,15 +149,14 @@ Home Screens and notification shades ignore the page's dark mode
 
 One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper's /build. Two new colour tokens, `icon-tile` (#5B3AA0) and `icon-mark` (#FFFFFF): the light `accent` and `on-accent` pair, held fixed because the icon never follows dark mode.
 
-Concepts for the pause B test, made with the logo-design skill's process (research, a word map, black first, tested at 64, 32 and 16px). Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
+Concepts for the pause B test, made with the logo-design skill's process: a word map, a scored longlist (`docs/design/app-icon/longlist.md`), black first, tested at 64, 32 and 16px and beside real marks (Gatsby, Zendesk, Patreon) at the same size. Files in `docs/design/app-icon/`; on the violet tile at `/preview/app-icon`.
 
 | Concept | The idea in one line | What could sink it |
 | ------- | -------------------- | ------------------ |
-| A · Reply | A speech bubble with the tick cut out: the ask comes back with an OK | The closest to a stock chat or "approved" icon |
-| B · Halves | An S of two separate halves, one for each person, that meet in the middle | Less literal: it says "Shop-together", not "approve" |
-| C · Tag | A price tag with the tick cut out: shopping, approved | Close to a stock "verified price" icon |
+| A · And | An ampersand, Rose & Sam, whose last stroke is the OK | At 16px the tick foot reads as part of the "&", not as a tick |
+| B · st | One line writes s and t and joins them, the old printer's sign for letters held together | The s is the weaker letter, and the swash crowds Android's circle crop |
 
-An earlier round (a tick in a bubble, two overlapping circles, a plain "S") was replaced. Two overlapping circles is Mastercard's mark, and a plain S is a stock letter tile. "Two people make a tick" was tried and dropped: at 64px it read as a tick with two dots.
+Round 1 (a speech bubble with a tick, an S of two halves, a price tag with a tick) was turned down at pause B: stock pairings and a letter. Before it, a tick in a bubble, two overlapping circles (Mastercard's mark) and a plain "S" were replaced. Dropped from round 2's longlist after drawing: a tick in two pieces (read as a broken tick), one tick cut through two phones (read as a checkbox), a tick with two heads (read as a tick with dots).
 
 Rejected before testing: a shopping cart or bag, with or without a tick or heart. It is the first thing a one-line "family shopping app icon" prompt draws.
 

@@ -1,117 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="840" viewBox="0 0 1600 840"><defs><filter id="grey"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1600" height="840" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">Shop-together · app icon concepts</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Black first. On the violet tile at /preview/app-icon.</text><rect x="60" y="150" width="474.667" height="630" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="90" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
-  <title id="c0-t">Reply: the ask comes back with an OK</title>
-  <defs>
-    <mask id="c0-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <path d="M86 124 L114 152 L172 94" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <path mask="url(#c0-cut)" fill="#111" d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"/>
-</svg></g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="90" y="516" width="64" height="64" preserveAspectRatio="xMidYMid meet">
-  <title id="s064-t">Reply: the ask comes back with an OK</title>
-  <defs>
-    <mask id="s064-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <path d="M86 124 L114 152 L172 94" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <path mask="url(#s064-cut)" fill="#111" d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"/>
-</svg></g><text x="122" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="180" y="548" width="32" height="32" preserveAspectRatio="xMidYMid meet">
-  <title id="s032-t">Reply: the ask comes back with an OK</title>
-  <defs>
-    <mask id="s032-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <path d="M86 124 L114 152 L172 94" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <path mask="url(#s032-cut)" fill="#111" d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"/>
-</svg></g><text x="196" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="238" y="564" width="16" height="16" preserveAspectRatio="xMidYMid meet">
-  <title id="s016-t">Reply: the ask comes back with an OK</title>
-  <defs>
-    <mask id="s016-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <path d="M86 124 L114 152 L172 94" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <path mask="url(#s016-cut)" fill="#111" d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"/>
-</svg></g><text x="246" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="636" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · Reply</text><text x="90.0" y="670" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">The ask comes back with an OK.</text><rect x="562.667" y="150" width="474.667" height="630" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="592.667" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
-  <title id="c1-t">Halves: an S of two halves that meet</title>
-  <g id="c1-symbol" fill="#111">
-    <path d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"/>
-    <path d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="840" viewBox="0 0 1600 840"><defs><filter id="grey"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1600" height="840" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">Shop-together · app icon concepts, round 2</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Black first. On the violet tile at /preview/app-icon.</text><rect x="60" y="150" width="726" height="630" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="90" y="190" width="666" height="300" preserveAspectRatio="xMidYMid meet">
+  <title>And: an ampersand whose last stroke is a tick</title>
+  <path fill="none" stroke="#111" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"
+        d="M220 120 L182 210 L104 114 C88 94 74 82 74 66 C74 44 90 32 106 32 C122 32 138 44 138 64 C138 86 120 100 102 116 C74 140 52 156 52 182 C52 210 78 226 104 226 C116 226 124 222 130 216"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="90" y="516" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title>And: an ampersand whose last stroke is a tick</title>
+  <path fill="none" stroke="#111" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"
+        d="M220 120 L182 210 L104 114 C88 94 74 82 74 66 C74 44 90 32 106 32 C122 32 138 44 138 64 C138 86 120 100 102 116 C74 140 52 156 52 182 C52 210 78 226 104 226 C116 226 124 222 130 216"/>
+</svg>
+</g><text x="122" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="180" y="548" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title>And: an ampersand whose last stroke is a tick</title>
+  <path fill="none" stroke="#111" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"
+        d="M220 120 L182 210 L104 114 C88 94 74 82 74 66 C74 44 90 32 106 32 C122 32 138 44 138 64 C138 86 120 100 102 116 C74 140 52 156 52 182 C52 210 78 226 104 226 C116 226 124 222 130 216"/>
+</svg>
+</g><text x="196" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="238" y="564" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title>And: an ampersand whose last stroke is a tick</title>
+  <path fill="none" stroke="#111" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"
+        d="M220 120 L182 210 L104 114 C88 94 74 82 74 66 C74 44 90 32 106 32 C122 32 138 44 138 64 C138 86 120 100 102 116 C74 140 52 156 52 182 C52 210 78 226 104 226 C116 226 124 222 130 216"/>
+</svg>
+</g><text x="246" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="636" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · And</text><text x="90.0" y="664" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="90.0" y="698" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">An ampersand, Rose &amp; Sam, whose last stroke is the OK.</text><rect x="814" y="150" width="726" height="630" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="844" y="190" width="666" height="300" preserveAspectRatio="xMidYMid meet">
+  <title>st ligature</title>
+  <g fill="none" stroke="#111" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"/>
+    <path d="M152 120 H206"/>
   </g>
 </svg>
-</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="592.667" y="516" width="64" height="64" preserveAspectRatio="xMidYMid meet">
-  <title id="s164-t">Halves: an S of two halves that meet</title>
-  <g id="s164-symbol" fill="#111">
-    <path d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"/>
-    <path d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"/>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="844" y="516" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title>st ligature</title>
+  <g fill="none" stroke="#111" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"/>
+    <path d="M152 120 H206"/>
   </g>
 </svg>
-</g><text x="624.667" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="682.667" y="548" width="32" height="32" preserveAspectRatio="xMidYMid meet">
-  <title id="s132-t">Halves: an S of two halves that meet</title>
-  <g id="s132-symbol" fill="#111">
-    <path d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"/>
-    <path d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"/>
+</g><text x="876" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="934" y="548" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title>st ligature</title>
+  <g fill="none" stroke="#111" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"/>
+    <path d="M152 120 H206"/>
   </g>
 </svg>
-</g><text x="698.667" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="740.667" y="564" width="16" height="16" preserveAspectRatio="xMidYMid meet">
-  <title id="s116-t">Halves: an S of two halves that meet</title>
-  <g id="s116-symbol" fill="#111">
-    <path d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"/>
-    <path d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"/>
+</g><text x="950" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="992" y="564" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title>st ligature</title>
+  <g fill="none" stroke="#111" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"/>
+    <path d="M152 120 H206"/>
   </g>
 </svg>
-</g><text x="748.667" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="592.6666666666667" y="636" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · Halves</text><text x="592.6666666666667" y="664" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="592.6666666666667" y="698" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">An S of two halves, one for each of you,</text><text x="592.6666666666667" y="724" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">that meet in the middle.</text><rect x="1065.33" y="150" width="474.667" height="630" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="1095.33" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
-  <title id="c2-t">Tag: a price tag that says OK</title>
-  <defs>
-    <mask id="c2-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <circle cx="128" cy="62" r="15" fill="#000"/>
-      <path d="M92 158 L118 184 L166 130" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <g id="c2-symbol" mask="url(#c2-cut)">
-    <path d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z" fill="#111" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
-  </g>
-</svg>
-</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="1095.33" y="516" width="64" height="64" preserveAspectRatio="xMidYMid meet">
-  <title id="s264-t">Tag: a price tag that says OK</title>
-  <defs>
-    <mask id="s264-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <circle cx="128" cy="62" r="15" fill="#000"/>
-      <path d="M92 158 L118 184 L166 130" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <g id="s264-symbol" mask="url(#s264-cut)">
-    <path d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z" fill="#111" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
-  </g>
-</svg>
-</g><text x="1127.33" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="1185.33" y="548" width="32" height="32" preserveAspectRatio="xMidYMid meet">
-  <title id="s232-t">Tag: a price tag that says OK</title>
-  <defs>
-    <mask id="s232-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <circle cx="128" cy="62" r="15" fill="#000"/>
-      <path d="M92 158 L118 184 L166 130" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <g id="s232-symbol" mask="url(#s232-cut)">
-    <path d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z" fill="#111" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
-  </g>
-</svg>
-</g><text x="1201.33" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t" viewBox="0 0 256 256" x="1243.33" y="564" width="16" height="16" preserveAspectRatio="xMidYMid meet">
-  <title id="s216-t">Tag: a price tag that says OK</title>
-  <defs>
-    <mask id="s216-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-      <rect width="256" height="256" fill="#fff"/>
-      <circle cx="128" cy="62" r="15" fill="#000"/>
-      <path d="M92 158 L118 184 L166 130" fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    </mask>
-  </defs>
-  <g id="s216-symbol" mask="url(#s216-cut)">
-    <path d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z" fill="#111" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
-  </g>
-</svg>
-</g><text x="1251.33" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="1095.3333333333335" y="636" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">C · Tag</text><text x="1095.3333333333335" y="670" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">A price tag that says OK.</text></svg>
+</g><text x="1000" y="600" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="844.0" y="636" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · st</text><text x="844.0" y="670" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">One line writes s and t and joins them: the printer&#x27;s sign for</text><text x="844.0" y="696" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">letters held together.</text></svg>

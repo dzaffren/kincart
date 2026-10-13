@@ -80,20 +80,9 @@
   fill: var(--color-icon-tile);
 }
 
-.icon-mark {
-  fill: var(--color-icon-mark);
-}
-
-.icon-solid {
-  fill: var(--color-icon-mark);
-  stroke: var(--color-icon-mark);
-  stroke-width: 12;
-  stroke-linejoin: round;
-}
-
-.icon-cut {
+.icon-stroke {
   fill: none;
-  stroke: black;
+  stroke: var(--color-icon-mark);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -102,11 +91,6 @@
   display: none;
 }
 
-.icon-badge .icon-mark,
-.icon-badge .icon-solid {
-  fill: currentColor;
-}
-
-.icon-badge .icon-solid {
+.icon-badge .icon-stroke {
   stroke: currentColor;
 }

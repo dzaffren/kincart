@@ -3,63 +3,35 @@ import type { ReactNode } from "react";
 import "../approve-and-pay/preview.css";
 import "./icon.css";
 
-type Mark = { name: string; note: string; draw: (id: string) => ReactNode };
+type Mark = { name: string; note: string; draw: () => ReactNode };
 
 // Each mark is drawn on a 256 canvas; fit scales and centres it to about 62% of the tile.
 const marks: Mark[] = [
   {
-    name: "A · Reply",
-    note: "The ask comes back with an OK. Clearest at 16px; also the closest to a stock chat icon.",
-    draw: (id) => (
-      <>
-        <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-          <rect width="256" height="256" fill="white" />
-          <path className="icon-cut" strokeWidth="28" d="M86 124 L114 152 L172 94" />
-        </mask>
-        <g transform={fit(0.78, 130, 126)}>
-          <path
-            className="icon-mark"
-            mask={`url(#${id})`}
-            d="M128 24 A100 100 0 1 1 68 204 L34 228 L44 172 A100 100 0 0 1 128 24 Z"
-          />
-        </g>
-      </>
-    ),
-  },
-  {
-    name: "B · Halves",
-    note: "An S of two halves, one for each of you, that meet in the middle. The most ownable; the least literal.",
+    name: "A · And",
+    note: "An ampersand, Rose & Sam, whose last stroke is the OK.",
     draw: () => (
-      <g transform={fit(0.84, 128, 128)}>
+      <g transform={fit(0.7, 136, 129)}>
         <path
-          className="icon-mark"
-          d="M166.56 64.5 A63 63 0 1 0 112 159 A15 15 0 0 0 112 129 A33 33 0 1 1 140.58 79.5 A15 15 0 0 0 166.56 64.5 Z"
-        />
-        <path
-          className="icon-mark"
-          d="M144 97 A63 63 0 1 1 89.44 191.5 A15 15 0 0 1 115.42 176.5 A33 33 0 1 0 144 127 A15 15 0 0 1 144 97 Z"
+          className="icon-stroke"
+          strokeWidth="34"
+          d="M220 120 L182 210 L104 114 C88 94 74 82 74 66 C74 44 90 32 106 32 C122 32 138 44 138 64 C138 86 120 100 102 116 C74 140 52 156 52 182 C52 210 78 226 104 226 C116 226 124 222 130 216"
         />
       </g>
     ),
   },
   {
-    name: "C · Tag",
-    note: "A price tag that says OK. Reads as shopping at once; close to a stock \"verified price\" icon.",
-    draw: (id) => (
-      <>
-        <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
-          <rect width="256" height="256" fill="white" />
-          <circle cx="128" cy="62" r="15" fill="black" />
-          <path className="icon-cut" strokeWidth="28" d="M92 158 L118 184 L166 130" />
-        </mask>
-        <g transform={fit(0.75, 128, 128)}>
-          <path
-            className="icon-solid"
-            mask={`url(#${id})`}
-            d="M128 22 L196 82 V218 A16 16 0 0 1 180 234 H76 A16 16 0 0 1 60 218 V82 Z"
-          />
-        </g>
-      </>
+    name: "B · st",
+    note: "One line writes s and t and joins them: the printer's sign for letters held together.",
+    draw: () => (
+      <g transform={fit(0.78, 128, 124)}>
+        <path
+          className="icon-stroke"
+          strokeWidth="32"
+          d="M44 202 A32 32 0 1 0 78 156 A28 28 0 0 1 78 100 C104 100 118 38 150 38 C170 38 178 56 178 84 V182 A28 28 0 0 0 206 210 H212"
+        />
+        <path className="icon-stroke" strokeWidth="32" d="M152 120 H206" />
+      </g>
     ),
   },
 ];
@@ -74,7 +46,7 @@ export default function AppIconPreview() {
   return (
     <main className="preview">
       <header className="preview-header">
-        <h1>App icon: three concepts</h1>
+        <h1>App icon: round 2</h1>
         <p>
           Each mark at 192px, on a Home Screen at 64px on two wallpapers, cropped to Android&apos;s smallest circle, and
           as the 24px badge beside a notification. Corners are rounded the way iPhone rounds them. The tile and the mark
@@ -82,30 +54,30 @@ export default function AppIconPreview() {
         </p>
       </header>
 
-      {marks.map((mark, i) => (
+      {marks.map((mark) => (
         <section className="preview-section" key={mark.name}>
           <h2>{mark.name}</h2>
           <p className="icon-note">{mark.note}</p>
           <div className="icon-row">
             <Shot label="Close up">
-              <Icon className="icon-large" draw={mark.draw} id={`m${i}a`} />
+              <Icon className="icon-large" draw={mark.draw} />
             </Shot>
             <Shot label="Home Screen">
               <div className="icon-walls">
                 <div className="icon-wall icon-wall-pale">
-                  <Icon className="icon-home" draw={mark.draw} id={`m${i}b`} />
+                  <Icon className="icon-home" draw={mark.draw} />
                 </div>
                 <div className="icon-wall icon-wall-deep">
-                  <Icon className="icon-home" draw={mark.draw} id={`m${i}c`} />
+                  <Icon className="icon-home" draw={mark.draw} />
                 </div>
               </div>
             </Shot>
             <Shot label="Android circle">
-              <Icon className="icon-home icon-circle" draw={mark.draw} id={`m${i}d`} />
+              <Icon className="icon-home icon-circle" draw={mark.draw} />
             </Shot>
             <Shot label="Notification badge">
               <p className="icon-strip">
-                <Icon className="icon-badge" draw={mark.draw} id={`m${i}e`} />
+                <Icon className="icon-badge" draw={mark.draw} />
                 Rose would like something
               </p>
             </Shot>
@@ -116,11 +88,11 @@ export default function AppIconPreview() {
   );
 }
 
-function Icon({ className, draw, id }: { className: string; draw: Mark["draw"]; id: string }) {
+function Icon({ className, draw }: { className: string; draw: Mark["draw"] }) {
   return (
     <svg className={`icon ${className}`} viewBox="0 0 256 256" aria-hidden="true">
       <rect className="icon-tile" width="256" height="256" />
-      {draw(id)}
+      {draw()}
     </svg>
   );
 }
