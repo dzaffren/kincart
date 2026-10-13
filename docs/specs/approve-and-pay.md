@@ -138,18 +138,21 @@ Scenario: An answered request can't be answered again
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
 | -- | ---- | ---- | --------- | ----- | ------ | ------ |
-| O1 | Saving Rose's PayPal once (vault), then charging it later on Sam's OK alone, works in sandbox (from shape O1) | unproven | shape | poc | Open | Spike runs after pause 1 approval, before pause 3. Agreed 2026-10-13 |
+| O1 | Saving Rose's PayPal once (vault), then charging it later on Sam's OK alone, works in sandbox (from shape O1) | unproven | shape | poc | Resolved | Yes, with Billing Agreements v1, not the v3 vault. Vault setup tokens answer `NOT_AUTHORIZED` on both sandbox apps, MY and US. A billing agreement approved once (`B-8T410996G4242493E`) was charged $18.99 later with no buyer: `POST /v2/checkout/orders` with `payment_source.token` of type `BILLING_AGREEMENT` came back `COMPLETED` at once, capture `50G56147LD7319003`. Resending it with the same `PayPal-Request-Id` returned the same order and one capture. Billing Agreements v1 is on PayPal's deprecated list. `.env.local` now holds a US sandbox app (merchant `sb-qe3zu53303991`); Vercel and GitHub still hold the MY app's keys. Spike, 2026-10-13 |
 | O2 | Fallback if the vault fails. Normal checkout puts Rose's PayPal login back in the path (from shape O2) | question | shape | user | Resolved | Sam pays from their own PayPal: OK opens normal PayPal checkout on Sam's phone. No shared passwords; the money comes from Sam. Built only if O1 fails, and then scenario 1 goes and scenarios 2, 4 and 5 charge Sam. 2026-10-13 |
 | O3 | Two fixed demo people and no sign-up. Anyone holding Sam's link could approve a sandbox charge (from shape O8) | assumption | shape | user | Accepted risk | One long random secret link each. A leaked link for Sam can approve a charge in sandbox money only. Agreed 2026-10-13 |
 | O4 | Assuming US dollars and US sandbox accounts: a US personal account for Rose, a US business account receiving the money. Which countries PayPal offers the vault in is unchecked; the spike uses US accounts | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O5 | Assuming one waiting request at a time, with no cancel. If Sam never answers, Rose can't ask for anything else | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-13 |
 | O6 | The e2e can drive PayPal's sandbox login and approval page in CI, or it has to start from an already-linked PayPal | unproven | spec p1 | spec p3 | Open | — |
+| O7 | A personal sandbox account can approve the billing agreement and be charged. Both spike approvals were made by the MY business account (`sb-hnzlq53312161`), so a personal payer is untested | unproven | poc | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
 - **Vault** — PayPal's store for a saved payment method. The account holder approves once, and the app can charge later without them logging in.
+- **Billing agreement** — PayPal's older form of a saved PayPal. The buyer approves once and the shop gets an ID (`B-…`) it can charge later. Deprecated, but it works where the vault doesn't (O1).
+- **PayPal-Request-Id** — a header PayPal uses to spot a repeated request and return the first result instead of charging again.
 - **Sandbox** — PayPal's test environment. Fake accounts, fake money, real API.
 - **Secret link** — a URL with a long random part nobody can guess. Holding the link is the only key.
 - **Transaction ID** — the reference PayPal gives each payment, shown on the receipt so either person can find it in PayPal.
