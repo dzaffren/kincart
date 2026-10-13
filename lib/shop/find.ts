@@ -8,6 +8,10 @@ export type Search =
   | { outcome: "options"; options: Option[] }
   | { outcome: "nothing found" | "over limit" | "several" };
 
+export function searchOn(): boolean {
+  return Boolean(process.env.ANTHROPIC_API_KEY && process.env.CHANNEL3_API_KEY);
+}
+
 export async function find(words: string, limitCents: number): Promise<Search> {
   const started = Date.now();
   let reason = "";
