@@ -1,14 +1,13 @@
 import { useId } from "react";
 import type { Item } from "../../lib/shop/items";
+import type { Source } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
 import { money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
 
-type Found = { shop: string; url: string; why: string };
-
 export type SamState =
   | { kind: "nothing"; declined?: Item }
-  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Found }
+  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source }
   | { kind: "paid"; receipt: Receipt }
   | { kind: "failed"; item: Item };
 
@@ -32,7 +31,7 @@ export function SamView({ state, answer, limit, setLimit }: Props) {
         {found && (
           <div className="heading">
             <p>
-              <strong>Why it fits:</strong> {found.why}
+              <strong>Why it fits:</strong> {found.reason}
             </p>
             <a className="link" href={found.url} target="_blank" rel="noopener noreferrer">
               See it on {found.shop}

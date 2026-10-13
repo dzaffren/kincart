@@ -134,7 +134,7 @@ export default function FindAndExplainPreview() {
         <div className="frames">
           <Frame label="Rose asks (scenario 2)">
             <SamView
-              state={{ kind: "request", item: strap, askedAt, found: { shop: strap.shop, url: strap.url, why: strap.why } }}
+              state={{ kind: "request", item: strap, askedAt, found: { shop: strap.shop, url: strap.url, reason: strap.why } }}
             />
           </Frame>
           <Frame label="Paying">
@@ -144,7 +144,7 @@ export default function FindAndExplainPreview() {
                 item: strap,
                 askedAt,
                 busy: true,
-                found: { shop: strap.shop, url: strap.url, why: strap.why },
+                found: { shop: strap.shop, url: strap.url, reason: strap.why },
               }}
             />
           </Frame>
