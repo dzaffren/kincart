@@ -129,10 +129,59 @@ Scenario: An answered request can't be answered again
 - Typed requests and AI explanations of options: `find-and-explain`.
 - Notifications when the page is closed: `ping-helper`.
 - Asking by voice: `ask-by-voice`.
-- Sam paying from their own PayPal: built only if the vault spike fails (O2).
+- Sam paying from their own PayPal: not built. The vault works (O1, D16), so the O2 fallback isn't needed.
 - Cancelling a waiting request, refunds, a history of past purchases, unlinking or switching PayPal accounts: no slice planned.
 - More than one relative or helper, and sign-up: no slice planned (O3).
 - Spend limits, auto-approve, real shop orders: shape's Not doing list.
+
+## Interface
+
+Two phone pages built from the design system's tokens (D15), one for Rose and one for Sam, plus a page for a broken link. Each is a pure view that takes one state and renders it, the same pattern as `StatusView`.
+
+```mermaid
+flowchart LR
+    NL["Rose: Link your PayPal to start"] -- "Link PayPal, approves" --> PK["Rose: What would you like?"]
+    NL -- "cancels at PayPal" --> NC["Rose: PayPal isn't linked yet"]
+    NC -- "Link PayPal" --> PK
+    PK -- "Ask Sam" --> WT["Rose: Waiting for Sam"]
+    WT -- "shows within 5 s" --> RQ["Sam: Rose would like Reading glasses"]
+    RQ -- "OK, pay $18.99" --> PD["Both: receipt"]
+    RQ -- "No: grey notice for Rose" --> PK
+    RQ -- "PayPal refuses: red notice for both" --> PK
+    PD -- "Ask for something else" --> PK
+```
+
+Rose's page loops through pick, wait and outcome. Every outcome returns Rose to the three items. Sam's page keeps the latest outcome until Rose asks again.
+
+| Page | State | Heading | What else shows |
+| ---- | ----- | ------- | --------------- |
+| Rose | not linked | Link your PayPal to start | one line on what linking does; Link PayPal |
+| Rose | cancelled at PayPal | PayPal isn't linked yet | "Nothing was saved"; Link PayPal |
+| Rose | pick | What would you like? | "PayPal linked. Nothing is paid until Sam says OK."; three radio cards with prices; Ask Sam |
+| Rose | pick, no item chosen | What would you like? | red line under the cards: "Pick one of the three first." |
+| Rose | pick, after No | What would you like? | grey notice above: "Sam said no to AA batteries, pack of 8." |
+| Rose | pick, after a failed charge | What would you like? | red notice above: "Payment didn't go through. Nothing was taken." |
+| Rose | waiting | Waiting for Sam | amber notice: "Asked at 10:15 AM. This page changes by itself when Sam answers."; item and amount |
+| Rose | paid | Sam said OK. It's paid. | green receipt; Ask for something else |
+| Sam | nothing | Nothing to approve | "Keep this page open." After a No, a grey notice: "You said no to AA batteries, pack of 8. Rose can see that." |
+| Sam | request | Rose would like Reading glasses, +2.00 | $18.99 with "Paid from Rose's PayPal if you say OK."; asked time; OK, pay $18.99; No |
+| Sam | paid | Paid from Rose's PayPal | green receipt; "Rose sees this receipt too." |
+| Sam | failed | Payment didn't go through | red notice: "Nothing was taken from Rose's PayPal for Weekly pill organiser. Rose can ask again." |
+| either | wrong or cut-off link | This link doesn't work | open the whole link again, or ask the sender |
+
+The receipt shows Paid, the amount at 40px, the item, the day and time, and the PayPal transaction ID. Rose and Sam see the same one.
+
+Busy states: Link PayPal becomes "Opening PayPal…", Ask Sam becomes "Asking Sam…", and OK becomes "Paying…" with No hidden, so it can't be tapped mid-charge. No loading screen: the server sends each page complete. No empty state beyond Sam's "Nothing to approve".
+
+Checked: no sideways scroll at 320px and 390px wide; light and dark both rendered; text on the green receipt is 15.2:1 light and 12.2:1 dark, and "Paid" on it is 7.0:1 and 8.1:1. Every other pair is in the brief's table. Radio cards are real radio inputs, so the arrow keys move between them and the focus ring shows on the card.
+
+Craft checks: a one-line "approve a purchase" prompt gives a card with a shadow, a gradient header, and green and red Approve and Decline buttons. Here, No is a plain grey button, cards are flat, and the amount is the one big thing. Against the brief's references: Monzo's large amount and plain "you paid" receipt, and Stripe Checkout's amount kept in view, with an error that says how to fix it ("Pick one of the three first."). It holds up next to both. One thing it lacks: Monzo's receipt names who was paid, and there's no real shop here (shape O9).
+
+**Motion tier:** 1. Buttons shrink to 98% on press (120ms). Notices and the receipt rise 8px and fade in (240ms, ease-out). Spinners turn once every 900ms. Colour changes are instant. Under reduced motion nothing moves, and the words still change.
+
+**Components used:** tokens only, as the system has no component library (its conventions say to build each control from the tokens). Built here from them: `Button` (primary, secondary, busy), `ItemPicker` (radio cards), `Notice` (wait, neutral, danger), `Summary`, `ReceiptCard`, in `app/(shop)/ui.tsx`.
+
+**Preview:** `/preview/approve-and-pay` on `pnpm dev`. The views are `app/(shop)/RoseView.tsx`, `SamView.tsx` and `BrokenLinkView.tsx`. Tokens come from `docs/design/design-system/tokens/` through `app/(shop)/layout.tsx`, and the font from `next/font` in `app/layout.tsx`.
 
 ## Open items
 
