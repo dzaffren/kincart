@@ -1,30 +1,34 @@
 # PayPalHackathon
 
-**Status:** Active · **Updated:** 2026-10-12 by /shape onboarding
+**Status:** Active · **Updated:** 2026-10-13 by /ship skeleton
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
 
 ## Run it
 
-| Task    | Command          |
-| ------- | ---------------- |
-| install | `not set up yet` |
-| run     | `not set up yet` |
-| test    | `not set up yet` |
-| lint    | `not set up yet` |
+| Task    | Command         |
+| ------- | --------------- |
+| install | `pnpm install`  |
+| migrate | `pnpm db:up`    |
+| run     | `pnpm dev`      |
+| test    | `pnpm test`     |
+| e2e     | `pnpm test:e2e` |
+| lint    | `pnpm lint`     |
 
 ## Where things are
 
-- Nothing yet. Empty repo.
+- `app/status/` — the `/status` page and its view.
+- `lib/status/` — the database, PayPal and build checks.
+- `db/migrations/` and `scripts/migrate.mjs` — plain SQL migrations and the runner.
+- `e2e/` — Playwright tests.
+- `.github/workflows/ci.yml` — tests on every push; migrates Neon after a green main.
 
 ## Slices
 
-Nothing shipped yet
-
-| Slice    | Status   | What it does | Page     |
-| -------- | -------- | ------------ | -------- |
-| none yet | none yet | none yet     | none yet |
+| Slice    | Status | What it does                                                                                                  | Page                   |
+| -------- | ------ | ------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| skeleton | Built  | A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live. | docs/specs/skeleton.md |
 
 ## More
 
