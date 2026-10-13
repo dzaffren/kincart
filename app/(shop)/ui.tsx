@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from "react";
+import type { Option } from "../../lib/shop/find";
 import type { Item } from "../../lib/shop/items";
 import { LocalTime } from "./LocalTime";
 
@@ -6,8 +7,6 @@ export const RELATIVE = "Rose";
 export const HELPER = "Sam";
 
 export type Receipt = { item: Item; paidAt: Date; transactionId: string };
-
-export type Listing = Item & { shop: string; url: string; imageUrl?: string; what: string; why: string; watch: string };
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
@@ -90,7 +89,7 @@ export function ItemPicker({ items, labelledBy, picked, error }: PickerProps) {
 }
 
 type ListingPickerProps = {
-  listings: Listing[];
+  listings: Option[];
   labelledBy: string;
   picked?: string;
   error?: boolean;
@@ -120,7 +119,11 @@ export function ListingPicker({ listings, labelledBy, picked, error }: ListingPi
                 </span>
               </span>
               <span className="listing-text">
-                {listing.imageUrl && <img className="listing-photo" src={listing.imageUrl} alt="" />}
+                {listing.imageUrl && (
+                  // A 64px photo from Channel3's CDN gains nothing from Vercel's image optimizer.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img className="listing-photo" src={listing.imageUrl} alt="" />
+                )}
                 <span>
                   {listing.what} {listing.why}
                 </span>

@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { RoseView } from "../../RoseView";
 import { SamView } from "../../SamView";
-import type { Listing, Receipt } from "../../ui";
+import type { Option } from "../../../../lib/shop/find";
+import type { Receipt } from "../../ui";
 import "../approve-and-pay/preview.css";
 
 // The photos are an empty image, so each shows the grey square a photo sits on while it loads.
@@ -10,7 +11,7 @@ const photo = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAI
 
 const words = "warm slippers that are easy to put on, size 8";
 
-const listings: Listing[] = [
+const listings: Option[] = [
   {
     id: "clog",
     name: "Women's Memory Foam Slip-On Clog Slippers, Closed Toe",

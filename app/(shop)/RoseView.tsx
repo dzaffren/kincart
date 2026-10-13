@@ -1,4 +1,5 @@
 import { useId } from "react";
+import type { Option } from "../../lib/shop/find";
 import type { Item } from "../../lib/shop/items";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
@@ -9,7 +10,6 @@ import {
   Notice,
   ReceiptCard,
   Summary,
-  type Listing,
   type Receipt,
   wholeDollars,
 } from "./ui";
@@ -37,7 +37,7 @@ export type RoseState =
       kind: "options";
       limitCents: number;
       words: string;
-      listings: Listing[];
+      listings: Option[];
       picked?: string;
       error?: boolean;
       busy?: boolean;
@@ -47,9 +47,9 @@ export type RoseState =
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { state: RoseState; items: Item[]; link?: Action; ask?: Action; find?: Action };
+type Props = { state: RoseState; items: Item[]; link?: Action; ask?: Action; find?: Action; tryAgain?: Action };
 
-export function RoseView({ state, items, link, ask, find }: Props) {
+export function RoseView({ state, items, link, ask, find, tryAgain }: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -162,9 +162,11 @@ export function RoseView({ state, items, link, ask, find }: Props) {
           </Button>
         </form>
         {!state.busy && (
-          <a className="button button-secondary" href="?">
-            Try other words
-          </a>
+          <form action={tryAgain}>
+            <Button type="submit" kind="secondary">
+              Try other words
+            </Button>
+          </form>
         )}
       </div>
     );
