@@ -1,6 +1,6 @@
 # Demo home
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** households
@@ -264,19 +264,19 @@ Cut: a client component that adds the frames by window width (O14 proved lazy en
 | 3 A phone gets a button for each | `HomeView.test.tsx`: lazy frames. `demo-home.spec.ts` phone test: Be Rose and Be Sam visible, no sample caption visible, and no document request to `/r/` or `/h/` | `pnpm test`, `pnpm test:e2e` |
 | 4 Start a new one swaps both phones | `demo-home.spec.ts` laptop test, below | `pnpm test:e2e` |
 | `/status` says KinCart | `app/status/StatusView.test.tsx` | `pnpm test` |
-| O15 | `demo-home.spec.ts` laptop test: Sam's phone has no "Notifications" heading. `e2e/ping-helper.spec.ts` still turns notifications on in a full tab | `pnpm test:e2e` |
+| O15 | `demo-home.spec.ts` laptop test: after the receipt, neither phone shows "Notifications". `e2e/ping-helper.spec.ts` still turns notifications on in a full tab | `pnpm test:e2e` |
 
 **E2E:** `e2e/demo-home.spec.ts`, test "a judge plays Rose and Sam side by side", at 1280 by 800 with `test.use`.
 
 1. `reset()` saves household 1's PayPal.
 2. The judge opens `/` and sees "Mom asks." and two "Sample, not live" captions. They tap Try KinCart and see "Your Rose and Sam are ready.".
-3. Rose's phone, `frameLocator('iframe[title="Rose\'s phone"]')`, shows "What do you need?". Sam's phone shows "Nothing to approve" and no "Notifications" heading.
+3. Rose's phone, `locator('iframe[title="Rose\'s phone"]').contentFrame()`, shows "What do you need?". Sam's phone shows "Nothing to approve". The words, Rose's phone and Sam's phone sit left to right.
 4. `searchFor()` gives the new household AA batteries at $9.99. Within 5 s, Rose's phone refreshes to "Which one would you like?". The judge picks it and taps Ask Sam.
 5. Within 5 s, Sam's phone shows "Rose would like this" and "OK, pay $9.99". The judge taps it.
-6. Sam's phone shows "Paid from Rose's PayPal", and Rose's phone shows "Sam said OK. It's paid.", with the same PayPal transaction.
+6. Sam's phone shows "Paid from Rose's PayPal", and Rose's phone shows "Sam said OK. It's paid.", with the same PayPal transaction. Neither phone shows "Notifications". The check waits until here, because the control appears only after the page runs its effect.
 7. The judge taps Start a new one and sees "Your new Rose and Sam are ready.". Both frames' links change, and the phones show "What do you need?" and "Nothing to approve".
 
-The second test, "a phone gets a button for each", runs at 390 by 844. It starts a household and finds Be Rose and Be Sam, no visible sample caption, and no document request to `/r/` or `/h/`. Together they make one real sandbox charge (D20), and no Channel3 or Claude call. Stop `pnpm dev` before running them.
+The second test, "a phone gets a button for each", runs at 390 by 844. It starts a household and finds Be Rose and Be Sam, no visible sample caption, and no document request to `/r/` or `/h/`. Then Be Rose and Be Sam each open their page in a new tab. Together they make one real sandbox charge (D20), and no Channel3 or Claude call. Stop `pnpm dev` before running them.
 
 ### Chunks
 
