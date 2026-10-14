@@ -2,7 +2,7 @@
 
 **Learned:** 2026-10-14 · **From:** /ship ping-helper
 
-A flag that defaults off in code can already be on in production. The three VAPID variables were set on Vercel Production for the O1 spike, so merging ping-helper turned notifications on at deploy, while the PR said they would stay off until someone set them.
+A flag that defaults off in code can already be on in production. The three VAPID variables were already set on Vercel Production, so merging ping-helper turned notifications on at deploy, while the PR said they would stay off until someone set them.
 
 Wrong: reading `.env.example` and saying the slice ships dark.
 
