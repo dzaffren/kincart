@@ -22,7 +22,7 @@ Be Rose and Be Sam each open a new tab. On a laptop, a judge asks as Rose, then 
 | Cuts every layer it needs     | yes: the home page only, deployed. No data or action changes, because `households` already gives each browser its two links |
 | One e2e test walks it         | yes: a judge in a 1280 by 800 window taps Try KinCart, asks in Rose's phone, taps OK in Sam's phone, and both phones show the receipt |
 | Worth shipping alone          | yes: a judge on a laptop reads what KinCart does, and sees Sam's page change as Rose asks, with no tab switch |
-| Fits (≤5 scenarios, ≤2 areas) | yes: 4 scenarios; one area, the home page in `app/(shop)`, on the breakpoints and phone frame already in the design system (D40) |
+| Fits (≤5 scenarios, ≤2 areas) | yes: 4 scenarios; two areas, the home page in `app/(shop)` and the rename and restyle of `/status` (O12), on the design system's breakpoints and phone frame (D40) and its showcase extension (O10) |
 
 **Path:** full. It adds a wide layout, which is new interface, and the light path doesn't allow that.
 
@@ -86,6 +86,7 @@ Scenario: Start a new one on a laptop swaps both phones
 - From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages show side by side in two phone frames, live, in place of Be Rose and Be Sam (D39, D40). From 1280px wide, the words sit in a column to their left.
 - Below 880px wide or 480px high, the phone column from `households`, with Be Rose and Be Sam. It loads no frames.
 - Start a new one swaps both phones to the new household.
+- `/status` and the default tab title say KinCart, not Shop-together, and `/status` takes the system's type and colours (O12).
 
 **Out:**
 - Start over. Each judge has their own household, so nobody clears what another left (O8). No later slice.
@@ -159,6 +160,9 @@ Status: active
 | O7 | An old judge who opens their Rose or Sam page again saves their phone again: `NotifyControl.tsx:19` puts back a phone the server forgot. Recommended: accept, because opening the page is using it again. Other: drop the put-back, so a phone the push service dropped stays off until someone taps the control | flag | spec p3 | user | Resolved | No longer applies: with households, an old judge's phone belongs to the old judge's own household (O8). 2026-10-15 |
 | O8 | Should every judge get their own Rose and Sam, as every family would in production? Today all judges share one pair, which needs Start over (D37, D38, D41) and leaves O4 and O7 | question | spec p3 | user | Resolved | Yes. Split: a `households` slice first, where a visitor starts their own Rose and Sam with the demo sandbox PayPal already linked and every table is keyed by household. Then demo-home redoes pause 1 on top of it. Start over, D37, D38 and D41 go; D18 stands. 2026-10-15 |
 | O9 | What a laptop shows before Try KinCart. Recommended: the words and Try KinCart only, and the two phones appear once this browser has a household. Other choices: two empty phone outlines that say where Rose and Sam will show; or start a household on the first visit, so the phones show at once, which makes a household and a vault copy for every visit, crawlers too | question | spec p1 | user | Resolved | The words and Try KinCart only; the phones appear once this browser has a household. Empty outlines and a household on the first visit were turned down. 2026-10-15 |
+| O10 | The home page sells KinCart, so it needs a premium feel. The system lacks it: 28px is its largest type, cards and frames sit flat with no shadow, D40 turned down a bezel, and its motion stops at tier 1. Recommended: a showcase extension through `/design-system`, used only on `/`. Other: rework the page from today's tokens | flag | spec p2 | user | Resolved | A showcase extension through `/design-system`, used only on `/`: a display type step, phone frames with depth, a stage behind them and a tier-2 load reveal. Rose's and Sam's own pages stay as they are. 2026-10-15 |
+| O11 | Which reference the selling page aims at. Recommended: an Apple product page. Others: Monzo, Stripe's homepage, Linear | question | spec p2 | user | Resolved | Build two directions, Apple and Monzo, and compare them at the `/design-system` direction test. 2026-10-15 |
+| O12 | `/status` still says "Shop-together status" (`app/status/StatusView.tsx:13`), and the tab title is "Shop-together" (`app/layout.tsx:7`). The page also uses `system-ui` and the browser's default colours, not the system | flag | spec p2 | user | Resolved | Rename both to KinCart, and restyle `/status` from the system. In this slice. 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
