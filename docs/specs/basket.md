@@ -1,6 +1,6 @@
 # Basket
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** find-and-explain, ping-helper
@@ -384,7 +384,7 @@ The moved types live in chunk A: `Group` and `Search` in `find.ts`, and `Line`, 
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| A 5-thing Find runs past 20 s, or 10 searches at once get rate-limited | O12: prove it with `/poc` before /build. A thing that fails blanks only its own group, and the log names why |
+| A 5-thing Find runs past 20 s, or 10 searches at once get rate-limited | The spike (O12) took 7.2 to 7.7 s with no 429. On Vercel, a cold start and Neon add to that; the 20 s budget leaves room. A thing that fails blanks only its own group, and the log names why |
 | Haiku splits Rose's words differently from what Rose meant, or drops the "a" | The prompt asks for Rose's own words and keeps one product as one thing; Rose can try other words. The poc checks the e2e's list |
 | Channel3 has nothing for one of the e2e's three things, so the test can't pick two | The test picks from any two groups with listings, not fixed ones. Batteries, night lights and chargers are everyday stock; the poc checks all three |
 | A rollback while a basket waits | Old code shows Sam a one-item screen for "2 things" and OK charges the asked total: the right amount, just less detail. Accepted |
@@ -394,8 +394,8 @@ The moved types live in chunk A: `Group` and `Search` in `find.ts`, and `Line`, 
 ```
 ## D31 · 2026-10-14 · A basket searches all its things at once, each with find-and-explain's two calls
 
-Why: a 5-thing basket must show within 20 s (O5), and one thing takes about 10 s (find-and-explain O11); each thing keeps its own searches and Haiku pick, so a thing that fails blanks only its own group (scenario 3).
-Rejected: one thing after another (up to 50 s), one Haiku call choosing for every thing at once (one long answer, and one bad thing spoils the whole basket).
+Why: a 5-thing basket must show within 20 s (O5); searched all at once, it took 7.2 to 7.7 s in the spike with no rate limit (O12), where one after another would add up every thing's time. Each thing keeps its own searches and Haiku pick, so a thing that fails blanks only its own group (scenario 3).
+Rejected: one thing after another (about 27 s for five at the spike's 4.3 to 5.9 s a thing, past the 20 s budget), one Haiku call choosing for every thing at once (one long answer, and one bad thing spoils the whole basket).
 Source: docs/specs/basket.md
 Status: active
 
@@ -429,7 +429,7 @@ Status: active
 | O9 | Summary, ReceiptCard and ListingPicker are design-system components, and this slice gives each an optional prop. Sam's ticking also needs a tick box, which the system doesn't have; it is built from the option ring's tokens. craft.md asks for both to be a deliberate choice: accept them here as composition, as find-and-explain did with the listing card, or take them through `/design-system`. Either way the Claude Design bundle in `docs/design/design-system/ds-bundle/` shows the old versions until `/design-sync` | flag | spec p2 | user | Resolved | Accepted as composition with pause 2 approval: no new colours or tokens. The bundle stays stale until `/design-sync`. 2026-10-14 |
 | O10 | Sam ticking which things to pay for, split out as `basket-trim` at O1, comes back into this slice at pause 2. Unticked things go back to Rose: both receipts name them, and Rose's next ask starts with them in the box. The slice stays at 5 scenarios in the same two areas: Sam's answers share one scenario, and the untick path is scenario 2 | flag | spec p2 | user | Resolved | Asked for at pause 2 review; "back in Rose's box" picked over a note only or reopening the old options. `basket-trim` comes off the shape. 2026-10-14 |
 | O11 | Assuming Sam can't pay with nothing ticked: OK reads "Tick at least one to pay" and does nothing, and No is how Sam refuses all of it | assumption | spec p2 | user | Resolved | Confirmed with pause 2 approval, 2026-10-14 |
-| O12 | Unproven: with the real keys, a basket Find shows within 20 s (O5) when 10 Channel3 searches and 5 Haiku picks run at once, with no 429 from either; Haiku splits a list into Rose's own words ("a night light") and counts six things as six; and Channel3 has listings for all three of the e2e's things. find-and-explain's spike timed one thing only | unproven | spec p3 | user | Open | — |
+| O12 | Unproven: with the real keys, a basket Find shows within 20 s (O5) when 10 Channel3 searches and 5 Haiku picks run at once, with no 429 from either; Haiku splits a list into Rose's own words ("a night light") and counts six things as six; and Channel3 has listings for all three of the e2e's things. find-and-explain's spike timed one thing only | unproven | spec p3 | user | Resolved | Proven by a spike on 2026-10-14, everything fired at once as planned, from this machine: the 3-thing list took 6.2, 7.2 and 8.1 s, and the 5-thing list (adding a doormat and a flashlight) 7.7, 7.2 and 7.5 s. Of that, the split took 1.5 to 2.7 s, each thing 4.3 to 5.9 s, and Channel3 1.7 to 3.1 s. 48 Channel3 searches and 34 Haiku calls, with no 429 and no error. Haiku kept Rose's words ("a night light", "a phone charger") with queries like "night light", and counted the six-thing list as six. Every thing got three picks in every run. The plan stands |
 
 _Never delete this section or its rows. See references/ledger.md._
 
