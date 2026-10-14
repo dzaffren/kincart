@@ -531,8 +531,66 @@ body {
   gap: var(--space-6);
 }
 
-.home-phones {
+.home-phones,
+.home-guide {
   display: none;
+}
+
+/* Under the block: how it works and why the helper stays in charge, then the status link. */
+.home-more {
+  box-sizing: border-box;
+  max-width: calc(var(--page-max) * 2 + var(--space-16));
+  margin: 0 auto;
+  padding: var(--space-12) var(--page-inline);
+  display: grid;
+  align-items: start;
+  gap: var(--space-12);
+}
+
+.home-more h2 {
+  font: var(--type-heading);
+  margin: 0;
+}
+
+.home-more p {
+  margin: 0;
+}
+
+.home-steps,
+.home-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-6);
+}
+
+.home-steps {
+  counter-reset: step;
+}
+
+.home-steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: var(--space-8) 1fr;
+  column-gap: var(--space-3);
+}
+
+.home-steps li::before {
+  content: counter(step);
+  grid-row: span 2;
+  font: var(--type-heading);
+  color: var(--color-accent-text);
+}
+
+.home-steps strong,
+.home-points strong {
+  display: block;
+}
+
+.home-points li {
+  padding-left: var(--space-4);
+  border-left: var(--border-selected) solid var(--color-accent);
 }
 
 .home-reveal {
@@ -561,6 +619,19 @@ body {
 
   .home-ways {
     display: none;
+  }
+
+  .home-guide {
+    display: block;
+  }
+
+  .home-more {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-16);
+  }
+
+  .home-status {
+    grid-column: 1 / -1;
   }
 
   .home-phones {
