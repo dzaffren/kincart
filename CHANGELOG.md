@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-15
+
 ### Added
 
 - A `/status` page says plainly whether the database and the PayPal sandbox keys work (missing, rejected or unreachable), and which build is live.
@@ -33,3 +35,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.
+
+[unreleased]: https://github.com/dzaffren/kincart/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/dzaffren/kincart/releases/tag/v1.0.0
