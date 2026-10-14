@@ -328,3 +328,24 @@ Rejected: the Apple direction, a centred name over lifted phones on a grey stage
 Supersedes: D40
 Source: docs/design/system-brief.md
 Status: active
+
+## D51 · 2026-10-15 · Hidden phones stay unloaded with loading="lazy", not a width check in the browser
+
+Why: Chromium, Firefox and WebKit 26.6 skip a lazy iframe that is `display:none`, and load both once shown (demo-home O14 spike, 2026-10-15). So a phone never loads and polls two hidden pages, and the frames come with the HTML, not after hydration.
+Rejected: a client component that adds the frames only when the window matches (the frames appear after hydration, and it is one more client component), frames that load at once (every phone with a household would load and poll both pages).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D52 · 2026-10-15 · Rose's and Sam's pages leave out Notifications inside the home page's phones
+
+Why: on a laptop both phones are on one screen, so a push adds nothing there. A permission prompt or a push subscription from inside a frame is unproven (demo-home O15). Rose's or Sam's page in its own tab still offers it.
+Rejected: a spike to prove it first (time spent on a part judges don't need on a laptop), leaving it in (a refused prompt shows "Blocked" or an error inside the phone).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D53 · 2026-10-15 · A wide home page shows Rose's and Sam's real pages side by side
+
+Why: a judge sees Sam's screen change within seconds of Rose's ask without switching tabs, which is the product's point (O2).
+Rejected: a button for each that opens a new tab (the judge switches tabs to see the ask arrive), a button plus a QR code for each (a second device for every judge).
+Source: docs/specs/demo-home.md
+Status: active

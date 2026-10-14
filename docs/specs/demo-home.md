@@ -87,7 +87,7 @@ Scenario: Start a new one on a laptop swaps both phones
 - A page description and link-preview title, so a shared link says what KinCart is.
 - A premium look for `/` and `/status`, from the design system's showcase extension (O10, O11, D50).
 - Before Try KinCart, a laptop's two phones show Rose's and Sam's real screens with a sample ask, still and marked as a sample (O13).
-- From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages show side by side in two phone frames, live, in place of Be Rose and Be Sam (D39, D40). From 1280px wide, the words sit in a column to their left.
+- From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages show side by side in two phone frames, live, in place of Be Rose and Be Sam (D53, D40). From 1280px wide, the words sit in a column to their left.
 - Below 880px wide or 480px high, the phone column from `households`, with Be Rose and Be Sam. It loads no frames.
 - Start a new one swaps both phones to the new household.
 - `/status` and the default tab title say KinCart, not Shop-together, and `/status` takes the system's type and colours (O12).
@@ -163,7 +163,7 @@ Pause 2 already built the look into the real code: `HomeView`, `PhoneFrame`, the
 
 No new route, action, table or dependency. The live phones are iframes of the household's own `/r/<token>` and `/h/<token>`, which re-render every 3 s like any open tab (D19). The sample phones are the real `RoseView` and `SamView` with fixed data, rendered on the server and made `inert`.
 
-Relies on: D9, D10, D11, D19, D20, D24, D42, D44, D48, D50, and the drafted D39, D51 and D52.
+Relies on: D9, D10, D11, D19, D20, D24, D42, D44, D48, D50, D51, D52 and D53.
 
 ```mermaid
 flowchart TB
@@ -293,35 +293,14 @@ Single chunk. Pause 2 built most of it, and what is left is one small code chang
 
 ### Decisions to record
 
-D50 was recorded at the `/design-system` direction test.
-
-## D39 · 2026-10-15 · A wide home page shows Rose's and Sam's real pages side by side
-
-Why: a judge sees Sam's screen change within seconds of Rose's ask without switching tabs, which is the product's point (O2).
-Rejected: a button for each that opens a new tab (the judge switches tabs to see the ask arrive), a button plus a QR code for each (a second device for every judge).
-Source: docs/specs/demo-home.md
-Status: active
-
-## D51 · 2026-10-15 · Hidden phones stay unloaded with loading="lazy", not a width check in the browser
-
-Why: Chromium, Firefox and WebKit 26.6 skip a lazy iframe that is `display:none`, and load both once shown (demo-home O14 spike, 2026-10-15). So a phone never loads and polls two hidden pages, and the frames come with the HTML, not after hydration.
-Rejected: a client component that adds the frames only when the window matches (the frames appear after hydration, and it is one more client component), frames that load at once (every phone with a household would load and poll both pages).
-Source: docs/specs/demo-home.md
-Status: active
-
-## D52 · 2026-10-15 · Rose's and Sam's pages leave out Notifications inside the home page's phones
-
-Why: on a laptop both phones are on one screen, so a push adds nothing there. A permission prompt or a push subscription from inside a frame is unproven (demo-home O15). Rose's or Sam's page in its own tab still offers it.
-Rejected: a spike to prove it first (time spent on a part judges don't need on a laptop), leaving it in (a refused prompt shows "Blocked" or an error inside the phone).
-Source: docs/specs/demo-home.md
-Status: active
+Recorded as D51, D52 and D53.
 
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
 | -- | ---- | ---- | --------- | ----- | ------ | ------ |
 | O1 | The home page opens Rose's and Sam's links for anyone, so the links stop being secret. D18 chose secret links for two fixed demo people moving sandbox money; the worst case is a stranger's ask or a spoiled demo, not lost money. The other choice is a short demo code that judges get with the submission | question | spec p1 | user | Resolved | Open to anyone: sandbox money only, and Start over fixes a spoiled demo. Supersedes D18 (D37). 2026-10-15. No longer applies: each household has its own secret links (D42), and D37 was dropped (O8). |
-| O2 | How a judge plays both people. Recommended: on a wide screen, Rose's and Sam's pages side by side on the home page, live, so Sam's screen changes as Rose asks; on a phone, a button for each. Other choices: a button for each that opens a new tab, or a button plus a QR code to open the other person on a phone | question | spec p1 | user | Resolved | Side by side on a wide screen, live; a button for each on a phone (D39). 2026-10-15 |
+| O2 | How a judge plays both people. Recommended: on a wide screen, Rose's and Sam's pages side by side on the home page, live, so Sam's screen changes as Rose asks; on a phone, a button for each. Other choices: a button for each that opens a new tab, or a button plus a QR code to open the other person on a phone | question | spec p1 | user | Resolved | Side by side on a wide screen, live; a button for each on a phone (D53). 2026-10-15 |
 | O3 | What Start over clears. Recommended: every ask and receipt, Rose's search, both limits back to $50 and none, and every saved phone; Rose's PayPal stays. The other choice keeps past receipts and phones, and only ends a waiting ask and resets the limits | question | spec p1 | user | Resolved | Everything but Rose's PayPal: asks and receipts, the search, both limits and saved phones (D38). 2026-10-15. No longer applies: Start over and D38 were dropped (O8). |
 | O4 | Two judges at the same moment still share one Rose and one Sam. One judge's ask shows on the other's Sam page, and one can start over in the middle of the other's turn. Judging runs Dec 1 to 15 (D3), so it is unlikely | flag | spec p1 | user | Accepted risk | Judging runs Dec 1 to 15, so two judges at once is unlikely, and Start over cleans up after. Agreed 2026-10-15. No longer applies: two judges at once each have their own household (O8). |
 | O5 | The design system is phone-only: `page-max` is 480px and it has no breakpoints. The home page adds two widths (54em and 80em) and a 390 by 844 phone frame, written into `shop.css` from existing tokens. craft.md asks for this to be a choice: accept it as composition for the home page, as basket did with its tick box, or take a wide layout through `/design-system` | flag | spec p2 | user | Resolved | Through `/design-system`: add wide breakpoints and a phone frame to the system first, then compose the home page from them. Pause 2 resumes with `/spec continue demo-home`. 2026-10-15. Done in D40: breakpoints at 880 and 1280px, and `PhoneFrame`. |

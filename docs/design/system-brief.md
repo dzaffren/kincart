@@ -155,7 +155,7 @@ One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper
 
 ## Wide screens
 
-The system was phone-only: one 480px column and no breakpoints. Demo-home needs a laptop shape, where Rose's and Sam's real pages run side by side in two phone frames (D39).
+The system was phone-only: one 480px column and no breakpoints. Demo-home needs a laptop shape, where Rose's and Sam's real pages run side by side in two phone frames (D53).
 
 ```
 judges open the one URL on a laptop or a phone
