@@ -299,8 +299,8 @@ Recorded as D51, D52 and D53.
 
 2026-10-15 · 4 raw findings, 2 survived, 2 fixed.
 
-- correctness · `app/(shop)/HomeView.tsx:66` · the guide line says "in the two phones", not "on the right" · `699d7c3`
-- quality · `docs/specs/demo-home.md:148` · System status comes last in the keyboard order · `e8b7c50`
+- correctness · `app/(shop)/HomeView.tsx:66` · the guide line says "in the two phones", not "on the right" · `eb8c961`
+- quality · `docs/specs/demo-home.md:148` · System status comes last in the keyboard order · `08efc4d`
 
 ## Open items
 
