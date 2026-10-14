@@ -17,3 +17,5 @@
 - Leave Haiku room to think, even at low effort
 - Put what a server action redirects back to at the top of the page
 - Change a file's content when pnpm dev serves an old copy after a branch switch
+- Break the code once when pause 2 already built it
+- Check a client-only control is absent only after it would have shown
