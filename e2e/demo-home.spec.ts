@@ -59,3 +59,30 @@ test.describe("on a laptop", () => {
     await expect(heading(sam)).toHaveText("Nothing to approve");
   });
 });
+
+test("a phone gets a button for each", async ({ page, context }) => {
+  await reset(savedPaypal);
+  const loaded: string[] = [];
+  page.on("request", (request) => {
+    const { pathname } = new URL(request.url());
+    if (request.resourceType() === "document" && /^\/[rh]\//.test(pathname)) loaded.push(pathname);
+  });
+
+  await page.goto("/");
+  for (const caption of await page.getByText("Sample, not live").all()) await expect(caption).toBeHidden();
+  await page.getByRole("button", { name: "Try KinCart" }).click();
+  await expect(page.getByText("Your Rose and Sam are ready.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Be Rose" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Be Sam" })).toBeVisible();
+  await page.mouse.wheel(0, 5000);
+  await page.waitForTimeout(2000);
+  expect(loaded).toEqual([]);
+
+  for (const [who, first] of [
+    ["Rose", "What do you need?"],
+    ["Sam", "Nothing to approve"],
+  ]) {
+    const [tab] = await Promise.all([context.waitForEvent("page"), page.getByRole("link", { name: `Be ${who}` }).click()]);
+    await expect(heading(tab)).toHaveText(first);
+  }
+});
