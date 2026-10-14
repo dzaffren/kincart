@@ -4,7 +4,7 @@ import { Atkinson_Hyperlegible_Next } from "next/font/google";
 const atkinson = Atkinson_Hyperlegible_Next({ subsets: ["latin"], variable: "--font-atkinson" });
 
 export const metadata: Metadata = {
-  title: "Shop-together",
+  title: "KinCart",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

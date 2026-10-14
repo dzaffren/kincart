@@ -11,7 +11,7 @@ it("shows both rails up and the build", () => {
     />,
   );
 
-  expect(html).toContain("<h1>Shop-together status</h1>");
+  expect(html).toContain("<h1>KinCart status</h1>");
   expect(html).toContain("<dt>Database</dt><dd>OK, check #42 at 14:03 UTC</dd>");
   expect(html).toContain("<dt>PayPal sandbox</dt><dd>connected</dd>");
   expect(html).toContain("<dt>Build</dt><dd><code>a1b2c3d</code></dd>");
