@@ -279,7 +279,7 @@ The push services only ever see ciphertext. Our server stores each phone's endpo
 | `package.json`, `pnpm-lock.yaml` | Add `web-push` (D27) | 3, 4 |
 | `.env.example:21` | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, made with `pnpm exec web-push generate-vapid-keys`. With any unset, the Notifications section is hidden | rollout |
 | `e2e/db.ts:15` | `reset()` also clears `push_subscriptions` | e2e |
-| `e2e/ping-helper.spec.ts` (new) | The one e2e below, in a persistent Firefox profile (D26) with `dom.push.serverURL` and `dom.push.connection.enabled` set (O11) | 1, 3, 4 |
+| `e2e/ping-helper.spec.ts` (new) | The one e2e below, in a persistent Firefox profile (D26) with `dom.push.serverURL` and `dom.push.connection.enabled` set (O11), and `alerts.useSystemBackend` off (O13) | 1, 3, 4 |
 | `.github/workflows/ci.yml:45` | Install `chromium firefox`; pass the three VAPID secrets | e2e |
 | `README.md` | Setup: the VAPID keys and the iPhone Home Screen step. One line: in PayPal itself these would be PayPal app notifications (Scope, Out) | Scope |
 
@@ -396,6 +396,7 @@ Recorded as D27, D28, D29, D30.
 | O10 | Encrypt and sign pushes with the `web-push` package, or by hand with `node:crypto` | question | spec p3 | user | Resolved | `web-push`: one dependency against about 100 lines of crypto that only a real push proves (D27). Agreed 2026-10-14 |
 | O11 | O5's answer named only `dom.push.serverURL`. Playwright's Firefox (build 1555) also sets `dom.push.connection.enabled` to false, and with it off `pushManager.subscribe` fails with "Error retrieving push subscription" even in a persistent profile | flag | build | build | Resolved | The e2e sets both prefs; the push then arrives through Mozilla in under 10 s. 2026-10-14 |
 | O12 | The Changes table missed three things the build needed: `decline()` returning the declined request (Rose's "Sam said no" ping names the item), one shared place for `after(() => notify(…))` used by `answer` and both pages' stuck-payment check, and `app/icon.svg` for the browser tab the Interface lists | flag | build | build | Resolved | `decline()` returns the request like `claim()`; `pings.ts` holds `sendPing` and `sendPayment` next to `ping()`; `app/icon.svg` is the kit's `favicon.svg`. Changes table updated. 2026-10-14 |
+| O13 | O5's spike and the build ran the e2e on a workstation. On CI's runner, with no desktop session bus, Mozilla accepts the push (`sent=1`) but Firefox never shows it, because it hands notifications to a desktop notification service that isn't there | flag | ship | ship | Resolved | The e2e also sets `alerts.useSystemBackend` to false, so Firefox shows notifications itself. Reproduced and fixed locally with the display and session bus unset. 2026-10-14 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

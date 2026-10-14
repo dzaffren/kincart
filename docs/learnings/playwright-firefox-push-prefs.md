@@ -1,4 +1,4 @@
-# Turn both push prefs back on in Playwright's Firefox
+# Set three prefs for push in Playwright's Firefox
 
 **Learned:** 2026-10-14 · **From:** /build ping-helper
 
@@ -6,4 +6,6 @@ Playwright's Firefox ships a `playwright.cfg` that turns its push service off tw
 
 Wrong: `firefoxUserPrefs: { "dom.push.serverURL": "wss://push.services.mozilla.com/" }`
 
-Right: `firefoxUserPrefs: { "dom.push.serverURL": "wss://push.services.mozilla.com/", "dom.push.connection.enabled": true }` on `firefox.launchPersistentContext`.
+On a machine with no desktop session bus, like a GitHub runner, the push then arrives but never shows: Firefox hands notifications to the desktop's notification service, finds none, and `getNotifications()` stays empty. The server logs `sent=1` while the test times out. It passes on a workstation, so reproduce it with `env -u DISPLAY -u DBUS_SESSION_BUS_ADDRESS -u XDG_RUNTIME_DIR`. `alerts.useSystemBackend: false` makes Firefox show them itself.
+
+Right: `firefoxUserPrefs: { "dom.push.serverURL": "wss://push.services.mozilla.com/", "dom.push.connection.enabled": true, "alerts.useSystemBackend": false }` on `firefox.launchPersistentContext`.
