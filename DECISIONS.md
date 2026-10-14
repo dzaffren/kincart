@@ -234,3 +234,24 @@ Why: `charge()` stays as it is, and our receipt already lists every line (scenar
 Rejected: PayPal line items with an amount breakdown (Rose's PayPal activity would list each thing, but no scenario needs it, and the item amounts must add up to the total exactly or PayPal refuses the order).
 Source: docs/specs/basket.md
 Status: active
+
+## D34 · 2026-10-14 · Sam's total limit is off until set, and stops Rose at Ask Sam for any ask
+
+Why: Sam already approves and can untick every basket, so the limit's job is to keep an ask over Sam's budget from reaching Sam at all. One check for every ask keeps Sam's two limits independent.
+Rejected: a warning on Sam's page (the basket still arrives, and Sam trims it as today), a total limit at least the price limit (both of Sam's forms would have to refuse a clash), $100 from the start (today's three-thing baskets at $40 each would be stopped).
+Source: docs/specs/basket-cap.md
+Status: active
+
+## D35 · 2026-10-14 · Sam's total limit is its own one-row table, and no row means no limit
+
+Why: no total limit is the default (D34), and an absent row says that with no null column; clearing is one DELETE.
+Rejected: a nullable column on `price_limit` (its row needs a price limit, so saving only a total would store a made-up one).
+Source: docs/specs/basket-cap.md
+Status: active
+
+## D36 · 2026-10-14 · Rose's over-limit picks come back in the page address as listing ids
+
+Why: scenario 2 keeps Rose's picks after the redirect; the ids only choose from the saved search, so every price still comes from Neon (D23).
+Rejected: a picks column on `rose_search` (a schema change for state that lasts one screen).
+Source: docs/specs/basket-cap.md
+Status: active
