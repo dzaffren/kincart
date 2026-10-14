@@ -58,7 +58,11 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
               reading out card numbers.
             </p>
             <p>
-              <strong>Sandbox money only.</strong> Nothing real is bought.
+              <strong>Sandbox money only.</strong> Nothing real is bought. This is a hackathon build:{" "}
+              <a className="link" href="https://github.com/dzaffren/kincart/blob/main/docs/ROADMAP.md">
+                what&apos;s real, what stands in, and what comes next
+              </a>
+              .
             </p>
             {links ? (
               <>

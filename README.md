@@ -38,6 +38,17 @@ Used by older shoppers and the relative who helps them pay online.
 
 <!-- zuko:end -->
 
+## What this is, and isn't
+
+KinCart is a hackathon proof of concept. The whole path works: Rose asks, AI finds real listings and explains them, Sam says OK from their own phone, and a PayPal API call charges Rose's saved PayPal. Some parts stand in for what a shipped product would use:
+
+- **Sandbox money.** The charge lands in a PayPal sandbox account. No order reaches a shop and nothing is delivered.
+- **Secret links, not accounts.** No sign-up or login. Every household starts with a copy of one demo PayPal, so a judge can try both sides in one tap.
+- **Free tiers.** Channel3's search returns US listings and allows about 1,000 searches a month. Claude Haiku's explanations are not checked by a person; Sam's OK is the check.
+- **Web push stands in for PayPal app notifications.** It needs https, and on iPhone works only from the Home Screen.
+
+What it would take to go further, and the two paths it could take, are in [docs/ROADMAP.md](docs/ROADMAP.md).
+
 ## Setup
 
 You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker.
