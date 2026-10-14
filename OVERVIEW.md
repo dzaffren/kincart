@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Updated:** 2026-10-14 by /ship basket
+**Status:** Active · **Updated:** 2026-10-14 by /ship basket (shipped)
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -36,7 +36,7 @@ Used by older shoppers and the relative who helps them pay online.
 | approve-and-pay | Shipped | Rose links their sandbox PayPal once and picks one of three items. Sam taps OK or No on their own phone, and an OK charges Rose's saved PayPal and shows both of them a receipt. | docs/specs/approve-and-pay.md |
 | find-and-explain | Shipped | Rose types what they need in plain words, and AI shows up to three real listings under Sam's price limit, each explained plainly. Rose's pick goes to Sam, who sees why it fits and a link to the listing. | docs/specs/find-and-explain.md |
 | ping-helper | Shipped | Sam's phone buzzes when Rose asks for something, and Rose's phone buzzes when Sam answers, so neither has to keep their page open. | docs/specs/ping-helper.md |
-| basket | Built | Rose types several things at once and picks a listing for each one they want. Sam ticks the ones to pay for, and one OK makes one charge; anything Sam leaves out goes back to Rose. | docs/specs/basket.md |
+| basket | Shipped | Rose types several things at once and picks a listing for each one they want. Sam ticks the ones to pay for, and one OK makes one charge; anything Sam leaves out goes back to Rose. | docs/specs/basket.md |
 
 ## More
 
