@@ -33,7 +33,7 @@ export async function notify(person: Person, ping: Ping): Promise<void> {
   if (!pushOn()) return;
   try {
     const phones = await subscriptionsFor(person);
-    const results = await Promise.all(phones.map((phone) => send(phone, ping)));
+    const results = await Promise.all(phones.map((phone) => send(person, phone, ping)));
     const count = (result: Sent) => results.filter((each) => each === result).length;
     console.log(
       `push to=${person} phones=${phones.length} sent=${count("sent")} gone=${count("gone")} failed=${count("failed")}`,
@@ -45,7 +45,7 @@ export async function notify(person: Person, ping: Ping): Promise<void> {
 
 type Sent = "sent" | "gone" | "failed";
 
-async function send(phone: Subscription, { title, body }: Ping): Promise<Sent> {
+async function send(person: Person, phone: Subscription, { title, body }: Ping): Promise<Sent> {
   try {
     await webpush.sendNotification(
       { endpoint: phone.endpoint, keys: { p256dh: phone.p256dh, auth: phone.auth } },
@@ -64,7 +64,12 @@ async function send(phone: Subscription, { title, body }: Ping): Promise<Sent> {
     return "sent";
   } catch (error) {
     const status = (error as { statusCode?: number }).statusCode;
-    if (status !== 404 && status !== 410) return "failed";
+    if (status !== 404 && status !== 410) {
+      console.log(
+        `push to=${person} host=${new URL(phone.endpoint).host} status=failed reason=${status ?? reasonOf(error)}`,
+      );
+      return "failed";
+    }
     await forgetSubscription(phone.endpoint);
     return "gone";
   }

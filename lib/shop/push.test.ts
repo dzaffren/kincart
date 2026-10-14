@@ -88,6 +88,7 @@ it("forgets a phone its push service says is gone, keeps one that failed, and st
 
   expect(send).toHaveBeenCalledTimes(3);
   expect(await subscriptionsFor("sam")).toEqual([samFirefox, samTablet]);
+  expect(console.log).toHaveBeenCalledWith("push to=sam host=updates.push.services.mozilla.com status=failed reason=500");
   expect(console.log).toHaveBeenCalledWith("push to=sam phones=3 sent=1 gone=1 failed=1");
 });
 
