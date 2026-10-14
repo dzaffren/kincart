@@ -22,10 +22,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - When Rose's picks come to more than Sam's total limit, Rose sees the total and leaves something out before anything reaches Sam.
 - Anyone who opens the site can tap Try KinCart and get their own Rose and Sam, with a sandbox PayPal already linked, and never sees anyone else's asks, limits or phones.
 - The same browser comes back to its own Rose and Sam, and Start a new one gives a fresh pair while the old links keep working.
+- On a laptop, after Try KinCart, your Rose and Sam run side by side on the home page, so you see Sam's page change within seconds of Rose's ask.
 
 ### Changed
 
 - The site's front page now says what KinCart is and starts your own Rose and Sam, with the status page one link away.
+- The home page now speaks to the helper who would use KinCart: how it works in three steps, how they stay in charge, and on a laptop two sample phones before they try it.
+- The status page is now KinCart status, in the home page's violet look.
 
 ### Fixed
 
