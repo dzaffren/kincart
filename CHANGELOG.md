@@ -16,3 +16,5 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Sam gets a notification when Rose asks for something, even with the page closed, once they turn notifications on from their link.
 - Rose gets a notification when Sam says OK or no, or when the payment doesn't go through.
 - On iPhone, Rose's or Sam's link can be added to the Home Screen as KinCart, and opens their own page.
+- Rose can ask for up to five things at once and pick a listing for each, and Sam answers them all with one OK and one payment.
+- Sam can untick anything Rose asked for before paying, and what Sam leaves out goes back in Rose's box for the next ask.

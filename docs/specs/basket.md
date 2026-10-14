@@ -296,7 +296,9 @@ The trim and the claim are one update, guarded by `status = 'waiting'`, so a dou
 | `app/(shop)/pings.ts:11`, `:37`, `:43` | `ping(kind, { item, lines?, leftOut? })`: with lines, the words in the Interface's notification table. `sendPing` and `sendPayment` take the same object | 2, 5 |
 | `app/(shop)/state.ts:11` | `roseState`: a saved basket gives the `basket` state, with `error` on `?pick=missing`. Waiting, the declined or failed outcome and the paid receipt pass `lines`, and the receipt passes `leftOut`. `?ask=1` after a paid request that left something out puts `listed(leftOut)` in the box. `too many` reaches the box through the existing outcome-to-problem fall-through | 1, 2, 4 |
 | `app/(shop)/state.ts:60`, `:81` | `samState` passes `lines` for request, failed and declined, and `receiptOf` adds `lines` and `leftOut` | 2, 5 |
-| `app/(shop)/ui.tsx:11`, `:25` | Imports `Line` from `requests.ts`. New `things(n)`: "1 thing", "2 things" | O8 |
+| `app/(shop)/ui.tsx:11` | Imports `Line` from `requests.ts` | 2 |
+| `lib/shop/items.ts` | New `things(n)`: "1 thing", "2 things". It sits in `lib`, not `ui.tsx`, because `claim()` names a trimmed basket with it too | O8 |
+| `app/(shop)/preview/find-and-explain/page.tsx` | Its "A shopping list" frame goes, since the "several" answer no longer exists | 4 |
 | `app/(shop)/RoseView.tsx:21`, `:107`, `:125`; `SamView.tsx:103`, `:113`; `BasketAnswer.tsx:25` | `Group` comes from `find.ts`. The "One thing at a time" notice goes. Counts use `things(n)`, so a basket trimmed to one line says "1 thing" while paying or failed. Otherwise as built at pause 2 | O8 |
 | `app/(shop)/r/[token]/page.tsx:33`, `h/[token]/page.tsx:30` | `sendPayment(settled.result, settled.request)` | 2 |
 | `app/(shop)/preview/basket/page.tsx:4` | `Group` from `find.ts` | — |
