@@ -18,7 +18,7 @@
   .queries { margin: var(--space-4) 0; gap: var(--space-3); }
   .queries li { grid-template-columns: 1fr; gap: 0; }
   code { font: var(--type-code); }
-  .frame { box-sizing: border-box; width: var(--frame-width); max-width: 100%; height: var(--frame-height); margin-top: var(--space-4); display: grid; place-items: center; border: var(--border-width) solid var(--color-control); border-radius: var(--radius-surface); background: var(--color-bg); font: var(--type-small); color: var(--color-muted); }
+  .frame { box-sizing: border-box; width: var(--frame-width); max-width: 100%; height: var(--frame-height); margin-top: var(--space-4); display: grid; place-items: center; border: var(--showcase-bezel) solid var(--showcase-device); border-radius: var(--showcase-radius); background: var(--color-bg); font: var(--type-small); color: var(--color-muted); }
 </style>
 </head>
 <body>
@@ -52,7 +52,7 @@
 <li><span>two-phones: two phone frames show</span><code>(min-width: 880px) and (min-height: 480px)</code></li>
 <li><span>text-beside: the text moves left of them</span><code>(min-width: 1280px) and (min-height: 480px)</code></li>
 </ul>
-<p>A phone frame shows a real page at the e2e's phone size. Its edge is control, because the page inside is also bg.</p>
+<p>A phone frame shows a real page at the e2e's phone size. Its 10px device edge sits inside the frame, so the page inside is 370 wide (D50).</p>
 <div class="frame">frame.width × frame.height · 390 × 844</div>
 </main>
 </body>

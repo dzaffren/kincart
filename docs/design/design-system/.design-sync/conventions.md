@@ -26,6 +26,8 @@ Light and dark follow the device through `prefers-color-scheme`. There is no pro
 - One primary `Button` per screen: the next step. Everything else is `kind="secondary"`.
 - Green (`--color-success`) only means paid. Red (`--color-danger`) only means a real failure. A helper's "no" is `<Notice tone="neutral">`.
 - Nothing smaller than `--type-small` (16px). Nothing tappable under `--target-min` (48px).
+- `--showcase-*` tokens are for the public pages, `/` and `/status`, only. Never use them on Rose's or Sam's screens.
+- `PhoneFrame` with `href` shows that page live. Without `href`, it shows its children as a still sample, marked "Sample, not live".
 - Wide screens use two media queries: `(min-width: 880px) and (min-height: 480px)` shows two `PhoneFrame`s, and `(min-width: 1280px) and (min-height: 480px)` moves the text beside them. CSS can't read a variable there, so copy these values.
 
 ## Tokens

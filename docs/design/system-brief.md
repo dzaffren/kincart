@@ -3,7 +3,7 @@
 **Status:** Approved · 2026-10-13 · /design-system pause A
 **Extension:** App icon · Approved · 2026-10-14 · for ping-helper (O8)
 **Extension:** Wide screens · Approved · 2026-10-15 · for demo-home (O5), D40
-**Extension:** Showcase · Draft · 2026-10-15 · for demo-home (O10, O11)
+**Extension:** Showcase · Draft, direction approved · 2026-10-15 · for demo-home (O10, O11, O12), D50
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
@@ -193,6 +193,8 @@ flowchart LR
 | `two-phones`  | `(min-width: 880px) and (min-height: 480px)`  | The two frames show under the text; Be Rose and Be Sam go        |
 | `text-beside` | `(min-width: 1280px) and (min-height: 480px)` | The text moves to a left column, no wider than `page.max`        |
 
+Since D50, the frame edge is the showcase's 10px device edge, inside the frame, in place of the 1px `control` edge.
+
 CSS cannot read a variable inside a media query, so the breakpoints are not tokens. Each media query copies its value from this table.
 
 An em breakpoint follows the browser's text-size setting, but the frames stay 390px. At a 12px setting, the spec's 54em is 648px, and the 852px of frames scroll sideways.
@@ -201,105 +203,67 @@ An em breakpoint follows the browser's text-size setting, but the frames stay 39
 
 ## Showcase
 
-The home page `/` sells KinCart to judges, and it needs to feel premium (O10). The system was built for Rose's and Sam's pages: 28px is its largest type, everything sits flat, and motion stops at tier 1. This extension is for `/` only. Every token is named `showcase-*`, so nothing here reaches Rose's or Sam's pages.
+The public pages, `/` and `/status`, sell KinCart to judges, and they need to feel premium (O10). The system was built for Rose's and Sam's pages: 28px was its largest type, everything sits flat, and motion stops at tier 1. Every token here is named `showcase-*`, and nothing here reaches Rose's or Sam's pages.
 
 | Question | Answer |
 | -------- | ------ |
 | Feel | Clear, kind, premium |
 | Never feel | Flashy, salesy, cluttered |
-| Apple product page | The product's name huge, with one short line under it; the device itself is the hero; wide, calm space; one reveal as the page arrives |
-| Monzo | Full-bleed flat blocks in the brand colour; heavy, bold type; a warm, plain voice; flat, with no shadows |
+| Monzo (chosen) | Full-bleed flat blocks in the brand colour; heavy, bold type; a warm, plain voice; flat, with no shadows |
+| Apple product page (shown, not chosen) | The product's name huge, with one short line under it; the device as the hero; wide, calm space |
 | Locked | Atkinson Hyperlegible Next, the violet accent, the KinCart mark (D25), the 16px floor, 7:1 text |
-| Motion ceiling | Tier 2, on `/` only: one load reveal, then nothing moves |
-
-Shared by both directions:
+| Motion ceiling | Tier 2, on the public pages only: one load reveal, then nothing moves |
 
 ```
 judges decide in the first seconds, mostly on a laptop
-                              → `showcase-display`: 56px on a phone, 80px from 880px wide
-a headline needs a short line, and the lead is 72 characters
-                              → `showcase-lede`: 24px; a new headline, "Shop online. Family says OK."
-the product sells itself: the two live phones
-                              → each frame gets a device edge, `showcase-bezel` 10px, `showcase-radius` 44px
+                              → a full-bleed violet block behind the words, and on a laptop behind the phones too
+Monzo: the promise is the headline, in heavy type
+                              → "Rose asks. / Sam says OK. / PayPal pays.", 800 weight, one sentence a line
+the longest line, "Sam says OK.", is 6.4em at 800 weight
+                              → 40 to 48px on a phone (12.3vw), 64px in the 432px column, 56px in the 379px column beside the phones
+text on the block             → `showcase-on-stage`: #FFFFFF light (8.2:1), #EEF1F6 dark (12.9:1); no muted text on it
+the next step on the block    → light: a white button with violet text (8.2:1); dark: the accent button, 7.6:1 against the block
+a focus ring on the block     → on-stage, because `text` on violet is 2.2:1
+the product sells itself: the two phones
+                              → a 10px device edge with a 44px radius; flat, no shadow
 D40's 880px still has to fit two phones
-                              → the bezel sits inside the 390 × 844 frame, so the page inside is 370 wide (above the 320 floor)
-"premium", never "flashy"     → one reveal as the page arrives: the words, then the phones, rise 24px and fade in
-motion ceiling: tier 2, `/` only
-                              → `showcase-reveal` 640ms, `showcase-stagger` 120ms, `ease.out`; 0ms and 0px under reduced motion
+                              → the edge sits inside the 390 × 844 frame, so the page inside is 370 wide (above the 320 floor)
+before a household starts, a laptop shows no live phones
+                              → the phones show Rose's and Sam's real screens with a sample ask, still, marked "Sample, not live" (demo-home O13)
+"premium", never "flashy"; motion ceiling tier 2
+                              → one reveal: the words, the body, then the phones rise 24px and fade in, 120ms apart, over 640ms
 only transform and opacity move
-                              → the reveal is a CSS animation on `transform` and `opacity`; no JavaScript
+                              → a CSS animation; 0ms and 0px under reduced motion
 ```
 
-### Direction A: Apple
-
-```
-┌───────────────────────── 1280 × 800 ─────────────────────────┐
-│                         [mark]                               │
-│                        KinCart              80px, centred    │
-│              Shop online. Family says OK.   24px lede        │
-│        Rose says what they need. AI finds…  18px muted       │
-│                     [ Try KinCart ]                          │
-│ ░░░░░░░░░░░░░░░░░░ stage: `sunken`, full width ░░░░░░░░░░░░░ │
-│ ░░░░░░░░░░░░ ╭────────╮      ╭────────╮ ░░░░░░░░░░░░░░░░░░░░ │
-│ ░░░░░░░░░░░░ │ Rose   │      │ Sam    │  lifted: device edge │
-│ ░░░░░░░░░░░░ │        │      │        │  and a soft shadow   │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    W{"Window"} -- "under 880px wide, or under 480px high" --> P["Violet block, the words, no phones"]
+    W -- "880px wide and up" --> T["Words on top, the two phones under them, all on violet"]
+    W -- "1280px wide and up" --> B["Words on the left, the two phones on the right"]
 ```
 
-```
-Apple: the product's name is the headline
-                              → "KinCart" at `showcase-display`, centred; the new line under it at `showcase-lede`
-the device is the hero        → the phones sit on a full-width `sunken` stage, under the words, at every wide width
-the device lifts off the page → `showcase-shadow`: a soft shadow under each phone; the only shadow on `/`
-calm space                    → `space-16` above and below the stage; the text column stays 480px
-```
+| Token | Light | Dark | Use |
+| ----- | ----- | ---- | --- |
+| `showcase-display` | 800, 40 to 48px, line 1.08 | the same | The headline on a phone; the title on `/status` |
+| `showcase-display-wide` | 800 64/68 | the same | The headline from 880px, words above the phones |
+| `showcase-display-side` | 800 56/60 | the same | The headline from 1280px, words beside the phones |
+| `showcase-tracking` | -0.02em | the same | Every display size |
+| `showcase-stage` | `#5B3AA0` | `#2B2150` | The block |
+| `showcase-on-stage` | `#FFFFFF` | `#EEF1F6` | Text, links and focus rings on the block |
+| `showcase-cta`, `showcase-on-cta` | `#FFFFFF`, `#5B3AA0` | `#C3B2F0`, `#1E1240` | The next step on the block |
+| `showcase-bezel`, `showcase-radius` | 10px, 44px | the same | The device edge |
+| `showcase-device` | `#14181F` | `#5A6270` | The device edge's colour |
+| `showcase-reveal`, `showcase-stagger`, `showcase-rise` | 640ms, 120ms, 24px | the same | The load reveal; 0 under reduced motion |
 
-The phones move below the words at every wide width. At 1280 × 800, the top of the phones shows, and a judge scrolls to the rest. This drops D40's text-beside layout on `/`.
-
-### Direction B: Monzo
-
-```
-┌───────────────────────── 1280 × 800 ─────────────────────────┐
-│▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│
-│▓ [mark] KinCart           ╭────────╮  ╭────────╮ ▓▓▓▓▓▓▓▓▓▓▓▓│
-│▓ Shop online.             │ Rose   │  │ Sam    │ ▓ violet    │
-│▓ Family says OK.   80px   │        │  │        │ ▓ block     │
-│▓ Rose says what… on-stage │        │  │        │ ▓▓▓▓▓▓▓▓▓▓▓▓│
-│▓ [ Try KinCart ] white    │        │  │        │ ▓▓▓▓▓▓▓▓▓▓▓▓│
-│                           ╰────────╯  ╰────────╯ page `bg`   │
-└──────────────────────────────────────────────────────────────┘
-```
-
-```
-Monzo: the promise is the headline
-                              → "Shop online. Family says OK." at `showcase-display`, weight 800, left-aligned
-full-bleed brand colour       → `showcase-stage` behind the words and the top of the phones: `#5B3AA0` light, `#2B2150` dark
-text on the block             → `showcase-on-stage`: `#FFFFFF` light (8.2:1), `#EEF1F6` dark (12.9:1); no muted text on it
-the next step on the block    → light: a white button with violet text (8.2:1); dark: the normal accent button, 7.6:1 against the block
-flat, no shadows              → the device edge alone; the phones run off the bottom of the block onto `bg`
-```
-
-The words stay beside the phones from 1280px, as D40 has it. Between 880 and 1280px, the block holds the words, and the phones sit under them.
-
-| Token | A: Apple | B: Monzo |
-| ----- | -------- | -------- |
-| `showcase-display` | 700 56/60, 80/84 from 880px | 800 56/60, 80/84 from 880px |
-| `showcase-lede` | 400 24/32 | 400 24/32 |
-| `showcase-bezel` | 10px, `#14181F` light, `#5A6270` dark | the same |
-| `showcase-radius` | 44px | 44px |
-| `showcase-shadow` | `0 32px 64px -16px rgb(20 24 31 / 0.28)`; dark `rgb(0 0 0 / 0.6)` | none |
-| `showcase-stage` | `sunken` | `#5B3AA0` light, `#2B2150` dark |
-| `showcase-on-stage` | `text` | `#FFFFFF` light, `#EEF1F6` dark |
-| `showcase-reveal`, `showcase-stagger` | 640ms, 120ms | 640ms, 120ms |
-
-Under 880px wide, both are the phone column: the display step at 56px and the reveal, with no phones. B keeps its violet block behind the words.
+Apple was built and compared at the direction test. It centred the name over phones lifted by a shadow on a grey stage. It lost because, at 1280 × 800, its phones sat mostly below the fold (D50).
 
 ## Never
 
 - An icon without a word next to it.
 - Text under 16px.
 - A placeholder standing in for a label.
-- A shadow on a card. Direction A's phones on `/` are the one exception, if A is chosen.
+- A shadow on a card.
 - Bounce or spring easing.
 - Red for a helper's No.
 
