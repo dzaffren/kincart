@@ -25,10 +25,9 @@ flowchart LR
     S0["0 skeleton"] -- "deploy, CI, e2e rails" --> S1["1 approve-and-pay"]
     S1 -- "request → OK → charge path" --> S2["2 find-and-explain"]
     S1 -- "pending requests" --> S3["3 ping-helper"]
-    S2 -- "request box" --> S4["4 ask-by-voice"]
 ```
 
-Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in slice 2. Slices 3 and 4 get built only if time is left.
+Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in slice 2. Slices 3 and 5 get built only if time is left. Slice 4 was dropped.
 
 | # | Slice | What ships | Why this order |
 |---|-------|-----------|----------------|
@@ -36,7 +35,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 1 | `approve-and-pay` | The relative links their sandbox PayPal once. They pick an item from a short fixed list. You see the request on your phone and tap OK or No. On OK, the saved PayPal is charged and both of you see a plain receipt. On No, they see that you said no. | Rests on the riskiest claim (O1), so it fails early if it's going to fail. It's also the core value: no shared passwords. |
 | 2 | `find-and-explain` | The relative types what they need in plain words. AI pulls real listings, shows three, and explains each one plainly. Their pick goes into slice 1's approval, replacing the fixed list. | Brings the AI the rules require. |
 | 3 | `ping-helper` | A new request reaches your phone as a notification, so you don't have to keep the page open. | Only if time is left. Makes "approve from afar" real on video. |
-| 4 | `ask-by-voice` | The relative says what they need instead of typing it. | Only if time is left. Needs slice 2's request box. |
+| 4 | ~~`ask-by-voice`~~ | Dropped at `/spec ask-by-voice`, 2026-10-14. | The phone keyboard's mic key already lets the relative say what they need into slice 2's box. |
 | 5 | `basket` | The relative asks for several things at once, such as groceries. You approve the list once and one total is charged. | Only if time is left. Found at `/spec find-and-explain`: a request is one item today. |
 
 ## Not doing
@@ -45,6 +44,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 - **Scam checks.** PayPal has run AI scam alerts on Friends and Family payments since 2025, with far more data than this app would have.
 - **Spend limits or auto-approve.** You approve every purchase.
 - **Native phone app.** A web page on the phone is enough (O3).
+- **A voice button.** The mic key on Gboard and the iPhone keyboard already turns speech into text in the request box.
 - **Sign-up and logins.** Two fixed demo people, unless slice 1 finds a reason otherwise (O8).
 - **The earlier lanes**: invoice chaser, dispute helper, group trip splitting, pay-when-done, haggle bots. Each was already crowded, already built into PayPal, or too heavy for 22 to 44 hours.
 
