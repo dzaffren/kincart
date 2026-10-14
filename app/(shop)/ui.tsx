@@ -114,65 +114,56 @@ type ListingPickerProps = {
   labelledBy: string;
   name?: string;
   picked?: string;
-  error?: boolean;
   none?: string;
 };
 
-export function ListingPicker({ listings, labelledBy, name = "listing", picked, error, none }: ListingPickerProps) {
-  const errorId = useId();
+export function ListingPicker({ listings, labelledBy, name = "listing", picked, none }: ListingPickerProps) {
   return (
-    <>
-      <fieldset className="options" aria-labelledby={labelledBy} aria-describedby={error ? errorId : undefined}>
-        {listings.map((listing) => (
-          <label className="option" key={listing.id}>
-            <input
-              className="option-input"
-              type="radio"
-              name={name}
-              value={listing.id}
-              defaultChecked={listing.id === picked}
-            />
-            <span className="option-body listing">
-              <span className="option-ring" aria-hidden="true" />
-              <span className="listing-title">
-                <span className="listing-name">{listing.name}</span>
-                <span>
-                  <span className="option-price">{money(listing.cents)}</span>{" "}
-                  <span className="small">at {listing.shop}</span>
-                </span>
-              </span>
-              <span className="listing-text">
-                {listing.imageUrl && (
-                  // A 64px photo from Channel3's CDN gains nothing from Vercel's image optimizer.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img className="listing-photo" src={listing.imageUrl} alt="" />
-                )}
-                <span>
-                  {listing.what} {listing.why}
-                </span>
-                <span>
-                  <strong>Good to know:</strong> {listing.watch}
-                </span>
+    <fieldset className="options" aria-labelledby={labelledBy}>
+      {listings.map((listing) => (
+        <label className="option" key={listing.id}>
+          <input
+            className="option-input"
+            type="radio"
+            name={name}
+            value={listing.id}
+            defaultChecked={listing.id === picked}
+          />
+          <span className="option-body listing">
+            <span className="option-ring" aria-hidden="true" />
+            <span className="listing-title">
+              <span className="listing-name">{listing.name}</span>
+              <span>
+                <span className="option-price">{money(listing.cents)}</span>{" "}
+                <span className="small">at {listing.shop}</span>
               </span>
             </span>
-          </label>
-        ))}
-        {/* A radio can't be unticked, so this is how Rose takes back a pick. */}
-        {none && (
-          <label className="option">
-            <input className="option-input" type="radio" name={name} value="" defaultChecked={picked === ""} />
-            <span className="option-body">
-              <span className="option-ring" aria-hidden="true" />
-              <span>{none}</span>
+            <span className="listing-text">
+              {listing.imageUrl && (
+                // A 64px photo from Channel3's CDN gains nothing from Vercel's image optimizer.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="listing-photo" src={listing.imageUrl} alt="" />
+              )}
+              <span>
+                {listing.what} {listing.why}
+              </span>
+              <span>
+                <strong>Good to know:</strong> {listing.watch}
+              </span>
             </span>
-          </label>
-        )}
-      </fieldset>
-      {error && (
-        <p className="field-error" id={errorId}>
-          Pick one first.
-        </p>
+          </span>
+        </label>
+      ))}
+      {/* A radio can't be unticked, so this is how Rose takes back a pick. */}
+      {none && (
+        <label className="option">
+          <input className="option-input" type="radio" name={name} value="" defaultChecked={picked === ""} />
+          <span className="option-body">
+            <span className="option-ring" aria-hidden="true" />
+            <span>{none}</span>
+          </span>
+        </label>
       )}
-    </>
+    </fieldset>
   );
 }

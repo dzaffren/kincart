@@ -173,9 +173,11 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
     );
   }
 
+  // The page comes back scrolled to the top after Ask Sam, so its notices go at the top.
   if (state.kind === "options") {
     return (
       <div className="screen">
+        {state.error && <Notice tone="neutral">Pick one first.</Notice>}
         <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
         <div className="heading">
           <h1 id={headingId}>Which one would you like?</h1>
@@ -191,7 +193,6 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
             listings={state.listings}
             labelledBy={headingId}
             picked={state.picked}
-            error={state.error}
           />
           <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
@@ -212,6 +213,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
   if (state.kind === "basket") {
     return (
       <div className="screen">
+        {state.error && <Notice tone="neutral">Pick at least one first.</Notice>}
         <OverNotice
           totalCents={state.totalCents}
           overCents={state.overCents}
@@ -233,11 +235,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
               />
             ))}
           </div>
-          {state.error ? (
-            <p className="field-error">Pick at least one first.</p>
-          ) : (
-            <TotalLine totalCents={state.totalCents} />
-          )}
+          <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
             Ask {HELPER}
           </Button>
@@ -321,7 +319,6 @@ function TotalLine({ totalCents }: { totalCents?: number }) {
   );
 }
 
-// At the top, because the page comes back scrolled to the top after Ask Sam.
 function OverNotice({ totalCents, overCents, several }: { totalCents?: number; overCents?: number; several: boolean }) {
   if (totalCents === undefined || overCents === undefined) return null;
   return (
