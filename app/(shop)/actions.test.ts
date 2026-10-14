@@ -114,15 +114,15 @@ it("won't find, try again or set the limit from the wrong person's link", async 
 it("finds with Rose's words and keeps the result, and asks for words when the box is empty", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});
+  const six = ["batteries", "a night light", "a phone charger", "a doormat", "a kettle", "a flashlight"];
+  const things = JSON.stringify({ things: six.map((thing) => ({ words: thing, query: thing })) });
   vi.stubGlobal(
     "fetch",
-    vi.fn(async () =>
-      Response.json({ content: [{ type: "text", text: '{"kind":"list","query":"milk bread eggs"}' }], stop_reason: "end_turn" }),
-    ),
+    vi.fn(async () => Response.json({ content: [{ type: "text", text: things }], stop_reason: "end_turn" })),
   );
 
-  expect(await redirectOf(find(rose, form({ words: "  milk, bread and eggs " })))).toBe(`/r/${rose}`);
-  expect(await getSearch()).toMatchObject({ words: "milk, bread and eggs", outcome: "several" });
+  expect(await redirectOf(find(rose, form({ words: `  ${six.join(", ")} ` })))).toBe(`/r/${rose}`);
+  expect(await getSearch()).toMatchObject({ words: six.join(", "), outcome: "too many" });
 
   expect(await redirectOf(find(rose, form({ words: "   " })))).toBe(`/r/${rose}?find=empty`);
 });

@@ -1,20 +1,27 @@
 import type { Found } from "./search";
 
-export type Need = { kind: "product" | "list" | "not a product"; query: string };
+export type Need = { things: { words: string; query: string }[] };
 export type Pick = { id: string; what: string; why: string; watch: string };
 export type Choice = { picks: Pick[]; aboveLimit: boolean };
 
 const MODEL = "claude-haiku-5-5";
 
-const NEED = `You read what an older person typed into a shopping box. Decide whether it is one product to buy, a list of several things, or not a product at all. For one product, write a short shop search query that keeps the sizes, colours and other must-haves they gave.`;
+const NEED = `You read what an older person typed into a shopping box. List every product they want to buy, in the order they gave. For each, copy their own words for it exactly, such as "a night light", and write a short shop search query that keeps the sizes, colours and other must-haves they gave. Something sold as one product, such as salt and pepper shakers, is one thing. If they typed nothing to buy, return an empty list.`;
 
 const NEED_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["kind", "query"],
+  required: ["things"],
   properties: {
-    kind: { type: "string", enum: ["product", "list", "not a product"] },
-    query: { type: "string" },
+    things: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["words", "query"],
+        properties: { words: { type: "string" }, query: { type: "string" } },
+      },
+    },
   },
 };
 
@@ -39,7 +46,8 @@ const CHOOSE_SCHEMA = {
 };
 
 export function readNeed(words: string): Promise<Need> {
-  return haiku(NEED, words, NEED_SCHEMA, 200);
+  // Room for a list longer than five, so it comes back whole and counts as too many.
+  return haiku(NEED, words, NEED_SCHEMA, 600);
 }
 
 export function choose(words: string, under: Found[], above: Found[]): Promise<Choice> {
