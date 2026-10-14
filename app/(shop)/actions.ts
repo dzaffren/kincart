@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { find as findOptions, searchOn, type Group, type Option } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
 import { pay } from "../../lib/shop/pay";
-import { createSetupToken } from "../../lib/shop/paypal";
-import { whoIs } from "../../lib/shop/people";
+import { createSetupToken, reasonOf } from "../../lib/shop/paypal";
+import { hashOf, newLink, whoIs } from "../../lib/shop/people";
 import { parseSubscription, pushOn } from "../../lib/shop/push";
 import {
   ask,
@@ -21,8 +21,33 @@ import {
   saveSubscription,
   setLimit as saveLimit,
   setTotal as saveTotal,
+  startHousehold,
 } from "../../lib/shop/requests";
 import { sendPayment, sendPing } from "./pings";
+
+// Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44).
+export async function start(): Promise<void> {
+  const jar = await cookies();
+  const had = jar.has("household");
+  const [rose, sam] = [newLink(), newLink()];
+
+  let household: number;
+  try {
+    household = await startHousehold(hashOf(rose), hashOf(sam));
+  } catch (error) {
+    console.log(`household status=failed reason=${reasonOf(error)}`);
+    redirect("/?started=failed");
+  }
+  jar.set("household", `${rose}.${sam}`, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 90 * 24 * 60 * 60,
+  });
+  console.log(`household id=${household} status=started`);
+  redirect(`/?started=${had ? "fresh" : "ready"}`);
+}
 
 export async function startLink(token: string): Promise<void> {
   if ((await whoIs(token))?.person !== "rose") return;

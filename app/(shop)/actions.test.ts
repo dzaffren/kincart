@@ -2,13 +2,14 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
-import { hashOf } from "../../lib/shop/people";
+import { hashOf, whoIs } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
 import {
   ask,
   getLimit,
   getSearch,
   getTotal,
+  getVault,
   latest,
   saveSearch,
   saveVault,
@@ -16,7 +17,7 @@ import {
   startHousehold,
   subscriptionsFor,
 } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, setTotal, startLink, subscribe, tryAgain } from "./actions";
+import { answer, askSam, find, setLimit, setTotal, start, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -24,6 +25,17 @@ vi.mock("next/server", async (importOriginal) => ({
   after: (task: () => unknown) => {
     Promise.resolve(task()).catch(() => {});
   },
+}));
+
+// This browser's cookies, as start() sets and reads them.
+const jar = vi.hoisted(() => new Map<string, { value: string; options?: object }>());
+
+vi.mock("next/headers", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/headers")>()),
+  cookies: async () => ({
+    has: (name: string) => jar.has(name),
+    set: (name: string, value: string, options?: object) => jar.set(name, { value, options }),
+  }),
 }));
 
 vi.mock("../../lib/shop/push", async (importOriginal) => ({
@@ -59,6 +71,7 @@ beforeEach(async () => {
   vi.stubEnv("VAPID_SUBJECT", "https://kincart.vercel.app");
   vi.stubGlobal("fetch", vi.fn());
   vi.mocked(notify).mockReset();
+  jar.clear();
 });
 
 afterEach(() => {
@@ -556,4 +569,47 @@ it("charges nothing when Sam's OK has nothing ticked, and tells Rose when Sam sa
     title: "Sam said no",
     body: "Sam said no to your 2 things. Nothing was taken.",
   });
+});
+
+it("starts a household with its own two links and household 1's saved PayPal, and keeps the links in this browser", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+
+  expect(await redirectOf(start())).toBe("/?started=ready");
+
+  const { value, options } = jar.get("household")!;
+  const [roseLink, samLink] = value.split(".");
+  const rose = (await whoIs(roseLink))!;
+  expect(rose.person).toBe("rose");
+  expect(rose.household).not.toBe(owner);
+  expect(await whoIs(samLink)).toEqual({ household: rose.household, person: "sam" });
+  expect(await getVault(rose.household)).toBe("1j970427g9944212v");
+  expect(options).toEqual({ httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 90 * 24 * 60 * 60 });
+  expect(console.log).toHaveBeenCalledWith(`household id=${rose.household} status=started`);
+});
+
+it("starts a new household in place of this browser's old one, and the old links still work", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await redirectOf(start());
+  const old = jar.get("household")!.value;
+
+  expect(await redirectOf(start())).toBe("/?started=fresh");
+
+  const fresh = jar.get("household")!.value;
+  expect(fresh).not.toBe(old);
+  const [oldRose, oldSam] = old.split(".");
+  const [freshRose] = fresh.split(".");
+  expect((await whoIs(freshRose))?.household).not.toBe((await whoIs(oldRose))?.household);
+  expect(await whoIs(oldSam)).toMatchObject({ person: "sam" });
+});
+
+it("saves nothing, and says so, when the database can't be reached", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const database = process.env.DATABASE_URL;
+  vi.stubEnv("DATABASE_URL", "postgres://postgres@127.0.0.1:1/none");
+
+  expect(await redirectOf(start())).toBe("/?started=failed");
+
+  vi.stubEnv("DATABASE_URL", database);
+  expect(jar.has("household")).toBe(false);
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^household status=failed reason=\S+/));
 });

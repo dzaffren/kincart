@@ -1,7 +1,7 @@
 import pg from "pg";
 import { beforeAll, beforeEach, expect, it } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
-import { hashOf, newLink, whoIs } from "./people";
+import { hashOf, linksIn, newLink, whoIs } from "./people";
 import { startHousehold } from "./requests";
 
 const links = { rose: "rose-link-4f9c2a7e", sam: "sam-link-b81d5e30" };
@@ -49,4 +49,19 @@ it("knows nobody by a wrong, cut-off or empty link", async () => {
 it("knows nobody by the env's links when they aren't set", async () => {
   expect(await whoIs("", { rose: "", sam: "" })).toBeNull();
   expect(await whoIs("rose-link-4f9c2a7e", { rose: undefined, sam: undefined })).toBeNull();
+});
+
+it("brings back one household's two links from this browser's cookie, and nothing else", async () => {
+  const [rose, sam] = [newLink(), newLink()];
+  await startHousehold(hashOf(rose), hashOf(sam));
+  const [otherRose, otherSam] = [newLink(), newLink()];
+  await startHousehold(hashOf(otherRose), hashOf(otherSam));
+
+  expect(await linksIn(`${rose}.${sam}`)).toEqual({ rose, sam });
+  expect(await linksIn(`${sam}.${rose}`)).toBeNull();
+  expect(await linksIn(`${rose}.${otherSam}`)).toBeNull();
+  expect(await linksIn(`${rose}.${newLink()}`)).toBeNull();
+  expect(await linksIn(`${rose}.${sam}.${otherSam}`)).toBeNull();
+  expect(await linksIn("")).toBeNull();
+  expect(await linksIn(undefined)).toBeNull();
 });

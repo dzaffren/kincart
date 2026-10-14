@@ -16,6 +16,16 @@ export async function whoIs(token: string, links: Links = envLinks()): Promise<W
   return token ? findHousehold(hashOf(token)) : null;
 }
 
+// This browser's cookie holds one household's two links, Rose's then Sam's (D44).
+export async function linksIn(cookie: string | undefined): Promise<{ rose: string; sam: string } | null> {
+  const [rose, sam, ...rest] = (cookie ?? "").split(".");
+  if (!rose || !sam || rest.length) return null;
+  const [asRose, asSam] = await Promise.all([whoIs(rose), whoIs(sam)]);
+  return asRose?.person === "rose" && asSam?.person === "sam" && asRose.household === asSam.household
+    ? { rose, sam }
+    : null;
+}
+
 export function newLink(): string {
   return randomBytes(16).toString("base64url");
 }
