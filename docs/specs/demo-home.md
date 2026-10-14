@@ -34,7 +34,7 @@ As a hackathon judge on a laptop, I want to see my Rose and Sam side by side and
 
 ```mermaid
 flowchart LR
-    J((Judge)) -- "opens kincart.vercel.app" --> H["/: what KinCart does, Try KinCart"]
+    J((Judge)) -- "opens kincart.vercel.app" --> H["/: what KinCart does, Try KinCart, sample phones on a laptop"]
     H -- "taps Try KinCart" --> W{"window 880px wide, 480px high?"}
     W -- "yes" --> P["/: Rose's and Sam's real pages, side by side"]
     W -- "no" --> B["/: Be Rose, Be Sam, each a new tab"]
@@ -55,7 +55,7 @@ Scenario: A judge reads what KinCart does before trying it
   When they open it
   Then they read what Rose does, what the AI does and what Sam does, in a few plain sentences
   And they see "Sandbox money only. Nothing real is bought." and "Try KinCart"
-  And on a laptop, no phones show until they tap "Try KinCart"
+  And on a laptop, Rose's and Sam's phones show a sample ask for AA batteries at $9.99, marked "Sample, not live", until they tap "Try KinCart"
 
 Scenario: A judge on a laptop plays both people side by side
   Given a judge in a 1280 by 800 window
@@ -83,6 +83,8 @@ Scenario: Start a new one on a laptop swaps both phones
 
 **In:**
 - More words on `/`: what Rose does, what the AI does and what Sam does. Every width, before and after Try KinCart.
+- A premium look for `/` and `/status`, from the design system's showcase extension (O10, O11, D50).
+- Before Try KinCart, a laptop's two phones show Rose's and Sam's real screens with a sample ask, still and marked as a sample (O13).
 - From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages show side by side in two phone frames, live, in place of Be Rose and Be Sam (D39, D40). From 1280px wide, the words sit in a column to their left.
 - Below 880px wide or 480px high, the phone column from `households`, with Be Rose and Be Sam. It loads no frames.
 - Start a new one swaps both phones to the new household.
@@ -95,12 +97,14 @@ Scenario: Start a new one on a laptop swaps both phones
 
 ## Interface
 
-One page at `/`, built on the `households` home page, in two shapes. On a phone it is one column: the KinCart mark, what it is, what Rose, the AI and Sam each do, the sandbox line, then Try KinCart, or Be Rose, Be Sam and Start a new one. From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages appear as two 390 by 844 phones, live, and Be Rose and Be Sam go. From 1280px the text sits in a column to their left, so all three fit on one laptop screen.
+Two public pages in the showcase look (D50): `/` and `/status`. Both put their words on a full-bleed violet block in 800-weight display type. Rose's and Sam's own pages do not change.
+
+`/` has three shapes. On a phone it is one column on violet: the KinCart mark and name, the headline, who Rose and Sam are, the sandbox line, then Try KinCart, or Be Rose, Be Sam and Start a new one. From 880px wide and 480px high, two phones appear under the words, and Be Rose and Be Sam go. From 1280px the words sit in a column to the left of the phones, so everything fits on one laptop screen. Before Try KinCart the phones show a still sample. After it, they show this browser's own Rose and Sam, live.
 
 ```mermaid
 flowchart LR
-    N["/: Try KinCart, no phones"] -- "tap" --> B["Starting…"]
-    B -- "started, wide window" --> W["/: words, Rose's phone, Sam's phone"]
+    N["/: Try KinCart, sample phones"] -- "tap" --> B["Starting…"]
+    B -- "started, wide window" --> W["/: Rose's and Sam's live phones"]
     B -- "started, phone" --> P["/: Be Rose, Be Sam, new tabs"]
     B -- "nothing saved" --> F["/: didn't start, Try KinCart again"]
     W -- "Start a new one" --> B2["Starting…"]
@@ -108,37 +112,49 @@ flowchart LR
     RF["Rose's phone"] -- "Ask Sam, within 3 s" --> SF["Sam's phone"]
 ```
 
-The words come first on every width. The phones appear only once this browser has a household (O9).
+The phones swap from sample to live once this browser has a household (O13).
 
 | Width | State | What's on it |
 | ----- | ----- | ------------ |
-| any | new | the mark at 64px; "KinCart"; lead: "An older shopper buys online with a relative's OK, and no shared passwords."; "Rose says what they need. AI finds real listings and explains each one. Sam taps OK on their own phone, and Rose's saved PayPal pays."; "**Sandbox money only.** Nothing real is bought."; "You get your own Rose and Sam to try. Rose's sandbox PayPal is already linked."; Try KinCart (primary); "System status" link. No phones on a wide screen |
+| any | new | on violet: the mark at 48px and "KinCart"; the headline in three lines, "Rose asks." "Sam says OK." "PayPal pays."; "Rose is an older shopper, and Sam is family. AI finds real listings and explains each one, and Sam taps OK on their own phone. Nobody shares a password."; "**Sandbox money only.** Nothing real is bought."; "You get your own Rose and Sam to try. Rose's sandbox PayPal is already linked."; Try KinCart (white, violet text); "System status" link |
+| 880px and up, 480px high | new | the words, then "Rose's phone" and "Sam's phone", each captioned "Sample, not live": Rose's "Waiting for Sam" and Sam's "Rose would like this" with "OK, pay $9.99", for Amazon Basics 24-Pack AA Alkaline Batteries at $9.99. Nobody can tap or focus them |
 | any | starting | Try KinCart becomes "Starting…" with the spinner |
 | any | failed | red notice at the top: "Your Rose and Sam didn't start. Nothing was saved. Try again in a moment."; then new |
-| phone | yours | the mark, "KinCart", the lead, what each one does and the sandbox line; small: "Each opens in a new tab. Come back here to open them again."; Be Rose (primary) and Be Sam (secondary), links that open a new tab; small: "Want a clean start? A new Rose and Sam have nothing asked and no limits. Your old links keep working."; Start a new one (secondary); "System status" link |
-| 880px and up, 480px high | yours | the text of yours without the new-tab line, Be Rose and Be Sam; below it, "Rose's phone" and "Sam's phone", each with "Open Rose's page" or "Open Sam's page" and a 390 by 844 frame of the real page |
-| 1280px and up, 480px high | yours | the text in a column up to 480px wide on the left, the two phones on the right |
+| phone | yours | the words of new without its last line; small: "Each opens in a new tab. Come back here to open them again."; Be Rose (white) and Be Sam (secondary), links that open a new tab; small: "Want a clean start? A new Rose and Sam have nothing asked and no limits. Your old links keep working."; Start a new one (secondary); "System status" link |
+| 880px and up, 480px high | yours | the words of yours without the new-tab line, Be Rose and Be Sam; the two phones, each with "Open Rose's page" or "Open Sam's page" and the real page, live |
+| 1280px and up, 480px high | new, yours | the words in a column up to 480px wide on the left, the two phones on the right, the headline at 56px |
 | any | ready | grey notice at the top: "Your Rose and Sam are ready."; then yours |
 | any | restarting | Start a new one becomes "Starting…" with the spinner |
 | any | fresh | grey notice at the top: "Your new Rose and Sam are ready. Tabs you already have open still show the old ones."; then yours, with the phones on the new links |
 
-The new state's last line was "You get your own Rose, who asks for things, and Sam, who says OK." in `households`. The new sentence above it now says what each one does, so that line only says the pair is theirs.
+`/status` keeps its three checks and their words. Its head is the violet block with the mark and "KinCart status" at display size, in place of "Shop-together status". The checks sit under it in rows split by `line`, in the system's type and colours. A failed check is `danger` and bold. The tab title on both pages is "KinCart" (O12).
 
-The frames are the real pages, so their 3 s refresh (D19) shows Sam the ask and both the receipt with no extra code. A frame's height is kept within the window, and each page scrolls inside its frame. Each frame loads lazily, so on a phone or a short window, where the frames are hidden, neither page loads (scenario 3).
+The live phones are the real pages, so their 3 s refresh (D19) shows Sam the ask and both the receipt with no extra code. A phone's height is kept within the window, and each page scrolls inside it. Each live phone loads lazily, so on a phone or a short window, where the phones are hidden, neither page loads (scenario 3). The sample phones are the real `RoseView` and `SamView` with fixed data, made inert.
 
-Checked on the preview, 2026-10-15, in Chromium and Firefox: no sideways scroll at 390, 900, 1024, 1280 and 1440px. A 900 by 420 window keeps the phone column. A 1280 by 800 window shows all three with no scroll. Light and dark both rendered. On 390 by 844 and 900 by 420, neither frame loads; on 1024 and up, both do. The keyboard order follows the page: Start a new one, System status, Open Rose's page, Rose's page, Open Sam's page, Sam's page. No new colours: the frame edge is `color-control` on `color-bg` (D40), the notices are the existing neutral and danger tones, and the buttons and links are the system's.
+Checked on the preview, 2026-10-15, in Chromium and Firefox:
+- No sideways scroll at 320, 390, 900, 1024, 1280 and 1440px.
+- A 1280 by 800 window shows the words and both phones with no scroll.
+- A 900 by 420 window keeps the phone column.
+- The headline stays three lines at every width from 320 to 1440px.
+- Light and dark both rendered.
+- On 390 by 844 and 900 by 420, no live page loads; on 1024 and up, both do.
+- `/status` renders in both themes with no scroll at 390 and 1280px.
 
-Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here the page has no marketing: one sentence says what each person does, and on a laptop the product runs live beside it as two real phones. Against Vercel's restraint: one accent, hierarchy from type size alone, and no decoration. Against Stripe's interactive docs: the real thing to try, beside the words that explain it.
+The keyboard order follows the page: the words' controls, System status, then each phone's link and its page. The sample phones take no focus. On the block, focus rings are `showcase-on-stage`, because `text` on violet is 2.2:1.
 
-**Motion tier:** 1, as in `households`. Nothing new moves: the notices rise and fade like every notice, and "Starting…" turns the spinner.
+Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here there is no gradient, no card grid and no screenshot: one flat brand block, a headline that is the product in three steps, and the real product running beside it. Against Monzo: the full-bleed flat brand colour and heavy, plain headline, with no shadows. Against Vercel's restraint: one accent, and nothing that does not explain or run the product.
 
-**Components used:** from the system, Button, Notice, PhoneFrame, and the `screen`, `heading`, `lead`, `small`, `stack`, `link` and `button` styles. The layout uses the system's two breakpoints, `two-phones` and `text-beside` (D40). Composed here: `HomeView`, and the home layout in `shop.css` from `space` and `page` tokens.
+**Motion tier:** 2 on `/` only (D50), 1 everywhere else. One reveal as the page arrives: the words, the body, then the phones rise 24px and fade in, 120ms apart, over 640ms. Then nothing moves. Under reduced motion, nothing moves at all. The notices and "Starting…" behave as in tier 1.
 
-**Preview:** http://localhost:3000/preview/demo-home with `pnpm dev`, and `?state=new`, `starting`, `failed`, `ready`, `yours`, `restarting` or `fresh`. Resize the window to see the three shapes. The phones show household 1's real pages. It answers 404 in production. It replaces `/preview/households`, whose made-up links would show a broken page in each phone.
+**Components used:** from the system, Button, Notice, PhoneFrame (live, or a still sample with no `href`), RoseView and SamView inside the samples, and the `screen`, `stack`, `small`, `link` and `button` styles. The showcase tokens and the two breakpoints, `two-phones` and `text-beside` (D50). Composed here: `HomeView`, `StatusView`, the home layout in `shop.css` and the status rows in `status.css`.
+
+**Preview:** http://localhost:3000/preview/demo-home with `pnpm dev`, and `?state=new`, `starting`, `failed`, `ready`, `yours`, `restarting` or `fresh`. Resize the window to see the three shapes. The live phones show household 1's real pages. It answers 404 in production. It replaces `/preview/households`, whose made-up links would show a broken page in each phone. `/status` is its own preview: http://localhost:3000/status.
 
 ## Technical plan
 
 ### Decisions to record
+
+D50 was recorded at the `/design-system` direction test.
 
 ## D39 · 2026-10-15 · A wide home page shows Rose's and Sam's real pages side by side
 
@@ -159,10 +175,11 @@ Status: active
 | O6 | Public links let anyone run Find. Each Find calls Channel3 and Claude Haiku, so a stranger in a loop spends on both keys and can use up Channel3's quota during judging. Recommended: accept, and set a spend limit on the Anthropic workspace. Other: a cap on Finds an hour, in this slice | flag | spec p3 | user | Resolved | Moved to `households` as shape O11: there, any visitor can start a household and run Find. 2026-10-15 |
 | O7 | An old judge who opens their Rose or Sam page again saves their phone again: `NotifyControl.tsx:19` puts back a phone the server forgot. Recommended: accept, because opening the page is using it again. Other: drop the put-back, so a phone the push service dropped stays off until someone taps the control | flag | spec p3 | user | Resolved | No longer applies: with households, an old judge's phone belongs to the old judge's own household (O8). 2026-10-15 |
 | O8 | Should every judge get their own Rose and Sam, as every family would in production? Today all judges share one pair, which needs Start over (D37, D38, D41) and leaves O4 and O7 | question | spec p3 | user | Resolved | Yes. Split: a `households` slice first, where a visitor starts their own Rose and Sam with the demo sandbox PayPal already linked and every table is keyed by household. Then demo-home redoes pause 1 on top of it. Start over, D37, D38 and D41 go; D18 stands. 2026-10-15 |
-| O9 | What a laptop shows before Try KinCart. Recommended: the words and Try KinCart only, and the two phones appear once this browser has a household. Other choices: two empty phone outlines that say where Rose and Sam will show; or start a household on the first visit, so the phones show at once, which makes a household and a vault copy for every visit, crawlers too | question | spec p1 | user | Resolved | The words and Try KinCart only; the phones appear once this browser has a household. Empty outlines and a household on the first visit were turned down. 2026-10-15 |
+| O9 | What a laptop shows before Try KinCart. Recommended: the words and Try KinCart only, and the two phones appear once this browser has a household. Other choices: two empty phone outlines that say where Rose and Sam will show; or start a household on the first visit, so the phones show at once, which makes a household and a vault copy for every visit, crawlers too | question | spec p1 | user | Resolved | The words and Try KinCart only; the phones appear once this browser has a household. Empty outlines and a household on the first visit were turned down. 2026-10-15. Reopened by O13: the phones now show a still sample before Try KinCart. |
 | O10 | The home page sells KinCart, so it needs a premium feel. The system lacks it: 28px is its largest type, cards and frames sit flat with no shadow, D40 turned down a bezel, and its motion stops at tier 1. Recommended: a showcase extension through `/design-system`, used only on `/`. Other: rework the page from today's tokens | flag | spec p2 | user | Resolved | A showcase extension through `/design-system`, used only on `/`: a display type step, phone frames with depth, a stage behind them and a tier-2 load reveal. Rose's and Sam's own pages stay as they are. 2026-10-15 |
 | O11 | Which reference the selling page aims at. Recommended: an Apple product page. Others: Monzo, Stripe's homepage, Linear | question | spec p2 | user | Resolved | Build two directions, Apple and Monzo, and compare them at the `/design-system` direction test. 2026-10-15 |
 | O12 | `/status` still says "Shop-together status" (`app/status/StatusView.tsx:13`), and the tab title is "Shop-together" (`app/layout.tsx:7`). The page also uses `system-ui` and the browser's default colours, not the system | flag | spec p2 | user | Resolved | Rename both to KinCart, and restyle `/status` from the system. In this slice. 2026-10-15 |
+| O13 | Before Try KinCart, a laptop shows no phones (O9), so a selling page opens on words alone. Recommended: the phones show Rose's and Sam's real screens with a sample ask, still and marked as a sample. Other: keep O9 | question | design-system p A | user | Resolved | Sample phones: the real screens with a sample ask for AA batteries, still, marked "Sample, not live". They become the household's live pages after Try KinCart. 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
