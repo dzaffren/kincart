@@ -255,3 +255,10 @@ Why: scenario 2 keeps Rose's picks after the redirect; the ids only choose from 
 Rejected: a picks column on `rose_search` (a schema change for state that lasts one screen).
 Source: docs/specs/basket-cap.md
 Status: active
+
+## D40 · 2026-10-15 · Wide screens: px breakpoints at 880 and 1280px, and phone frames edged in `control`
+
+Why: two 390px phones need 852px plus a 17px desktop scrollbar, and at 1280px a 379px text column fits beside them; the page inside a frame is also `bg`, so a `line` edge (1.2:1) almost vanishes, and `control` is 3.6:1.
+Rejected: em breakpoints at 54em and 80em (at a 12px browser text setting, 54em is 648px and the 852px of frames scroll sideways), 864px (with a 17px scrollbar the sides drop under 24px), a `line` frame edge (1.2:1 light, 1.5:1 dark), a device bezel or notch (decoration, against "steady, never flashy").
+Source: docs/design/system-brief.md
+Status: active
