@@ -145,7 +145,7 @@ Checked on the preview, 2026-10-15, in Chromium and Firefox:
 - On 390 by 844 and 900 by 420, no live page loads; on 1024 and up, both do.
 - `/status` renders in both themes with no scroll at 390 and 1280px.
 
-The keyboard order follows the page: the words' controls, System status, then each phone's link and its page. The sample phones take no focus. On the block, focus rings are `showcase-on-stage`, because `text` on violet is 2.2:1.
+The keyboard order follows the page: the words' controls, then each phone's link and its page, then System status under the block. The sample phones take no focus. On the block, focus rings are `showcase-on-stage`, because `text` on violet is 2.2:1.
 
 Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here there is no gradient, no card grid and no screenshot: one flat brand block, a headline that is the product in three steps, and the real product running beside it. The steps are numbered because they are a sequence; the three points in charge are plain lines with a violet rule, not cards with icons. Against Monzo: the full-bleed flat brand colour and heavy, plain headline, with no shadows. Against Vercel's restraint: one accent, and nothing that does not explain or run the product.
 
