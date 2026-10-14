@@ -145,6 +145,14 @@ it("keeps Rose's picks and names their sum after Ask Sam went over the total lim
     picked: over,
     overCents: 4747,
   });
+  expect(roseState(vault, null, { over: ["prod_3Ba7aA", "", "prod_7Bk2wC"] }, on({ ...saved("basket"), groups }, 5000, 3000))).toMatchObject({
+    picked: ["prod_3Ba7aA", "", "prod_7Bk2wC"],
+    overCents: 3498,
+  });
+  const shared = [groups[0], { thing: "batteries for the remote", options: groups[0].options }, groups[2]];
+  expect(
+    roseState(vault, null, { over: ["prod_3Ba7aA", "prod_3Ba7aA", "prod_7Bk2wC"] }, on({ ...saved("basket"), groups: shared }, 5000, 3000)),
+  ).toMatchObject({ picked: ["prod_3Ba7aA", "prod_3Ba7aA", "prod_7Bk2wC"], overCents: 3498 });
   expect(roseState(vault, null, { over }, on({ ...saved("basket"), groups }, 5000, 5000))).toEqual(
     roseState(vault, null, {}, on({ ...saved("basket"), groups }, 5000, 5000)),
   );

@@ -217,7 +217,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
         <OverNotice
           totalCents={state.totalCents}
           overCents={state.overCents}
-          several={(state.picked?.length ?? 0) > 1}
+          several={new Set(state.picked?.filter(Boolean)).size > 1}
         />
         <div className="heading">
           <h1>Which ones would you like?</h1>
@@ -231,7 +231,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
                 group={group}
                 name={`pick-${index}`}
                 limitCents={state.limitCents}
-                picked={state.picked}
+                picked={state.picked?.[index]}
               />
             ))}
           </div>
@@ -286,7 +286,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
   );
 }
 
-type GroupProps = { group: Group; name: string; limitCents: number; picked?: string[] };
+type GroupProps = { group: Group; name: string; limitCents: number; picked?: string };
 
 function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
   const headingId = useId();
@@ -302,7 +302,7 @@ function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
           listings={group.options}
           labelledBy={headingId}
           name={name}
-          picked={group.options.find((option) => picked?.includes(option.id))?.id}
+          picked={picked}
           none="None of these"
         />
       )}

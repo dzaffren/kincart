@@ -413,6 +413,27 @@ it("stops picks over Sam's total limit before they reach Sam, and asks once Rose
   expect(await latest()).toMatchObject({ item: { id: "basket", name: "2 things", cents: 3498 }, status: "waiting" });
 });
 
+it("sends each group's pick back in its own place, with an empty place for a group left out", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const aa16 = option("prod_8En1rG", "Energizer MAX AA Batteries, 16 Count", 1449, "walmart.com");
+  await saveTotal(3000);
+  await saveSearch("AA batteries, batteries for the remote and a phone charger", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24, aa16] },
+      { thing: "batteries for the remote", options: [aa24] },
+      { thing: "a phone charger", options: [belkin] },
+    ],
+  });
+
+  const leftOut = form({ "pick-0": "prod_8En1rG", "pick-1": "", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, leftOut))).toBe(`/r/${rose}?over=prod_8En1rG,,prod_7Bk2wC`);
+  const shared = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_3Ba7aA", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, shared))).toBe(`/r/${rose}?over=prod_3Ba7aA,prod_3Ba7aA,prod_7Bk2wC`);
+  expect(await latest()).toBeNull();
+});
+
 it("lets picks that come to exactly Sam's total limit through", async () => {
   searchOn();
   const dimmer = option("prod_4Dm1nL", "Dimmable Plug-In Night Light", 1501, "walmart.com");

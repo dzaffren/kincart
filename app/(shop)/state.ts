@@ -38,7 +38,7 @@ export function roseState(
   const { limitCents } = search;
   const totalCents = search.totalCents ?? undefined;
   if (current?.outcome === "options") {
-    const over = overOf(current.options, params.over, totalCents);
+    const over = overOf([current.options.find(({ id }) => id === params.over?.[0])], totalCents);
     return {
       kind: "options",
       limitCents,
@@ -51,7 +51,10 @@ export function roseState(
     };
   }
   if (current?.outcome === "basket") {
-    const over = overOf(current.groups.flatMap((group) => group.options), params.over, totalCents);
+    const over = overOf(
+      current.groups.map(({ options }, index) => options.find(({ id }) => id === params.over?.[index])),
+      totalCents,
+    );
     return {
       kind: "basket",
       limitCents,
@@ -87,12 +90,13 @@ export function roseState(
   };
 }
 
-// The picks Ask Sam sent back for going over Sam's total limit, while their saved prices still do (D36).
-function overOf(options: Option[], ids: string[] | undefined, totalCents: number | undefined) {
-  const picked = [...new Set(ids)].flatMap((id) => options.find((option) => option.id === id) ?? []);
-  const cents = picked.reduce((sum, option) => sum + option.cents, 0);
+// The picks Ask Sam sent back for going over Sam's total limit, one place per group, while their
+// saved prices still do (D36). A listing picked in two groups counts once, as in askSam.
+function overOf(picks: (Option | undefined)[], totalCents: number | undefined) {
+  const prices = new Map(picks.flatMap((option) => (option ? [[option.id, option.cents] as const] : [])));
+  const cents = [...prices.values()].reduce((sum, price) => sum + price, 0);
   if (totalCents === undefined || cents <= totalCents) return undefined;
-  return { ids: picked.map((option) => option.id), cents };
+  return { ids: picks.map((option) => option?.id ?? ""), cents };
 }
 
 function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {

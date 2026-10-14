@@ -177,7 +177,7 @@ export default function BasketCapPreview() {
                 totalCents: 4000,
                 words,
                 groups,
-                picked: ["aa-24", "charger-belkin"],
+                picked: ["aa-24", "", "charger-belkin"],
                 busy: true,
               }}
               items={[]}

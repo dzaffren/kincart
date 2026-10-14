@@ -73,7 +73,12 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
     const total = await getTotal();
     if (total !== null && cents > total) {
       console.log(`ask status=over cents=${cents} total=${total}`);
-      redirect(`/r/${token}?over=${picks.map(({ option }) => encodeURIComponent(option.id)).join(",")}`);
+      // One place per group, empty for a group left out, so each group gets its own pick back.
+      const over =
+        saved?.outcome === "basket"
+          ? saved.groups.map(({ options }, index) => options.find(({ id }) => id === formData.get(`pick-${index}`))?.id ?? "")
+          : picks.map(({ option }) => option.id);
+      redirect(`/r/${token}?over=${over.map(encodeURIComponent).join(",")}`);
     }
     if (await getVault()) {
       if (picks.length === 1) {
