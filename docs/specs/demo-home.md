@@ -225,9 +225,9 @@ On a phone the same page renders the frames hidden, and the lazy frames never lo
 | `e2e/households.spec.ts` | Imports those two from `e2e/db.ts` | reuse |
 | `e2e/demo-home.spec.ts` (new) | The two tests below | 1 to 4 |
 
-Built at pause 2, and kept as built: `app/(shop)/HomeView.tsx`, `PhoneFrame` in `app/(shop)/ui.tsx:172`, the showcase block in `app/(shop)/shop.css`, `docs/design/design-system/tokens/showcase.css` and its import in `app/(shop)/layout.tsx`, `app/status/StatusView.tsx`, `app/status/status.css`, the token imports in `app/status/page.tsx`, the title in `app/layout.tsx`, `app/status/StatusView.test.tsx`, and `app/(shop)/preview/demo-home/page.tsx`. `app/(shop)/preview/households/page.tsx` is deleted.
+Built at pause 2, and kept as built: `app/(shop)/HomeView.tsx`, `PhoneFrame` in `app/(shop)/ui.tsx:172`, the showcase block in `app/(shop)/shop.css`, `docs/design/design-system/tokens/showcase.css` and its import in `app/(shop)/layout.tsx`, `app/status/StatusView.tsx`, `app/status/status.css`, the token imports in `app/status/page.tsx`, the title in `app/layout.tsx`, `app/status/StatusView.test.tsx`, and `app/(shop)/preview/demo-home/page.tsx`. `app/(shop)/preview/households/page.tsx` is deleted. Also built then: the page title, description and link preview in `app/(shop)/page.tsx`. From `/design-system` (D40, D50): the frame size in `tokens/spacing.css`, the showcase import in `styles.css`, `guidelines/showcase.html` and `guidelines/spacing.html`, the design-system `readme.md`, `PhoneFrame` in `.design-sync/`, and `docs/design/system-brief.md`.
 
-No change: `app/(shop)/page.tsx`, `actions.ts`, `RoseView.tsx`, `SamView.tsx`, `Refresher.tsx`, `lib/shop/`, `db/`, `.github/workflows/ci.yml` and `package.json`.
+No change: `actions.ts`, `RoseView.tsx`, `SamView.tsx`, `Refresher.tsx`, `lib/shop/`, `db/`, `.github/workflows/ci.yml` and `package.json`.
 
 Reusing: `RoseView` and `SamView` for the samples, `PhoneFrame`, `Button`, `Notice`, `linksIn()`, `start()`, `Refresher`'s 3 s refresh, `reset()` and `sql()` in `e2e/db.ts`, and the PayPal vault saved for the e2e (D20).
 
