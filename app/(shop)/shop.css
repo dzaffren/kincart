@@ -263,6 +263,29 @@ body {
   text-underline-offset: 0.2em;
 }
 
+.phone-frame {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.phone-frame figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* The window's height holds the caption, its gap and 32px of page space above and below. */
+.phone-frame iframe {
+  box-sizing: border-box;
+  width: var(--frame-width);
+  height: min(var(--frame-height), calc(100vh - var(--space-16) - var(--target-min) - var(--space-2)));
+  border: var(--border-width) solid var(--color-control);
+  border-radius: var(--radius-surface);
+  background: var(--color-bg);
+}
+
 .limit,
 .notify {
   padding-top: var(--space-6);

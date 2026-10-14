@@ -167,3 +167,17 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
     </fieldset>
   );
 }
+
+export function PhoneFrame({ who, href }: { who: string; href: string }) {
+  return (
+    <figure className="phone-frame">
+      <figcaption>
+        <span className="field-label">{who}&apos;s phone</span>
+        <a className="link" href={href} target="_blank" rel="noopener">
+          Open {who}&apos;s page
+        </a>
+      </figcaption>
+      <iframe src={href} title={`${who}'s phone`} />
+    </figure>
+  );
+}

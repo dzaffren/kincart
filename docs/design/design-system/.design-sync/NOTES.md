@@ -12,6 +12,8 @@
 
 - `ListingPicker` review captures crop at the 700px capture window. The full card in `_screenshots/general__ListingPicker.png` shows every listing and the error line.
 
+- `PhoneFrame` previews show an empty frame. The real pages need a link token and the app's server.
+
 ## Re-sync risks
 
 - `dtsPropsFor` is hand-copied from `app/(shop)/Button.tsx` and `ui.tsx`. Nothing checks it against the source.

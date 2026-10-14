@@ -12,6 +12,8 @@
   --page-max: 480px;
   --control-height: 56px;
   --target-min: 48px;
+  --frame-width: 390px;
+  --frame-height: 844px;
 
   --radius-control: 8px;
   --radius-surface: 12px;

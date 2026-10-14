@@ -15,6 +15,10 @@
   li { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-3); align-items: center; font: var(--type-small); }
   .bar { height: 16px; border-radius: 2px; background: var(--color-accent); }
   .box { box-sizing: border-box; border: var(--border-width) solid var(--color-control); background: var(--color-surface); }
+  .queries { margin: var(--space-4) 0; gap: var(--space-3); }
+  .queries li { grid-template-columns: 1fr; gap: 0; }
+  code { font: var(--type-code); }
+  .frame { box-sizing: border-box; width: var(--frame-width); max-width: 100%; height: var(--frame-height); margin-top: var(--space-4); display: grid; place-items: center; border: var(--border-width) solid var(--color-control); border-radius: var(--radius-surface); background: var(--color-bg); font: var(--type-small); color: var(--color-muted); }
 </style>
 </head>
 <body>
@@ -41,6 +45,15 @@
 <li><span>radius.surface · 12</span><span class="box" style="height: 64px; border-radius: var(--radius-surface)"></span></li>
 <li><span>border.selected · 2</span><span class="box" style="height: 56px; border-radius: var(--radius-surface); border: var(--border-selected) solid var(--color-accent); background: var(--color-accent-soft)"></span></li>
 </ul>
+
+<h2>Wide screens</h2>
+<p>Under 880px wide, or under 480px high, every screen is the phone column. CSS can't read a variable in a media query, so each query copies its value from here.</p>
+<ul class="queries">
+<li><span>two-phones: two phone frames show</span><code>(min-width: 880px) and (min-height: 480px)</code></li>
+<li><span>text-beside: the text moves left of them</span><code>(min-width: 1280px) and (min-height: 480px)</code></li>
+</ul>
+<p>A phone frame shows a real page at the e2e's phone size. Its edge is control, because the page inside is also bg.</p>
+<div class="frame">frame.width × frame.height · 390 × 844</div>
 </main>
 </body>
 </html>
