@@ -126,6 +126,20 @@ Scenario: Sam says no to the basket
 
 Rose's options screen becomes one group per thing: the thing's name as a heading, find-and-explain's listing cards under it, and a "None of these" card last. Sam's request screen leads with the total and lists each thing with its price, shop, reason and link. The waiting screen and both receipts list every line under the total.
 
+```mermaid
+flowchart LR
+    A["Rose: What do you need?"] -- "Find, 2 to 5 things" --> G["Rose: Which ones would you like?"]
+    A -- "Find, 6 or more" --> A
+    G -- "Ask Sam, 2+ picks" --> W["Rose: Waiting for Sam"]
+    G -- "Ask Sam, 1 pick" --> W1["find-and-explain's one-item request"]
+    G -- "Try other words" --> A
+    W -- "push: 2 things, $22.48" --> S["Sam: Rose would like 2 things"]
+    S -- "OK, pay $22.48" --> R["Both: receipt with every line"]
+    S -- "No" --> A
+```
+
+Rose's Find with 2 to 5 things opens the groups screen; two or more picks go to Sam as one basket, and Sam's OK shows both of them the same receipt.
+
 | Who | State | Heading | What's on it |
 | --- | ----- | ------- | ------------ |
 | Rose | asking | What do you need? | the hint becomes "Say it the way you'd tell Sam, one thing or up to 5. For example: AA batteries, a night light and a phone charger."; the rest as find-and-explain |
