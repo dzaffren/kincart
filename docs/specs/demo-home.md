@@ -1,6 +1,6 @@
 # Demo home
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** households
@@ -152,6 +152,140 @@ Craft checks: a one-line "landing page for a demo app" prompt gives a gradient h
 
 ## Technical plan
 
+### Approach
+
+Pause 2 already built the look into the real code: `HomeView`, `PhoneFrame`, the showcase tokens, `StatusView` and their CSS. `app/(shop)/page.tsx:12` already reads the household cookie and renders `HomeView`, so `/` has the showcase today. `/build` adds three things on top. `NotifyControl` renders nothing inside a frame (O15). A unit test covers `HomeView`'s two phone modes. A laptop e2e walks scenarios 1, 2 and 4, and a phone e2e checks scenario 3.
+
+No new route, action, table or dependency. The live phones are iframes of the household's own `/r/<token>` and `/h/<token>`, which re-render every 3 s like any open tab (D19). The sample phones are the real `RoseView` and `SamView` with fixed data, rendered on the server and made `inert`.
+
+Relies on: D9, D10, D11, D19, D20, D24, D42, D44, D48, D50, and the drafted D39, D51 and D52.
+
+```mermaid
+flowchart TB
+    subgraph browser["Judge's laptop"]
+        HV["/ HomeView"]
+        RF["iframe: /r/<rose>"]
+        SF["iframe: /h/<sam>"]
+    end
+    subgraph server["Next.js on Vercel"]
+        HP["(shop)/page.tsx: linksIn(cookie)"]
+        RP["r/[token]/page.tsx, h/[token]/page.tsx"]
+        ACT["actions.ts: start, askSam, answer"]
+    end
+    DB[("Neon")]
+    HV -- "GET /, household cookie" --> HP
+    HP -- "two links, or none: sample phones" --> HV
+    HV -- "lazy src, only once shown" --> RF
+    HV -- "lazy src, only once shown" --> SF
+    RF -- "GET every 3 s (D19), Ask Sam" --> RP
+    SF -- "GET every 3 s, OK pay" --> RP
+    RP -- "household's rows" --> DB
+    ACT -- "household's rows" --> DB
+```
+
+The home page only hands the browser two links. Each phone is the real page in a frame, so the ask and the receipt reach the other phone through the 3 s refresh that already exists.
+
+```mermaid
+sequenceDiagram
+    participant B as Laptop browser
+    participant H as / (page.tsx)
+    participant R as Rose's frame
+    participant S as Sam's frame
+    participant N as Next.js and Neon
+    B->>H: GET /, no cookie
+    H-->>B: words, Try KinCart, sample phones (inert)
+    B->>N: start()
+    N-->>B: cookie, redirect /?started=ready
+    B->>H: GET /?started=ready
+    H-->>B: words, two iframes (lazy)
+    B->>R: load /r/<rose> (window is 880px wide)
+    B->>S: load /h/<sam>
+    R->>N: askSam, AA batteries $9.99
+    S->>N: router.refresh() within 3 s
+    N-->>S: Rose would like this, OK pay $9.99
+    S->>N: answer OK, pay() (D20)
+    R->>N: router.refresh() within 3 s
+    N-->>R: Sam said OK. It's paid.
+```
+
+On a phone the same page renders the frames hidden, and the lazy frames never load (O14).
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `app/(shop)/NotifyControl.tsx:14` | The effect returns at once when `window.self !== window.top`. The state stays null, so nothing renders, and no phone gets put back from inside a frame | O15 |
+| `app/(shop)/HomeView.test.tsx` (new) | Renders with `renderToStaticMarkup`, as `app/status/StatusView.test.tsx` does. No household: the headline's three lines, Try KinCart, two "Sample, not live" captions, two `inert` screens with "Waiting for Sam" and "OK, pay $9.99", and no `<iframe`. A household: two iframes with `loading="lazy"` on the two links, "Open Rose's page", Be Rose and Start a new one, and no "Sample" | 1, 2, 3 |
+| `e2e/db.ts` | Takes `listing()` and `searchFor()` from `e2e/households.spec.ts:10`, so both e2e files seed a household's search the same way | reuse |
+| `e2e/households.spec.ts` | Imports those two from `e2e/db.ts` | reuse |
+| `e2e/demo-home.spec.ts` (new) | The two tests below | 1 to 4 |
+
+Built at pause 2, and kept as built: `app/(shop)/HomeView.tsx`, `PhoneFrame` in `app/(shop)/ui.tsx:172`, the showcase block in `app/(shop)/shop.css`, `docs/design/design-system/tokens/showcase.css` and its import in `app/(shop)/layout.tsx`, `app/status/StatusView.tsx`, `app/status/status.css`, the token imports in `app/status/page.tsx`, the title in `app/layout.tsx`, `app/status/StatusView.test.tsx`, and `app/(shop)/preview/demo-home/page.tsx`. `app/(shop)/preview/households/page.tsx` is deleted.
+
+No change: `app/(shop)/page.tsx`, `actions.ts`, `RoseView.tsx`, `SamView.tsx`, `Refresher.tsx`, `lib/shop/`, `db/`, `.github/workflows/ci.yml` and `package.json`.
+
+Reusing: `RoseView` and `SamView` for the samples, `PhoneFrame`, `Button`, `Notice`, `linksIn()`, `start()`, `Refresher`'s 3 s refresh, `reset()` and `sql()` in `e2e/db.ts`, and the PayPal vault saved for the e2e (D20).
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| Sample phones from `RoseView` and `SamView` with fixed data | Scenario 1, O13 |
+| `inert` on the samples | The samples must not take a tap or focus: nothing there is live |
+| `loading="lazy"` on the live phones | Scenario 3; checked in Chromium, Firefox and WebKit (O14, D51) |
+| The frame check in `NotifyControl` | O15, D52 |
+| `tokens/showcase.css` and the reveal | O10, D50 |
+| `HomeView.test.tsx` | Scenarios 1 to 3 at the markup level, faster than the e2e |
+| `listing()` and `searchFor()` in `e2e/db.ts` | Both e2e files seed a search; one copy |
+
+Cut: a client component that adds the frames by window width (O14 proved lazy enough), a `frame-ancestors` header (another site needs Sam's secret link to frame it), notifications inside the frames (O15), and a flag (no server path changes, and rollback is one deploy).
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Judging runs Dec 1 to 15, with tens of judges. A laptop with a household renders Rose's and Sam's pages every 3 s while visible, as two open tabs would (D19). Phones and short windows load neither (O14). The samples add two server renders to `/`, with no database read |
+| **Breaks first**     | Neon connections: every query opens its own client (`lib/shop/requests.ts:288`), and each open laptop polls two pages. At 10×, a few hundred laptops open at once, this is the first limit. Not measured |
+| **Security surface** | No new endpoint, input, secret or stored data. The frames load the household's own links, which the page already carries in Be Rose and Be Sam. `/` now needs same-origin framing: the site sends no `X-Frame-Options` or `frame-ancestors` (checked on `/status` with curl, 2026-10-15). A later `DENY` would blank both phones; `SAMEORIGIN` keeps them. Another site can frame Sam's page only with Sam's secret link |
+| **Proof it works**   | No new server path, so no new log line. In Vercel's log, `household id=17 status=started`, then that household's page requests every 3 s. Their paths hold the links, so never copy them out of the log. CI's e2e on main walks the laptop path |
+| **Rollout**          | No flag. CI runs the e2e on main (D5, D24), and Vercel promotes after it (D10). Before judging, open kincart.vercel.app on a real iPhone and check that Safari's network panel shows no `/r/` or `/h/` request. Rollback: promote the previous deploy, then revert the merge. No data to undo |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 Reads what KinCart does | `HomeView.test.tsx`: headline, words and the two samples. `demo-home.spec.ts` laptop test: two "Sample, not live" captions before Try KinCart | `pnpm test`, `pnpm test:e2e` |
+| 2 Plays both side by side | `demo-home.spec.ts` laptop test, below | `pnpm test:e2e` |
+| 3 A phone gets a button for each | `HomeView.test.tsx`: lazy frames. `demo-home.spec.ts` phone test: Be Rose and Be Sam visible, no sample caption visible, and no document request to `/r/` or `/h/` | `pnpm test`, `pnpm test:e2e` |
+| 4 Start a new one swaps both phones | `demo-home.spec.ts` laptop test, below | `pnpm test:e2e` |
+| `/status` says KinCart | `app/status/StatusView.test.tsx` | `pnpm test` |
+| O15 | `demo-home.spec.ts` laptop test: Sam's phone has no "Notifications" heading. `e2e/ping-helper.spec.ts` still turns notifications on in a full tab | `pnpm test:e2e` |
+
+**E2E:** `e2e/demo-home.spec.ts`, test "a judge plays Rose and Sam side by side", at 1280 by 800 with `test.use`.
+
+1. `reset()` saves household 1's PayPal.
+2. The judge opens `/` and sees "Rose asks." and two "Sample, not live" captions. They tap Try KinCart and see "Your Rose and Sam are ready.".
+3. Rose's phone, `frameLocator('iframe[title="Rose\'s phone"]')`, shows "What do you need?". Sam's phone shows "Nothing to approve" and no "Notifications" heading.
+4. `searchFor()` gives the new household AA batteries at $9.99. Within 5 s, Rose's phone refreshes to "Which one would you like?". The judge picks it and taps Ask Sam.
+5. Within 5 s, Sam's phone shows "Rose would like this" and "OK, pay $9.99". The judge taps it.
+6. Sam's phone shows "Paid from Rose's PayPal", and Rose's phone shows "Sam said OK. It's paid.", with the same PayPal transaction.
+7. The judge taps Start a new one and sees "Your new Rose and Sam are ready.". Both frames' links change, and the phones show "What do you need?" and "Nothing to approve".
+
+The second test, "a phone gets a button for each", runs at 390 by 844. It starts a household and finds Be Rose and Be Sam, no visible sample caption, and no document request to `/r/` or `/h/`. Together they make one real sandbox charge (D20), and no Channel3 or Claude call. Stop `pnpm dev` before running them.
+
+### Chunks
+
+Single chunk. Pause 2 built most of it, and what is left is one small code change and its tests.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Household 1 has no saved PayPal on the live site. New households then show "Link your PayPal to start" inside Rose's phone, and PayPal refuses to load in a frame | The pre-judging check from `households`. "Open Rose's page" opens it in a tab, where the PayPal flow works |
+| The spike ran Playwright's WebKit 26.6 on Linux, not Safari on an iPhone | The real-iPhone check under Rollout |
+| A later security header sets `X-Frame-Options: DENY` and blanks both phones | Under Security surface; `SAMEORIGIN` keeps them |
+| The laptop e2e waits on the 3 s refresh inside each frame | Each wait allows 5 s, as the scenarios say; the receipt allows 15 s, as `approve-and-pay.spec.ts` does |
+
 ### Decisions to record
 
 D50 was recorded at the `/design-system` direction test.
@@ -160,6 +294,20 @@ D50 was recorded at the `/design-system` direction test.
 
 Why: a judge sees Sam's screen change within seconds of Rose's ask without switching tabs, which is the product's point (O2).
 Rejected: a button for each that opens a new tab (the judge switches tabs to see the ask arrive), a button plus a QR code for each (a second device for every judge).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D51 · 2026-10-15 · Hidden phones stay unloaded with loading="lazy", not a width check in the browser
+
+Why: Chromium, Firefox and WebKit 26.6 skip a lazy iframe that is `display:none`, and load both once shown (demo-home O14 spike, 2026-10-15). So a phone never loads and polls two hidden pages, and the frames come with the HTML, not after hydration.
+Rejected: a client component that adds the frames only when the window matches (the frames appear after hydration, and it is one more client component), frames that load at once (every phone with a household would load and poll both pages).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D52 · 2026-10-15 · Rose's and Sam's pages leave out Notifications inside the home page's phones
+
+Why: on a laptop both phones are on one screen, so a push adds nothing there. A permission prompt or a push subscription from inside a frame is unproven (demo-home O15). Rose's or Sam's page in its own tab still offers it.
+Rejected: a spike to prove it first (time spent on a part judges don't need on a laptop), leaving it in (a refused prompt shows "Blocked" or an error inside the phone).
 Source: docs/specs/demo-home.md
 Status: active
 
@@ -180,6 +328,8 @@ Status: active
 | O11 | Which reference the selling page aims at. Recommended: an Apple product page. Others: Monzo, Stripe's homepage, Linear | question | spec p2 | user | Resolved | Build two directions, Apple and Monzo, and compare them at the `/design-system` direction test. 2026-10-15 |
 | O12 | `/status` still says "Shop-together status" (`app/status/StatusView.tsx:13`), and the tab title is "Shop-together" (`app/layout.tsx:7`). The page also uses `system-ui` and the browser's default colours, not the system | flag | spec p2 | user | Resolved | Rename both to KinCart, and restyle `/status` from the system. In this slice. 2026-10-15 |
 | O13 | Before Try KinCart, a laptop shows no phones (O9), so a selling page opens on words alone. Recommended: the phones show Rose's and Sam's real screens with a sample ask, still and marked as a sample. Other: keep O9 | question | design-system p A | user | Resolved | Sample phones: the real screens with a sample ask for AA batteries, still, marked "Sample, not live". They become the household's live pages after Try KinCart. 2026-10-15 |
+| O14 | Safari skips a `display:none` iframe with `loading="lazy"`. If not, every iPhone with a household loads and polls both hidden pages (scenario 3) | unproven | spec p3 | poc | Resolved | Yes. Spike, 2026-10-15: WebKit 26.6 (Playwright 1.63's image) loaded no `/r/` or `/h/` document at 390 by 844 or 900 by 420, and both at 1280 by 800. Chromium and Firefox match. Not yet checked on a real iPhone: see Rollout (D51) |
+| O15 | Notification permission and a push subscription work from inside a same-origin frame | unproven | spec p3 | user | Resolved | Not needed: inside the home page's phones, Rose's and Sam's pages leave out Notifications. A spike and leaving it in were turned down (D52). 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -189,4 +339,10 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Start over**: a dropped plan for one tap that cleared the shared Rose and Sam for the next judge. Households made it unneeded.
 - **Household**: one Rose and one Sam with their own links, PayPal, asks, limits and phones. Each judge starts their own.
 - **Phone frame**: a 390 by 844 box on the home page that shows a real page inside it, live, like a phone held up beside the text.
+- **iframe**: a box on one page that shows another page, live.
+- **Lazy loading**: the browser loads a frame only when it is about to show on screen. A hidden frame never loads.
+- **inert**: an HTML attribute that makes a part of the page take no tap, click or keyboard focus.
+- **Showcase**: the design system's look for the public pages: a violet block, big heavy type and phones with a device edge.
+- **WebKit**: the browser engine inside Safari.
+- **Spike**: a short, throwaway test that answers one question before a plan rests on it.
 - **e2e**: end-to-end, one test that walks the whole slice as a user would.
