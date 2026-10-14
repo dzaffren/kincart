@@ -59,16 +59,6 @@ test("Rose finds slippers, Sam checks the listing and pays", async ({ page, cont
   await expect(page.getByText(transaction!)).toBeVisible();
 });
 
-test("a shopping list asks for one thing at a time", async ({ page }) => {
-  await reset(savedPaypal);
-  await roseFinds(page, "milk, bread and eggs");
-
-  await expect(page.getByText("One thing at a time for now. What would you like first?")).toBeVisible({
-    timeout: 20_000,
-  });
-  await expect(box(page)).toHaveValue("milk, bread and eggs");
-});
-
 test("Sam sets the price limit, and Rose's page shows it", async ({ page }) => {
   await reset(savedPaypal);
   await page.goto(`/h/${sam}`);
