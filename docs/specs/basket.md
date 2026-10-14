@@ -122,6 +122,53 @@ Scenario: Sam says no to the basket
 - One charge per shop when the things come from different shops. The sandbox charge lands in one test business account (shape O9). No later slice.
 - Rose changing a pick after asking. Sam says no, and Rose asks again. No later slice.
 
+## Interface
+
+Rose's options screen becomes one group per thing: the thing's name as a heading, find-and-explain's listing cards under it, and a "None of these" card last. Sam's request screen leads with the total and lists each thing with its price, shop, reason and link. The waiting screen and both receipts list every line under the total.
+
+| Who | State | Heading | What's on it |
+| --- | ----- | ------- | ------------ |
+| Rose | asking | What do you need? | the hint becomes "Say it the way you'd tell Sam, one thing or up to 5. For example: AA batteries, a night light and a phone charger."; the rest as find-and-explain |
+| Rose | looking | What do you need? | as find-and-explain: the box locked, "Looking…" with the spinner |
+| Rose | groups | Which ones would you like? | "For "AA batteries, a night light and a phone charger". Pick one for each thing you want."; per thing, its name at title size, up to three listing cards, then "None of these"; Ask Sam; Try other words |
+| Rose | Ask Sam with no pick | Which ones would you like? | red above Ask Sam: "Pick at least one first." |
+| Rose | asking Sam | Which ones would you like? | Ask Sam becomes "Asking Sam…" with the spinner; Try other words goes |
+| Rose | a thing with nothing | Which ones would you like? | in that thing's group, a grey notice instead of cards: "Couldn't find this one." or "Nothing under $30 for this one." |
+| Rose | more than five | What do you need? | grey notice: "Up to 5 things at a time. Which 5 do you need most?"; Rose's words still in the box |
+| Rose | waiting | Waiting for Sam | approve-and-pay's notice; a summary with "2 things", $22.48 at 40px, and each line's name and price |
+| Rose | paid | Sam said OK. It's paid. | the receipt: Paid, $22.48, each line's name and price, the date, the PayPal transaction |
+| Rose | Sam said no | What do you need? | grey notice: "Sam said no to your 2 things. Nothing was taken."; an empty box |
+| Rose | charge failed | What do you need? | approve-and-pay's red notice, unchanged |
+| Sam | request | Rose would like 2 things | a summary: "In total", $22.48 at 40px, "Paid from Rose's PayPal if you say OK."; per line, between dividers: the name, "$9.99 at amazon.com", "Why it fits: …", "See it on amazon.com"; asked time; OK, pay $22.48; No |
+| Sam | paying | Rose would like 2 things | as find-and-explain: one "Paying…" button |
+| Sam | paid | Paid from Rose's PayPal | the same receipt as Rose's |
+| Sam | said no | Nothing to approve | grey notice: "You said no to Rose's 2 things. Rose can see that." |
+| Sam | charge failed | Payment didn't go through | red notice: "Nothing was taken from Rose's PayPal for the 2 things. Rose can ask again." |
+
+When Rose picks only one thing from a basket, it goes to Sam as a one-item request, exactly as find-and-explain, so no screen ever says "1 things" (O8).
+
+The notifications from ping-helper, for a basket:
+
+| To | Title | Text |
+| -- | ----- | ---- |
+| Sam | Rose would like 2 things | $22.48 in total. Tap to see them and say OK or No. |
+| Rose | Sam said OK | Your 2 things are paid: $22.48. Tap to see the receipt. |
+| Rose | Sam said no | Sam said no to your 2 things. Nothing was taken. |
+
+A failed charge keeps ping-helper's text, which names no item.
+
+"None of these" is there because a radio can't be unticked: it is how Rose takes back a pick. Nothing is ticked at first, and a group left alone is left out (O2). Ask Sam keeps its plain label: showing the count or total on it would need the page to react to every tap, and Sam sees the total before paying.
+
+Checked: no sideways scroll at 420px; light and dark both rendered. No new colour pairs: the line list uses body text on the summary's and receipt's existing backgrounds, and the dividers use the `line` colour that the limit form's divider already uses. The focus ring shows on "None of these" like on any option card, which is 56px tall.
+
+Craft checks: a one-line "shopping basket" prompt gives quantity steppers, a cart badge, subtotal, tax and shipping rows, and a Checkout button. Here there are no quantities and no checkout: each thing keeps Rose's own words as its heading, and the only next step is Ask Sam. Against Stripe Checkout's order summary: line names on the left, prices on the right in tabular figures, the total above them. Against Monzo: Sam's total stays at 40px with plain words around it.
+
+**Motion tier:** 1, as before. Nothing new moves: the grey notices in a group rise and fade like every notice, and "Looking…" and "Asking Sam…" turn the spinner.
+
+**Components used:** from the system, Button, Notice, Summary, ReceiptCard and ListingPicker. Three gain an optional prop: Summary and ReceiptCard take `lines`, and ListingPicker takes `name` and `none`. Composed from tokens here: the line list (`LineItems`, `space-2`, tabular figures), the group stack (`space-8`), and Sam's per-line list (`space-4`, `border-width`, `line`). Changing three system components is O9.
+
+**Preview:** http://localhost:3000/preview/basket with `pnpm dev`. It answers 404 in production. The listings are written examples and grey squares stand in for photos; real results replace both at /build.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -133,6 +180,8 @@ Scenario: Sam says no to the basket
 | O5 | Assuming up to 20 seconds is acceptable for a basket of up to 5 things, with "Looking…" shown meanwhile. One thing took 9.9 s in find-and-explain's spike (its O11) | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-14 |
 | O6 | Assuming one thing typed still works exactly as find-and-explain: up to three options and a one-item request | assumption | spec p1 | user | Resolved | Confirmed with pause 1 approval, 2026-10-14 |
 | O7 | A 5-thing basket uses up to 10 Channel3 searches, against 2 per Find today. find-and-explain O14 accepted the free tier, assumed 1,000 a month, for a few hundred Finds. The basket e2e adds about 6 searches to every CI run | flag | spec p1 | user | Accepted risk | The demo, testing and CI need a few hundred searches a month at most. If Channel3 refuses for quota, Rose sees "Couldn't find that" and the log says why, as in find-and-explain O14. Agreed 2026-10-14 |
+| O8 | Assuming one pick from a basket goes to Sam as a one-item request, exactly as find-and-explain, so Sam's screen, the receipt and the notifications never say "1 things" | assumption | spec p2 | user | Open | — |
+| O9 | Summary, ReceiptCard and ListingPicker are design-system components, and this slice gives each an optional prop. craft.md asks for that to be a deliberate choice: accept it here as composition, as find-and-explain did with the listing card, or take it through `/design-system`. Either way the Claude Design bundle in `docs/design/design-system/ds-bundle/` shows the old versions until `/design-sync` | flag | spec p2 | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
