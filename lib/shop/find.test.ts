@@ -24,6 +24,10 @@ const pick = (id: string) => ({
   watch: "Check the size chart.",
 });
 
+// The first Haiku call answers with things; the pick calls answer with picks.
+const isNeed = (body: { output_config: { format: { schema: { required: string[] } } } }) =>
+  body.output_config.format.schema.required[0] === "things";
+
 type Answers = { need: unknown; under?: unknown[]; all?: unknown[]; choice?: unknown };
 
 function stubServices(answers: Answers | (() => never)) {
@@ -31,7 +35,7 @@ function stubServices(answers: Answers | (() => never)) {
     if (typeof answers === "function") return answers();
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
-      const data = body.max_tokens === 600 ? answers.need : answers.choice;
+      const data = isNeed(body) ? answers.need : answers.choice;
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     return Response.json({ products: body.filters ? answers.under : answers.all });
@@ -159,7 +163,7 @@ function stubBasket(things: Thing[]) {
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
       const data =
-        body.max_tokens === 600
+        isNeed(body)
           ? { things: things.map(({ words, query }) => ({ words, query })) }
           : things.find((thing) => body.messages[0].content.startsWith(`They asked: ${JSON.stringify(thing.words)}`))
               ?.choice;
@@ -205,7 +209,7 @@ it("searches every thing at once and shows a group of listings for each, under R
   });
   const calls = fetch.mock.calls.map(([url, init]) => ({ url: String(url), body: JSON.parse(String(init.body)) }));
   const lastSearch = calls.findLastIndex(({ url }) => url.includes("trychannel3"));
-  const firstPick = calls.findIndex(({ url, body }) => url.includes("anthropic") && body.max_tokens === 1000);
+  const firstPick = calls.findIndex(({ url, body }) => url.includes("anthropic") && !isNeed(body));
   expect(searches(fetch)).toBe(6);
   expect(lastSearch).toBeLessThan(firstPick);
   expect(console.log).toHaveBeenCalledWith(

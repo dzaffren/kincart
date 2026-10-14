@@ -46,8 +46,7 @@ const CHOOSE_SCHEMA = {
 };
 
 export function readNeed(words: string): Promise<Need> {
-  // Room for a list longer than five, so it comes back whole and counts as too many.
-  return haiku(NEED, words, NEED_SCHEMA, 600);
+  return haiku(NEED, words, NEED_SCHEMA, 2000);
 }
 
 export function choose(words: string, under: Found[], above: Found[]): Promise<Choice> {
@@ -57,9 +56,11 @@ export function choose(words: string, under: Found[], above: Found[]): Promise<C
     `Under their price limit, pick from these:\n${JSON.stringify(listings)}`,
     `Above their price limit, not to pick from:\n${JSON.stringify(above.map((listing) => listing.name))}`,
   ].join("\n\n");
-  return haiku(CHOOSE, message, CHOOSE_SCHEMA, 1000);
+  return haiku(CHOOSE, message, CHOOSE_SCHEMA, 4000);
 }
 
+// Low effort still thinks now and then, and the thinking counts toward max_tokens: a pick that
+// thought used about 700 of them, against about 360 without.
 async function haiku<T>(system: string, message: string, schema: object, maxTokens: number): Promise<T> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
