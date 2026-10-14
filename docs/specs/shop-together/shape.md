@@ -39,6 +39,8 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 5 | `basket` | The relative asks for several things at once, such as batteries, a night light and a charger. You approve the list once and one total is charged. | Only if time is left. Found at `/spec find-and-explain`: a request is one item today. |
 | 6 | ~~`basket-trim`~~ | Folded back into `basket` at its pause 2, 2026-10-14. | You untick things and pay for the rest; unticked things go back to the relative. |
 | 7 | `basket-cap` | You set a total cap for one basket, such as $100. | Only if time is left. Split from `basket` at `/spec basket`. |
+| 8 | `households` | A visitor taps a button on `/` and gets their own Rose and Sam links, with the demo sandbox PayPal already linked. Every ask, search, limit and phone belongs to that household, so two visitors never see each other's. | Found at `/spec demo-home` pause 3 (its O8): judges share one Rose and Sam today, and in production every family is its own. |
+| 9 | `demo-home` | `/` says what KinCart is. On a laptop, the visitor's own Rose and Sam run side by side, live. | The URL is what judges get. Waits on `households`. |
 
 ## Not doing
 
@@ -47,7 +49,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 - **Spend limits or auto-approve.** You approve every purchase.
 - **Native phone app.** A web page on the phone is enough (O3).
 - **A voice button.** The mic key on Gboard and the iPhone keyboard already turns speech into text in the request box.
-- **Sign-up and logins.** Two fixed demo people, unless slice 1 finds a reason otherwise (O8).
+- **Sign-up and logins.** Two fixed demo people, unless slice 1 finds a reason otherwise (O8). From `households`, each visitor gets their own pair, still with no sign-up.
 - **The earlier lanes**: invoice chaser, dispute helper, group trip splitting, pay-when-done, haggle bots. Each was already crowded, already built into PayPal, or too heavy for 22 to 44 hours.
 
 ## Open items
@@ -64,6 +66,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | O8 | Assuming two fixed demo people (relative and helper) and no sign-up. Anyone holding the helper link could approve a sandbox charge | assumption | shape | user | Handed to approve-and-pay | — |
 | O9 | No real order reaches a shop. The sandbox charge lands in a test business account standing in for the store | flag | shape | user | Accepted risk | The rules allow sandbox-only builds; the video says so plainly. Agreed 2026-10-12 |
 | O10 | 22 to 44 hours left (Oct 12 to Nov 12, 12:00 pm PT) for 5 slices, the video and the README. Slices 3 and 4 may not get built | flag | shape | user | Accepted risk | 0 to 2 are the must-have; the last week goes to the video and README. Agreed 2026-10-12 |
+| O11 | Any visitor can start a household and run Find. Each Find calls Channel3 and Claude Haiku, so a stranger in a loop spends on both keys and can use up Channel3's 1,000 free searches a month during judging (from demo-home O6) | flag | spec demo-home p3 | user | Handed to households | — |
 
 ## Glossary
 
