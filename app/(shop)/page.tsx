@@ -4,7 +4,14 @@ import { linksIn } from "../../lib/shop/people";
 import { start } from "./actions";
 import { HomeView } from "./HomeView";
 
-export const metadata: Metadata = { title: "KinCart" };
+const description =
+  "Your parent shops from their own phone, AI explains real options, and you approve from yours. PayPal pays, and nobody shares a password.";
+
+export const metadata: Metadata = {
+  title: "KinCart: Mom asks, you say OK",
+  description,
+  openGraph: { title: "KinCart: Mom asks. You say OK. PayPal pays.", description, siteName: "KinCart" },
+};
 
 const outcomes = ["ready", "fresh", "failed"] as const;
 

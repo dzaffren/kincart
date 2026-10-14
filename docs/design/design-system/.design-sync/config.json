@@ -12,7 +12,8 @@
     "Summary": "app/(shop)/ui.tsx",
     "ReceiptCard": "app/(shop)/ui.tsx",
     "ItemPicker": "app/(shop)/ui.tsx",
-    "ListingPicker": "app/(shop)/ui.tsx"
+    "ListingPicker": "app/(shop)/ui.tsx",
+    "PhoneFrame": "app/(shop)/ui.tsx"
   },
   "guidelinesGlob": [
     "docs/design/design-system/guidelines/*.html"
@@ -26,6 +27,7 @@
     "Summary": "/** Item name, shown above the amount. */\n  title?: string;\n  /** Amount in US cents; rendered as $29.99. */\n  cents: number;\n  /** One short line under the amount, e.g. \"From amazon.com\". */\n  note?: string;",
     "ReceiptCard": "receipt: { item: { id: string; name: string; cents: number }; paidAt: Date; transactionId: string };",
     "ItemPicker": "/** Prices are in US cents. */\n  items: { id: string; name: string; cents: number }[];\n  /** id of the heading that names the choice. */\n  labelledBy: string;\n  /** id of the item checked at first. */\n  picked?: string;\n  /** Shows \"Pick one of the three first.\" under the list. */\n  error?: boolean;",
-    "ListingPicker": "/** Prices are in US cents. what, why and watch are one sentence each. */\n  listings: { id: string; name: string; cents: number; shop: string; url: string; imageUrl?: string; what: string; why: string; watch: string }[];\n  /** id of the heading that names the choice. */\n  labelledBy: string;\n  /** id of the listing checked at first. */\n  picked?: string;\n  /** Shows \"Pick one first.\" under the list. */\n  error?: boolean;"
+    "ListingPicker": "/** Prices are in US cents. what, why and watch are one sentence each. */\n  listings: { id: string; name: string; cents: number; shop: string; url: string; imageUrl?: string; what: string; why: string; watch: string }[];\n  /** id of the heading that names the choice. */\n  labelledBy: string;\n  /** id of the listing checked at first. */\n  picked?: string;\n  /** Shows \"Pick one first.\" under the list. */\n  error?: boolean;",
+    "PhoneFrame": "/** The person whose page it shows, e.g. \"Rose\". Captions it \"Rose's phone\". */\n  who: string;\n  /** That person's page. The frame shows it live, and the caption's link opens it in a new tab. */\n  href?: string;\n  /** Without href: a still sample of the page, captioned \"Sample, not live\". Nobody can use it. */\n  children?: React.ReactNode;"
   }
 }

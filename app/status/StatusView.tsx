@@ -10,8 +10,14 @@ type Props = {
 export function StatusView({ database, paypal, build }: Props) {
   return (
     <main className="status">
-      <h1>Shop-together status</h1>
-      <dl>
+      <header className="status-head">
+        <div className="screen">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="brand-mark" src="/icon.svg" alt="" />
+          <h1>KinCart status</h1>
+        </div>
+      </header>
+      <dl className="screen">
         <dt>Database</dt>
         <dd className={database.state === "ok" ? undefined : "fail"}>{databaseText(database)}</dd>
         <dt>PayPal sandbox</dt>

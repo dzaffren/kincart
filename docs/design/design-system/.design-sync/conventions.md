@@ -1,6 +1,6 @@
 # Building with this design system
 
-Six components ship on `window.ShopTogether`: `Button`, `Notice`, `Summary`, `ReceiptCard`, `ItemPicker` and `ListingPicker`. Use them whenever one fits. Build anything else in plain JSX with the classes and tokens below. Never hard-code a colour, size, radius, duration or font.
+Seven components ship on `window.ShopTogether`: `Button`, `Notice`, `Summary`, `ReceiptCard`, `ItemPicker`, `ListingPicker` and `PhoneFrame`. Use them whenever one fits. Build anything else in plain JSX with the classes and tokens below. Never hard-code a colour, size, radius, duration or font.
 
 ## Setup
 
@@ -26,6 +26,9 @@ Light and dark follow the device through `prefers-color-scheme`. There is no pro
 - One primary `Button` per screen: the next step. Everything else is `kind="secondary"`.
 - Green (`--color-success`) only means paid. Red (`--color-danger`) only means a real failure. A helper's "no" is `<Notice tone="neutral">`.
 - Nothing smaller than `--type-small` (16px). Nothing tappable under `--target-min` (48px).
+- `--showcase-*` tokens are for the public pages, `/` and `/status`, only. Never use them on Rose's or Sam's screens.
+- `PhoneFrame` with `href` shows that page live. Without `href`, it shows its children as a still sample, marked "Sample, not live".
+- Wide screens use two media queries: `(min-width: 880px) and (min-height: 480px)` shows two `PhoneFrame`s, and `(min-width: 1280px) and (min-height: 480px)` moves the text beside them. CSS can't read a variable there, so copy these values.
 
 ## Tokens
 
@@ -36,7 +39,7 @@ Light and dark follow the device through `prefers-color-scheme`. There is no pro
 | Status | `--color-success` + `--color-success-soft`, `--color-wait` + `--color-wait-soft`, `--color-danger` + `--color-danger-soft` | paid or approved; waiting for the helper; real failures only. Text colour on its `-soft` background. |
 | Type | `--type-amount`, `--type-heading`, `--type-title`, `--type-body`, `--type-button`, `--type-small`, `--type-code` | font shorthands: write `font: var(--type-title)`, never `font-size`. One heading per screen. `--type-small` is the smallest text allowed. |
 | Space | `--space-1` `-2` `-3` `-4` `-6` `-8` `-12` `-16` | 4, 8, 12, 16, 24, 32, 48, 64px. There is no `-5`, `-7` or `-10`. |
-| Layout | `--page-max`, `--page-inline`, `--control-height`, `--target-min` | 480px phone column; 24px side padding; 56px buttons and inputs; 48px smallest tap target |
+| Layout | `--page-max`, `--page-inline`, `--control-height`, `--target-min`, `--frame-width`, `--frame-height` | 480px phone column; 24px side padding; 56px buttons and inputs; 48px smallest tap target; the 390 × 844 phone frame |
 | Shape | `--radius-control`, `--radius-surface`, `--border-width`, `--border-selected`, `--focus-ring-width`, `--focus-ring-offset`, `--shadow-overlay`, `--scrim` | controls; cards; 1px edges; 2px selected edge; focus ring; modals and their backdrop |
 | Motion | `--motion-fast`, `--motion-base`, `--motion-slow`, `--motion-loading`, `--ease-out`, `--ease-in` | press; tint fade; banner, toast, modal; one spinner turn. Animate only `transform` and `opacity`. |
 

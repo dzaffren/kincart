@@ -29,3 +29,24 @@ export async function reset(paypal: string | null, search?: { words: string; opt
     ]);
   }
 }
+
+export const listing = (id: string, name: string, cents: number, shop: string): Option => ({
+  id,
+  name,
+  cents,
+  shop,
+  url: `https://www.${shop}/`,
+  what: `${name}.`,
+  why: "It is what Rose asked for.",
+  watch: "Check the pack before you buy.",
+});
+
+// The newest household gets a one-listing search, so its Rose asks at a fixed price.
+export async function searchFor(words: string, option: Option) {
+  const [{ id }] = await sql("SELECT max(id) AS id FROM households");
+  await sql("INSERT INTO rose_search (id, words, outcome, listings) VALUES ($1, $2, 'options', $3)", [
+    id,
+    words,
+    JSON.stringify([option]),
+  ]);
+}

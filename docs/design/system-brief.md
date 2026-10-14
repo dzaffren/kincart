@@ -2,6 +2,8 @@
 
 **Status:** Approved · 2026-10-13 · /design-system pause A
 **Extension:** App icon · Approved · 2026-10-14 · for ping-helper (O8)
+**Extension:** Wide screens · Approved · 2026-10-15 · for demo-home (O5), D40
+**Extension:** Showcase · Approved · 2026-10-15 · for demo-home (O10, O11, O12), D50
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
@@ -151,6 +153,111 @@ One SVG holds the mark. The PNG sizes are made from it in the app at ping-helper
 
 **Chosen:** KinCart's tick cart, a tick on two wheels: the helper's OK carries the shopping. Brief, longlist and concepts in `docs/design/logo/`; the masters, every size above and the usage rules in `docs/design/logo/kit/` (`guidelines.md`). The earlier Shop-together icon rounds were not carried over (D25).
 
+## Wide screens
+
+The system was phone-only: one 480px column and no breakpoints. Demo-home needs a laptop shape, where Rose's and Sam's real pages run side by side in two phone frames (D53).
+
+```
+judges open the one URL on a laptop or a phone
+                              → under the first width, the phone column as before
+two 390px phones + 24px gap + 24px sides + a 17px desktop scrollbar = 869px
+                              → the frames show from 880px wide
+a phone held sideways is still a phone: 430px high at most
+                              → the frames also need 480px of height
+1280px is the narrowest common laptop window; less the scrollbar, the sides, a 32px gap and the phones, 379px is left
+                              → the text moves beside the phones from 1280px; 379px is above the 320px phone floor
+the frames are fixed px, and so is every size in the system
+                              → breakpoints in px, not em
+the page inside a frame is also `bg`, so a `line` edge (1.2:1 light, 1.5:1 dark) almost vanishes
+                              → the frame edge is 1px `control`: 3.6:1 light, 4.5:1 dark, on `bg`
+"steady", never "flashy"; cards sit flat
+                              → no bezel, notch or shadow: a `radius-surface` rectangle on `bg`
+the e2e's phone (`playwright.config.ts:17`)
+                              → 390 × 844, an iPhone 12 to 15 screen
+```
+
+```mermaid
+flowchart LR
+    W{"Window"} -- "under 880px wide, or under 480px high" --> P["Phone column: Be Rose and Be Sam buttons"]
+    W -- "880px wide and up" --> T["Text column on top, the two frames under it"]
+    W -- "1280px wide and up" --> B["Text column on the left, the two frames on the right"]
+```
+
+| Token          | Value | Use                                                   |
+| -------------- | ----- | ----------------------------------------------------- |
+| `frame.width`  | 390px | A phone frame's width                                 |
+| `frame.height` | 844px | A phone frame's height, when the window has the room |
+
+| Breakpoint    | Media query                                   | What changes                                                    |
+| ------------- | --------------------------------------------- | --------------------------------------------------------------- |
+| `two-phones`  | `(min-width: 880px) and (min-height: 480px)`  | The two frames show under the text; Be Rose and Be Sam go        |
+| `text-beside` | `(min-width: 1280px) and (min-height: 480px)` | The text moves to a left column, no wider than `page.max`        |
+
+Since D50, the frame edge is the showcase's 10px device edge, inside the frame, in place of the 1px `control` edge.
+
+CSS cannot read a variable inside a media query, so the breakpoints are not tokens. Each media query copies its value from this table.
+
+An em breakpoint follows the browser's text-size setting, but the frames stay 390px. At a 12px setting, the spec's 54em is 648px, and the 852px of frames scroll sideways.
+
+**Phone frame.** A caption row holds who it is and a link that opens their page in a new tab. Under it, the real page runs in an iframe titled "Rose's phone" or "Sam's phone". The frame is `frame.height` high, or less when the window is shorter, so the caption and frame fit in the window. The page scrolls inside its frame.
+
+## Showcase
+
+The public pages, `/` and `/status`, sell KinCart to judges, and they need to feel premium (O10). The system was built for Rose's and Sam's pages: 28px was its largest type, everything sits flat, and motion stops at tier 1. Every token here is named `showcase-*`, and nothing here reaches Rose's or Sam's pages.
+
+| Question | Answer |
+| -------- | ------ |
+| Feel | Clear, kind, premium |
+| Never feel | Flashy, salesy, cluttered |
+| Monzo (chosen) | Full-bleed flat blocks in the brand colour; heavy, bold type; a warm, plain voice; flat, with no shadows |
+| Apple product page (shown, not chosen) | The product's name huge, with one short line under it; the device as the hero; wide, calm space |
+| Locked | Atkinson Hyperlegible Next, the violet accent, the KinCart mark (D25), the 16px floor, 7:1 text |
+| Motion ceiling | Tier 2, on the public pages only: one load reveal, then nothing moves |
+
+```
+judges decide in the first seconds, mostly on a laptop
+                              → a full-bleed violet block behind the words, and on a laptop behind the phones too
+Monzo: the promise is the headline, in heavy type
+                              → "Rose asks. / Sam says OK. / PayPal pays.", 800 weight, one sentence a line
+the longest line, "Sam says OK.", is 6.4em at 800 weight
+                              → 40 to 48px on a phone (12.3vw), 64px in the 432px column, 56px in the 379px column beside the phones
+text on the block             → `showcase-on-stage`: #FFFFFF light (8.2:1), #EEF1F6 dark (12.9:1); no muted text on it
+the next step on the block    → light: a white button with violet text (8.2:1); dark: the accent button, 7.6:1 against the block
+a focus ring on the block     → on-stage, because `text` on violet is 2.2:1
+the product sells itself: the two phones
+                              → a 10px device edge with a 44px radius; flat, no shadow
+D40's 880px still has to fit two phones
+                              → the edge sits inside the 390 × 844 frame, so the page inside is 370 wide (above the 320 floor)
+before a household starts, a laptop shows no live phones
+                              → the phones show Rose's and Sam's real screens with a sample ask, still, marked "Sample, not live" (demo-home O13)
+"premium", never "flashy"; motion ceiling tier 2
+                              → one reveal: the words, the body, then the phones rise 24px and fade in, 120ms apart, over 640ms
+only transform and opacity move
+                              → a CSS animation; 0ms and 0px under reduced motion
+```
+
+```mermaid
+flowchart LR
+    W{"Window"} -- "under 880px wide, or under 480px high" --> P["Violet block, the words, no phones"]
+    W -- "880px wide and up" --> T["Words on top, the two phones under them, all on violet"]
+    W -- "1280px wide and up" --> B["Words on the left, the two phones on the right"]
+```
+
+| Token | Light | Dark | Use |
+| ----- | ----- | ---- | --- |
+| `showcase-display` | 800, 40 to 48px, line 1.08 | the same | The headline on a phone; the title on `/status` |
+| `showcase-display-wide` | 800 64/68 | the same | The headline from 880px, words above the phones |
+| `showcase-display-side` | 800 56/60 | the same | The headline from 1280px, words beside the phones |
+| `showcase-tracking` | -0.02em | the same | Every display size |
+| `showcase-stage` | `#5B3AA0` | `#2B2150` | The block |
+| `showcase-on-stage` | `#FFFFFF` | `#EEF1F6` | Text, links and focus rings on the block |
+| `showcase-cta`, `showcase-on-cta` | `#FFFFFF`, `#5B3AA0` | `#C3B2F0`, `#1E1240` | The next step on the block |
+| `showcase-bezel`, `showcase-radius` | 10px, 44px | the same | The device edge |
+| `showcase-device` | `#14181F` | `#5A6270` | The device edge's colour |
+| `showcase-reveal`, `showcase-stagger`, `showcase-rise` | 640ms, 120ms, 24px | the same | The load reveal; 0 under reduced motion |
+
+Apple was built and compared at the direction test. It centred the name over phones lifted by a shadow on a grey stage. It lost because, at 1280 × 800, its phones sat mostly below the fold (D50).
+
 ## Never
 
 - An icon without a word next to it.
@@ -172,6 +279,8 @@ Confirm or correct these with the brief.
 | Oldest phone: 320px wide, iOS 15.4 or Chrome 100                                    | A relative's phone may be a few years old; so hex, not `oklch()`  |
 | Icons from Lucide (`lucide-react`, a new dependency, added when a slice needs one)  | The repo has no icon set; craft bans emojis                        |
 | The name under the Home Screen icon is "KinCart", seven letters, so iPhone shows it whole | The logo kit names the product KinCart |
+| A desktop scrollbar takes 17px at most                                              | Windows' classic scrollbar width; macOS draws its scrollbar over the page |
+| No phone held sideways is 480px high                                                | The largest iPhone is 430px across                                  |
 
 ## Glossary
 
@@ -182,3 +291,6 @@ Confirm or correct these with the brief.
 - **Lucide** — an open-source icon set with a React package.
 - **Maskable icon** — an Android app icon with its mark kept inside the middle 80%, so Android can crop the tile to a circle or a rounded square without cutting the mark.
 - **Badge** — the small one-colour icon Android shows in the status bar for a notification. Android uses only its shape, not its colours.
+- **Breakpoint** — a window width at which the layout changes shape.
+- **iframe** — a box on one page that shows another page, live.
+- **em (in a media query)** — a unit equal to the browser's default text size, 16px unless the user changes it.

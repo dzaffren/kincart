@@ -263,6 +263,32 @@ body {
   text-underline-offset: 0.2em;
 }
 
+.phone-frame {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.phone-frame figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* The window's height holds the caption, its gap and 32px of page space above and below. The bezel sits inside the
+   390 × 844 frame. */
+.phone-screen {
+  box-sizing: border-box;
+  display: block;
+  width: var(--frame-width);
+  height: min(var(--frame-height), calc(100vh - var(--space-16) - var(--target-min) - var(--space-2)));
+  border: var(--showcase-bezel) solid var(--showcase-device);
+  border-radius: var(--showcase-radius);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
 .limit,
 .notify {
   padding-top: var(--space-6);
@@ -439,7 +465,210 @@ body {
   transform: rotate(45deg);
 }
 
-.home-mark {
-  width: var(--space-16);
-  height: var(--space-16);
+/* Home: the showcase. The words sit on a full-bleed violet block; on a wide screen, Rose's and Sam's phones sit on
+   it too. */
+.home {
+  position: relative;
+  isolation: isolate;
+}
+
+.home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--showcase-stage);
+}
+
+.home-hero,
+.home-hero .small,
+.home-hero .link,
+.home figcaption,
+.home figcaption .small,
+.home figcaption .link {
+  color: var(--showcase-on-stage);
+}
+
+.home-hero :focus-visible,
+.home figcaption :focus-visible {
+  outline-color: var(--showcase-on-stage);
+}
+
+.home-hero .button-primary {
+  background: var(--showcase-cta);
+  color: var(--showcase-on-cta);
+}
+
+.home-head {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-title);
+}
+
+.brand-mark {
+  width: var(--space-12);
+  height: var(--space-12);
+}
+
+.home .home-display {
+  font: var(--showcase-display);
+  letter-spacing: var(--showcase-tracking);
+  margin: 0;
+}
+
+.home-display span {
+  display: block;
+}
+
+.home-body {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.home-phones,
+.home-guide {
+  display: none;
+}
+
+/* Under the block: how it works and why the helper stays in charge, then the status link. */
+.home-more {
+  box-sizing: border-box;
+  max-width: calc(var(--page-max) * 2 + var(--space-16));
+  margin: 0 auto;
+  padding: var(--space-12) var(--page-inline);
+  display: grid;
+  align-items: start;
+  gap: var(--space-12);
+}
+
+.home-more h2 {
+  font: var(--type-heading);
+  margin: 0;
+}
+
+.home-more p {
+  margin: 0;
+}
+
+.home-steps,
+.home-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-6);
+}
+
+.home-steps {
+  counter-reset: step;
+}
+
+.home-steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: var(--space-8) 1fr;
+  column-gap: var(--space-3);
+}
+
+.home-steps li::before {
+  content: counter(step);
+  grid-row: span 2;
+  font: var(--type-heading);
+  color: var(--color-accent-text);
+}
+
+.home-steps strong,
+.home-points strong {
+  display: block;
+}
+
+.home-points li {
+  padding-left: var(--space-4);
+  border-left: var(--border-selected) solid var(--color-accent);
+}
+
+.home-reveal {
+  animation: showcase-rise var(--showcase-reveal) var(--ease-out) both;
+}
+
+.home-reveal-2 {
+  animation-delay: var(--showcase-stagger);
+}
+
+.home-reveal-3 {
+  animation-delay: calc(var(--showcase-stagger) * 2);
+}
+
+@keyframes showcase-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--showcase-rise));
+  }
+}
+
+@media (min-width: 880px) and (min-height: 480px) {
+  .home {
+    padding-bottom: var(--space-12);
+  }
+
+  .home-ways {
+    display: none;
+  }
+
+  .home-guide {
+    display: block;
+  }
+
+  .home-more {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-16);
+  }
+
+  .home-status {
+    grid-column: 1 / -1;
+  }
+
+  .home-phones {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+  }
+
+  .home .home-display {
+    font: var(--showcase-display-wide);
+    letter-spacing: var(--showcase-tracking);
+  }
+
+  .home-hero .button {
+    justify-self: start;
+    width: auto;
+    padding-inline: var(--space-12);
+  }
+}
+
+@media (min-width: 1280px) and (min-height: 480px) {
+  .home {
+    display: grid;
+    grid-template-columns: minmax(0, var(--page-max)) max-content;
+    justify-content: center;
+    align-items: center;
+    column-gap: var(--space-8);
+    padding: var(--space-8) var(--page-inline);
+  }
+
+  .home-hero {
+    margin: 0;
+    padding: 0;
+  }
+
+  .home .home-display {
+    font: var(--showcase-display-side);
+    letter-spacing: var(--showcase-tracking);
+  }
 }

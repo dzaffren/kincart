@@ -167,3 +167,28 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
     </fieldset>
   );
 }
+
+// With href, the frame shows that page live. Without it, it shows children as a still sample nobody can use.
+export function PhoneFrame({ who, href, children }: { who: string; href?: string; children?: ReactNode }) {
+  return (
+    <figure className="phone-frame">
+      <figcaption>
+        <span className="field-label">{who}&apos;s phone</span>
+        {href ? (
+          <a className="link" href={href} target="_blank" rel="noopener">
+            Open {who}&apos;s page
+          </a>
+        ) : (
+          <span className="small">Sample, not live</span>
+        )}
+      </figcaption>
+      {href ? (
+        <iframe className="phone-screen" src={href} title={`${who}'s phone`} loading="lazy" />
+      ) : (
+        <div className="phone-screen" inert>
+          {children}
+        </div>
+      )}
+    </figure>
+  );
+}

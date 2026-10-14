@@ -12,6 +12,8 @@ export function NotifyControl({ who, token, publicKey }: Props) {
   const [state, setState] = useState<NotifyState | null>(null);
 
   useEffect(() => {
+    // Inside the home page's phones both people share one screen, so a push adds nothing there (D52).
+    if (window.self !== window.top) return;
     look(scope).then(
       ({ env, subscription }) => {
         setState(notifyState(env));

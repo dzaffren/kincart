@@ -1,0 +1,34 @@
+/* For the public pages, `/` and `/status`. Rose's and Sam's pages never use these. */
+:root {
+  --showcase-display: 800 clamp(40px, 12.3vw, 48px) / 1.08 var(--font-sans);
+  --showcase-display-side: 800 56px/60px var(--font-sans);
+  --showcase-display-wide: 800 64px/68px var(--font-sans);
+  --showcase-tracking: -0.02em;
+  --showcase-stage: #5B3AA0;
+  --showcase-on-stage: #FFFFFF;
+  --showcase-cta: #FFFFFF;
+  --showcase-on-cta: #5B3AA0;
+  --showcase-bezel: 10px;
+  --showcase-radius: 44px;
+  --showcase-device: #14181F;
+  --showcase-reveal: 640ms;
+  --showcase-stagger: 120ms;
+  --showcase-rise: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --showcase-stage: #2B2150;
+    --showcase-on-stage: #EEF1F6;
+    --showcase-cta: #C3B2F0;
+    --showcase-on-cta: #1E1240;
+    --showcase-device: #5A6270;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --showcase-reveal: 0ms;
+    --showcase-rise: 0px;
+  }
+}

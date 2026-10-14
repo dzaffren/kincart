@@ -256,6 +256,13 @@ Rejected: a picks column on `rose_search` (a schema change for state that lasts 
 Source: docs/specs/basket-cap.md
 Status: active
 
+## D40 · 2026-10-15 · Wide screens: px breakpoints at 880 and 1280px, and phone frames edged in `control`
+
+Why: two 390px phones need 852px plus a 17px desktop scrollbar, and at 1280px a 379px text column fits beside them; the page inside a frame is also `bg`, so a `line` edge (1.2:1) almost vanishes, and `control` is 3.6:1.
+Rejected: em breakpoints at 54em and 80em (at a 12px browser text setting, 54em is 648px and the 852px of frames scroll sideways), 864px (with a 17px scrollbar the sides drop under 24px), a `line` frame edge (1.2:1 light, 1.5:1 dark), a device bezel or notch (decoration, against "steady, never flashy").
+Source: docs/design/system-brief.md
+Status: superseded by D50
+
 ## D42 · 2026-10-15 · Each visitor starts a household of their own, with one secret link each for its Rose and Sam
 
 Why: in production every family is its own; judges sharing one pair see each other's asks and buzz each other's phones (demo-home O8). A link still opens on a phone with no account to make.
@@ -312,4 +319,33 @@ Status: active
 Why: `db:up` reruns every up file, and 0002's global open-ask index cannot be built again once two households have open asks ("could not create unique index" on the scratch run).
 Rejected: leaving 0002 as it is and dropping the index in 0007 (the next `db:up` fails at 0002), a table of applied migrations (a new runner for one index).
 Source: docs/specs/households.md
+Status: active
+
+## D50 · 2026-10-15 · The home page is a showcase: a violet block, 800-weight display type, and phones with a device edge, on px breakpoints at 880 and 1280px
+
+Why: the home page sells KinCart to judges (demo-home O10), and at 1280 × 800 this keeps the three-line headline, both phones and Try KinCart on one screen. Two 390px phones need 852px plus a 17px scrollbar, so the phones show from 880px and the words move beside them from 1280px. The 10px edge sits inside the 390 × 844 frame. Text on the block is 8.2:1 light and 12.9:1 dark.
+Rejected: the Apple direction, a centred name over lifted phones on a grey stage (at 1280 × 800 the phones sit mostly below the fold); D40's flat `control` frame edge (a box, not a phone, on a selling page); a shadow under the phones (the block is flat); em breakpoints (at a 12px text setting, 54em is 648px and the frames scroll sideways); 864px (with a 17px scrollbar the sides drop under 24px).
+Supersedes: D40
+Source: docs/design/system-brief.md
+Status: active
+
+## D51 · 2026-10-15 · Hidden phones stay unloaded with loading="lazy", not a width check in the browser
+
+Why: Chromium, Firefox and WebKit 26.6 skip a lazy iframe that is `display:none`, and load both once shown (demo-home O14 spike, 2026-10-15). So a phone never loads and polls two hidden pages, and the frames come with the HTML, not after hydration.
+Rejected: a client component that adds the frames only when the window matches (the frames appear after hydration, and it is one more client component), frames that load at once (every phone with a household would load and poll both pages).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D52 · 2026-10-15 · Rose's and Sam's pages leave out Notifications inside the home page's phones
+
+Why: on a laptop both phones are on one screen, so a push adds nothing there. A permission prompt or a push subscription from inside a frame is unproven (demo-home O15). Rose's or Sam's page in its own tab still offers it.
+Rejected: a spike to prove it first (time spent on a part judges don't need on a laptop), leaving it in (a refused prompt shows "Blocked" or an error inside the phone).
+Source: docs/specs/demo-home.md
+Status: active
+
+## D53 · 2026-10-15 · A wide home page shows Rose's and Sam's real pages side by side
+
+Why: a judge sees Sam's screen change within seconds of Rose's ask without switching tabs, which is the product's point (O2).
+Rejected: a button for each that opens a new tab (the judge switches tabs to see the ask arrive), a button plus a QR code for each (a second device for every judge).
+Source: docs/specs/demo-home.md
 Status: active
