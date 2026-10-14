@@ -1,15 +1,16 @@
 # PayPalHackathon · architecture
 
-**Status:** Active · **Updated:** 2026-10-14 by /ship basket-cap
+**Status:** Active · **Updated:** 2026-10-15 by /ship households
 
 ## Context
 
 ```mermaid
 flowchart LR
     U((Phone browser)) -- "GET /status" --> APP[Next.js app on Vercel]
+    J((Judge's browser)) -- "GET /, Try KinCart" --> APP
     R((Rose's phone)) -- "links PayPal, finds, asks" --> APP
     S((Sam's phone)) -- "OK or No, price and total limits" --> APP
-    APP -- "check rows, saved PayPal, requests, search, limit, phones" --> NEON[(Neon Postgres)]
+    APP -- "check rows, households, saved PayPal, requests, search, limits, phones" --> NEON[(Neon Postgres)]
     APP -- "token, vault, orders" --> PP[PayPal sandbox]
     APP -- "product search" --> C3[Channel3]
     APP -- "read words, explain listings" --> CL[Claude Haiku 5.5]
@@ -28,7 +29,7 @@ flowchart TB
     LIB -- "INSERT over TCP" --> NEON[(Neon)]
     LIB -- "POST /v1/oauth2/token" --> PP[PayPal sandbox]
     SHOP["app/(shop)"] -- "actions and page loads" --> SLIB["lib/shop"]
-    SLIB -- "paypal_vault, purchase_requests, rose_search, price_limit, total_limit, push_subscriptions" --> NEON
+    SLIB -- "households, and per household: paypal_vault, purchase_requests, rose_search, price_limit, total_limit, push_subscriptions" --> NEON
     SLIB -- "vault tokens, orders" --> PP
     SLIB -- "POST /v1/search" --> C3[Channel3]
     SLIB -- "POST /v1/messages" --> CL[Claude Haiku 5.5]
@@ -42,9 +43,9 @@ flowchart TB
 | --------- | ------ | ------------ |
 | Status page | `app/status/` | Runs the checks in parallel, logs one line, renders the three lines |
 | Checks | `lib/status/` | Database insert, PayPal token request, build commit |
-| Shop pages | `app/(shop)/` | Rose's and Sam's pages behind secret links, the server actions behind each tap (Find, Ask Sam, OK or No, the price and total limits, Turn on notifications), Ask Sam's stop when the picks come to more than Sam's total limit, Sam's tick list for a basket, the PayPal return route, a manifest per link, the words of each ping, and a refresh every 3 s |
-| Shop logic | `lib/shop/` | Link check, PayPal vault and charge calls, `find()` (Haiku splits the words into up to five things; each thing gets two Channel3 searches and a Haiku pick of up to three, all at once), storage for requests and their basket lines, Rose's search, Sam's two limits and saved phones, `claim()`, which keeps only the lines Sam ticked, `pay()` with its stuck-request retry, and `notify()`, which sends one push per saved phone with `web-push` and forgets dead ones |
+| Shop pages | `app/(shop)/` | The home page `/`, where Try KinCart starts a household and this browser keeps its two links in an httpOnly cookie; Rose's and Sam's pages behind each household's secret links, the server actions behind each tap (Find, Ask Sam, OK or No, the price and total limits, Turn on notifications), Ask Sam's stop when the picks come to more than Sam's total limit, Sam's tick list for a basket, the PayPal return route, a manifest per link, the words of each ping, and a refresh every 3 s |
+| Shop logic | `lib/shop/` | Households: `whoIs()` turns a link into a household and a person (the env's links are household 1, any other is found by its SHA-256 hash), and `startHousehold()` saves a new one with a copy of household 1's saved PayPal. Every query below takes the household. Link check, PayPal vault and charge calls, `find()` (Haiku splits the words into up to five things; each thing gets two Channel3 searches and a Haiku pick of up to three, all at once), storage for requests and their basket lines, Rose's search, Sam's two limits and saved phones, `claim()`, which keeps only the lines Sam ticked, `pay()` with its stuck-request retry, and `notify()`, which sends one push per saved phone with `web-push` and forgets dead ones |
 | Service worker | `public/sw.js` | Registered under each person's link; shows a push and opens that link on tap |
 | Migrations | `db/migrations/`, `scripts/migrate.mjs` | Plain SQL up and down files, and the runner behind `pnpm db:up` and `db:down` |
 | CI | `.github/workflows/ci.yml` | `test` job on every push and PR; `migrate` job on main after `test` passes |
-| E2E | `e2e/` | Playwright tests at phone width, one worker: `/status`, Rose's ask through Sam's OK or No to the receipt, Rose's Find with real Channel3 and Claude calls, a three-thing basket that Sam trims before paying, a basket stopped by Sam's total limit, and a real push to Sam and back to Rose in Firefox |
+| E2E | `e2e/` | Playwright tests at phone width, one worker: `/status`, Rose's ask through Sam's OK or No to the receipt, Rose's Find with real Channel3 and Claude calls, a three-thing basket that Sam trims before paying, a basket stopped by Sam's total limit, a real push to Sam and back to Rose in Firefox, and two judges each in their own household |

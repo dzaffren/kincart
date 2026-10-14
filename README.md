@@ -26,6 +26,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Sam's phone buzzes when Rose asks for something, and Rose's phone buzzes when Sam answers, so neither has to keep their page open.
 - Rose types several things at once and picks a listing for each one they want. Sam ticks the ones to pay for, and one OK makes one charge; anything Sam leaves out goes back to Rose.
 - Sam sets a total limit for everything Rose asks for at once, such as $40. Rose's picks that come to more than that never reach Sam.
+- Each visitor to kincart.vercel.app starts their own Rose and Sam, with the demo PayPal already linked, and sees only their own asks, limits and phones.
 
 ## Docs
 

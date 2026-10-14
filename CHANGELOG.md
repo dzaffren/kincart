@@ -20,6 +20,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Sam can untick anything Rose asked for before paying, and what Sam leaves out goes back in Rose's box for the next ask.
 - Sam can set a total limit for everything Rose asks for at once, or leave it empty for none.
 - When Rose's picks come to more than Sam's total limit, Rose sees the total and leaves something out before anything reaches Sam.
+- Anyone who opens the site can tap Try KinCart and get their own Rose and Sam, with a sandbox PayPal already linked, and never sees anyone else's asks, limits or phones.
+- The same browser comes back to its own Rose and Sam, and Start a new one gives a fresh pair while the old links keep working.
+
+### Changed
+
+- The site's front page now says what KinCart is and starts your own Rose and Sam, with the status page one link away.
 
 ### Fixed
 
