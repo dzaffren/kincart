@@ -21,13 +21,15 @@ test.describe("on a laptop", () => {
     await page.getByRole("button", { name: "Try KinCart" }).click();
     await expect(page.getByText("Your Rose and Sam are ready.")).toBeVisible();
 
-    const rose = page.frameLocator('iframe[title="Rose\'s phone"]');
-    const sam = page.frameLocator('iframe[title="Sam\'s phone"]');
+    const roseFrame = page.locator('iframe[title="Rose\'s phone"]');
+    const samFrame = page.locator('iframe[title="Sam\'s phone"]');
+    const rose = roseFrame.contentFrame();
+    const sam = samFrame.contentFrame();
     await expect(heading(rose)).toHaveText("What do you need?");
     await expect(heading(sam)).toHaveText("Nothing to approve");
     const words = (await heading(page).boundingBox())!;
-    const roseBox = (await page.locator('iframe[title="Rose\'s phone"]').boundingBox())!;
-    const samBox = (await page.locator('iframe[title="Sam\'s phone"]').boundingBox())!;
+    const roseBox = (await roseFrame.boundingBox())!;
+    const samBox = (await samFrame.boundingBox())!;
     expect(words.x + words.width).toBeLessThanOrEqual(roseBox.x);
     expect(roseBox.x + roseBox.width).toBeLessThanOrEqual(samBox.x);
     expect(samBox.y).toBe(roseBox.y);
@@ -47,5 +49,13 @@ test.describe("on a laptop", () => {
     await expect(rose.getByText(transaction!)).toBeVisible();
     // Both pages have been open for seconds by now, so a Notifications control would have shown.
     for (const phone of [rose, sam]) await expect(phone.getByText("Notifications", { exact: true })).toHaveCount(0);
+
+    const [oldRose, oldSam] = [await roseFrame.getAttribute("src"), await samFrame.getAttribute("src")];
+    await page.getByRole("button", { name: "Start a new one" }).click();
+    await expect(page.getByText("Your new Rose and Sam are ready.")).toBeVisible();
+    await expect(roseFrame).not.toHaveAttribute("src", oldRose!);
+    await expect(samFrame).not.toHaveAttribute("src", oldSam!);
+    await expect(heading(rose)).toHaveText("What do you need?");
+    await expect(heading(sam)).toHaveText("Nothing to approve");
   });
 });
