@@ -4,6 +4,7 @@
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** find-and-explain, ping-helper
+**Page:** none. Skipped: you read the `.md` directly.
 
 Rose types several things at once and picks a listing for each one they want. Sam ticks the ones to pay for, and one OK makes one charge; anything Sam leaves out goes back to Rose. It is slice 5 in the shape, built now because slices 0 to 3 shipped and ask-by-voice was dropped.
 
@@ -200,6 +201,219 @@ Craft checks: a one-line "shopping basket" prompt gives quantity steppers, a car
 
 **Preview:** http://localhost:3000/preview/basket with `pnpm dev`. It answers 404 in production. The listings are written examples and grey squares stand in for photos; real results replace both at /build.
 
+## Technical plan
+
+### Approach
+
+Haiku's first call now returns a list of things instead of a kind. Each thing comes back with Rose's own words for it and a short shop query. One thing runs find-and-explain's search exactly as today. Two to five things run that same search for every thing at once, each with its own two Channel3 searches and its own Haiku pick (D31), and the result is saved as groups in Rose's one current search. More than five stops before any search.
+
+Ask Sam reads the picks from the saved groups, never from the form (D23). Two or more picks become one purchase request whose lines sit in a jsonb column (D32): `item` holds "2 things" and the total. One pick becomes find-and-explain's one-item request (O8). Sam's OK sends the ticked line ids. `claim()` keeps only stored lines that are ticked, and in the same update that moves the request to paying, it rewrites the lines, the total and what was left out. `pay()` and PayPal's `charge()` are unchanged: they charge `item`, which is now the ticked total, as one purchase unit (D33). Rose's next "Ask for something else" fills the box with what was left out.
+
+There is no new switch. Baskets ride `searchOn()`, like find-and-explain.
+
+Relies on: D12, D17, D18, D19, D20, D21, D22, D23, D24, D29, and the drafted D31, D32 and D33 below.
+
+```mermaid
+flowchart TB
+    subgraph phones["Rose's and Sam's phones"]
+        RV["RoseView: groups, Ask Sam"]
+        BA["BasketAnswer (client): ticks, OK, No"]
+    end
+    subgraph server["Next.js on Vercel"]
+        ACT["actions.ts: find, askSam, answer"]
+        FIND["find.ts: split, then searchThing per thing"]
+        REQ["requests.ts: ask, claim, keep"]
+        PAY["pay.ts, paypal.ts: unchanged"]
+    end
+    RV -- "words; pick-0 to pick-4 listing ids" --> ACT
+    BA -- "answer, ticked line ids" --> ACT
+    ACT -- "words and Sam's limit" --> FIND
+    FIND -- "Haiku and Channel3, per thing at once" --> EXT["Haiku, Channel3"]
+    ACT -- "groups, basket lines, ticked ids" --> REQ
+    REQ -- "rose_search.groups, purchase_requests.lines and left_out" --> DB[(Neon)]
+    ACT -- "claimed request, ticked total" --> PAY
+    PAY -- "one order, one purchase unit" --> PP[PayPal sandbox]
+```
+
+Rose's words go out to Haiku once and to Channel3 once per thing; the picks and the ticks come back in as ids only, and every price is read from Neon.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's page
+    participant A as find action
+    participant H as Haiku
+    participant C as Channel3
+    participant D as Neon
+    R->>A: "AA batteries, a night light and a phone charger"
+    A->>D: Sam's limit ($50)
+    A->>H: split the words
+    H-->>A: 3 things, each with Rose's words and a query
+    par each of the 3 things at once
+        A->>C: search the query, max_price 50, and without a limit
+        C-->>A: up to 10 listings each
+        A->>H: the thing's words and its listings
+        H-->>A: up to 3 picks, aboveLimit
+    end
+    A->>D: save the search: outcome basket, 3 groups
+    A-->>R: redirect, "Which ones would you like?"
+```
+
+The three things search side by side, so a basket takes about as long as its slowest thing, plus the split.
+
+```mermaid
+sequenceDiagram
+    participant S as Sam's page
+    participant A as answer action
+    participant D as Neon
+    participant P as PayPal
+    participant R as Rose's phone
+    S->>A: answer ok, line aa-24 (night light unticked)
+    A->>D: claim: read the lines, keep aa-24
+    A->>D: UPDATE paying, lines [aa-24], left_out ["a night light"], $9.99, WHERE waiting
+    A->>P: charge $9.99, one purchase unit "1 thing"
+    P-->>A: COMPLETED, capture id
+    A->>D: record paid
+    A-->>S: redirect, the receipt and "You left out a night light."
+    A->>R: after(): push "Sam paid $9.99 for 1 thing and left out a night light."
+```
+
+The trim and the claim are one update, guarded by `status = 'waiting'`, so a double tap or a second phone can't trim twice or charge twice.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `db/migrations/0005_basket.up.sql`, `.down.sql` (new) | Up: `purchase_requests` gains `lines jsonb` and `left_out jsonb`, both null for a one-item request; `rose_search` gains `groups jsonb NOT NULL DEFAULT '[]'`; `rose_search_outcome_check` (the name Postgres gave it, read from the local database) is dropped and re-added with `basket` and `too many`. `several` stays allowed, so old rows keep loading. Down, below | 1, 2, 4 |
+| `scripts/migrate.test.ts:43` | Up checks `purchase_requests.lines` and `rose_search.groups`; down removes them, and `push_subscriptions` now survives a down, since down undoes only 0005; up brings both back | reverse path |
+| `lib/shop/ai.ts:3`, `:9`, `:11`, `:41` | `Need` becomes `{ things: { words: string; query: string }[] }`. The prompt asks for every product they want to buy, in their order, with their own words for each ("a night light", not "night light") and a short query that keeps sizes, colours and must-haves. Something sold as one product, like salt and pepper shakers, stays one thing. Nothing to buy gives an empty list. `max_tokens` goes from 200 to 600, so a list of six or more still comes back whole and counts as too many | 1, 4 |
+| `lib/shop/find.ts:5`, `:7`, `:27` | `Group` moves here from `RoseView.tsx:21`. `Search` gains `{ outcome: "basket"; groups: Group[] }` and `"too many"`, and loses `"several"`. Today's search body (`:32` to `:44`) becomes `searchThing(words, query, limitCents)`, unchanged. `search()`: no things or a blank query gives nothing found; one thing runs `searchThing` with Rose's whole words, as today; six or more gives too many and searches nothing; two to five run `searchThing` for every thing with `Promise.all`, each with its own words. A thing that throws becomes "nothing found" in its own group only. No group with options gives nothing found (O3). The log line becomes `find outcome=basket things=3 shown=3 listings=8 ms=11873`, with `reason=` naming any thing that failed | 1, 3, 4 |
+| `lib/shop/requests.ts:8`, `:10`, `:26`, `:192` | `Line` moves here from `ui.tsx:11`, beside `Source`. `PurchaseRequest` and `Row` gain `lines` and `leftOut`, null when absent or empty | 2 |
+| `lib/shop/requests.ts:72` | `ask(item, source?, lines?)` also writes `lines` | 2 |
+| `lib/shop/requests.ts:126` | New pure `keep(lines, ticked)` returns `{ lines, leftOut, cents }` for the stored lines whose ids are ticked, or null when none are. `claim(id, ticked?)`: for a basket, reads the stored lines, runs `keep`, and returns null without claiming when nothing is kept (O11). Otherwise it runs one `UPDATE … SET status = 'paying', answered_at = now(), lines, left_out, amount_cents, item_name WHERE id = $1 AND status = 'waiting'`. A one-item request ignores `ticked`, as today | 2, 5 |
+| `lib/shop/requests.ts:44`, `:83`, `:91` | `SavedSearch` gains `groups`; `saveSearch` writes them for a basket, `getSearch` reads them | 1 |
+| `app/(shop)/actions.ts:62` | `askSam`, for a saved basket: reads `pick-0` to `pick-4` against `saved.groups[i].options`, and a listing picked in two groups counts once. No pick: `?pick=missing` (O2). One pick: `ask(option, source)` as today (O8). Two or more: `ask({ id: "basket", name: things(n), cents: total }, undefined, lines)`, each line carrying its group's words as `thing`, then `sendPing("asked", { item, lines })` and `clearSearch()` | 2 |
+| `app/(shop)/actions.ts:80` | `answer`: OK passes `formData.getAll("line")` to `claim()`. `sendPing("declined", declined)` and `sendPayment(await pay(claimed), claimed)` pass the request, not just its item | 2, 5 |
+| `app/(shop)/pings.ts:11`, `:37`, `:43` | `ping(kind, { item, lines?, leftOut? })`: with lines, the words in the Interface's notification table. `sendPing` and `sendPayment` take the same object | 2, 5 |
+| `app/(shop)/state.ts:11` | `roseState`: a saved basket gives the `basket` state, with `error` on `?pick=missing`. Waiting, the declined or failed outcome and the paid receipt pass `lines`, and the receipt passes `leftOut`. `?ask=1` after a paid request that left something out puts `listed(leftOut)` in the box. `too many` reaches the box through the existing outcome-to-problem fall-through | 1, 2, 4 |
+| `app/(shop)/state.ts:60`, `:81` | `samState` passes `lines` for request, failed and declined, and `receiptOf` adds `lines` and `leftOut` | 2, 5 |
+| `app/(shop)/ui.tsx:11`, `:25` | Imports `Line` from `requests.ts`. New `things(n)`: "1 thing", "2 things" | O8 |
+| `app/(shop)/RoseView.tsx:21`, `:107`, `:125`; `SamView.tsx:103`, `:113`; `BasketAnswer.tsx:25` | `Group` comes from `find.ts`. The "One thing at a time" notice goes. Counts use `things(n)`, so a basket trimmed to one line says "1 thing" while paying or failed. Otherwise as built at pause 2 | O8 |
+| `app/(shop)/r/[token]/page.tsx:33`, `h/[token]/page.tsx:30` | `sendPayment(settled.result, settled.request)` | 2 |
+| `app/(shop)/preview/basket/page.tsx:4` | `Group` from `find.ts` | — |
+| `e2e/basket.spec.ts` (new) | The e2e below, plus "more than five things", which asks Haiku and never reaches Channel3 | 1, 2, 4 |
+| `e2e/find-and-explain.spec.ts:62` | "a shopping list asks for one thing at a time" goes: that answer no longer exists, and scenario 4 takes its place | 4 |
+
+No change: `lib/shop/pay.ts` and `paypal.ts` (they charge `request.item`, which `claim()` already set to the ticked total; the log reads `item=basket`), `search.ts`, `e2e/db.ts` (`reset()` already empties both tables), `.github/workflows/ci.yml` (the keys are there), and `package.json`.
+
+Reusing: `searchThing` (today's search body), `choose()`, `searchListings()`, `query()`, `whoIs()`, the one-open index for one basket at a time, the `WHERE status = 'waiting'` claim guard, `pay()` and `charge()`, `sendPing`/`after()` (D29), `listed()` and `money()`, `reset()` in `e2e/db.ts`, and the pause 2 components.
+
+### Data
+
+```mermaid
+erDiagram
+    PURCHASE_REQUESTS {
+        bigint id PK
+        text item_id "basket for a basket"
+        text item_name "2 things"
+        integer amount_cents "the total; the ticked total once claimed"
+        jsonb lines "new: id, name, cents, shop, url, reason, thing per line; null for one item"
+        jsonb left_out "new: Rose's words for unticked things; null when none"
+        text status
+    }
+    ROSE_SEARCH {
+        smallint id PK
+        text outcome "gains basket and too many"
+        jsonb listings "one thing's options, as today"
+        jsonb groups "new: thing, options, problem per group"
+    }
+```
+
+The two tables stay unlinked: Ask Sam copies the picked lines out of `rose_search` into the request, then clears the search, as find-and-explain does.
+
+**Migration:** expand only. Three nullable or defaulted columns and a wider check; nothing to backfill, and no code reads the new columns until the deploy that writes them. CI runs it on Neon after tests pass on main (D11). No contract step: `several` stays in the check, unused and harmless.
+**Reverse:** `0005_basket.down.sql`: `DELETE FROM rose_search WHERE outcome IN ('basket', 'too many')`, then put back the old check, then drop `groups`, `lines` and `left_out`. `pnpm db:down` runs it, and `scripts/migrate.test.ts` checks up, down, up. Past baskets keep their row, total and "2 things", and lose their lines.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `purchase_requests.lines` | Scenario 2: Sam sees each line, and both receipts list what was paid (D32) |
+| `purchase_requests.left_out` | Scenario 2: both receipts name what Sam left out, and Rose's box gets it back |
+| `rose_search.groups`, and `basket` and `too many` in the check | Scenarios 1, 3 and 4: the groups and the problem survive the redirect and the 3 s refresh, and Ask Sam reads prices from them (D23) |
+| `keep()` with the trim inside `claim()` | Scenario 2 and O11: the charge is the stored prices of the ticked lines, never the form's, and a double tap can't trim twice |
+| Searching every thing at once | O5: a basket within 20 s (D31) |
+| `things(n)` | O8: no screen says "1 things", including a basket trimmed to one |
+| `max_tokens` 600 | Scenario 4: a six-thing list must come back whole to count as too many |
+
+Cut: PayPal line items (D33); a retry per thing (the group says "Couldn't find this one" and Rose can try other words); a cache of searches; a flag (baskets ride `searchOn()`).
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Two people, a few baskets a month. A basket Find is 1 + n Haiku calls and 2n Channel3 searches, at most 6 and 10; Ask Sam and the answer are one or two queries each, as today |
+| **Breaks first**     | Channel3's free-tier quota (O7), 10 searches for a 5-thing Find. When refused, the groups say "Couldn't find this one" and the log carries `reason=channel3 429` |
+| **Security surface** | `find`, `askSam` and `answer` run only with Rose's or Sam's link (`whoIs`). Prices come from the saved groups and the stored lines, never the form; a pick or tick that matches no stored id is dropped, and a forged OK with nothing kept charges nothing. Rose's words go to Haiku, as today; each thing's short query goes to Channel3. No new secrets. New stored data: listing names, prices, links and reasons per line, and Rose's words for left-out things |
+| **Proof it works**   | In Vercel's log: `find outcome=basket things=3 shown=3 listings=8 ms=11873`, then `purchase id=12 item=basket status=paid capture=…` |
+| **Rollout**          | No flag; baskets go live with the deploy wherever `searchOn()` is true. Rollback: promote the previous deploy on Vercel. Old code ignores the new columns; a saved basket search shows the empty box, and a waiting basket shows Sam "Rose would like 2 things" with OK charging the total. `pnpm db:down` removes the columns if needed |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 Groups for several things | `lib/shop/ai.test.ts`: the new schema and prompt, `max_tokens` 600. `lib/shop/find.test.ts` (Haiku and Channel3 stubbed): three things give three groups, every thing's searches start before any finishes, and each `choose` gets its own thing's words; one thing still gives `options` (O6). e2e below | `pnpm test`, `pnpm test:e2e` |
+| 2 Sam unticks one | `lib/shop/requests.test.ts`: `keep` keeps ticked ids only and ignores unknown ones; `claim(id, ["aa-24"])` sets $9.99, one line and `["a night light"]`, and a second claim returns null. `app/(shop)/actions.test.ts`: two picks make one $22.48 request with two lines and one `asked` ping; one pick makes a one-item request (O8); a listing picked twice counts once; OK with one tick pays $9.99. `pings.test.ts`: the four basket texts. `state.test.ts`: groups, waiting with lines, paid with left out, and `?ask=1` putting "a night light" in the box. e2e below | `pnpm test`, `pnpm test:e2e` |
+| 3 Some can't be shown | `find.test.ts`: a thing over the limit and a thing with nothing give their problems while the other group shows; a thing whose search throws blanks only its own group; no group with options gives nothing found (O3). `state.test.ts`. The preview frame | `pnpm test` |
+| 4 More than five | `find.test.ts`: six things give too many and Channel3 is never called. `state.test.ts`: the notice and the words kept. e2e "more than five things" | `pnpm test`, `pnpm test:e2e` |
+| 5 All, or No | `actions.test.ts` (`pay` stubbed): OK with both ticked pays $22.48 and pings `paid` with no left out; No declines and pings "Sam said no to your 2 things"; OK with nothing ticked claims nothing and charges nothing (O11) | `pnpm test` |
+| Storage and migration | `requests.test.ts`: `ask` with lines and `saveSearch` with groups round-trip. `scripts/migrate.test.ts`: up, down, up | `pnpm test` |
+
+**E2E:** `e2e/basket.spec.ts`, test "Rose asks for three things, Sam pays for one, and the other goes back to Rose". Rose types "AA batteries, a night light and a phone charger" and taps Find. Within 20 s Rose's page shows three group headings, each group with up to three listings at $50 or less, or a grey line. The test picks the first listing in the first two groups that have listings, leaves the third alone, and taps Ask Sam. Sam's page shows "Rose would like 2 things", both ticked, and "OK, pay" with their sum. The test unticks the second, checks the button now names the first price, and taps it. Both pages show one receipt with the first line, and Rose's says "Sam left out {the second group's heading}.". "Ask for something else" leaves that heading in Rose's box. A real Haiku, Channel3 and sandbox charge (D20, D24). Stop `pnpm dev` before running it.
+
+### Chunks
+
+| Chunk | Scenarios | Files owned |
+| ----- | --------- | ----------- |
+| A · finding and storing | 1, 3, 4, storage | `db/migrations/0005_*`, `scripts/migrate.test.ts`, `lib/shop/ai.ts` and test, `lib/shop/find.ts` and test, `lib/shop/requests.ts` and test |
+| B · asking and answering | 2, 5 | `app/(shop)/actions.ts` and test, `pings.ts` and test, `state.ts` and test, `ui.tsx`, `RoseView.tsx`, `SamView.tsx`, `BasketAnswer.tsx`, `r/[token]/page.tsx`, `h/[token]/page.tsx`, `preview/basket/page.tsx` |
+| C · e2e | 1, 2, 4 | `e2e/basket.spec.ts`, `e2e/find-and-explain.spec.ts` |
+
+The moved types live in chunk A: `Group` and `Search` in `find.ts`, and `Line`, `PurchaseRequest`, `SavedSearch`, `ask`, `claim` and `keep` in `requests.ts`. B and C build against the signatures in Changes.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| A 5-thing Find runs past 20 s, or 10 searches at once get rate-limited | O12: prove it with `/poc` before /build. A thing that fails blanks only its own group, and the log names why |
+| Haiku splits Rose's words differently from what Rose meant, or drops the "a" | The prompt asks for Rose's own words and keeps one product as one thing; Rose can try other words. The poc checks the e2e's list |
+| Channel3 has nothing for one of the e2e's three things, so the test can't pick two | The test picks from any two groups with listings, not fixed ones. Batteries, night lights and chargers are everyday stock; the poc checks all three |
+| A rollback while a basket waits | Old code shows Sam a one-item screen for "2 things" and OK charges the asked total: the right amount, just less detail. Accepted |
+
+### Decisions to record
+
+```
+## D31 · 2026-10-14 · A basket searches all its things at once, each with find-and-explain's two calls
+
+Why: a 5-thing basket must show within 20 s (O5), and one thing takes about 10 s (find-and-explain O11); each thing keeps its own searches and Haiku pick, so a thing that fails blanks only its own group (scenario 3).
+Rejected: one thing after another (up to 50 s), one Haiku call choosing for every thing at once (one long answer, and one bad thing spoils the whole basket).
+Source: docs/specs/basket.md
+Status: active
+
+## D32 · 2026-10-14 · A basket is one purchase request, with its lines in a jsonb column
+
+Why: one OK and one charge per basket (scenario 2), and the one-open index already keeps Rose to one request at a time; the lines are only ever read with their request, like Rose's saved listings (D23).
+Rejected: a `request_lines` table (a join on every 3 s render, for rows nothing reads alone), one request per thing (Sam answers each one, the problem this slice removes).
+Source: docs/specs/basket.md
+Status: active
+
+## D33 · 2026-10-14 · A basket is charged as one PayPal purchase unit for the ticked total
+
+Why: `charge()` stays as it is, and our receipt already lists every line (scenario 2).
+Rejected: PayPal line items with an amount breakdown (Rose's PayPal activity would list each thing, but no scenario needs it, and the item amounts must add up to the total exactly or PayPal refuses the order).
+Source: docs/specs/basket.md
+Status: active
+```
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -215,6 +429,7 @@ Craft checks: a one-line "shopping basket" prompt gives quantity steppers, a car
 | O9 | Summary, ReceiptCard and ListingPicker are design-system components, and this slice gives each an optional prop. Sam's ticking also needs a tick box, which the system doesn't have; it is built from the option ring's tokens. craft.md asks for both to be a deliberate choice: accept them here as composition, as find-and-explain did with the listing card, or take them through `/design-system`. Either way the Claude Design bundle in `docs/design/design-system/ds-bundle/` shows the old versions until `/design-sync` | flag | spec p2 | user | Resolved | Accepted as composition with pause 2 approval: no new colours or tokens. The bundle stays stale until `/design-sync`. 2026-10-14 |
 | O10 | Sam ticking which things to pay for, split out as `basket-trim` at O1, comes back into this slice at pause 2. Unticked things go back to Rose: both receipts name them, and Rose's next ask starts with them in the box. The slice stays at 5 scenarios in the same two areas: Sam's answers share one scenario, and the untick path is scenario 2 | flag | spec p2 | user | Resolved | Asked for at pause 2 review; "back in Rose's box" picked over a note only or reopening the old options. `basket-trim` comes off the shape. 2026-10-14 |
 | O11 | Assuming Sam can't pay with nothing ticked: OK reads "Tick at least one to pay" and does nothing, and No is how Sam refuses all of it | assumption | spec p2 | user | Resolved | Confirmed with pause 2 approval, 2026-10-14 |
+| O12 | Unproven: with the real keys, a basket Find shows within 20 s (O5) when 10 Channel3 searches and 5 Haiku picks run at once, with no 429 from either; Haiku splits a list into Rose's own words ("a night light") and counts six things as six; and Channel3 has listings for all three of the e2e's things. find-and-explain's spike timed one thing only | unproven | spec p3 | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -226,3 +441,7 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Price limit**: the most one item may cost. Sam sets it, and Rose is never shown anything above it.
 - **Sandbox**: PayPal's test environment. Fake accounts, fake money, real API.
 - **e2e**: end-to-end, one test that walks the whole slice as a user would.
+- **Haiku**: Claude Haiku 5.5, the small, fast Claude model that splits Rose's words and explains each listing.
+- **jsonb**: a Postgres column that holds a JSON value, such as a list of lines.
+- **Purchase unit**: one amount inside a PayPal order; a basket's order has one, for the ticked total.
+- **429**: the HTTP answer "too many requests", sent when a service rate-limits a caller.
