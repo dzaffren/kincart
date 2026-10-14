@@ -11,6 +11,7 @@ import {
   getLimit,
   getSearch,
   getVault,
+  keep,
   latest,
   record,
   saveSearch,
@@ -152,11 +153,99 @@ it("keeps Rose's one current search until the next one or a clear", async () => 
     options: [strap],
   });
 
-  await saveSearch("milk, bread and eggs", { outcome: "several" });
-  expect(await getSearch()).toMatchObject({ words: "milk, bread and eggs", outcome: "several", options: [] });
+  await saveSearch("AA batteries, a tablet for video calls", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [strap] },
+      { thing: "a tablet for video calls", options: [], problem: "over limit" },
+    ],
+  });
+  expect(await getSearch()).toMatchObject({
+    outcome: "basket",
+    options: [],
+    groups: [
+      { thing: "AA batteries", options: [strap] },
+      { thing: "a tablet for video calls", options: [], problem: "over limit" },
+    ],
+  });
+
+  await saveSearch("batteries, a night light, a phone charger, a doormat, a kettle and a flashlight", {
+    outcome: "too many",
+  });
+  expect(await getSearch()).toMatchObject({ outcome: "too many", options: [], groups: [] });
 
   await clearSearch();
   expect(await getSearch()).toBeNull();
+});
+
+const aa = {
+  id: "prod_3Ba7aA",
+  name: "Amazon Basics 24-Pack AA Alkaline Batteries",
+  cents: 999,
+  shop: "amazon.com",
+  url: "https://www.amazon.com/dp/B00MNV8E0C",
+  reason: "Enough for the remotes and clocks for a long while.",
+  thing: "AA batteries",
+};
+const light = {
+  id: "prod_6Nl2tL",
+  name: "Plug-In LED Night Light with Dusk-to-Dawn Sensor, 2 Pack",
+  cents: 1249,
+  shop: "target.com",
+  url: "https://www.target.com/p/A-81532901",
+  reason: "They come on by themselves when it gets dark.",
+  thing: "a night light",
+};
+const basket = { id: "basket", name: "2 things", cents: 2248 };
+
+it("records a basket as one request with its lines", async () => {
+  expect(await ask(basket, undefined, [aa, light])).toBe(true);
+
+  expect(await latest()).toMatchObject({ item: basket, found: null, lines: [aa, light], leftOut: null, status: "waiting" });
+
+  await sql("TRUNCATE purchase_requests");
+  await ask(glasses);
+  expect(await latest()).toMatchObject({ lines: null, leftOut: null });
+});
+
+it("keeps only the ticked lines, by their stored prices", () => {
+  expect(keep([aa, light], ["prod_3Ba7aA", "prod_made_up"])).toEqual({
+    lines: [aa],
+    leftOut: ["a night light"],
+    cents: 999,
+  });
+  expect(keep([aa, light], ["prod_6Nl2tL", "prod_3Ba7aA"])).toEqual({ lines: [aa, light], leftOut: [], cents: 2248 });
+  expect(keep([aa, light], [])).toBeNull();
+  expect(keep([aa, light], ["prod_made_up"])).toBeNull();
+});
+
+it("claims a basket for the ticked lines only, and only once", async () => {
+  await ask(basket, undefined, [aa, light]);
+  const { id } = (await latest())!;
+
+  expect(await claim(id, ["prod_3Ba7aA"])).toMatchObject({
+    status: "paying",
+    item: { id: "basket", name: "1 thing", cents: 999 },
+    lines: [aa],
+    leftOut: ["a night light"],
+  });
+  expect(await claim(id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toBeNull();
+  expect((await latest())?.item.cents).toBe(999);
+});
+
+it("claims a whole basket with nothing left out, and refuses to claim one with nothing ticked", async () => {
+  await ask(basket, undefined, [aa, light]);
+  const { id } = (await latest())!;
+
+  expect(await claim(id, [])).toBeNull();
+  expect(await claim(id, ["prod_made_up"])).toBeNull();
+  expect((await latest())?.status).toBe("waiting");
+
+  expect(await claim(id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toMatchObject({
+    item: basket,
+    lines: [aa, light],
+    leftOut: null,
+  });
 });
 
 it("keeps Sam's price limit, $50 until Sam sets one", async () => {

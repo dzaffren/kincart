@@ -9,3 +9,7 @@ export const ITEMS: Item[] = [
 export function findItem(id: unknown): Item | undefined {
   return ITEMS.find((item) => item.id === id);
 }
+
+export function things(count: number): string {
+  return `${count} ${count === 1 ? "thing" : "things"}`;
+}

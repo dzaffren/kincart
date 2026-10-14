@@ -1,11 +1,14 @@
 import { Client } from "pg";
-import type { Option, Search } from "./find";
-import type { Item } from "./items";
+import type { Group, Option, Search } from "./find";
+import { things, type Item } from "./items";
 import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
 
 export type Source = { shop: string; url: string; reason: string };
+
+// thing is what Rose called it, such as "a night light"; name is the listing's own.
+export type Line = Item & Source & { thing: string };
 
 export type PurchaseRequest = {
   id: number;
@@ -17,6 +20,8 @@ export type PurchaseRequest = {
   orderId: string | null;
   captureId: string | null;
   failureReason: string | null;
+  lines: Line[] | null;
+  leftOut: string[] | null;
 };
 
 export type Outcome =
@@ -37,6 +42,8 @@ type Row = {
   shop: string | null;
   listing_url: string | null;
   reason: string | null;
+  lines: Line[] | null;
+  left_out: string[] | null;
 };
 
 export type Subscription = { endpoint: string; p256dh: string; auth: string };
@@ -45,6 +52,7 @@ export type SavedSearch = {
   words: string;
   outcome: Search["outcome"] | "retry";
   options: Option[];
+  groups: Group[];
   searchedAt: Date;
 };
 
@@ -69,31 +77,51 @@ export async function latest(): Promise<PurchaseRequest | null> {
 }
 
 // A second ask while one is open hits purchase_requests_one_open and is dropped.
-export async function ask(item: Item, source?: Source): Promise<boolean> {
+export async function ask(item: Item, source?: Source, lines?: Line[]): Promise<boolean> {
   const rows = await query(
-    `INSERT INTO purchase_requests (item_id, item_name, amount_cents, shop, listing_url, reason)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO purchase_requests (item_id, item_name, amount_cents, shop, listing_url, reason, lines)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      ON CONFLICT DO NOTHING
      RETURNING id`,
-    [item.id, item.name, item.cents, source?.shop ?? null, source?.url ?? null, source?.reason ?? null],
+    [
+      item.id,
+      item.name,
+      item.cents,
+      source?.shop ?? null,
+      source?.url ?? null,
+      source?.reason ?? null,
+      lines ? JSON.stringify(lines) : null,
+    ],
   );
   return rows.length === 1;
 }
 
 export async function getSearch(): Promise<SavedSearch | null> {
-  const rows = await query<{ words: string; outcome: SavedSearch["outcome"]; listings: Option[]; searched_at: Date }>(
-    "SELECT words, outcome, listings, searched_at FROM rose_search WHERE id = 1",
-  );
+  const rows = await query<{
+    words: string;
+    outcome: SavedSearch["outcome"];
+    listings: Option[];
+    groups: Group[];
+    searched_at: Date;
+  }>("SELECT words, outcome, listings, groups, searched_at FROM rose_search WHERE id = 1");
   const row = rows[0];
-  return row ? { words: row.words, outcome: row.outcome, options: row.listings, searchedAt: row.searched_at } : null;
+  return row
+    ? { words: row.words, outcome: row.outcome, options: row.listings, groups: row.groups, searchedAt: row.searched_at }
+    : null;
 }
 
 export async function saveSearch(words: string, result: Search | { outcome: "retry" }): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings) VALUES (1, $1, $2, $3)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups) VALUES (1, $1, $2, $3, $4)
      ON CONFLICT (id) DO UPDATE
-     SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, searched_at = now()`,
-    [words, result.outcome, JSON.stringify(result.outcome === "options" ? result.options : [])],
+     SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
+         searched_at = now()`,
+    [
+      words,
+      result.outcome,
+      JSON.stringify(result.outcome === "options" ? result.options : []),
+      JSON.stringify(result.outcome === "basket" ? result.groups : []),
+    ],
   );
 }
 
@@ -123,11 +151,39 @@ export async function decline(id: number): Promise<PurchaseRequest | null> {
   return rows[0] ? toRequest(rows[0]) : null;
 }
 
-export async function claim(id: number): Promise<PurchaseRequest | null> {
-  const rows = await query<Row>(
-    `UPDATE purchase_requests SET status = 'paying', answered_at = now()
-     WHERE id = $1 AND status = 'waiting' RETURNING *`,
+export function keep(lines: Line[], ticked: string[]): { lines: Line[]; leftOut: string[]; cents: number } | null {
+  const kept = lines.filter((line) => ticked.includes(line.id));
+  if (!kept.length) return null;
+  return {
+    lines: kept,
+    leftOut: lines.filter((line) => !kept.includes(line)).map((line) => line.thing),
+    cents: kept.reduce((sum, line) => sum + line.cents, 0),
+  };
+}
+
+// A basket is claimed for its ticked lines only, at their stored prices; with none ticked it stays waiting.
+export async function claim(id: number, ticked: string[] = []): Promise<PurchaseRequest | null> {
+  const [open] = await query<Pick<Row, "lines">>(
+    "SELECT lines FROM purchase_requests WHERE id = $1 AND status = 'waiting'",
     [id],
+  );
+  if (!open) return null;
+  const basket = open.lines && keep(open.lines, ticked);
+  if (open.lines && !basket) return null;
+
+  const rows = await query<Row>(
+    `UPDATE purchase_requests
+     SET status = 'paying', answered_at = now(),
+         lines = COALESCE($2, lines), left_out = $3, amount_cents = COALESCE($4, amount_cents),
+         item_name = COALESCE($5, item_name)
+     WHERE id = $1 AND status = 'waiting' RETURNING *`,
+    [
+      id,
+      basket ? JSON.stringify(basket.lines) : null,
+      basket?.leftOut.length ? JSON.stringify(basket.leftOut) : null,
+      basket?.cents ?? null,
+      basket ? things(basket.lines.length) : null,
+    ],
   );
   return rows[0] ? toRequest(rows[0]) : null;
 }
@@ -200,5 +256,7 @@ function toRequest(row: Row): PurchaseRequest {
     orderId: row.paypal_order_id,
     captureId: row.paypal_capture_id,
     failureReason: row.failure_reason,
+    lines: row.lines,
+    leftOut: row.left_out,
   };
 }
