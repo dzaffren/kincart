@@ -193,10 +193,10 @@ The first ask stops before `ask()`, so no request row and no push. The second go
 | `scripts/migrate.test.ts:30` | Up expects `total_limit`. Down now undoes 0006 only, so it expects `total_limit` gone and `purchase_requests.lines` still there; up brings the table back | reverse path |
 | `lib/shop/requests.ts:137` | New `getTotal(): Promise<number \| null>` reads the row, null when absent. New `setTotal(cents \| null)` upserts like `setLimit`, or deletes the row for null | 1 |
 | `lib/shop/requests.test.ts:42`, `:252` | The reset also empties `total_limit`. New test: null at first, 4000 after `setTotal(4000)`, null after `setTotal(null)`, and `setTotal(300)` rejected by the check | 1 |
-| `app/(shop)/actions.ts:62` | `askSam`, after the pick-missing check: adds the picks' stored cents and reads `getTotal()`. Over: logs `ask status=over cents=4747 total=4000` and redirects to `?over=` the picked ids, joined by commas. One pick or several, the same check (D34). The fixed list, with search off, is untouched | 2, 3 |
+| `app/(shop)/actions.ts:62` | `askSam`, after the pick-missing check: adds the picks' stored cents and reads `getTotal()`. Over: logs `ask status=over cents=4747 total=4000` and redirects to `?over=` with one place per group, joined by commas and empty for a group left out. One pick or several, the same check (D34). The fixed list, with search off, is untouched | 2, 3 |
 | `app/(shop)/actions.ts:110` | New `setTotal(token, formData)` beside `setLimit`, from Sam's link only (`whoIs`). An empty box clears; a whole number from 5 to 2500 saves; anything else redirects to `?total=invalid`. Saved: `?total=saved` | 1 |
 | `app/(shop)/actions.test.ts:39` | The reset also empties `total_limit`. New tests below | 1, 2, 3 |
-| `app/(shop)/state.ts:7`, `:9`, `:30` to `:52` | `RoseParams` gains `over?: string[]`; `SearchOn` gains `totalCents: number \| null`. The ask, options and basket states carry `totalCents`. For options and basket, `over` ids found in the saved listings give `picked` and `overCents`, counting each id once. Ids not found, or a sum no longer over the current total, show no notice | 2, 3 |
+| `app/(shop)/state.ts:7`, `:9`, `:30` to `:52` | `RoseParams` gains `over?: string[]`; `SearchOn` gains `totalCents: number \| null`. The ask, options and basket states carry `totalCents`. For options and basket, each `over` place found in its own group's saved listings gives that group's `picked`, and `overCents` counts each listing once. Ids not found, or a sum no longer over the current total, show no notice | 2, 3 |
 | `app/(shop)/r/[token]/page.tsx:34` | Reads `getTotal()` with the others when search is on; passes `over` from `?over=` split on commas | 2 |
 | `app/(shop)/h/[token]/page.tsx:31` | Reads `getTotal()` when search is on; passes `total` with `saved` and `error` from `?total=`, and `setTotal` | 1 |
 | `app/(shop)/RoseView.tsx`, `SamView.tsx`, `preview/basket-cap/page.tsx` | As built at pause 2. Plus O6 in `RoseView.tsx`: "Pick at least one first." on the groups screen and "Pick one first." on the options screen become a neutral `Notice` at the top, like `OverNotice` | 1, 2, 3, O6 |
@@ -283,6 +283,12 @@ Single chunk. Every test file shares the local database, and the change is about
 ### Decisions to record
 
 Recorded as D34, D35, D36.
+
+## Review
+
+2026-10-14 · 1 raw finding, 1 survived, 1 fixed.
+
+- correctness · `app/(shop)/state.ts:62` · the over-limit address keeps one place per group, so a listing shared by two groups no longer ticks the wrong group · `2a28af0`
 
 ## Open items
 
