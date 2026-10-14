@@ -49,7 +49,7 @@ it("asks Haiku for each thing in Rose's own words, with a search query for each"
   expect(body.messages).toEqual([{ role: "user", content: "AA batteries and a night light" }]);
   expect(body.system).toContain("their own words");
   expect(body.output_config.format.schema.required).toEqual(["things"]);
-  expect(body.max_tokens).toBe(600);
+  expect(body.max_tokens).toBe(2000);
 });
 
 it("calls Haiku 5.5 with low effort and a fixed answer shape", async () => {
@@ -81,6 +81,7 @@ it("gives Haiku the listings under the limit by id, and only the names above it"
     aboveLimit: false,
   });
 
+  expect(sent(fetch).body.max_tokens).toBe(4000);
   const message = sent(fetch).body.messages[0].content;
   expect(message).toContain(words);
   expect(message).toContain('"id":"prod_7Hq2kZ"');
