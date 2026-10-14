@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import { HomeView, type HomeState } from "../../HomeView";
 
-// One state per address: ?state=new, starting, failed, ready, yours, restarting or fresh. The layout follows the
-// window's width, and the phones show household 1's real pages.
+// One state per address: ?state=new, starting, failed, ready, yours, restarting or fresh, and ?look=apple or monzo.
+// The layout follows the window's width, and the phones show household 1's real pages.
 export default async function DemoHomePreview({ searchParams }: PageProps<"/preview/demo-home">) {
   if (process.env.VERCEL_ENV === "production") notFound();
-  const { state } = await searchParams;
+  const { state, look } = await searchParams;
   const links = { rose: `/r/${process.env.ROSE_LINK_TOKEN}`, sam: `/h/${process.env.SAM_LINK_TOKEN}` };
 
   const states: Record<string, HomeState> = {
@@ -20,7 +20,10 @@ export default async function DemoHomePreview({ searchParams }: PageProps<"/prev
 
   return (
     <main>
-      <HomeView state={states[typeof state === "string" ? state : ""] ?? {}} />
+      <HomeView
+        state={states[typeof state === "string" ? state : ""] ?? {}}
+        look={look === "monzo" ? "monzo" : "apple"}
+      />
     </main>
   );
 }

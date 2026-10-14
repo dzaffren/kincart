@@ -276,14 +276,17 @@ body {
   gap: var(--space-4);
 }
 
-/* The window's height holds the caption, its gap and 32px of page space above and below. */
-.phone-frame iframe {
+/* The window's height holds the caption, its gap and 32px of page space above and below. The bezel sits inside the
+   390 × 844 frame. */
+.phone-screen {
   box-sizing: border-box;
+  display: block;
   width: var(--frame-width);
   height: min(var(--frame-height), calc(100vh - var(--space-16) - var(--target-min) - var(--space-2)));
-  border: var(--border-width) solid var(--color-control);
-  border-radius: var(--radius-surface);
+  border: var(--showcase-bezel) solid var(--showcase-device);
+  border-radius: var(--showcase-radius);
   background: var(--color-bg);
+  overflow: hidden;
 }
 
 .limit,
@@ -462,47 +465,228 @@ body {
   transform: rotate(45deg);
 }
 
-/* Home: one column on a phone; on a wide screen, Rose's and Sam's real pages side by side. */
+/* Home: the showcase. One column on a phone; on a wide screen, Rose's and Sam's phones as well. The two looks are on
+   trial; the one not chosen goes, and the chosen one's values move into tokens/showcase.css. */
+.home-apple {
+  --home-stage: var(--color-sunken);
+  --home-shadow: 0 32px 64px -16px rgb(20 24 31 / 0.28);
+}
+
+.home-monzo {
+  --home-stage: #5B3AA0;
+  --home-on-stage: #FFFFFF;
+  --home-cta: #FFFFFF;
+  --home-on-cta: #5B3AA0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .home-apple {
+    --home-shadow: 0 32px 64px -16px rgb(0 0 0 / 0.6);
+  }
+
+  .home-monzo {
+    --home-stage: #2B2150;
+    --home-on-stage: #EEF1F6;
+    --home-cta: var(--color-accent);
+    --home-on-cta: var(--color-on-accent);
+  }
+}
+
+.home-head {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .home-mark {
   width: var(--space-16);
   height: var(--space-16);
 }
 
-.home-phones {
+.home .home-display {
+  font: var(--showcase-display);
+  letter-spacing: var(--showcase-tracking);
+  margin: 0;
+}
+
+.home-lede {
+  font: var(--showcase-lede);
+  color: var(--color-muted);
+}
+
+.home-body {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.home-more {
+  padding-top: 0;
+}
+
+.home-stage {
   display: none;
 }
 
+.home-reveal {
+  animation: showcase-rise var(--showcase-reveal) var(--ease-out) both;
+}
+
+.home-reveal-2 {
+  animation-delay: var(--showcase-stagger);
+}
+
+.home-reveal-3 {
+  animation-delay: calc(var(--showcase-stagger) * 2);
+}
+
+@keyframes showcase-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--showcase-rise));
+  }
+}
+
+/* Monzo: the words sit on a full-bleed violet block. */
+.home-monzo {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-monzo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--home-stage);
+}
+
+.home-monzo .home-hero,
+.home-monzo .home-hero .small,
+.home-monzo .home-hero .link,
+.home-monzo figcaption,
+.home-monzo figcaption .small,
+.home-monzo figcaption .link {
+  color: var(--home-on-stage);
+}
+
+.home-monzo .home-hero .button-primary {
+  background: var(--home-cta);
+  color: var(--home-on-cta);
+}
+
+.home-monzo .home-hero :focus-visible,
+.home-monzo figcaption :focus-visible {
+  outline-color: var(--home-on-stage);
+}
+
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-title);
+}
+
+.home-monzo .home-mark {
+  width: var(--space-12);
+  height: var(--space-12);
+}
+
+.home-monzo .home-display {
+  font-weight: 800;
+}
+
+.home-monzo .home-display span {
+  display: block;
+}
+
 @media (min-width: 880px) and (min-height: 480px) {
-  .home {
-    display: grid;
-    justify-items: center;
-    gap: var(--space-8);
-    padding-bottom: var(--space-12);
-  }
-
-  .home-intro {
-    padding-bottom: 0;
-  }
-
   .home-ways {
     display: none;
   }
 
+  .home-stage {
+    display: block;
+  }
+
   .home-phones {
     display: flex;
+    justify-content: center;
     gap: var(--space-6);
+  }
+
+  .home .home-display {
+    font: var(--showcase-display-wide);
+    letter-spacing: var(--showcase-tracking);
+  }
+
+  .home-monzo .home-display {
+    font-weight: 800;
+  }
+
+  .home-hero .button {
+    width: auto;
+    padding-inline: var(--space-12);
+  }
+
+  /* Apple: the name and one line, centred over the phones on a full-width stage. */
+  .home-apple .home-hero {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-12);
+    text-align: center;
+  }
+
+  .home-apple .home-head,
+  .home-apple .home-body,
+  .home-apple .home-body .stack {
+    justify-items: center;
+  }
+
+  .home-apple .home-stage {
+    background: var(--home-stage);
+    padding: var(--space-16) var(--page-inline);
+  }
+
+  .home-apple .phone-screen {
+    box-shadow: var(--home-shadow);
+  }
+
+  .home-apple .home-more {
+    padding-top: var(--space-12);
+  }
+
+  .home-monzo {
+    padding-bottom: var(--space-12);
+  }
+
+  .home-monzo .home-hero {
+    padding-bottom: var(--space-12);
+  }
+
+  .home-monzo .home-hero .button {
+    justify-self: start;
   }
 }
 
 @media (min-width: 1280px) and (min-height: 480px) {
-  .home {
-    grid-template-columns: minmax(0, var(--page-max)) max-content;
-    justify-content: center;
-    align-items: start;
-    padding: var(--space-8) var(--page-inline);
+  .home-apple .home-phones {
+    gap: var(--space-12);
   }
 
-  .home-intro {
+  .home-monzo {
+    display: grid;
+    grid-template-columns: minmax(0, var(--page-max)) max-content;
+    justify-content: center;
+    align-items: center;
+    column-gap: var(--space-8);
+    padding: var(--space-12) var(--page-inline);
+  }
+
+  .home-monzo .home-hero {
+    margin: 0;
     padding: 0;
+  }
+
+  .home-monzo .home-display {
+    font: var(--showcase-display-side);
+    font-weight: 800;
   }
 }

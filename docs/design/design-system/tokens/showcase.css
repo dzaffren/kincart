@@ -1,0 +1,27 @@
+/* For the home page `/` only. Rose's and Sam's pages never use these. */
+:root {
+  --showcase-display: 700 clamp(40px, 12.3vw, 48px) / 1.08 var(--font-sans);
+  --showcase-display-side: 700 56px/60px var(--font-sans);
+  --showcase-display-wide: 700 64px/68px var(--font-sans);
+  --showcase-tracking: -0.02em;
+  --showcase-lede: 400 24px/32px var(--font-sans);
+  --showcase-bezel: 10px;
+  --showcase-radius: 44px;
+  --showcase-device: #14181F;
+  --showcase-reveal: 640ms;
+  --showcase-stagger: 120ms;
+  --showcase-rise: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --showcase-device: #5A6270;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --showcase-reveal: 0ms;
+    --showcase-rise: 0px;
+  }
+}
