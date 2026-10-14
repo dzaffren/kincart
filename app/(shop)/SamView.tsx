@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import type { Item } from "../../lib/shop/items";
 import type { Source } from "../../lib/shop/requests";
 import { Button } from "./Button";
@@ -15,9 +15,9 @@ export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: bo
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action };
+type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action; notify?: ReactNode };
 
-export function SamView({ state, answer, limit, setLimit }: Props) {
+export function SamView({ state, answer, limit, setLimit, notify }: Props) {
   if (state.kind === "request") {
     const { found } = state;
     return (
@@ -62,6 +62,7 @@ export function SamView({ state, answer, limit, setLimit }: Props) {
   return (
     <div className="screen">
       <SamOutcome state={state} />
+      {notify}
       {limit && <LimitForm limit={limit} setLimit={setLimit} />}
     </div>
   );
@@ -98,7 +99,7 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
       )}
       <div className="heading">
         <h1>Nothing to approve</h1>
-        <p className="lead">When {RELATIVE} asks for something, it shows up here. Keep this page open.</p>
+        <p className="lead">When {RELATIVE} asks for something, it shows up here.</p>
       </div>
     </>
   );

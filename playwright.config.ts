@@ -22,5 +22,7 @@ export default defineConfig({
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // The server's log lines (push to=…, purchase id=…) show in CI's output when a test fails.
+    stdout: "pipe",
   },
 });

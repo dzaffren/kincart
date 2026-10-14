@@ -2,8 +2,22 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
-import { ask, getLimit, getSearch, latest, saveSearch, saveVault } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, startLink, tryAgain } from "./actions";
+import { notify } from "../../lib/shop/push";
+import { ask, getLimit, getSearch, latest, saveSearch, saveVault, subscriptionsFor } from "../../lib/shop/requests";
+import { answer, askSam, find, setLimit, startLink, subscribe, tryAgain } from "./actions";
+
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  // No request surrounds these calls, so after() runs its task at once. Like Next, it keeps a failed task to itself.
+  after: (task: () => unknown) => {
+    Promise.resolve(task()).catch(() => {});
+  },
+}));
+
+vi.mock("../../lib/shop/push", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../lib/shop/push")>()),
+  notify: vi.fn(),
+}));
 
 const [glasses] = ITEMS;
 const rose = "rose-link-4f9c2a7e";
@@ -22,12 +36,16 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit");
+  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
   await client.end();
   await saveVault("1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
   vi.stubEnv("SAM_LINK_TOKEN", sam);
+  vi.stubEnv("VAPID_PUBLIC_KEY", "vapid-test-public-key");
+  vi.stubEnv("VAPID_PRIVATE_KEY", "vapid-test-private-key");
+  vi.stubEnv("VAPID_SUBJECT", "https://kincart.vercel.app");
   vi.stubGlobal("fetch", vi.fn());
+  vi.mocked(notify).mockReset();
 });
 
 afterEach(() => {
@@ -140,4 +158,128 @@ it("saves Sam's limit in whole dollars from $5 to $500, and refuses anything els
     expect(await redirectOf(setLimit(sam, form({ limit })))).toBe(`/h/${sam}?limit=invalid`);
   }
   expect(await getLimit()).toBe(3000);
+});
+
+const keys = {
+  p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
+  auth: "tBHItJI5svbpez7KI4CCXg",
+};
+const samPhone = { endpoint: "https://fcm.googleapis.com/fcm/send/dX9k2Lq0wE4:APA91bH7", expirationTime: null, keys };
+const rosePhone = { endpoint: "https://web.push.apple.com/QGuQyavXutnMH8Ig", expirationTime: null, keys };
+
+it("saves the phone that turned notifications on, for Sam's link and for Rose's", async () => {
+  expect(await subscribe(sam, samPhone)).toBe(true);
+  expect(await subscribe(rose, rosePhone)).toBe(true);
+
+  expect(await subscriptionsFor("sam")).toEqual([{ endpoint: samPhone.endpoint, ...keys }]);
+  expect(await subscriptionsFor("rose")).toEqual([{ endpoint: rosePhone.endpoint, ...keys }]);
+});
+
+it("refuses a phone from a made-up link, one it can't trust, or any while notifications are off", async () => {
+  expect(await subscribe("not-a-real-link", samPhone)).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, endpoint: "http://fcm.googleapis.com/fcm/send/dX9k2Lq0wE4" })).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, endpoint: "https://attacker.example/collect" })).toBe(false);
+  expect(await subscribe(sam, { ...samPhone, keys: { p256dh: "not base64url!", auth: keys.auth } })).toBe(false);
+
+  vi.stubEnv("VAPID_PRIVATE_KEY", "");
+  expect(await subscribe(sam, samPhone)).toBe(false);
+
+  expect(await subscriptionsFor("sam")).toEqual([]);
+});
+
+it("pings Sam when Rose's ask makes a request, and not for a second ask while one is open", async () => {
+  searchOn();
+  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })))).toBe(`/r/${rose}`);
+
+  expect(notify).toHaveBeenCalledExactlyOnceWith("sam", {
+    title: "Rose would like something",
+    body: "Adjustable Wide Slippers with Hook-and-Loop Strap, $32.50. Tap to see it and say OK or No.",
+  });
+
+  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })));
+  expect(notify).toHaveBeenCalledTimes(1);
+});
+
+it("pings Sam for an item from the fixed list too", async () => {
+  vi.stubEnv("CHANNEL3_API_KEY", "");
+  expect(await redirectOf(askSam(rose, form({ item: "glasses" })))).toBe(`/r/${rose}`);
+
+  expect(notify).toHaveBeenCalledExactlyOnceWith("sam", {
+    title: "Rose would like something",
+    body: "Reading glasses, +2.00, $18.99. Tap to see it and say OK or No.",
+  });
+});
+
+it("still asks Sam when the push can't go out", async () => {
+  vi.stubEnv("CHANNEL3_API_KEY", "");
+  vi.mocked(notify).mockRejectedValue(new Error("push service down"));
+
+  expect(await redirectOf(askSam(rose, form({ item: "glasses" })))).toBe(`/r/${rose}`);
+  expect(await latest()).toMatchObject({ status: "waiting", item: { id: "glasses" } });
+});
+
+function paypalAnswers(order: () => Response) {
+  vi.stubEnv("PAYPAL_CLIENT_ID", "sandbox-client-id");
+  vi.stubEnv("PAYPAL_CLIENT_SECRET", "sandbox-secret");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) =>
+      url.endsWith("/v1/oauth2/token") ? new Response('{"access_token":"A21AA-sandbox"}') : order(),
+    ),
+  );
+}
+
+const completed = () =>
+  Response.json(
+    {
+      id: "3BP30887MC6972056",
+      status: "COMPLETED",
+      purchase_units: [{ payments: { captures: [{ id: "7BM91101S1572292D", status: "COMPLETED" }] } }],
+    },
+    { status: 201 },
+  );
+
+async function samAnswers(choice: "ok" | "no") {
+  await ask(glasses);
+  const { id } = (await latest())!;
+  return redirectOf(answer(sam, id, form({ answer: choice })));
+}
+
+it("tells Rose when Sam says no", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  expect(await samAnswers("no")).toBe(`/h/${sam}`);
+
+  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+    title: "Sam said no",
+    body: "Sam said no to Reading glasses, +2.00. Nothing was taken.",
+  });
+});
+
+it("tells Rose when Sam's OK is paid, and when PayPal refuses it", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  paypalAnswers(completed);
+  expect(await samAnswers("ok")).toBe(`/h/${sam}`);
+  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+    title: "Sam said OK",
+    body: "Reading glasses, +2.00 is paid: $18.99. Tap to see the receipt.",
+  });
+
+  vi.mocked(notify).mockClear();
+  paypalAnswers(() => Response.json({ name: "NOT_AUTHORIZED", details: [{ issue: "PERMISSION_DENIED" }] }, { status: 403 }));
+  expect(await samAnswers("ok")).toBe(`/h/${sam}`);
+  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+    title: "Payment didn't go through",
+    body: "Sam said OK, but the payment didn't go through. Nothing was taken.",
+  });
+});
+
+it("tells Rose nothing while the charge is unknown", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  paypalAnswers(() => new Response("", { status: 503 }));
+
+  expect(await samAnswers("ok")).toBe(`/h/${sam}`);
+  expect((await latest())?.status).toBe("paying");
+  expect(notify).not.toHaveBeenCalled();
 });

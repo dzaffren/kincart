@@ -13,3 +13,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Sam approves or declines Rose's ask from their own phone. An OK pays from Rose's saved PayPal, and both see the same receipt.
 - Rose types what they need in plain words and sees up to three real listings, each explained: what it is, why it fits, and one thing to watch for.
 - Sam sets a price limit for what Rose is shown, and sees why a pick fits and a link to the real listing before paying.
+- Sam gets a notification when Rose asks for something, even with the page closed, once they turn notifications on from their link.
+- Rose gets a notification when Sam says OK or no, or when the payment doesn't go through.
+- On iPhone, Rose's or Sam's link can be added to the Home Screen as KinCart, and opens their own page.

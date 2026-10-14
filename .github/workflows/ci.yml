@@ -27,6 +27,9 @@ jobs:
       PAYPAL_E2E_VAULT_ID: ${{ secrets.PAYPAL_E2E_VAULT_ID }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       CHANNEL3_API_KEY: ${{ secrets.CHANNEL3_API_KEY }}
+      VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+      VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
       # These links only guard CI's throwaway database.
       ROSE_LINK_TOKEN: ci-rose-link
       SAM_LINK_TOKEN: ci-sam-link
@@ -42,7 +45,8 @@ jobs:
       - run: pnpm db:up
       - run: pnpm lint
       - run: pnpm test
-      - run: pnpm exec playwright install --with-deps chromium
+      # Firefox runs the push e2e (D26).
+      - run: pnpm exec playwright install --with-deps chromium firefox
       - run: pnpm test:e2e
 
   # Production schema changes only after tests pass on main (D11).

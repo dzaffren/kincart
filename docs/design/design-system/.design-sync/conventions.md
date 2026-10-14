@@ -1,12 +1,31 @@
 # Building with this design system
 
-There is no component library here, only tokens. Build every control yourself in plain JSX/HTML and style it with the CSS custom properties below. Never hard-code a colour, size, radius, duration or font.
+Six components ship on `window.ShopTogether`: `Button`, `Notice`, `Summary`, `ReceiptCard`, `ItemPicker` and `ListingPicker`. Use them whenever one fits. Build anything else in plain JSX with the classes and tokens below. Never hard-code a colour, size, radius, duration or font.
 
 ## Setup
 
-Load `styles.css`. It pulls Atkinson Hyperlegible Next from Google Fonts, imports every file in `tokens/`, sets the page background, text colour and 18px body font on `body`, and draws the focus ring on `:focus-visible`. Without it nothing is styled.
+Load `styles.css`. It imports `_ds_bundle.css`, which pulls Atkinson Hyperlegible Next from Google Fonts and holds every token, the base `body` rules, the focus ring and the component classes. Without it nothing is styled.
 
-Light and dark follow the device through `prefers-color-scheme`. There is no theme class or provider; just use the tokens and both modes work. Under `prefers-reduced-motion`, `styles.css` stops all animation and the motion tokens drop to 0ms.
+Put each screen in `<main className="screen">`. It makes the 480px phone column with 24px side padding, spaces its children, styles the `h1`, and zeroes `p` margins. `Summary`, `Notice` and `ReceiptCard` are built from `<p>` elements and look wrong outside it.
+
+Light and dark follow the device through `prefers-color-scheme`. There is no provider and no theme class. Under `prefers-reduced-motion`, all animation stops.
+
+## Classes
+
+| Class | Use |
+|---|---|
+| `screen`, `stack`, `heading` | screen column; a 16px-gap group (a form, a pair of buttons); an `h1` or label with the line under it, 8px apart |
+| `lead`, `small`, `amount` | muted intro line; 16px muted text; the big tabular money figure |
+| `field-label`, `field-input`, `field-error` | a text box's label, the box (`aria-invalid="true"` turns its edge red), the red line under it |
+| `money-input` | wraps a `field-input` with a leading `<span>$</span>` |
+| `button button-primary`, `button button-secondary` | a link that looks like `Button`, e.g. `<a className="button button-secondary">` |
+| `link` | a quiet text link with a 48px tap height |
+
+## Rules
+
+- One primary `Button` per screen: the next step. Everything else is `kind="secondary"`.
+- Green (`--color-success`) only means paid. Red (`--color-danger`) only means a real failure. A helper's "no" is `<Notice tone="neutral">`.
+- Nothing smaller than `--type-small` (16px). Nothing tappable under `--target-min` (48px).
 
 ## Tokens
 
@@ -25,29 +44,32 @@ A selected option is `border: var(--border-selected) solid var(--color-accent)` 
 
 ## Where the truth lives
 
-- `styles.css` and `tokens/*.css`: the exact values, light and dark.
-- `guidelines/colors.html`, `guidelines/typography.html`, `guidelines/spacing.html`, `guidelines/motion.html`: each foundation drawn with its intended use. Read them before styling a screen.
+- `components/general/<Name>/<Name>.prompt.md` and `<Name>.d.ts`: each component's props and worked examples. Read them before using one.
+- `_ds_bundle.css`: the exact token values, light and dark, and every class above.
+- `guidelines/colors.html`, `guidelines/typography.html`, `guidelines/spacing.html`, `guidelines/motion.html`: each foundation drawn with its intended use.
 
 ## Example
 
 ```jsx
-const css = `
-  .screen { max-width: var(--page-max); margin: 0 auto; padding: var(--space-8) var(--page-inline); display: grid; gap: var(--space-4); }
-  .screen h1 { font: var(--type-heading); margin: 0; }
-  .amount { font: var(--type-amount); font-variant-numeric: tabular-nums; margin: 0; padding: var(--space-4); background: var(--color-sunken); border-radius: var(--radius-surface); }
-  .primary { height: var(--control-height); border: 0; border-radius: var(--radius-control); background: var(--color-accent); color: var(--color-on-accent); font: var(--type-button); transition: transform var(--motion-fast) var(--ease-out); }
-  .primary:active { transform: scale(0.98); background: var(--color-accent-press); }
-`;
+const { Button, Summary } = window.ShopTogether;
 
 export default function Approve() {
   return (
     <main className="screen">
-      <style>{css}</style>
-      <h1>Mary wants a kettle</h1>
-      <p className="amount">$29.99</p>
-      <button type="button" className="primary">OK, pay $29.99</button>
+      <div className="heading">
+        <h1>Rose would like this</h1>
+        <p className="small">She asked at 10:15 AM.</p>
+      </div>
+      <Summary
+        title="Adjustable Wide Slippers with Hook-and-Loop Strap"
+        cents={3250}
+        note="From amazon.com. Paid from Rose's PayPal if you say OK."
+      />
+      <form className="stack">
+        <Button type="submit" name="answer" value="ok">OK, pay $32.50</Button>
+        <Button type="submit" name="answer" value="no" kind="secondary">No</Button>
+      </form>
     </main>
   );
 }
 ```
-

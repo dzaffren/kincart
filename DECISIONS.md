@@ -171,3 +171,45 @@ Why: no test-only layer, matching D20; results vary, so the e2e checks the shape
 Rejected: recorded replies behind a test-only switch (more code, and the real path only checked by hand).
 Source: docs/specs/find-and-explain.md
 Status: active
+
+## D25 · 2026-10-14 · KinCart's mark is a tick on two wheels: the helper's OK carries the shopping
+
+Why: one shape says both halves of the product, the helper's OK and the shopping; it scored 23 of 25 on the logo longlist and holds at 16px with its small cut, white on the violet tile (docs/design/logo/kit/).
+Rejected: the K of KinCart on two wheels (20 of 25), a kiss-lock coin purse (20 of 25, 2 of 5 at 16px), the i's dot in the K's arms (read as "K."), a C in the K's arms (too wide to sit near-square), a pull-along trolley (read as luggage), and the earlier Shop-together icon rounds (an ampersand with a tick leg, an armchair h, browline glasses and before).
+Source: docs/design/logo/brief.md
+Status: active
+
+## D26 · 2026-10-14 · The push e2e runs in Playwright's Firefox
+
+Why: headless Firefox with a persistent profile received a real push through Mozilla's push service in 337 ms (ping-helper O5). No headless Chromium build can subscribe.
+Rejected: Playwright's Chromium and Google Chrome (no push service in the headless shell, and subscribing hangs in full Chromium and Chrome; a normal Playwright context is incognito, where Chrome refuses push), faking the push with DevTools' `deliverPushMessage` (never proves our server sent anything).
+Source: docs/specs/ping-helper.md
+Status: active
+
+## D27 · 2026-10-14 · Send pushes with the web-push package
+
+Why: every push must be encrypted (RFC 8291) and signed (VAPID); `web-push` does both in one call and delivered in both spikes (ping-helper O1, O5).
+Rejected: hand-rolled ECDH, HKDF, AES-GCM and ES256 signing with `node:crypto` (about 100 lines of crypto that only a real push proves right), a hosted push service such as OneSignal or Firebase Cloud Messaging (another account and SDK for two people).
+Source: docs/specs/ping-helper.md
+Status: active
+
+## D28 · 2026-10-14 · One manifest and one service-worker scope per secret link
+
+Why: the Home Screen icon must open the person's own link (O1), and Rose's and Sam's links on one phone each need their own subscription (O7).
+Rejected: one site-wide manifest (its `start_url` can't hold a secret link, so the icon would open `/` and land on `/status`), one service worker for the whole site (both links on one phone would share a single subscription).
+Source: docs/specs/ping-helper.md
+Status: active
+
+## D29 · 2026-10-14 · Pushes go out after the response, with Next's after()
+
+Why: an ask or a payment never waits on a push service (ping-helper scenario 5).
+Rejected: awaiting the sends inside the action (a slow push service would hold Rose's or Sam's tap), a queue (no push takes more than a second).
+Source: docs/specs/ping-helper.md
+Status: active
+
+## D30 · 2026-10-14 · CI's e2e sends a real push through Mozilla's push service
+
+Why: it proves our server's encrypted, signed send end to end on every push, matching D20 and D24.
+Rejected: running the push e2e by hand only (CI would never catch a broken notification).
+Source: docs/specs/ping-helper.md
+Status: active

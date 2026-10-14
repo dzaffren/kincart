@@ -10,3 +10,5 @@
 - Channel3's price filter returns near-misses, never nothing
 - Run Playwright with one worker when specs reset the same tables
 - Pipe {} into zuko's Stop-hook scripts when running them by hand
+- Set three prefs for push in Playwright's Firefox
+- Lint the tracked files when pnpm lint fails on design caches

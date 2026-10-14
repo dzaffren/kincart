@@ -1,4 +1,5 @@
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
+import type { NotifyState } from "./Notify";
 import type { RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
 import type { Receipt } from "./ui";
@@ -79,4 +80,22 @@ export function samState(request: PurchaseRequest | null): SamState {
 
 function receiptOf(request: PurchaseRequest): Receipt {
   return { item: request.item, paidAt: request.answeredAt ?? request.askedAt, transactionId: request.captureId ?? "" };
+}
+
+export type NotifyEnv = {
+  hasServiceWorker: boolean;
+  hasPushManager: boolean;
+  isIPhone: boolean;
+  standalone: boolean;
+  permission: "default" | "granted" | "denied";
+  subscribed: boolean;
+};
+
+// iPhone gives web push only to a page opened from the Home Screen.
+export function notifyState(env: NotifyEnv): NotifyState {
+  if (env.isIPhone && !env.standalone) return { kind: "home screen first" };
+  if (!env.hasServiceWorker || !env.hasPushManager) return { kind: "not supported" };
+  if (env.permission === "denied") return { kind: "blocked" };
+  if (env.permission === "granted" && env.subscribed) return { kind: "on" };
+  return { kind: "off" };
 }
