@@ -177,7 +177,7 @@ export function PhoneFrame({ who, href }: { who: string; href: string }) {
           Open {who}&apos;s page
         </a>
       </figcaption>
-      <iframe src={href} title={`${who}'s phone`} />
+      <iframe src={href} title={`${who}'s phone`} loading="lazy" />
     </figure>
   );
 }
