@@ -7,7 +7,7 @@
 
 On a laptop, a judge's own Rose and Sam run side by side on kincart.vercel.app, live, beside a few plain sentences on what each one does. It comes now because `households` shipped, so every judge has their own pair to show.
 
-**Reopened:** 2026-10-15, at pause 3, for the `households` slice (O8). `households` shipped the same day, and pause 1 below is redone on top of it. Pause 2 is redone next: until then, Interface still describes the old shared demo with Start over.
+**Reopened:** 2026-10-15, at pause 3, for the `households` slice (O8). `households` shipped the same day, and pause 1 below is redone on top of it. Pause 2 is redone on top of it too.
 
 ## Problem
 
@@ -94,41 +94,46 @@ Scenario: Start a new one on a laptop swaps both phones
 
 ## Interface
 
-One page at `/`, in two shapes. On a phone it is one column: the KinCart mark, what it is, the sandbox line, Be Rose and Be Sam, then Start over and the status link. From 880px wide and 480px high, Rose's and Sam's real pages appear as two 390 by 844 phones, live, and the two buttons go. From 1280px the text sits in a column to their left, so all three fit on one laptop screen.
+One page at `/`, built on the `households` home page, in two shapes. On a phone it is one column: the KinCart mark, what it is, what Rose, the AI and Sam each do, the sandbox line, then Try KinCart, or Be Rose, Be Sam and Start a new one. From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages appear as two 390 by 844 phones, live, and Be Rose and Be Sam go. From 1280px the text sits in a column to their left, so all three fit on one laptop screen.
 
 ```mermaid
 flowchart LR
-    H["Home"] -- "Be Rose / Open Rose's page" --> R["/r/<token>, new tab"]
-    H -- "Be Sam / Open Sam's page" --> S["/h/<token>, new tab"]
-    H -- "Start over" --> HB["Home: Starting over…"]
-    HB -- "cleared" --> HD["Home: Done. Rose and Sam are back to a clean start."]
-    HB -- "a charge is going through" --> HP["Home: A payment is going through."]
-    H -- "System status" --> ST["/status"]
-    RF["Rose's phone frame"] -- "Ask Sam, within 3 s" --> SF["Sam's phone frame"]
+    N["/: Try KinCart, no phones"] -- "tap" --> B["Starting…"]
+    B -- "started, wide window" --> W["/: words, Rose's phone, Sam's phone"]
+    B -- "started, phone" --> P["/: Be Rose, Be Sam, new tabs"]
+    B -- "nothing saved" --> F["/: didn't start, Try KinCart again"]
+    W -- "Start a new one" --> B2["Starting…"]
+    B2 -- "started" --> W2["/: both phones show the new Rose and Sam"]
+    RF["Rose's phone"] -- "Ask Sam, within 3 s" --> SF["Sam's phone"]
 ```
 
-The home page opens each person in a new tab or shows both live in frames. Start over comes back to the home page with a notice saying it cleared, or that a charge is still going through.
+The words come first on every width. The phones appear only once this browser has a household (O9).
 
 | Width | State | What's on it |
 | ----- | ----- | ------------ |
-| phone | default | the mark at 64px; "KinCart"; lead: "An older shopper buys online with a relative's OK, and no shared passwords."; "Rose says what they need. AI finds real listings and explains each one. Sam taps OK on their own phone, and Rose's saved PayPal pays."; "**Sandbox money only.** Nothing real is bought."; Be Rose (primary) and Be Sam (secondary), each opening a new tab; small: "Someone may have tried it before you. Start over clears their asks, limits and phones. Rose's PayPal stays linked."; Start over (secondary); "System status" link |
-| phone | starting over | Start over becomes "Starting over…" with the spinner; Be Rose and Be Sam stay |
-| any | done | grey notice at the top: "Done. Rose and Sam are back to a clean start." |
-| any | a charge is going through | amber notice at the top: "A payment is going through. Try again in a few seconds." |
-| 880px and up, 480px high | default | the text above; below it, "Rose's phone" and "Sam's phone", each with "Open Rose's page" or "Open Sam's page" and a 390 by 844 frame of the real page; Be Rose and Be Sam go |
-| 1280px and up, 480px high | default | the text in a column up to 480px wide on the left, the two phones on the right |
+| any | new | the mark at 64px; "KinCart"; lead: "An older shopper buys online with a relative's OK, and no shared passwords."; "Rose says what they need. AI finds real listings and explains each one. Sam taps OK on their own phone, and Rose's saved PayPal pays."; "**Sandbox money only.** Nothing real is bought."; "You get your own Rose and Sam to try. Rose's sandbox PayPal is already linked."; Try KinCart (primary); "System status" link. No phones on a wide screen |
+| any | starting | Try KinCart becomes "Starting…" with the spinner |
+| any | failed | red notice at the top: "Your Rose and Sam didn't start. Nothing was saved. Try again in a moment."; then new |
+| phone | yours | the mark, "KinCart", the lead, what each one does and the sandbox line; small: "Each opens in a new tab. Come back here to open them again."; Be Rose (primary) and Be Sam (secondary), links that open a new tab; small: "Want a clean start? A new Rose and Sam have nothing asked and no limits. Your old links keep working."; Start a new one (secondary); "System status" link |
+| 880px and up, 480px high | yours | the text of yours without the new-tab line, Be Rose and Be Sam; below it, "Rose's phone" and "Sam's phone", each with "Open Rose's page" or "Open Sam's page" and a 390 by 844 frame of the real page |
+| 1280px and up, 480px high | yours | the text in a column up to 480px wide on the left, the two phones on the right |
+| any | ready | grey notice at the top: "Your Rose and Sam are ready."; then yours |
+| any | restarting | Start a new one becomes "Starting…" with the spinner |
+| any | fresh | grey notice at the top: "Your new Rose and Sam are ready. Tabs you already have open still show the old ones."; then yours, with the phones on the new links |
 
-The frames are the real pages, so their 3 s refresh (D19) shows Sam the ask and both the receipt with no extra code. A frame's height is kept within the window, and each page scrolls inside its frame.
+The new state's last line was "You get your own Rose, who asks for things, and Sam, who says OK." in `households`. The new sentence above it now says what each one does, so that line only says the pair is theirs.
 
-Checked: no sideways scroll at 390, 1024, 1280 and 1440px, and a 900 by 420 window keeps the phone column. A 1280 by 800 window shows all three with no scroll. Light and dark both rendered. The live site sends no `X-Frame-Options` or CSP header, so same-origin frames load (checked on `/status` with curl, 2026-10-15). No new colours: the frame edge is `color-control` on `color-bg` (D40), the notices are the existing neutral and wait tones, and the buttons and links are the system's.
+The frames are the real pages, so their 3 s refresh (D19) shows Sam the ask and both the receipt with no extra code. A frame's height is kept within the window, and each page scrolls inside its frame. Each frame loads lazily, so on a phone or a short window, where the frames are hidden, neither page loads (scenario 3).
 
-Craft checks: a one-line "landing page for a hackathon app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here the page has no marketing: the product runs live on it, as two real phones. Against Vercel's restraint: one accent, hierarchy from type size alone, and no decoration. Against Stripe's interactive docs: the real thing to try, beside the words that explain it.
+Checked on the preview, 2026-10-15, in Chromium and Firefox: no sideways scroll at 390, 900, 1024, 1280 and 1440px. A 900 by 420 window keeps the phone column. A 1280 by 800 window shows all three with no scroll. Light and dark both rendered. On 390 by 844 and 900 by 420, neither frame loads; on 1024 and up, both do. The keyboard order follows the page: Start a new one, System status, Open Rose's page, Rose's page, Open Sam's page, Sam's page. No new colours: the frame edge is `color-control` on `color-bg` (D40), the notices are the existing neutral and danger tones, and the buttons and links are the system's.
 
-**Motion tier:** 1, as before. Nothing new moves: the notices rise and fade like every notice, and "Starting over…" turns the spinner.
+Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here the page has no marketing: one sentence says what each person does, and on a laptop the product runs live beside it as two real phones. Against Vercel's restraint: one accent, hierarchy from type size alone, and no decoration. Against Stripe's interactive docs: the real thing to try, beside the words that explain it.
 
-**Components used:** from the system, Button, Notice, PhoneFrame, and the `screen`, `heading`, `lead`, `small`, `link` and `button` styles. The layout uses the system's two breakpoints, `two-phones` and `text-beside` (D40). Composed here: `HomeView`, and the home layout in `shop.css` from `space` and `page` tokens.
+**Motion tier:** 1, as in `households`. Nothing new moves: the notices rise and fade like every notice, and "Starting…" turns the spinner.
 
-**Preview:** http://localhost:3000/preview/demo-home with `pnpm dev`, and `?state=done`, `?state=paying` or `?state=busy`. Resize the window to see the three shapes. It answers 404 in production.
+**Components used:** from the system, Button, Notice, PhoneFrame, and the `screen`, `heading`, `lead`, `small`, `stack`, `link` and `button` styles. The layout uses the system's two breakpoints, `two-phones` and `text-beside` (D40). Composed here: `HomeView`, and the home layout in `shop.css` from `space` and `page` tokens.
+
+**Preview:** http://localhost:3000/preview/demo-home with `pnpm dev`, and `?state=new`, `starting`, `failed`, `ready`, `yours`, `restarting` or `fresh`. Resize the window to see the three shapes. The phones show household 1's real pages. It answers 404 in production. It replaces `/preview/households`, whose made-up links would show a broken page in each phone.
 
 ## Technical plan
 
@@ -145,7 +150,7 @@ Status: active
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
 | -- | ---- | ---- | --------- | ----- | ------ | ------ |
-| O1 | The home page opens Rose's and Sam's links for anyone, so the links stop being secret. D18 chose secret links for two fixed demo people moving sandbox money; the worst case is a stranger's ask or a spoiled demo, not lost money. The other choice is a short demo code that judges get with the submission | question | spec p1 | user | Resolved | Open to anyone: sandbox money only, and Start over fixes a spoiled demo. Supersedes D18 (D37). 2026-10-15. No longer applies: each household has its own secret links, D37 was dropped and D18 stands (O8). |
+| O1 | The home page opens Rose's and Sam's links for anyone, so the links stop being secret. D18 chose secret links for two fixed demo people moving sandbox money; the worst case is a stranger's ask or a spoiled demo, not lost money. The other choice is a short demo code that judges get with the submission | question | spec p1 | user | Resolved | Open to anyone: sandbox money only, and Start over fixes a spoiled demo. Supersedes D18 (D37). 2026-10-15. No longer applies: each household has its own secret links (D42), and D37 was dropped (O8). |
 | O2 | How a judge plays both people. Recommended: on a wide screen, Rose's and Sam's pages side by side on the home page, live, so Sam's screen changes as Rose asks; on a phone, a button for each. Other choices: a button for each that opens a new tab, or a button plus a QR code to open the other person on a phone | question | spec p1 | user | Resolved | Side by side on a wide screen, live; a button for each on a phone (D39). 2026-10-15 |
 | O3 | What Start over clears. Recommended: every ask and receipt, Rose's search, both limits back to $50 and none, and every saved phone; Rose's PayPal stays. The other choice keeps past receipts and phones, and only ends a waiting ask and resets the limits | question | spec p1 | user | Resolved | Everything but Rose's PayPal: asks and receipts, the search, both limits and saved phones (D38). 2026-10-15. No longer applies: Start over and D38 were dropped (O8). |
 | O4 | Two judges at the same moment still share one Rose and one Sam. One judge's ask shows on the other's Sam page, and one can start over in the middle of the other's turn. Judging runs Dec 1 to 15 (D3), so it is unlikely | flag | spec p1 | user | Accepted risk | Judging runs Dec 1 to 15, so two judges at once is unlikely, and Start over cleans up after. Agreed 2026-10-15. No longer applies: two judges at once each have their own household (O8). |
