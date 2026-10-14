@@ -2,19 +2,22 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
+import { hashOf, whoIs } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
 import {
   ask,
   getLimit,
   getSearch,
   getTotal,
+  getVault,
   latest,
   saveSearch,
   saveVault,
   setTotal as saveTotal,
+  startHousehold,
   subscriptionsFor,
 } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, setTotal, startLink, subscribe, tryAgain } from "./actions";
+import { answer, askSam, find, setLimit, setTotal, start, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -22,6 +25,17 @@ vi.mock("next/server", async (importOriginal) => ({
   after: (task: () => unknown) => {
     Promise.resolve(task()).catch(() => {});
   },
+}));
+
+// This browser's cookies, as start() sets and reads them.
+const jar = vi.hoisted(() => new Map<string, { value: string; options?: object }>());
+
+vi.mock("next/headers", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/headers")>()),
+  cookies: async () => ({
+    has: (name: string) => jar.has(name),
+    set: (name: string, value: string, options?: object) => jar.set(name, { value, options }),
+  }),
 }));
 
 vi.mock("../../lib/shop/push", async (importOriginal) => ({
@@ -32,6 +46,7 @@ vi.mock("../../lib/shop/push", async (importOriginal) => ({
 const [glasses] = ITEMS;
 const rose = "rose-link-4f9c2a7e";
 const sam = "sam-link-b81d5e30";
+const owner = 1;
 
 function form(fields: Record<string, string>) {
   const data = new FormData();
@@ -46,9 +61,9 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions");
+  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1");
   await client.end();
-  await saveVault("1j970427g9944212v");
+  await saveVault(owner, "1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
   vi.stubEnv("SAM_LINK_TOKEN", sam);
   vi.stubEnv("VAPID_PUBLIC_KEY", "vapid-test-public-key");
@@ -56,6 +71,7 @@ beforeEach(async () => {
   vi.stubEnv("VAPID_SUBJECT", "https://kincart.vercel.app");
   vi.stubGlobal("fetch", vi.fn());
   vi.mocked(notify).mockReset();
+  jar.clear();
 });
 
 afterEach(() => {
@@ -65,14 +81,14 @@ afterEach(() => {
 });
 
 it("won't answer for Sam from Rose's link or a made-up one", async () => {
-  await ask(glasses);
-  const { id } = (await latest())!;
+  await ask(owner, glasses);
+  const { id } = (await latest(owner))!;
 
   await expect(answer(rose, id, form({ answer: "ok" }))).resolves.toBeUndefined();
   await expect(answer("not-a-real-link", id, form({ answer: "ok" }))).resolves.toBeUndefined();
   await expect(answer(rose, id, form({ answer: "no" }))).resolves.toBeUndefined();
 
-  expect((await latest())!.status).toBe("waiting");
+  expect((await latest(owner))!.status).toBe("waiting");
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -80,7 +96,7 @@ it("won't ask or link for Rose from Sam's link", async () => {
   await expect(askSam(sam, form({ item: "glasses" }))).resolves.toBeUndefined();
   await expect(startLink(sam)).resolves.toBeUndefined();
 
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -110,14 +126,14 @@ function searchOn() {
 
 it("won't find, try again or set the limit from the wrong person's link", async () => {
   searchOn();
-  await saveSearch("warm slippers", { outcome: "options", options: [strap] });
+  await saveSearch(owner, "warm slippers", { outcome: "options", options: [strap] });
 
   await expect(find(sam, form({ words: "warm slippers" }))).resolves.toBeUndefined();
   await expect(tryAgain(sam)).resolves.toBeUndefined();
   await expect(setLimit(rose, form({ limit: "30" }))).resolves.toBeUndefined();
 
-  expect((await getSearch())?.outcome).toBe("options");
-  expect(await getLimit()).toBe(5000);
+  expect((await getSearch(owner))?.outcome).toBe("options");
+  expect(await getLimit(owner)).toBe(5000);
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -132,56 +148,56 @@ it("finds with Rose's words and keeps the result, and asks for words when the bo
   );
 
   expect(await redirectOf(find(rose, form({ words: `  ${six.join(", ")} ` })))).toBe(`/r/${rose}`);
-  expect(await getSearch()).toMatchObject({ words: six.join(", "), outcome: "too many" });
+  expect(await getSearch(owner)).toMatchObject({ words: six.join(", "), outcome: "too many" });
 
   expect(await redirectOf(find(rose, form({ words: "   " })))).toBe(`/r/${rose}?find=empty`);
 });
 
 it("asks Sam for the picked listing at the saved search's price, never the form's", async () => {
   searchOn();
-  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
 
   expect(await redirectOf(askSam(rose, form({ listing: "prod_madeUp1", cents: "1" })))).toBe(`/r/${rose}?pick=missing`);
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
 
   expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY", cents: "1" })))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     item: { id: "prod_9Wz4hY", cents: 3250 },
     found: { shop: "amazon.com", url: strap.url, reason: strap.why },
   });
-  expect(await getSearch()).toBeNull();
+  expect(await getSearch(owner)).toBeNull();
 });
 
 it("keeps Rose's words when Rose tries other words", async () => {
   searchOn();
-  await saveSearch("warm slippers", { outcome: "options", options: [strap] });
+  await saveSearch(owner, "warm slippers", { outcome: "options", options: [strap] });
 
   expect(await redirectOf(tryAgain(rose))).toBe(`/r/${rose}`);
-  expect(await getSearch()).toMatchObject({ words: "warm slippers", outcome: "retry", options: [] });
+  expect(await getSearch(owner)).toMatchObject({ words: "warm slippers", outcome: "retry", options: [] });
 });
 
 it("saves Sam's limit in whole dollars from $5 to $500, and refuses anything else", async () => {
   expect(await redirectOf(setLimit(sam, form({ limit: "30" })))).toBe(`/h/${sam}?limit=saved`);
-  expect(await getLimit()).toBe(3000);
+  expect(await getLimit(owner)).toBe(3000);
 
   for (const limit of ["3", "501", "30.5", "abc", ""]) {
     expect(await redirectOf(setLimit(sam, form({ limit })))).toBe(`/h/${sam}?limit=invalid`);
   }
-  expect(await getLimit()).toBe(3000);
+  expect(await getLimit(owner)).toBe(3000);
 });
 
 it("saves Sam's total limit in whole dollars from $5 to $2,500, clears it when empty, and refuses anything else", async () => {
   expect(await redirectOf(setTotal(sam, form({ total: "40" })))).toBe(`/h/${sam}?total=saved`);
-  expect(await getTotal()).toBe(4000);
+  expect(await getTotal(owner)).toBe(4000);
 
   for (const total of ["3", "2501", "12.50", "abc"]) {
     expect(await redirectOf(setTotal(sam, form({ total })))).toBe(`/h/${sam}?total=invalid`);
   }
   await expect(setTotal(rose, form({ total: "100" }))).resolves.toBeUndefined();
-  expect(await getTotal()).toBe(4000);
+  expect(await getTotal(owner)).toBe(4000);
 
   expect(await redirectOf(setTotal(sam, form({ total: " " })))).toBe(`/h/${sam}?total=saved`);
-  expect(await getTotal()).toBeNull();
+  expect(await getTotal(owner)).toBeNull();
 });
 
 const keys = {
@@ -195,8 +211,8 @@ it("saves the phone that turned notifications on, for Sam's link and for Rose's"
   expect(await subscribe(sam, samPhone)).toBe(true);
   expect(await subscribe(rose, rosePhone)).toBe(true);
 
-  expect(await subscriptionsFor("sam")).toEqual([{ endpoint: samPhone.endpoint, ...keys }]);
-  expect(await subscriptionsFor("rose")).toEqual([{ endpoint: rosePhone.endpoint, ...keys }]);
+  expect(await subscriptionsFor(owner, "sam")).toEqual([{ endpoint: samPhone.endpoint, ...keys }]);
+  expect(await subscriptionsFor(owner, "rose")).toEqual([{ endpoint: rosePhone.endpoint, ...keys }]);
 });
 
 it("refuses a phone from a made-up link, one it can't trust, or any while notifications are off", async () => {
@@ -208,20 +224,20 @@ it("refuses a phone from a made-up link, one it can't trust, or any while notifi
   vi.stubEnv("VAPID_PRIVATE_KEY", "");
   expect(await subscribe(sam, samPhone)).toBe(false);
 
-  expect(await subscriptionsFor("sam")).toEqual([]);
+  expect(await subscriptionsFor(owner, "sam")).toEqual([]);
 });
 
 it("pings Sam when Rose's ask makes a request, and not for a second ask while one is open", async () => {
   searchOn();
-  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
   expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })))).toBe(`/r/${rose}`);
 
-  expect(notify).toHaveBeenCalledExactlyOnceWith("sam", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "sam", {
     title: "Rose would like something",
     body: "Adjustable Wide Slippers with Hook-and-Loop Strap, $32.50. Tap to see it and say OK or No.",
   });
 
-  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
   await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })));
   expect(notify).toHaveBeenCalledTimes(1);
 });
@@ -230,10 +246,29 @@ it("pings Sam for an item from the fixed list too", async () => {
   vi.stubEnv("CHANNEL3_API_KEY", "");
   expect(await redirectOf(askSam(rose, form({ item: "glasses" })))).toBe(`/r/${rose}`);
 
-  expect(notify).toHaveBeenCalledExactlyOnceWith("sam", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "sam", {
     title: "Rose would like something",
     body: "Reading glasses, +2.00, $18.99. Tap to see it and say OK or No.",
   });
+});
+
+it("asks and pings only Ben's own Sam, and Ben's Sam can't answer another household's ask", async () => {
+  vi.stubEnv("CHANNEL3_API_KEY", "");
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await ask(owner, glasses);
+  const theirs = (await latest(owner))!;
+
+  expect(await redirectOf(askSam("ben-rose-link-7Qx2", form({ item: "batteries" })))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await latest(ben)).toMatchObject({ household: ben, item: { id: "batteries" }, status: "waiting" });
+  expect(notify).toHaveBeenCalledExactlyOnceWith(ben, "sam", {
+    title: "Rose would like something",
+    body: "AA batteries, pack of 8, $9.99. Tap to see it and say OK or No.",
+  });
+
+  await redirectOf(answer("ben-sam-link-9Lm4", theirs.id, form({ answer: "ok" })));
+  await redirectOf(answer("ben-sam-link-9Lm4", theirs.id, form({ answer: "no" })));
+  expect((await latest(owner))?.status).toBe("waiting");
+  expect(fetch).not.toHaveBeenCalled();
 });
 
 it("still asks Sam when the push can't go out", async () => {
@@ -241,7 +276,7 @@ it("still asks Sam when the push can't go out", async () => {
   vi.mocked(notify).mockRejectedValue(new Error("push service down"));
 
   expect(await redirectOf(askSam(rose, form({ item: "glasses" })))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({ status: "waiting", item: { id: "glasses" } });
+  expect(await latest(owner)).toMatchObject({ status: "waiting", item: { id: "glasses" } });
 });
 
 function paypalAnswers(order: () => Response) {
@@ -266,8 +301,8 @@ const completed = () =>
   );
 
 async function samAnswers(choice: "ok" | "no") {
-  await ask(glasses);
-  const { id } = (await latest())!;
+  await ask(owner, glasses);
+  const { id } = (await latest(owner))!;
   return redirectOf(answer(sam, id, form({ answer: choice })));
 }
 
@@ -275,7 +310,7 @@ it("tells Rose when Sam says no", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   expect(await samAnswers("no")).toBe(`/h/${sam}`);
 
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Sam said no",
     body: "Sam said no to Reading glasses, +2.00. Nothing was taken.",
   });
@@ -285,7 +320,7 @@ it("tells Rose when Sam's OK is paid, and when PayPal refuses it", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   paypalAnswers(completed);
   expect(await samAnswers("ok")).toBe(`/h/${sam}`);
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Sam said OK",
     body: "Reading glasses, +2.00 is paid: $18.99. Tap to see the receipt.",
   });
@@ -293,7 +328,7 @@ it("tells Rose when Sam's OK is paid, and when PayPal refuses it", async () => {
   vi.mocked(notify).mockClear();
   paypalAnswers(() => Response.json({ name: "NOT_AUTHORIZED", details: [{ issue: "PERMISSION_DENIED" }] }, { status: 403 }));
   expect(await samAnswers("ok")).toBe(`/h/${sam}`);
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Payment didn't go through",
     body: "Sam said OK, but the payment didn't go through. Nothing was taken.",
   });
@@ -304,7 +339,7 @@ it("tells Rose nothing while the charge is unknown", async () => {
   paypalAnswers(() => new Response("", { status: 503 }));
 
   expect(await samAnswers("ok")).toBe(`/h/${sam}`);
-  expect((await latest())?.status).toBe("paying");
+  expect((await latest(owner))?.status).toBe("paying");
   expect(notify).not.toHaveBeenCalled();
 });
 
@@ -340,34 +375,34 @@ const lightLine = lineOf("a night light", plugLight);
 
 it("asks Sam for two picks as one basket at the saved prices, and pings Sam once", async () => {
   searchOn();
-  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups });
+  await saveSearch(owner, "AA batteries, a night light and a phone charger", { outcome: "basket", groups });
 
   const picks = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_6Nl2tL", "pick-2": "", cents: "1" });
   expect(await redirectOf(askSam(rose, picks))).toBe(`/r/${rose}`);
 
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     item: { id: "basket", name: "2 things", cents: 2248 },
     found: null,
     lines: [aaLine, lightLine],
     status: "waiting",
   });
-  expect(notify).toHaveBeenCalledExactlyOnceWith("sam", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "sam", {
     title: "Rose would like 2 things",
     body: "$22.48 in total. Tap to see them and say OK or No.",
   });
-  expect(await getSearch()).toBeNull();
+  expect(await getSearch(owner)).toBeNull();
 });
 
 it("asks Sam for one pick from a basket as one item, and for no pick asks Rose to pick one", async () => {
   searchOn();
-  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups });
+  await saveSearch(owner, "AA batteries, a night light and a phone charger", { outcome: "basket", groups });
 
   const none = form({ "pick-0": "", "pick-1": "prod_madeUp1", "pick-2": "" });
   expect(await redirectOf(askSam(rose, none))).toBe(`/r/${rose}?pick=missing`);
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
 
   expect(await redirectOf(askSam(rose, form({ "pick-1": "prod_6Nl2tL" })))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     item: { id: "prod_6Nl2tL", cents: 1249 },
     found: { shop: "target.com", url: plugLight.url, reason: plugLight.why },
     lines: null,
@@ -376,7 +411,7 @@ it("asks Sam for one pick from a basket as one item, and for no pick asks Rose t
 
 it("counts a listing picked under two things once", async () => {
   searchOn();
-  await saveSearch("AA batteries and batteries for the remote", {
+  await saveSearch(owner, "AA batteries and batteries for the remote", {
     outcome: "basket",
     groups: [
       { thing: "AA batteries", options: [aa24] },
@@ -385,7 +420,7 @@ it("counts a listing picked under two things once", async () => {
   });
 
   await redirectOf(askSam(rose, form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_3Ba7aA" })));
-  expect(await latest()).toMatchObject({ item: { id: "prod_3Ba7aA", cents: 999 }, lines: null });
+  expect(await latest(owner)).toMatchObject({ item: { id: "prod_3Ba7aA", cents: 999 }, lines: null });
 });
 
 const belkin = option("prod_7Bk2wC", "Belkin 25W USB-C Wall Charger with 6 ft Cable", 2499, "bestbuy.com");
@@ -398,27 +433,27 @@ const capped = [
 it("stops picks over Sam's total limit before they reach Sam, and asks once Rose leaves one out", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});
-  await saveTotal(4000);
-  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
+  await saveTotal(owner, 4000);
+  await saveSearch(owner, "AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
 
   const three = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_6Nl2tL", "pick-2": "prod_7Bk2wC" });
   expect(await redirectOf(askSam(rose, three))).toBe(`/r/${rose}?over=prod_3Ba7aA,prod_6Nl2tL,prod_7Bk2wC`);
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
   expect(notify).not.toHaveBeenCalled();
   expect(console.log).toHaveBeenCalledWith("ask status=over cents=4747 total=4000");
-  expect(await getSearch()).toMatchObject({ outcome: "basket" });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "basket" });
 
   const two = form({ "pick-0": "prod_3Ba7aA", "pick-1": "", "pick-2": "prod_7Bk2wC" });
   expect(await redirectOf(askSam(rose, two))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({ item: { id: "basket", name: "2 things", cents: 3498 }, status: "waiting" });
+  expect(await latest(owner)).toMatchObject({ item: { id: "basket", name: "2 things", cents: 3498 }, status: "waiting" });
 });
 
 it("sends each group's pick back in its own place, with an empty place for a group left out", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});
   const aa16 = option("prod_8En1rG", "Energizer MAX AA Batteries, 16 Count", 1449, "walmart.com");
-  await saveTotal(3000);
-  await saveSearch("AA batteries, batteries for the remote and a phone charger", {
+  await saveTotal(owner, 3000);
+  await saveSearch(owner, "AA batteries, batteries for the remote and a phone charger", {
     outcome: "basket",
     groups: [
       { thing: "AA batteries", options: [aa24, aa16] },
@@ -431,14 +466,14 @@ it("sends each group's pick back in its own place, with an empty place for a gro
   expect(await redirectOf(askSam(rose, leftOut))).toBe(`/r/${rose}?over=prod_8En1rG,,prod_7Bk2wC`);
   const shared = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_3Ba7aA", "pick-2": "prod_7Bk2wC" });
   expect(await redirectOf(askSam(rose, shared))).toBe(`/r/${rose}?over=prod_3Ba7aA,prod_3Ba7aA,prod_7Bk2wC`);
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
 });
 
 it("lets picks that come to exactly Sam's total limit through", async () => {
   searchOn();
   const dimmer = option("prod_4Dm1nL", "Dimmable Plug-In Night Light", 1501, "walmart.com");
-  await saveTotal(4000);
-  await saveSearch("a phone charger and a night light", {
+  await saveTotal(owner, 4000);
+  await saveSearch(owner, "a phone charger and a night light", {
     outcome: "basket",
     groups: [
       { thing: "a phone charger", options: [belkin] },
@@ -447,26 +482,26 @@ it("lets picks that come to exactly Sam's total limit through", async () => {
   });
 
   expect(await redirectOf(askSam(rose, form({ "pick-0": "prod_7Bk2wC", "pick-1": "prod_4Dm1nL" })))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({ item: { id: "basket", cents: 4000 } });
+  expect(await latest(owner)).toMatchObject({ item: { id: "basket", cents: 4000 } });
 });
 
 it("stops one listing over Sam's total limit too", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});
-  await saveTotal(3000);
-  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  await saveTotal(owner, 3000);
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
 
   expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })))).toBe(`/r/${rose}?over=prod_9Wz4hY`);
-  expect(await latest()).toBeNull();
+  expect(await latest(owner)).toBeNull();
 });
 
 it("lets any total through when Sam has set no total limit", async () => {
   searchOn();
-  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
+  await saveSearch(owner, "AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
 
   const three = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_6Nl2tL", "pick-2": "prod_7Bk2wC" });
   expect(await redirectOf(askSam(rose, three))).toBe(`/r/${rose}`);
-  expect(await latest()).toMatchObject({ item: { name: "3 things", cents: 4747 } });
+  expect(await latest(owner)).toMatchObject({ item: { name: "3 things", cents: 4747 } });
 });
 
 function ticked(...lines: string[]) {
@@ -483,19 +518,19 @@ async function chargedValue() {
 it("pays for the ticked lines only, and tells Rose what Sam left out", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   paypalAnswers(completed);
-  await ask({ id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
-  const { id } = (await latest())!;
+  await ask(owner, { id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
+  const { id } = (await latest(owner))!;
 
   expect(await redirectOf(answer(sam, id, ticked("prod_3Ba7aA")))).toBe(`/h/${sam}`);
 
   expect(await chargedValue()).toBe("9.99");
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     status: "paid",
     item: { cents: 999 },
     lines: [aaLine],
     leftOut: ["a night light"],
   });
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Sam said OK",
     body: "Sam paid $9.99 for 1 thing and left out a night light. Tap to see the receipt.",
   });
@@ -504,14 +539,14 @@ it("pays for the ticked lines only, and tells Rose what Sam left out", async () 
 it("pays for the whole basket when Sam leaves both ticked", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   paypalAnswers(completed);
-  await ask({ id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
-  const { id } = (await latest())!;
+  await ask(owner, { id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
+  const { id } = (await latest(owner))!;
 
   await redirectOf(answer(sam, id, ticked("prod_3Ba7aA", "prod_6Nl2tL")));
 
   expect(await chargedValue()).toBe("22.48");
-  expect(await latest()).toMatchObject({ status: "paid", item: { cents: 2248 }, leftOut: null });
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect(await latest(owner)).toMatchObject({ status: "paid", item: { cents: 2248 }, leftOut: null });
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Sam said OK",
     body: "Your 2 things are paid: $22.48. Tap to see the receipt.",
   });
@@ -520,18 +555,61 @@ it("pays for the whole basket when Sam leaves both ticked", async () => {
 it("charges nothing when Sam's OK has nothing ticked, and tells Rose when Sam says no to a basket", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   paypalAnswers(completed);
-  await ask({ id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
-  const { id } = (await latest())!;
+  await ask(owner, { id: "basket", name: "2 things", cents: 2248 }, undefined, [aaLine, lightLine]);
+  const { id } = (await latest(owner))!;
 
   expect(await redirectOf(answer(sam, id, ticked()))).toBe(`/h/${sam}`);
-  expect((await latest())?.status).toBe("waiting");
+  expect((await latest(owner))?.status).toBe("waiting");
   expect(fetch).not.toHaveBeenCalled();
   expect(notify).not.toHaveBeenCalled();
 
   await redirectOf(answer(sam, id, form({ answer: "no", line: "prod_3Ba7aA" })));
-  expect((await latest())?.status).toBe("declined");
-  expect(notify).toHaveBeenCalledExactlyOnceWith("rose", {
+  expect((await latest(owner))?.status).toBe("declined");
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
     title: "Sam said no",
     body: "Sam said no to your 2 things. Nothing was taken.",
   });
+});
+
+it("starts a household with its own two links and household 1's saved PayPal, and keeps the links in this browser", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+
+  expect(await redirectOf(start())).toBe("/?started=ready");
+
+  const { value, options } = jar.get("household")!;
+  const [roseLink, samLink] = value.split(".");
+  const rose = (await whoIs(roseLink))!;
+  expect(rose.person).toBe("rose");
+  expect(rose.household).not.toBe(owner);
+  expect(await whoIs(samLink)).toEqual({ household: rose.household, person: "sam" });
+  expect(await getVault(rose.household)).toBe("1j970427g9944212v");
+  expect(options).toEqual({ httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 90 * 24 * 60 * 60 });
+  expect(console.log).toHaveBeenCalledWith(`household id=${rose.household} status=started`);
+});
+
+it("starts a new household in place of this browser's old one, and the old links still work", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await redirectOf(start());
+  const old = jar.get("household")!.value;
+
+  expect(await redirectOf(start())).toBe("/?started=fresh");
+
+  const fresh = jar.get("household")!.value;
+  expect(fresh).not.toBe(old);
+  const [oldRose, oldSam] = old.split(".");
+  const [freshRose] = fresh.split(".");
+  expect((await whoIs(freshRose))?.household).not.toBe((await whoIs(oldRose))?.household);
+  expect(await whoIs(oldSam)).toMatchObject({ person: "sam" });
+});
+
+it("saves nothing, and says so, when the database can't be reached", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const database = process.env.DATABASE_URL;
+  vi.stubEnv("DATABASE_URL", "postgres://postgres@127.0.0.1:1/none");
+
+  expect(await redirectOf(start())).toBe("/?started=failed");
+
+  vi.stubEnv("DATABASE_URL", database);
+  expect(jar.has("household")).toBe(false);
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^household status=failed reason=\S+/));
 });

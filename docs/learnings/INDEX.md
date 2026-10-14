@@ -16,3 +16,4 @@
 - Build chunks one after another when their tests share the local database
 - Leave Haiku room to think, even at low effort
 - Put what a server action redirects back to at the top of the page
+- Change a file's content when pnpm dev serves an old copy after a branch switch

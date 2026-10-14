@@ -7,6 +7,7 @@ import {
   claim,
   clearSearch,
   decline,
+  findHousehold,
   forgetSubscription,
   getLimit,
   getSearch,
@@ -20,11 +21,15 @@ import {
   saveVault,
   setLimit,
   setTotal,
+  startHousehold,
   stuck,
   subscriptionsFor,
 } from "./requests";
 
 const [glasses, pills, batteries] = ITEMS;
+
+// Household 1: the links in Vercel's env (D45).
+const owner = 1;
 
 async function sql(text: string) {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -41,20 +46,20 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1");
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
-  expect(await getVault()).toBeNull();
-  await saveVault("1j970427g9944212v");
-  await saveVault("8kf02113h7720954x");
-  expect(await getVault()).toBe("8kf02113h7720954x");
+  expect(await getVault(owner)).toBeNull();
+  await saveVault(owner, "1j970427g9944212v");
+  await saveVault(owner, "8kf02113h7720954x");
+  expect(await getVault(owner)).toBe("8kf02113h7720954x");
 });
 
 it("records an ask as waiting, with the item's name and price copied in", async () => {
-  await ask(glasses);
+  await ask(owner, glasses);
 
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     item: { id: "glasses", name: "Reading glasses, +2.00", cents: 1899 },
     status: "waiting",
     answeredAt: null,
@@ -62,39 +67,39 @@ it("records an ask as waiting, with the item's name and price copied in", async 
 });
 
 it("ignores a second ask while one is still open, and says which ask made a request", async () => {
-  expect(await ask(glasses)).toBe(true);
-  expect(await ask(batteries)).toBe(false);
+  expect(await ask(owner, glasses)).toBe(true);
+  expect(await ask(owner, batteries)).toBe(false);
 
-  expect((await latest())?.item.id).toBe("glasses");
+  expect((await latest(owner))?.item.id).toBe("glasses");
 });
 
 it("lets only the first OK claim a request", async () => {
-  await ask(glasses);
-  const { id } = (await latest())!;
+  await ask(owner, glasses);
+  const { id } = (await latest(owner))!;
 
-  expect((await claim(id))?.status).toBe("paying");
-  expect(await claim(id)).toBeNull();
-  expect(await decline(id)).toBeNull();
+  expect((await claim(owner, id))?.status).toBe("paying");
+  expect(await claim(owner, id)).toBeNull();
+  expect(await decline(owner, id)).toBeNull();
 });
 
 it("declines a waiting request, after which Rose can ask again", async () => {
-  await ask(batteries);
-  const { id } = (await latest())!;
+  await ask(owner, batteries);
+  const { id } = (await latest(owner))!;
 
-  expect(await decline(id)).toMatchObject({ id, item: batteries, status: "declined" });
-  expect((await latest())?.status).toBe("declined");
+  expect(await decline(owner, id)).toMatchObject({ id, item: batteries, status: "declined" });
+  expect((await latest(owner))?.status).toBe("declined");
 
-  await ask(pills);
-  expect((await latest())?.item.id).toBe("pills");
+  await ask(owner, pills);
+  expect((await latest(owner))?.item.id).toBe("pills");
 });
 
 it("records a paid charge with PayPal's ids", async () => {
-  await ask(glasses);
-  const { id } = (await latest())!;
-  await claim(id);
+  await ask(owner, glasses);
+  const { id } = (await latest(owner))!;
+  await claim(owner, id);
   await record(id, { state: "paid", orderId: "3BP30887MC6972056", captureId: "7BM91101S1572292D" });
 
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     status: "paid",
     orderId: "3BP30887MC6972056",
     captureId: "7BM91101S1572292D",
@@ -102,22 +107,22 @@ it("records a paid charge with PayPal's ids", async () => {
 });
 
 it("records a refused charge with the reason", async () => {
-  await ask(pills);
-  const { id } = (await latest())!;
-  await claim(id);
+  await ask(owner, pills);
+  const { id } = (await latest(owner))!;
+  await claim(owner, id);
   await record(id, { state: "refused", reason: "PERMISSION_DENIED" });
 
-  expect(await latest()).toMatchObject({ status: "failed", failureReason: "PERMISSION_DENIED" });
+  expect(await latest(owner)).toMatchObject({ status: "failed", failureReason: "PERMISSION_DENIED" });
 });
 
 it("finds a charge left paying for over 15 seconds, and not a fresh one", async () => {
-  await ask(glasses);
-  const { id } = (await latest())!;
-  await claim(id);
-  expect(await stuck()).toBeNull();
+  await ask(owner, glasses);
+  const { id } = (await latest(owner))!;
+  await claim(owner, id);
+  expect(await stuck(owner)).toBeNull();
 
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${id}`);
-  expect((await stuck())?.id).toBe(id);
+  expect((await stuck(owner))?.id).toBe(id);
 });
 
 const strap = {
@@ -133,36 +138,36 @@ const strap = {
 };
 
 it("records an ask from a search with the shop, the link and the reason it fits", async () => {
-  await ask(strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
 
-  expect(await latest()).toMatchObject({
+  expect(await latest(owner)).toMatchObject({
     item: { id: "prod_9Wz4hY", name: "Adjustable Wide Slippers with Hook-and-Loop Strap", cents: 3250 },
     found: { shop: "amazon.com", url: "https://www.amazon.com/dp/B0C7WIDE21", reason: strap.why },
   });
 
   await sql("TRUNCATE purchase_requests");
-  await ask(glasses);
-  expect((await latest())?.found).toBeNull();
+  await ask(owner, glasses);
+  expect((await latest(owner))?.found).toBeNull();
 });
 
 it("keeps Rose's one current search until the next one or a clear", async () => {
-  expect(await getSearch()).toBeNull();
+  expect(await getSearch(owner)).toBeNull();
 
-  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
-  expect(await getSearch()).toMatchObject({
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+  expect(await getSearch(owner)).toMatchObject({
     words: "warm slippers that are easy to put on, size 8",
     outcome: "options",
     options: [strap],
   });
 
-  await saveSearch("AA batteries, a tablet for video calls", {
+  await saveSearch(owner, "AA batteries, a tablet for video calls", {
     outcome: "basket",
     groups: [
       { thing: "AA batteries", options: [strap] },
       { thing: "a tablet for video calls", options: [], problem: "over limit" },
     ],
   });
-  expect(await getSearch()).toMatchObject({
+  expect(await getSearch(owner)).toMatchObject({
     outcome: "basket",
     options: [],
     groups: [
@@ -171,13 +176,13 @@ it("keeps Rose's one current search until the next one or a clear", async () => 
     ],
   });
 
-  await saveSearch("batteries, a night light, a phone charger, a doormat, a kettle and a flashlight", {
+  await saveSearch(owner, "batteries, a night light, a phone charger, a doormat, a kettle and a flashlight", {
     outcome: "too many",
   });
-  expect(await getSearch()).toMatchObject({ outcome: "too many", options: [], groups: [] });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "too many", options: [], groups: [] });
 
-  await clearSearch();
-  expect(await getSearch()).toBeNull();
+  await clearSearch(owner);
+  expect(await getSearch(owner)).toBeNull();
 });
 
 const aa = {
@@ -201,13 +206,13 @@ const light = {
 const basket = { id: "basket", name: "2 things", cents: 2248 };
 
 it("records a basket as one request with its lines", async () => {
-  expect(await ask(basket, undefined, [aa, light])).toBe(true);
+  expect(await ask(owner, basket, undefined, [aa, light])).toBe(true);
 
-  expect(await latest()).toMatchObject({ item: basket, found: null, lines: [aa, light], leftOut: null, status: "waiting" });
+  expect(await latest(owner)).toMatchObject({ item: basket, found: null, lines: [aa, light], leftOut: null, status: "waiting" });
 
   await sql("TRUNCATE purchase_requests");
-  await ask(glasses);
-  expect(await latest()).toMatchObject({ lines: null, leftOut: null });
+  await ask(owner, glasses);
+  expect(await latest(owner)).toMatchObject({ lines: null, leftOut: null });
 });
 
 it("keeps only the ticked lines, by their stored prices", () => {
@@ -222,28 +227,28 @@ it("keeps only the ticked lines, by their stored prices", () => {
 });
 
 it("claims a basket for the ticked lines only, and only once", async () => {
-  await ask(basket, undefined, [aa, light]);
-  const { id } = (await latest())!;
+  await ask(owner, basket, undefined, [aa, light]);
+  const { id } = (await latest(owner))!;
 
-  expect(await claim(id, ["prod_3Ba7aA"])).toMatchObject({
+  expect(await claim(owner, id, ["prod_3Ba7aA"])).toMatchObject({
     status: "paying",
     item: { id: "basket", name: "1 thing", cents: 999 },
     lines: [aa],
     leftOut: ["a night light"],
   });
-  expect(await claim(id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toBeNull();
-  expect((await latest())?.item.cents).toBe(999);
+  expect(await claim(owner, id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toBeNull();
+  expect((await latest(owner))?.item.cents).toBe(999);
 });
 
 it("claims a whole basket with nothing left out, and refuses to claim one with nothing ticked", async () => {
-  await ask(basket, undefined, [aa, light]);
-  const { id } = (await latest())!;
+  await ask(owner, basket, undefined, [aa, light]);
+  const { id } = (await latest(owner))!;
 
-  expect(await claim(id, [])).toBeNull();
-  expect(await claim(id, ["prod_made_up"])).toBeNull();
-  expect((await latest())?.status).toBe("waiting");
+  expect(await claim(owner, id, [])).toBeNull();
+  expect(await claim(owner, id, ["prod_made_up"])).toBeNull();
+  expect((await latest(owner))?.status).toBe("waiting");
 
-  expect(await claim(id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toMatchObject({
+  expect(await claim(owner, id, ["prod_3Ba7aA", "prod_6Nl2tL"])).toMatchObject({
     item: basket,
     lines: [aa, light],
     leftOut: null,
@@ -251,26 +256,26 @@ it("claims a whole basket with nothing left out, and refuses to claim one with n
 });
 
 it("keeps Sam's price limit, $50 until Sam sets one", async () => {
-  expect(await getLimit()).toBe(5000);
+  expect(await getLimit(owner)).toBe(5000);
 
-  await setLimit(3000);
-  expect(await getLimit()).toBe(3000);
+  await setLimit(owner, 3000);
+  expect(await getLimit(owner)).toBe(3000);
 
-  await expect(setLimit(300)).rejects.toThrow();
-  expect(await getLimit()).toBe(3000);
+  await expect(setLimit(owner, 300)).rejects.toThrow();
+  expect(await getLimit(owner)).toBe(3000);
 });
 
 it("keeps no total limit until Sam sets one, and clears it", async () => {
-  expect(await getTotal()).toBeNull();
+  expect(await getTotal(owner)).toBeNull();
 
-  await setTotal(4000);
-  expect(await getTotal()).toBe(4000);
+  await setTotal(owner, 4000);
+  expect(await getTotal(owner)).toBe(4000);
 
-  await expect(setTotal(300)).rejects.toThrow();
-  expect(await getTotal()).toBe(4000);
+  await expect(setTotal(owner, 300)).rejects.toThrow();
+  expect(await getTotal(owner)).toBe(4000);
 
-  await setTotal(null);
-  expect(await getTotal()).toBeNull();
+  await setTotal(owner, null);
+  expect(await getTotal(owner)).toBeNull();
 });
 
 const samPhone = {
@@ -285,14 +290,71 @@ const rosePhone = {
 };
 
 it("keeps each phone once under the person who turned it on, until it's forgotten", async () => {
-  await saveSubscription("sam", samPhone);
-  await saveSubscription("sam", { ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" });
-  await saveSubscription("rose", rosePhone);
+  await saveSubscription(owner, "sam", samPhone);
+  await saveSubscription(owner, "sam", { ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" });
+  await saveSubscription(owner, "rose", rosePhone);
 
-  expect(await subscriptionsFor("sam")).toEqual([{ ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" }]);
-  expect(await subscriptionsFor("rose")).toEqual([rosePhone]);
+  expect(await subscriptionsFor(owner, "sam")).toEqual([{ ...samPhone, auth: "Kp0vR3tYq8wZ1sXc5nBm2A" }]);
+  expect(await subscriptionsFor(owner, "rose")).toEqual([rosePhone]);
 
   await forgetSubscription(samPhone.endpoint);
-  expect(await subscriptionsFor("sam")).toEqual([]);
-  expect(await subscriptionsFor("rose")).toEqual([rosePhone]);
+  expect(await subscriptionsFor(owner, "sam")).toEqual([]);
+  expect(await subscriptionsFor(owner, "rose")).toEqual([rosePhone]);
+});
+
+it("starts a household with household 1's saved PayPal, or with none, and finds it by either link's hash", async () => {
+  const bare = await startHousehold("rose-hash-0a1b", "sam-hash-0a1b");
+  expect(await getVault(bare)).toBeNull();
+
+  await saveVault(owner, "1j970427g9944212v");
+  const linked = await startHousehold("rose-hash-2c3d", "sam-hash-2c3d");
+  expect(linked).toBeGreaterThan(bare);
+  expect(await getVault(linked)).toBe("1j970427g9944212v");
+
+  expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: linked, person: "rose" });
+  expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: linked, person: "sam" });
+  expect(await findHousehold("rose-hash-ffff")).toBeNull();
+});
+
+it("keeps each household's asks, searches, limits, saved PayPal and phones apart", async () => {
+  await saveVault(owner, "1j970427g9944212v");
+  const ana = await startHousehold("rose-hash-ana", "sam-hash-ana");
+  const ben = await startHousehold("rose-hash-ben", "sam-hash-ben");
+
+  expect(await ask(ana, batteries)).toBe(true);
+  expect(await ask(ben, light)).toBe(true);
+  expect((await latest(ana))?.item.id).toBe("batteries");
+  expect((await latest(ben))?.item.id).toBe("prod_6Nl2tL");
+  expect(await latest(owner)).toBeNull();
+
+  await saveSearch(ana, "warm slippers", { outcome: "options", options: [strap] });
+  await setLimit(ana, 3000);
+  await setTotal(ana, 2000);
+  await saveSubscription(ana, "sam", samPhone);
+  await saveVault(ben, "8kf02113h7720954x");
+
+  expect(await getSearch(ben)).toBeNull();
+  expect(await getLimit(ben)).toBe(5000);
+  expect(await getTotal(ben)).toBeNull();
+  expect(await subscriptionsFor(ben, "sam")).toEqual([]);
+  expect(await subscriptionsFor(ana, "sam")).toEqual([samPhone]);
+  expect(await getVault(ana)).toBe("1j970427g9944212v");
+  expect(await getVault(ben)).toBe("8kf02113h7720954x");
+  expect(await getVault(owner)).toBe("1j970427g9944212v");
+});
+
+it("lets only a household's own Sam claim or decline its ask, and finds only its own stuck charge", async () => {
+  const ana = await startHousehold("rose-hash-ana", "sam-hash-ana");
+  const ben = await startHousehold("rose-hash-ben", "sam-hash-ben");
+  await ask(ana, glasses);
+  const { id } = (await latest(ana))!;
+
+  expect(await claim(ben, id)).toBeNull();
+  expect(await decline(ben, id)).toBeNull();
+  expect((await latest(ana))?.status).toBe("waiting");
+
+  expect((await claim(ana, id))?.household).toBe(ana);
+  await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${id}`);
+  expect(await stuck(ben)).toBeNull();
+  expect((await stuck(ana))?.id).toBe(id);
 });

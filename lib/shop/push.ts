@@ -29,17 +29,17 @@ export function parseSubscription(json: unknown): Subscription | null {
   return { endpoint, p256dh, auth };
 }
 
-export async function notify(person: Person, ping: Ping): Promise<void> {
+export async function notify(household: number, person: Person, ping: Ping): Promise<void> {
   if (!pushOn()) return;
   try {
-    const phones = await subscriptionsFor(person);
+    const phones = await subscriptionsFor(household, person);
     const results = await Promise.all(phones.map((phone) => send(person, phone, ping)));
     const count = (result: Sent) => results.filter((each) => each === result).length;
     console.log(
-      `push to=${person} phones=${phones.length} sent=${count("sent")} gone=${count("gone")} failed=${count("failed")}`,
+      `push household=${household} to=${person} phones=${phones.length} sent=${count("sent")} gone=${count("gone")} failed=${count("failed")}`,
     );
   } catch (error) {
-    console.log(`push to=${person} status=failed reason=${reasonOf(error)}`);
+    console.log(`push household=${household} to=${person} status=failed reason=${reasonOf(error)}`);
   }
 }
 

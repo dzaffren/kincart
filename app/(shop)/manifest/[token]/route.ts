@@ -3,10 +3,10 @@ import { whoIs } from "../../../../lib/shop/people";
 // Each secret link has its own manifest, so its Home Screen icon opens that link (D28).
 export async function GET(_request: Request, { params }: RouteContext<"/manifest/[token]">) {
   const { token } = await params;
-  const person = whoIs(token);
-  if (!person) return new Response(null, { status: 404 });
+  const who = await whoIs(token);
+  if (!who) return new Response(null, { status: 404 });
 
-  const page = `/${person === "rose" ? "r" : "h"}/${token}`;
+  const page = `/${who.person === "rose" ? "r" : "h"}/${token}`;
   return Response.json(
     {
       name: "KinCart",
