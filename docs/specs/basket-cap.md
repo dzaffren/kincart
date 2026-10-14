@@ -1,6 +1,6 @@
 # Basket cap
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** basket
@@ -260,9 +260,9 @@ Cut: a live running total on Rose's screen (scenario 2 tells Rose after the tap)
 | Scenario | Test | Command |
 | -------- | ---- | ------- |
 | 1 Sam sets, changes or clears | `requests.test.ts`: get and set round-trip, null clears, the check refuses $3. `actions.test.ts`: "40" saves 4000 and redirects `?total=saved`; "" clears; "3", "2501", "12.50" and "abc" redirect `?total=invalid` and keep $40; Rose's link saves nothing. `state.test.ts`: `totalCents` reaches the ask, options and basket states. e2e below | `pnpm test`, `pnpm test:e2e` |
-| 2 Over, then leave one out | `actions.test.ts`: with $40 saved, three basket picks at $47.47 redirect `?over=prod_3Ba7aA,prod_6Nl2tL,prod_2Ak5cH`, make no request and send no push; the same picks without the night light ask Sam for 2 things at $34.98. `state.test.ts`: `?over=` gives the three picks and 4747; an unknown id is skipped; a sum no longer over the total gives no notice. e2e below | `pnpm test`, `pnpm test:e2e` |
+| 2 Over, then leave one out | `actions.test.ts`: with $40 saved, three basket picks at $47.47 redirect `?over=prod_3Ba7aA,prod_6Nl2tL,prod_7Bk2wC`, make no request and send no push; the same picks without the night light ask Sam for 2 things at $34.98. `state.test.ts`: `?over=` gives the three picks and 4747; an unknown id is skipped; a sum no longer over the total gives no notice. e2e below | `pnpm test`, `pnpm test:e2e` |
 | 3 Counts everything at once | `actions.test.ts`: $40.00 exactly asks Sam; one option at $44.99 redirects `?over=` its id; with no total limit, $112.48 asks Sam | `pnpm test` |
-| O6 Pick errors on screen | e2e below. `e2e/approve-and-pay.spec.ts:79` still finds "Pick one first." | `pnpm test:e2e` |
+| O6 Pick errors on screen | e2e below. `e2e/approve-and-pay.spec.ts:79` now checks "Pick one first." is in the viewport (O7) | `pnpm test:e2e` |
 | Migration | `scripts/migrate.test.ts`: up, down, up | `pnpm test` |
 
 **E2E:** `e2e/basket-cap.spec.ts`, test "Rose's picks over Sam's total limit are stopped, and leaving one out reaches Sam". `reset()` seeds the saved PayPal and a basket search with AA batteries at $9.99, a night light at $12.49 and a phone charger at $24.99. Sam types 40 under "Total limit", taps that form's Save, and sees "Saved. Rose can ask for up to $40 at once." Rose's page shows "Sam's limit is $40 in all." Rose scrolls to Ask Sam and taps it with nothing picked, and "Pick at least one first." is in the viewport (O6). Rose picks one listing in each group, scrolls to Ask Sam and taps it. Then "That comes to $47.47. Sam's limit is $40 in all. Leave something out." is in the viewport, the three picks are still checked, and `purchase_requests` is empty. Rose picks "None of these" for the night light and taps Ask Sam. Rose's page says "Waiting for Sam", and Sam's says "Rose would like 2 things" with "OK, pay $34.98". It makes no charge and no Channel3 or Claude call. Stop `pnpm dev` before running it.
@@ -294,6 +294,8 @@ Recorded as D34, D35, D36.
 | O4 | The total limit counts a one-item ask too, and Sam's two limits stay independent. The other choice makes the total limit at least the price limit, so one item can never be over it, and both forms refuse a clash | question | spec p1 | user | Resolved | Yes: one check for any ask, and the two limits stay independent. 2026-10-14 |
 | O5 | Measured on the dev server: after Ask Sam, the page comes back scrolled to the top (`scrollY` 2264 to 0), so the red line approved above Ask Sam at pause 2 would be off screen. The over message moves to a grey notice at the top, where Rose lands | flag | spec p3 | user | Resolved | Notice at the top, as in the preview; the e2e checks it is in the viewport. 2026-10-14 |
 | O6 | Basket's shipped "Pick at least one first." and the options screen's "Pick one first." sit below the listings, so they are off screen after the same redirect. Fixing them means moving each to a notice at the top in `RoseView.tsx`, the file this slice already changes | question | spec p3 | user | Resolved | Fold it in: both move to a notice at the top in `RoseView.tsx`, and `ListingPicker` loses its `error` prop. 2026-10-14 |
+| O7 | O6's options-screen half has no test that failed first. `e2e/approve-and-pay.spec.ts:79`, tightened to `toBeInViewport()`, passed before the fix, because its three fixed items make a page that fits the screen | flag | build | user | Decided alone | Chose: move "Pick one first." to the top anyway, as O6 agreed, and keep the tighter check. Other: leave it under the listings until a real-length options page proves it off screen. Undo: put the line back in `ListingPicker` from b58324f. 2026-10-14 |
+| O8 | The feat and fix commits on this branch add no CHANGELOG line | flag | build | user | Decided alone | Chose: leave the lines to /ship, which wrote them for every earlier slice. Other: add them in each commit. Undo: add them in a docs commit. 2026-10-14 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
