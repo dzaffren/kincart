@@ -3,7 +3,7 @@
 **Status:** Approved · 2026-10-13 · /design-system pause A
 **Extension:** App icon · Approved · 2026-10-14 · for ping-helper (O8)
 **Extension:** Wide screens · Approved · 2026-10-15 · for demo-home (O5), D40
-**Extension:** Showcase · Draft, direction approved · 2026-10-15 · for demo-home (O10, O11, O12), D50
+**Extension:** Showcase · Approved · 2026-10-15 · for demo-home (O10, O11, O12), D50
 
 The one design system for Shop-together. Every slice composes from it; none adds its own tokens.
 
