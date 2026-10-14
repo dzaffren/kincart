@@ -319,63 +319,7 @@ Single chunk. The household argument runs through every file, and every test sha
 
 ### Decisions to record
 
-## D42 · 2026-10-15 · Each visitor starts a household of their own, with one secret link each for its Rose and Sam
-
-Why: in production every family is its own; judges sharing one pair see each other's asks and buzz each other's phones (demo-home O8). A link still opens on a phone with no account to make.
-Rejected: one shared pair with a Start over button (two judges at once still mix, and old phones buzz), Log in with PayPal (judges would need sandbox logins), a link plus a 4-digit PIN and real sign-in (as in D18: more steps and hours).
-Supersedes: D18
-Source: docs/specs/households.md
-Status: active
-
-## D43 · 2026-10-15 · Every household's people are Rose and Sam
-
-Why: the video and every page and push say Rose and Sam, and a judge tries KinCart with no form first (O2).
-Rejected: the visitor types two names (production-like, but one more step before a judge can try it).
-Source: docs/specs/households.md
-Status: active
-
-## D44 · 2026-10-15 · A browser remembers the household it started
-
-Why: a judge who closes the tabs gets back to their own Rose and Sam from the one URL (O3).
-Rejected: every visit to `/` starts fresh (the two links would be the only way back).
-Source: docs/specs/households.md
-Status: active
-
-## D45 · 2026-10-15 · The two links from before become the first household
-
-Why: the owner's phones, Home Screen icons, Rose's saved PayPal, the receipts and Sam's saved phone keep working, and so do CI's fixed links (O4).
-Rejected: retiring them (the owner re-adds the icons and turns notifications on again).
-Source: docs/specs/households.md
-Status: active
-
-## D46 · 2026-10-15 · Every table is split by household; the one-row tables' id becomes the household id
-
-Why: the change is expand only. Old code still writes `id` 1, which is household 1 (D45), so existing rows need no backfill, and a rollback deploy keeps working (scratch run, 2026-10-15). Sam's total limit stays its own table, and no row for a household means no total limit for it.
-Rejected: a `household_id` column beside `id` on the one-row tables (the primary key moves off `id`, so old code's `ON CONFLICT (id)` fails), a database for each household (Neon's free tier, and every query would pick a connection).
-Supersedes: D35
-Source: docs/specs/households.md
-Status: active
-
-## D47 · 2026-10-15 · Household links are stored as SHA-256 hashes; household 1's stay in Vercel's env
-
-Why: a leaked table must not hand out links that act as Rose or Sam (O6). The browser's cookie brings the links back to `/` (D44), so nothing needs the plain token.
-Rejected: tokens in plain text (a database leak gives every link), copying household 1's env links into the table (a second copy of a secret, and a one-off script).
-Source: docs/specs/households.md
-Status: active
-
-## D48 · 2026-10-15 · A new household starts with a copy of household 1's saved PayPal
-
-Why: a judge meets no PayPal login (scenario 1), and the vault the owner keeps linked is the one every judge pays from.
-Rejected: a vault id in a new env setting (one more value to keep in step with the vault), a PayPal login for each household (judges would need sandbox logins).
-Source: docs/specs/households.md
-Status: active
-
-## D49 · 2026-10-15 · A migration file drops an index that a later migration replaces
-
-Why: `db:up` reruns every up file, and 0002's global open-ask index cannot be built again once two households have open asks ("could not create unique index" on the scratch run).
-Rejected: leaving 0002 as it is and dropping the index in 0007 (the next `db:up` fails at 0002), a table of applied migrations (a new runner for one index).
-Source: docs/specs/households.md
-Status: active
+Recorded as D42, D43, D44, D45, D46, D47, D48 and D49.
 
 ## Open items
 
