@@ -1,9 +1,10 @@
 import { useId, type ReactNode } from "react";
 import type { Item } from "../../lib/shop/items";
 import type { Source } from "../../lib/shop/requests";
+import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Line, type Receipt } from "./ui";
+import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Line, type Receipt } from "./ui";
 
 export type SamState =
   | { kind: "nothing"; declined?: Item; lines?: Line[] }
@@ -18,22 +19,24 @@ type Action = (formData: FormData) => void | Promise<void>;
 type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action; notify?: ReactNode };
 
 export function SamView({ state, answer, limit, setLimit, notify }: Props) {
-  if (state.kind === "request") {
-    const { found, lines } = state;
+  if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
-        {lines ? (
-          <BasketRequest lines={lines} cents={state.item.cents} />
-        ) : (
-          <>
-            <h1>{found ? `${RELATIVE} would like this` : `${RELATIVE} would like ${state.item.name}`}</h1>
-            <Summary
-              title={found && state.item.name}
-              cents={state.item.cents}
-              note={`${found ? `From ${found.shop}. ` : ""}Paid from ${RELATIVE}'s PayPal if you say OK.`}
-            />
-          </>
-        )}
+        <BasketAnswer lines={state.lines} askedAt={state.askedAt} answer={answer} busy={state.busy} />
+      </div>
+    );
+  }
+
+  if (state.kind === "request") {
+    const { found } = state;
+    return (
+      <div className="screen">
+        <h1>{found ? `${RELATIVE} would like this` : `${RELATIVE} would like ${state.item.name}`}</h1>
+        <Summary
+          title={found && state.item.name}
+          cents={state.item.cents}
+          note={`${found ? `From ${found.shop}. ` : ""}Paid from ${RELATIVE}'s PayPal if you say OK.`}
+        />
         {found && (
           <div className="heading">
             <p>
@@ -74,39 +77,18 @@ export function SamView({ state, answer, limit, setLimit, notify }: Props) {
   );
 }
 
-function BasketRequest({ lines, cents }: { lines: Line[]; cents: number }) {
-  return (
-    <>
-      <h1>
-        {RELATIVE} would like {lines.length} things
-      </h1>
-      <Summary title="In total" cents={cents} note={`Paid from ${RELATIVE}'s PayPal if you say OK.`} />
-      <ul className="lines">
-        {lines.map((line) => (
-          <li className="line" key={line.id}>
-            <p className="listing-name">{line.name}</p>
-            <p>
-              <span className="option-price">{money(line.cents)}</span> <span className="small">at {line.shop}</span>
-            </p>
-            <p>
-              <strong>Why it fits:</strong> {line.reason}
-            </p>
-            <a className="link" href={line.url} target="_blank" rel="noopener noreferrer">
-              See it on {line.shop}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
-
 function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }) {
   if (state.kind === "paid") {
     return (
       <>
         <h1>Paid from {RELATIVE}&apos;s PayPal</h1>
         <ReceiptCard receipt={state.receipt} />
+        {state.receipt.leftOut && (
+          <Notice tone="neutral">
+            You left out {listed(state.receipt.leftOut)}. {RELATIVE} can ask for{" "}
+            {state.receipt.leftOut.length > 1 ? "them" : "it"} again.
+          </Notice>
+        )}
         <p className="small">{RELATIVE} sees this receipt too.</p>
       </>
     );

@@ -7,9 +7,10 @@ import { LocalTime } from "./LocalTime";
 export const RELATIVE = "Rose";
 export const HELPER = "Sam";
 
-export type Line = Item & Source;
+// thing is what Rose called it, such as "a night light"; name is the listing's own.
+export type Line = Item & Source & { thing: string };
 
-export type Receipt = { item: Item; paidAt: Date; transactionId: string; lines?: Line[] };
+export type Receipt = { item: Item; paidAt: Date; transactionId: string; lines?: Line[]; leftOut?: string[] };
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
@@ -19,6 +20,12 @@ export function money(cents: number): string {
 
 export function wholeDollars(cents: number): string {
   return `$${Math.floor(cents / 100)}`;
+}
+
+const and = new Intl.ListFormat("en-US");
+
+export function listed(words: string[]): string {
+  return and.format(words);
 }
 
 export function Notice({ tone, children }: { tone: "wait" | "danger" | "neutral"; children: ReactNode }) {

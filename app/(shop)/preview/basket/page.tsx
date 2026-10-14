@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { BasketAnswer } from "../../BasketAnswer";
 import { RoseView, type Group } from "../../RoseView";
 import { SamView } from "../../SamView";
 import type { Option } from "../../../../lib/shop/find";
@@ -98,19 +99,27 @@ const chargers: Option[] = [
 
 const groups: Group[] = [
   { thing: "AA batteries", options: batteries },
-  { thing: "A night light", options: nightLights },
-  { thing: "A phone charger", options: chargers },
+  { thing: "a night light", options: nightLights },
+  { thing: "a phone charger", options: chargers },
 ];
 
 const mixedWords = "AA batteries, a tablet for video calls and a left-handed teapot for a cat";
 const mixed: Group[] = [
   { thing: "AA batteries", options: batteries },
-  { thing: "A tablet for video calls", options: [], problem: "over limit" },
-  { thing: "A left-handed teapot for a cat", options: [], problem: "nothing found" },
+  { thing: "a tablet for video calls", options: [], problem: "over limit" },
+  { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found" },
 ];
 
-const lineOf = ({ id, name, cents, shop, url, why }: Option): Line => ({ id, name, cents, shop, url, reason: why });
-const lines = [lineOf(batteries[0]), lineOf(nightLights[0])];
+const lineOf = (thing: string, { id, name, cents, shop, url, why }: Option): Line => ({
+  id,
+  name,
+  cents,
+  shop,
+  url,
+  reason: why,
+  thing,
+});
+const lines = [lineOf("AA batteries", batteries[0]), lineOf("a night light", nightLights[0])];
 const basket = { id: "basket", name: "2 things", cents: 2248 };
 const askedAt = new Date("2026-10-20T10:15:00");
 const receipt: Receipt = {
@@ -119,6 +128,7 @@ const receipt: Receipt = {
   paidAt: new Date("2026-10-20T10:16:00"),
   transactionId: "7KT20419UA331082M",
 };
+const trimmed: Receipt = { ...receipt, item: { ...basket, cents: 999 }, lines: [lines[0]], leftOut: ["a night light"] };
 const limit = { cents: 5000 };
 
 export default function BasketPreview() {
@@ -178,8 +188,14 @@ export default function BasketPreview() {
           <Frame label="Waiting for Sam (scenario 2)">
             <RoseView state={{ kind: "waiting", item: basket, askedAt, lines }} items={[]} />
           </Frame>
-          <Frame label="Paid (scenario 2)">
+          <Frame label="Paid for all (scenario 5)">
             <RoseView state={{ kind: "paid", receipt }} items={[]} />
+          </Frame>
+          <Frame label="Paid, the night light left out (scenario 2)">
+            <RoseView state={{ kind: "paid", receipt: trimmed }} items={[]} />
+          </Frame>
+          <Frame label="Ask for something else: the night light is back (scenario 2)">
+            <RoseView state={{ kind: "ask", limitCents: 5000, words: "a night light" }} items={[]} />
           </Frame>
           <Frame label="Sam said no (scenario 5)">
             <RoseView
@@ -199,14 +215,29 @@ export default function BasketPreview() {
       <section className="preview-section">
         <h2>Sam&apos;s phone</h2>
         <div className="frames">
-          <Frame label="Rose asks for 2 things (scenario 2)">
+          <Frame label="Rose asks for 2 things, both ticked (scenario 2)">
             <SamView state={{ kind: "request", item: basket, askedAt, lines }} />
           </Frame>
-          <Frame label="Paying">
-            <SamView state={{ kind: "request", item: basket, askedAt, lines, busy: true }} />
+          <Frame label="Night light unticked (scenario 2)">
+            <div className="screen">
+              <BasketAnswer lines={lines} askedAt={askedAt} unticked={["light-plug"]} />
+            </div>
           </Frame>
-          <Frame label="Paid (scenario 2)">
+          <Frame label="Both unticked (O11)">
+            <div className="screen">
+              <BasketAnswer lines={lines} askedAt={askedAt} unticked={["aa-24", "light-plug"]} />
+            </div>
+          </Frame>
+          <Frame label="Paying for the batteries">
+            <div className="screen">
+              <BasketAnswer lines={lines} askedAt={askedAt} unticked={["light-plug"]} busy />
+            </div>
+          </Frame>
+          <Frame label="Paid for all (scenario 5)">
             <SamView state={{ kind: "paid", receipt }} limit={limit} />
+          </Frame>
+          <Frame label="Paid, the night light left out (scenario 2)">
+            <SamView state={{ kind: "paid", receipt: trimmed }} limit={limit} />
           </Frame>
           <Frame label="Said no (scenario 5)">
             <SamView state={{ kind: "nothing", declined: basket, lines }} limit={limit} />

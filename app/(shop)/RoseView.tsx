@@ -6,6 +6,7 @@ import { LocalTime } from "./LocalTime";
 import {
   HELPER,
   ItemPicker,
+  listed,
   ListingPicker,
   Notice,
   ReceiptCard,
@@ -243,6 +244,11 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
       <div className="screen">
         <h1>{HELPER} said OK. It&apos;s paid.</h1>
         <ReceiptCard receipt={state.receipt} />
+        {state.receipt.leftOut && (
+          <Notice tone="neutral">
+            {HELPER} left out {listed(state.receipt.leftOut)}.
+          </Notice>
+        )}
         <a className="button button-secondary" href="?ask=1">
           Ask for something else
         </a>

@@ -27,7 +27,7 @@ flowchart LR
     S1 -- "pending requests" --> S3["3 ping-helper"]
 ```
 
-Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in slice 2. Slices 3 and 5 to 7 get built only if time is left. Slice 4 was dropped.
+Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in slice 2. Slices 3, 5 and 7 get built only if time is left. Slice 4 was dropped, and slice 6 went into slice 5.
 
 | # | Slice | What ships | Why this order |
 |---|-------|-----------|----------------|
@@ -37,7 +37,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 3 | `ping-helper` | A new request reaches your phone as a notification, so you don't have to keep the page open. | Only if time is left. Makes "approve from afar" real on video. |
 | 4 | ~~`ask-by-voice`~~ | Dropped at `/spec ask-by-voice`, 2026-10-14. | The phone keyboard's mic key already lets the relative say what they need into slice 2's box. |
 | 5 | `basket` | The relative asks for several things at once, such as batteries, a night light and a charger. You approve the list once and one total is charged. | Only if time is left. Found at `/spec find-and-explain`: a request is one item today. |
-| 6 | `basket-trim` | You untick things in the relative's basket and pay for the rest. | Only if time is left. Split from `basket` at `/spec basket`. |
+| 6 | ~~`basket-trim`~~ | Folded back into `basket` at its pause 2, 2026-10-14. | You untick things and pay for the rest; unticked things go back to the relative. |
 | 7 | `basket-cap` | You set a total cap for one basket, such as $100. | Only if time is left. Split from `basket` at `/spec basket`. |
 
 ## Not doing
