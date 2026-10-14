@@ -1,6 +1,6 @@
 # Households
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** basket-cap
@@ -211,6 +211,8 @@ Ana's household never enters Ben's path: every read and write carries 17, and An
 | `app/(shop)/HomeView.tsx`, `preview/households/page.tsx`, `.home-mark` in `shop.css` | As built at pause 2 | 1, 3 |
 | `e2e/db.ts:14` | `reset()` also deletes households other than 1, after their rows | 1 to 4 |
 | `e2e/households.spec.ts` (new) | The e2e below | 1, 2, 3 |
+
+Also changed for the new signatures: `app/(shop)/state.test.ts` and `app/(shop)/r/[token]/linked/route.test.ts`.
 
 No change: `public/sw.js` (a push still opens its own scope's link), `NotifyControl.tsx`, `state.ts`, `RoseView.tsx`, `SamView.tsx`, `find.ts`, `paypal.ts`, `.github/workflows/ci.yml` (CI's env links are household 1), `package.json`.
 
