@@ -461,3 +461,48 @@ body {
   border-width: 0 var(--border-selected) var(--border-selected) 0;
   transform: rotate(45deg);
 }
+
+/* Home: one column on a phone; on a wide screen, Rose's and Sam's real pages side by side. */
+.home-mark {
+  width: var(--space-16);
+  height: var(--space-16);
+}
+
+.home-phones {
+  display: none;
+}
+
+@media (min-width: 880px) and (min-height: 480px) {
+  .home {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-8);
+    padding-bottom: var(--space-12);
+  }
+
+  .home-intro {
+    padding-bottom: 0;
+  }
+
+  .home-ways {
+    display: none;
+  }
+
+  .home-phones {
+    display: flex;
+    gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1280px) and (min-height: 480px) {
+  .home {
+    grid-template-columns: minmax(0, var(--page-max)) max-content;
+    justify-content: center;
+    align-items: start;
+    padding: var(--space-8) var(--page-inline);
+  }
+
+  .home-intro {
+    padding: 0;
+  }
+}
