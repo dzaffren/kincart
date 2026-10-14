@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Updated:** 2026-10-13 by /ship find-and-explain (shipped)
+**Status:** Active · **Updated:** 2026-10-14 by /ship ping-helper
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -20,8 +20,9 @@ Used by older shoppers and the relative who helps them pay online.
 
 - `app/status/` — the `/status` page and its view.
 - `lib/status/` — the database, PayPal and build checks.
-- `app/(shop)/` — Rose's page `/r/<link>`, Sam's page `/h/<link>`, the PayPal return route, and the views they share.
-- `lib/shop/` — the link check, PayPal vault and charge calls, Channel3 search and Claude Haiku calls behind Rose's Find, request, search and price-limit storage, and `pay()`.
+- `app/(shop)/` — Rose's page `/r/<link>`, Sam's page `/h/<link>`, the PayPal return route, each link's manifest, the notifications control, and the views they share.
+- `lib/shop/` — the link check, PayPal vault and charge calls, Channel3 search and Claude Haiku calls behind Rose's Find, request, search, price-limit and phone storage, `pay()`, and the pushes to saved phones.
+- `public/` — `sw.js`, the service worker that shows a push and opens the link on tap, and the KinCart icons.
 - `docs/design/design-system/` — the design tokens the shop pages load.
 - `db/migrations/` and `scripts/migrate.mjs` — plain SQL migrations and the runner.
 - `e2e/` — Playwright tests.
@@ -34,6 +35,7 @@ Used by older shoppers and the relative who helps them pay online.
 | skeleton | Shipped | A `/status` page that says plainly whether the database and the PayPal sandbox keys work, and which build is live. | docs/specs/skeleton.md |
 | approve-and-pay | Shipped | Rose links their sandbox PayPal once and picks one of three items. Sam taps OK or No on their own phone, and an OK charges Rose's saved PayPal and shows both of them a receipt. | docs/specs/approve-and-pay.md |
 | find-and-explain | Shipped | Rose types what they need in plain words, and AI shows up to three real listings under Sam's price limit, each explained plainly. Rose's pick goes to Sam, who sees why it fits and a link to the listing. | docs/specs/find-and-explain.md |
+| ping-helper | Built | Sam's phone buzzes when Rose asks for something, and Rose's phone buzzes when Sam answers, so neither has to keep their page open. | docs/specs/ping-helper.md |
 
 ## More
 
