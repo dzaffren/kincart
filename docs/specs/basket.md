@@ -445,3 +445,4 @@ _Never delete this section or its rows. See references/ledger.md._
 - **jsonb**: a Postgres column that holds a JSON value, such as a list of lines.
 - **Purchase unit**: one amount inside a PayPal order; a basket's order has one, for the ticked total.
 - **429**: the HTTP answer "too many requests", sent when a service rate-limits a caller.
+- **Backfill**: filling a new column for rows that already exist; this slice has none to fill.
