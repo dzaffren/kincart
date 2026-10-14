@@ -22,17 +22,19 @@ export async function generateMetadata({ params }: PageProps<"/h/[token]">): Pro
 export default async function SamPage({ params, searchParams }: PageProps<"/h/[token]">) {
   await connection();
   const { token } = await params;
-  if (whoIs(token) !== "sam") notFound();
+  const who = await whoIs(token);
+  if (who?.person !== "sam") notFound();
+  const { household } = who;
 
   const query = await searchParams;
 
-  const settled = await settleStuck();
+  const settled = await settleStuck(household);
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
   const [request, limitCents, totalCents] = await Promise.all([
-    latest(),
-    on ? getLimit() : null,
-    on ? getTotal() : null,
+    latest(household),
+    on ? getLimit(household) : null,
+    on ? getTotal(household) : null,
   ]);
   const limit =
     limitCents === null

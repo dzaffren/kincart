@@ -438,3 +438,8 @@ body {
   border-width: 0 var(--border-selected) var(--border-selected) 0;
   transform: rotate(45deg);
 }
+
+.home-mark {
+  width: var(--space-16);
+  height: var(--space-16);
+}

@@ -10,6 +10,7 @@ const answeredAt = new Date("2026-10-20T10:16:00Z");
 function request(status: RequestStatus, item = glasses): PurchaseRequest {
   return {
     id: 12,
+    household: 1,
     item,
     found: null,
     status,

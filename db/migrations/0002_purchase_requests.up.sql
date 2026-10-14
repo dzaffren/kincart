@@ -17,6 +17,3 @@ CREATE TABLE IF NOT EXISTS purchase_requests (
   paypal_capture_id text,
   failure_reason text
 );
-
-CREATE UNIQUE INDEX IF NOT EXISTS purchase_requests_one_open
-  ON purchase_requests ((true)) WHERE status IN ('waiting', 'paying');

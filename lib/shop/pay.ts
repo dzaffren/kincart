@@ -4,7 +4,7 @@ import { getVault, record, stuck, type PurchaseRequest } from "./requests";
 export type PayResult = "paid" | "refused" | "unknown";
 
 export async function pay(request: PurchaseRequest): Promise<PayResult> {
-  const vaultId = await getVault();
+  const vaultId = await getVault(request.household);
   const result = vaultId
     ? await charge(vaultId, request.item, `purchase-${request.id}-${request.askedAt.getTime()}`)
     : ({ state: "refused", reason: "not linked" } as const);
@@ -18,7 +18,7 @@ export async function pay(request: PurchaseRequest): Promise<PayResult> {
   return (await record(request.id, result)) ? result.state : "unknown";
 }
 
-export async function settleStuck(): Promise<{ request: PurchaseRequest; result: PayResult } | null> {
-  const request = await stuck();
+export async function settleStuck(household: number): Promise<{ request: PurchaseRequest; result: PayResult } | null> {
+  const request = await stuck(household);
   return request ? { request, result: await pay(request) } : null;
 }

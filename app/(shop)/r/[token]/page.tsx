@@ -26,18 +26,20 @@ export async function generateMetadata({ params }: PageProps<"/r/[token]">): Pro
 export default async function RosePage({ params, searchParams }: PageProps<"/r/[token]">) {
   await connection();
   const { token } = await params;
-  if (whoIs(token) !== "rose") notFound();
+  const who = await whoIs(token);
+  if (who?.person !== "rose") notFound();
+  const { household } = who;
   const query = await searchParams;
 
-  const settled = await settleStuck();
+  const settled = await settleStuck(household);
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
   const [vault, request, saved, limitCents, totalCents] = await Promise.all([
-    getVault(),
-    latest(),
-    on ? getSearch() : null,
-    on ? getLimit() : 0,
-    on ? getTotal() : null,
+    getVault(household),
+    latest(household),
+    on ? getSearch(household) : null,
+    on ? getLimit(household) : 0,
+    on ? getTotal(household) : null,
   ]);
   const state = roseState(
     vault,

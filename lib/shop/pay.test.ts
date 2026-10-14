@@ -6,6 +6,7 @@ import { pay, settleStuck } from "./pay";
 import { ask, claim, latest, saveVault } from "./requests";
 
 const glasses = ITEMS[0];
+const owner = 1;
 
 async function sql(text: string) {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -37,8 +38,8 @@ const completed = () =>
   );
 
 async function claimedGlasses() {
-  await ask(glasses);
-  return (await claim((await latest())!.id))!;
+  await ask(owner, glasses);
+  return (await claim(owner, (await latest(owner))!.id))!;
 }
 
 beforeAll(async () => {
@@ -59,27 +60,27 @@ afterEach(() => {
 });
 
 it("charges Rose's saved PayPal and records the receipt", async () => {
-  await saveVault("1j970427g9944212v");
+  await saveVault(owner, "1j970427g9944212v");
   stubOrders(completed);
 
   expect(await pay(await claimedGlasses())).toBe("paid");
 
-  expect(await latest()).toMatchObject({ status: "paid", captureId: "7BM91101S1572292D" });
+  expect(await latest(owner)).toMatchObject({ status: "paid", captureId: "7BM91101S1572292D" });
   expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^purchase id=\d+ item=glasses status=paid capture=7BM91101S1572292D$/));
 });
 
 it("leaves an unknown charge paying, then settles it with the same request id", async () => {
-  await saveVault("1j970427g9944212v");
+  await saveVault(owner, "1j970427g9944212v");
   const fetch = stubOrders(() => new Response("", { status: 503 }), completed);
   const request = await claimedGlasses();
 
   expect(await pay(request)).toBe("unknown");
-  expect((await latest())?.status).toBe("paying");
-  expect(await settleStuck()).toBeNull();
+  expect((await latest(owner))?.status).toBe("paying");
+  expect(await settleStuck(owner)).toBeNull();
 
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${request.id}`);
-  expect(await settleStuck()).toMatchObject({ request: { id: request.id, item: glasses }, result: "paid" });
-  expect((await latest())?.status).toBe("paid");
+  expect(await settleStuck(owner)).toMatchObject({ request: { id: request.id, item: glasses }, result: "paid" });
+  expect((await latest(owner))?.status).toBe("paid");
 
   const ids = (fetch.mock.calls as unknown as [string, RequestInit][])
     .filter(([url]) => url.endsWith("/v2/checkout/orders"))
@@ -89,17 +90,17 @@ it("leaves an unknown charge paying, then settles it with the same request id", 
 });
 
 it("reports a payment only from the call that recorded it, so two overlapping settles ping Rose once", async () => {
-  await saveVault("1j970427g9944212v");
+  await saveVault(owner, "1j970427g9944212v");
   stubOrders(completed, completed);
   const request = await claimedGlasses();
 
   expect(await pay(request)).toBe("paid");
   expect(await pay(request)).toBe("unknown");
-  expect((await latest())?.status).toBe("paid");
+  expect((await latest(owner))?.status).toBe("paid");
 });
 
 it("sends a new request id when a fresh database reuses a request's number", async () => {
-  await saveVault("1j970427g9944212v");
+  await saveVault(owner, "1j970427g9944212v");
   const fetch = stubOrders(completed, completed);
 
   await sql("TRUNCATE purchase_requests RESTART IDENTITY");
@@ -121,6 +122,6 @@ it("fails the request when no PayPal is saved, without calling PayPal", async ()
 
   expect(await pay(await claimedGlasses())).toBe("refused");
 
-  expect(await latest()).toMatchObject({ status: "failed", failureReason: "not linked" });
+  expect(await latest(owner)).toMatchObject({ status: "failed", failureReason: "not linked" });
   expect(fetch).not.toHaveBeenCalled();
 });

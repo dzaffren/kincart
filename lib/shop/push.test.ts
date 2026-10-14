@@ -3,11 +3,12 @@ import webpush from "web-push";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { notify, parseSubscription } from "./push";
-import { saveSubscription, subscriptionsFor } from "./requests";
+import { saveSubscription, startHousehold, subscriptionsFor } from "./requests";
 
 vi.mock("web-push", () => ({ default: { sendNotification: vi.fn() } }));
 
 const send = vi.mocked(webpush.sendNotification);
+const owner = 1;
 
 const keys = {
   p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
@@ -34,7 +35,9 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("DELETE FROM push_subscriptions");
+  await client.query(
+    "TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1",
+  );
   await client.end();
   vi.stubEnv("VAPID_PUBLIC_KEY", "vapid-test-public-key");
   vi.stubEnv("VAPID_PRIVATE_KEY", "vapid-test-private-key");
@@ -49,12 +52,12 @@ afterEach(() => {
 });
 
 it("sends one encrypted push to each of Sam's phones and none to Rose's", async () => {
-  await saveSubscription("sam", samAndroid);
-  await saveSubscription("sam", samFirefox);
-  await saveSubscription("rose", roseIphone);
+  await saveSubscription(owner, "sam", samAndroid);
+  await saveSubscription(owner, "sam", samFirefox);
+  await saveSubscription(owner, "rose", roseIphone);
   send.mockResolvedValue(pushed);
 
-  await notify("sam", asked);
+  await notify(owner, "sam", asked);
 
   expect(send).toHaveBeenCalledTimes(2);
   expect(send).toHaveBeenCalledWith({ endpoint: samAndroid.endpoint, keys }, JSON.stringify(asked), {
@@ -71,44 +74,56 @@ it("sends one encrypted push to each of Sam's phones and none to Rose's", async 
     samAndroid.endpoint,
     samFirefox.endpoint,
   ]);
-  expect(console.log).toHaveBeenCalledWith("push to=sam phones=2 sent=2 gone=0 failed=0");
+  expect(console.log).toHaveBeenCalledWith("push household=1 to=sam phones=2 sent=2 gone=0 failed=0");
+});
+
+it("sends only to the phones of the household it's for", async () => {
+  const ben = await startHousehold("rose-hash-ben", "sam-hash-ben");
+  await saveSubscription(owner, "sam", samAndroid);
+  await saveSubscription(ben, "sam", samTablet);
+  send.mockResolvedValue(pushed);
+
+  await notify(ben, "sam", asked);
+
+  expect(send.mock.calls.map(([subscription]) => subscription.endpoint)).toEqual([samTablet.endpoint]);
+  expect(console.log).toHaveBeenCalledWith(`push household=${ben} to=sam phones=1 sent=1 gone=0 failed=0`);
 });
 
 it("forgets a phone its push service says is gone, keeps one that failed, and still sends to the rest", async () => {
-  await saveSubscription("sam", samAndroid);
-  await saveSubscription("sam", samFirefox);
-  await saveSubscription("sam", samTablet);
+  await saveSubscription(owner, "sam", samAndroid);
+  await saveSubscription(owner, "sam", samFirefox);
+  await saveSubscription(owner, "sam", samTablet);
   send.mockImplementation(async ({ endpoint }) => {
     if (endpoint === samAndroid.endpoint) throw refusedWith(410);
     if (endpoint === samFirefox.endpoint) throw refusedWith(500);
     return pushed;
   });
 
-  await expect(notify("sam", asked)).resolves.toBeUndefined();
+  await expect(notify(owner, "sam", asked)).resolves.toBeUndefined();
 
   expect(send).toHaveBeenCalledTimes(3);
-  expect(await subscriptionsFor("sam")).toEqual([samFirefox, samTablet]);
+  expect(await subscriptionsFor(owner, "sam")).toEqual([samFirefox, samTablet]);
   expect(console.log).toHaveBeenCalledWith("push to=sam host=updates.push.services.mozilla.com status=failed reason=500");
-  expect(console.log).toHaveBeenCalledWith("push to=sam phones=3 sent=1 gone=1 failed=1");
+  expect(console.log).toHaveBeenCalledWith("push household=1 to=sam phones=3 sent=1 gone=1 failed=1");
 });
 
 it("forgets a phone on a 404 too", async () => {
-  await saveSubscription("rose", roseIphone);
+  await saveSubscription(owner, "rose", roseIphone);
   send.mockRejectedValue(refusedWith(404));
 
-  await notify("rose", asked);
+  await notify(owner, "rose", asked);
 
-  expect(await subscriptionsFor("rose")).toEqual([]);
-  expect(console.log).toHaveBeenCalledWith("push to=rose phones=1 sent=0 gone=1 failed=0");
+  expect(await subscriptionsFor(owner, "rose")).toEqual([]);
+  expect(console.log).toHaveBeenCalledWith("push household=1 to=rose phones=1 sent=0 gone=1 failed=0");
 });
 
 it("sends and reads nothing unless all three VAPID variables are set", async () => {
-  await saveSubscription("sam", samAndroid);
+  await saveSubscription(owner, "sam", samAndroid);
 
   for (const name of ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT"]) {
     const value = process.env[name];
     vi.stubEnv(name, "");
-    await notify("sam", asked);
+    await notify(owner, "sam", asked);
     vi.stubEnv(name, value);
   }
 
@@ -119,10 +134,10 @@ it("sends and reads nothing unless all three VAPID variables are set", async () 
 it("never throws, even when the database can't be reached", async () => {
   vi.stubEnv("DATABASE_URL", "postgres://postgres@127.0.0.1:1/none");
 
-  await expect(notify("sam", asked)).resolves.toBeUndefined();
+  await expect(notify(owner, "sam", asked)).resolves.toBeUndefined();
 
   expect(send).not.toHaveBeenCalled();
-  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^push to=sam status=failed reason=\S+/));
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^push household=1 to=sam status=failed reason=\S+/));
 });
 
 it("trusts a subscription only from a known push service, over https, with well-formed keys", () => {

@@ -53,7 +53,7 @@ it("saves Rose's PayPal from the setup token cookie and sends Rose back", async 
   expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe(`http://localhost:3000/r/${rose}`);
   expect(response.headers.get("set-cookie")).toMatch(/^setup_token=; Path=\/r\/rose-link-4f9c2a7e; .*Max-Age=0/);
-  expect(await getVault()).toBe("1j970427g9944212v");
+  expect(await getVault(1)).toBe("1j970427g9944212v");
 });
 
 it("says not linked when PayPal won't turn the setup token into a saved PayPal", async () => {
@@ -62,7 +62,7 @@ it("says not linked when PayPal won't turn the setup token into a saved PayPal",
   const response = await returnFromPaypal(rose, "setup_token=4RV72937BH429471C");
 
   expect(response.headers.get("location")).toBe(`http://localhost:3000/r/${rose}?cancelled=1`);
-  expect(await getVault()).toBeNull();
+  expect(await getVault(1)).toBeNull();
 });
 
 it("says not linked when the cookie is gone, without calling PayPal", async () => {

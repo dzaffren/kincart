@@ -12,6 +12,7 @@ export type Line = Item & Source & { thing: string };
 
 export type PurchaseRequest = {
   id: number;
+  household: number;
   item: Item;
   found: Source | null;
   status: RequestStatus;
@@ -30,6 +31,7 @@ export type Outcome =
 
 type Row = {
   id: string;
+  household_id: string;
   item_id: string;
   item_name: string;
   amount_cents: number;
@@ -58,32 +60,60 @@ export type SavedSearch = {
 
 const DEFAULT_LIMIT_CENTS = 5000;
 
-export async function getVault(): Promise<string | null> {
-  const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = 1");
+// One statement, so a household never exists without the copy of household 1's saved PayPal (D48).
+export async function startHousehold(roseHash: string, samHash: string): Promise<number> {
+  const rows = await query<{ id: string }>(
+    `WITH household AS (INSERT INTO households (rose_hash, sam_hash) VALUES ($1, $2) RETURNING id),
+     vault AS (
+       INSERT INTO paypal_vault (id, payment_token)
+       SELECT household.id, payment_token FROM household, paypal_vault WHERE paypal_vault.id = 1
+     )
+     SELECT id FROM household`,
+    [roseHash, samHash],
+  );
+  return Number(rows[0].id);
+}
+
+export async function findHousehold(hash: string): Promise<{ household: number; person: Person } | null> {
+  const rows = await query<{ id: string; rose: boolean }>(
+    "SELECT id, rose_hash = $1 AS rose FROM households WHERE rose_hash = $1 OR sam_hash = $1",
+    [hash],
+  );
+  return rows[0] ? { household: Number(rows[0].id), person: rows[0].rose ? "rose" : "sam" } : null;
+}
+
+// The one-row tables' id is the household's id (D46).
+export async function getVault(household: number): Promise<string | null> {
+  const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = $1", [
+    household,
+  ]);
   return rows[0]?.payment_token ?? null;
 }
 
-export async function saveVault(paymentToken: string): Promise<void> {
+export async function saveVault(household: number, paymentToken: string): Promise<void> {
   await query(
-    `INSERT INTO paypal_vault (id, payment_token) VALUES (1, $1)
+    `INSERT INTO paypal_vault (id, payment_token) VALUES ($1, $2)
      ON CONFLICT (id) DO UPDATE SET payment_token = EXCLUDED.payment_token, linked_at = now()`,
-    [paymentToken],
+    [household, paymentToken],
   );
 }
 
-export async function latest(): Promise<PurchaseRequest | null> {
-  const rows = await query<Row>("SELECT * FROM purchase_requests ORDER BY id DESC LIMIT 1");
+export async function latest(household: number): Promise<PurchaseRequest | null> {
+  const rows = await query<Row>("SELECT * FROM purchase_requests WHERE household_id = $1 ORDER BY id DESC LIMIT 1", [
+    household,
+  ]);
   return rows[0] ? toRequest(rows[0]) : null;
 }
 
-// A second ask while one is open hits purchase_requests_one_open and is dropped.
-export async function ask(item: Item, source?: Source, lines?: Line[]): Promise<boolean> {
+// A second ask while one is open hits purchase_requests_one_open_per_household and is dropped.
+export async function ask(household: number, item: Item, source?: Source, lines?: Line[]): Promise<boolean> {
   const rows = await query(
-    `INSERT INTO purchase_requests (item_id, item_name, amount_cents, shop, listing_url, reason, lines)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO purchase_requests (household_id, item_id, item_name, amount_cents, shop, listing_url, reason, lines)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      ON CONFLICT DO NOTHING
      RETURNING id`,
     [
+      household,
       item.id,
       item.name,
       item.cents,
@@ -96,27 +126,28 @@ export async function ask(item: Item, source?: Source, lines?: Line[]): Promise<
   return rows.length === 1;
 }
 
-export async function getSearch(): Promise<SavedSearch | null> {
+export async function getSearch(household: number): Promise<SavedSearch | null> {
   const rows = await query<{
     words: string;
     outcome: SavedSearch["outcome"];
     listings: Option[];
     groups: Group[];
     searched_at: Date;
-  }>("SELECT words, outcome, listings, groups, searched_at FROM rose_search WHERE id = 1");
+  }>("SELECT words, outcome, listings, groups, searched_at FROM rose_search WHERE id = $1", [household]);
   const row = rows[0];
   return row
     ? { words: row.words, outcome: row.outcome, options: row.listings, groups: row.groups, searchedAt: row.searched_at }
     : null;
 }
 
-export async function saveSearch(words: string, result: Search | { outcome: "retry" }): Promise<void> {
+export async function saveSearch(household: number, words: string, result: Search | { outcome: "retry" }): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups) VALUES (1, $1, $2, $3, $4)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups) VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
          searched_at = now()`,
     [
+      household,
       words,
       result.outcome,
       JSON.stringify(result.outcome === "options" ? result.options : []),
@@ -125,46 +156,46 @@ export async function saveSearch(words: string, result: Search | { outcome: "ret
   );
 }
 
-export async function clearSearch(): Promise<void> {
-  await query("DELETE FROM rose_search");
+export async function clearSearch(household: number): Promise<void> {
+  await query("DELETE FROM rose_search WHERE id = $1", [household]);
 }
 
-export async function getLimit(): Promise<number> {
-  const rows = await query<{ cents: number }>("SELECT cents FROM price_limit WHERE id = 1");
+export async function getLimit(household: number): Promise<number> {
+  const rows = await query<{ cents: number }>("SELECT cents FROM price_limit WHERE id = $1", [household]);
   return rows[0]?.cents ?? DEFAULT_LIMIT_CENTS;
 }
 
-export async function setLimit(cents: number): Promise<void> {
+export async function setLimit(household: number, cents: number): Promise<void> {
   await query(
-    `INSERT INTO price_limit (id, cents) VALUES (1, $1)
+    `INSERT INTO price_limit (id, cents) VALUES ($1, $2)
      ON CONFLICT (id) DO UPDATE SET cents = EXCLUDED.cents, set_at = now()`,
-    [cents],
+    [household, cents],
   );
 }
 
 // No row means no total limit.
-export async function getTotal(): Promise<number | null> {
-  const rows = await query<{ cents: number }>("SELECT cents FROM total_limit WHERE id = 1");
+export async function getTotal(household: number): Promise<number | null> {
+  const rows = await query<{ cents: number }>("SELECT cents FROM total_limit WHERE id = $1", [household]);
   return rows[0]?.cents ?? null;
 }
 
-export async function setTotal(cents: number | null): Promise<void> {
+export async function setTotal(household: number, cents: number | null): Promise<void> {
   if (cents === null) {
-    await query("DELETE FROM total_limit");
+    await query("DELETE FROM total_limit WHERE id = $1", [household]);
     return;
   }
   await query(
-    `INSERT INTO total_limit (id, cents) VALUES (1, $1)
+    `INSERT INTO total_limit (id, cents) VALUES ($1, $2)
      ON CONFLICT (id) DO UPDATE SET cents = EXCLUDED.cents, set_at = now()`,
-    [cents],
+    [household, cents],
   );
 }
 
-export async function decline(id: number): Promise<PurchaseRequest | null> {
+export async function decline(household: number, id: number): Promise<PurchaseRequest | null> {
   const rows = await query<Row>(
     `UPDATE purchase_requests SET status = 'declined', answered_at = now()
-     WHERE id = $1 AND status = 'waiting' RETURNING *`,
-    [id],
+     WHERE id = $1 AND household_id = $2 AND status = 'waiting' RETURNING *`,
+    [id, household],
   );
   return rows[0] ? toRequest(rows[0]) : null;
 }
@@ -180,10 +211,10 @@ export function keep(lines: Line[], ticked: string[]): { lines: Line[]; leftOut:
 }
 
 // A basket is claimed for its ticked lines only, at their stored prices; with none ticked it stays waiting.
-export async function claim(id: number, ticked: string[] = []): Promise<PurchaseRequest | null> {
+export async function claim(household: number, id: number, ticked: string[] = []): Promise<PurchaseRequest | null> {
   const [open] = await query<Pick<Row, "lines">>(
-    "SELECT lines FROM purchase_requests WHERE id = $1 AND status = 'waiting'",
-    [id],
+    "SELECT lines FROM purchase_requests WHERE id = $1 AND household_id = $2 AND status = 'waiting'",
+    [id, household],
   );
   if (!open) return null;
   const basket = open.lines && keep(open.lines, ticked);
@@ -194,13 +225,14 @@ export async function claim(id: number, ticked: string[] = []): Promise<Purchase
      SET status = 'paying', answered_at = now(),
          lines = COALESCE($2, lines), left_out = $3, amount_cents = COALESCE($4, amount_cents),
          item_name = COALESCE($5, item_name)
-     WHERE id = $1 AND status = 'waiting' RETURNING *`,
+     WHERE id = $1 AND household_id = $6 AND status = 'waiting' RETURNING *`,
     [
       id,
       basket ? JSON.stringify(basket.lines) : null,
       basket?.leftOut.length ? JSON.stringify(basket.leftOut) : null,
       basket?.cents ?? null,
       basket ? things(basket.lines.length) : null,
+      household,
     ],
   );
   return rows[0] ? toRequest(rows[0]) : null;
@@ -222,27 +254,30 @@ export async function record(id: number, outcome: Outcome): Promise<boolean> {
   return rows.length === 1;
 }
 
-export async function stuck(): Promise<PurchaseRequest | null> {
+export async function stuck(household: number): Promise<PurchaseRequest | null> {
   const rows = await query<Row>(
     `SELECT * FROM purchase_requests
-     WHERE status = 'paying' AND answered_at < now() - interval '15 seconds'
+     WHERE household_id = $1 AND status = 'paying' AND answered_at < now() - interval '15 seconds'
      ORDER BY id LIMIT 1`,
+    [household],
   );
   return rows[0] ? toRequest(rows[0]) : null;
 }
 
-export async function saveSubscription(person: Person, subscription: Subscription): Promise<void> {
+export async function saveSubscription(household: number, person: Person, subscription: Subscription): Promise<void> {
   await query(
-    `INSERT INTO push_subscriptions (person, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)
-     ON CONFLICT (endpoint) DO UPDATE SET person = EXCLUDED.person, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth`,
-    [person, subscription.endpoint, subscription.p256dh, subscription.auth],
+    `INSERT INTO push_subscriptions (household_id, person, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (endpoint) DO UPDATE
+     SET household_id = EXCLUDED.household_id, person = EXCLUDED.person, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth`,
+    [household, person, subscription.endpoint, subscription.p256dh, subscription.auth],
   );
 }
 
-export async function subscriptionsFor(person: Person): Promise<Subscription[]> {
-  return query<Subscription>("SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE person = $1 ORDER BY id", [
-    person,
-  ]);
+export async function subscriptionsFor(household: number, person: Person): Promise<Subscription[]> {
+  return query<Subscription>(
+    "SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE household_id = $1 AND person = $2 ORDER BY id",
+    [household, person],
+  );
 }
 
 export async function forgetSubscription(endpoint: string): Promise<void> {
@@ -266,6 +301,7 @@ async function query<T>(text: string, params: unknown[] = []): Promise<T[]> {
 function toRequest(row: Row): PurchaseRequest {
   return {
     id: Number(row.id),
+    household: Number(row.household_id),
     item: { id: row.item_id, name: row.item_name, cents: row.amount_cents },
     found: row.shop && row.listing_url && row.reason ? { shop: row.shop, url: row.listing_url, reason: row.reason } : null,
     status: row.status,

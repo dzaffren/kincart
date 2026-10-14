@@ -3,7 +3,7 @@ import { things, type Item } from "../../lib/shop/items";
 import type { PayResult } from "../../lib/shop/pay";
 import type { Person } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
-import type { Line } from "../../lib/shop/requests";
+import type { Line, PurchaseRequest } from "../../lib/shop/requests";
 import { HELPER, listed, money, RELATIVE } from "./ui";
 
 export type PingKind = "asked" | "paid" | "declined" | "failed";
@@ -55,13 +55,13 @@ export function ping(kind: PingKind, { item, lines, leftOut }: Subject): { to: P
 }
 
 // Sent once the response is out, so a slow push service never holds Rose's or Sam's tap (D29).
-export function sendPing(kind: PingKind, subject: Subject): void {
+export function sendPing(household: number, kind: PingKind, subject: Subject): void {
   const { to, title, body } = ping(kind, subject);
-  after(() => notify(to, { title, body }));
+  after(() => notify(household, to, { title, body }));
 }
 
 // An unknown charge sends nothing; Rose hears once the stuck-payment check settles it.
-export function sendPayment(result: PayResult, subject: Subject): void {
-  if (result === "paid") sendPing("paid", subject);
-  if (result === "refused") sendPing("failed", subject);
+export function sendPayment(result: PayResult, request: PurchaseRequest): void {
+  if (result === "paid") sendPing(request.household, "paid", request);
+  if (result === "refused") sendPing(request.household, "failed", request);
 }
