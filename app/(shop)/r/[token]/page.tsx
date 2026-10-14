@@ -30,7 +30,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
   const query = await searchParams;
 
   const settled = await settleStuck();
-  if (settled) sendPayment(settled.result, settled.request.item);
+  if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
   const [vault, request, saved, limitCents] = await Promise.all([
     getVault(),

@@ -2,7 +2,7 @@ import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
 import type { RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
-import type { Receipt } from "./ui";
+import { listed, type Receipt } from "./ui";
 
 type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean; emptyFind?: boolean };
 
@@ -18,7 +18,13 @@ export function roseState(
   if (!search) return fixedListState(request, params);
 
   if (request?.status === "waiting" || request?.status === "paying") {
-    return { kind: "waiting", item: request.item, askedAt: request.askedAt, shop: request.found?.shop };
+    return {
+      kind: "waiting",
+      item: request.item,
+      askedAt: request.askedAt,
+      shop: request.found?.shop,
+      lines: request.lines ?? undefined,
+    };
   }
 
   const current = search.saved && (!request || search.saved.searchedAt > request.askedAt) ? search.saved : null;
@@ -26,19 +32,24 @@ export function roseState(
   if (current?.outcome === "options") {
     return { kind: "options", limitCents, words: current.words, listings: current.options, error: params.pickMissing ?? false };
   }
+  if (current?.outcome === "basket") {
+    return { kind: "basket", limitCents, words: current.words, groups: current.groups, error: params.pickMissing ?? false };
+  }
   if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
     return { kind: "paid", receipt: receiptOf(request) };
   }
   const outcome =
     !current && (request?.status === "declined" || request?.status === "failed")
-      ? { kind: request.status, item: request.item }
+      ? { kind: request.status, item: request.item, lines: request.lines ?? undefined }
       : undefined;
+  // What Sam left out goes back in Rose's box for the next ask.
+  const leftOut = request?.status === "paid" && params.askAgain && request.leftOut;
   const problem = params.emptyFind
     ? "empty"
     : current?.outcome === "retry"
       ? undefined
       : current?.outcome;
-  return { kind: "ask", limitCents, words: current?.words, outcome, problem };
+  return { kind: "ask", limitCents, words: current?.words ?? (leftOut ? listed(leftOut) : undefined), outcome, problem };
 }
 
 function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {
@@ -68,18 +79,25 @@ export function samState(request: PurchaseRequest | null): SamState {
         askedAt: request.askedAt,
         busy: request.status === "paying",
         found: request.found ?? undefined,
+        lines: request.lines ?? undefined,
       };
     case "paid":
       return { kind: "paid", receipt: receiptOf(request) };
     case "failed":
-      return { kind: "failed", item: request.item };
+      return { kind: "failed", item: request.item, lines: request.lines ?? undefined };
     case "declined":
-      return { kind: "nothing", declined: request.item };
+      return { kind: "nothing", declined: request.item, lines: request.lines ?? undefined };
   }
 }
 
 function receiptOf(request: PurchaseRequest): Receipt {
-  return { item: request.item, paidAt: request.answeredAt ?? request.askedAt, transactionId: request.captureId ?? "" };
+  return {
+    item: request.item,
+    paidAt: request.answeredAt ?? request.askedAt,
+    transactionId: request.captureId ?? "",
+    lines: request.lines ?? undefined,
+    leftOut: request.leftOut ?? undefined,
+  };
 }
 
 export type NotifyEnv = {

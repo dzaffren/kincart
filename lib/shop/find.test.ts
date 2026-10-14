@@ -31,7 +31,7 @@ function stubServices(answers: Answers | (() => never)) {
     if (typeof answers === "function") return answers();
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
-      const data = body.max_tokens === 200 ? answers.need : answers.choice;
+      const data = body.max_tokens === 600 ? answers.need : answers.choice;
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     return Response.json({ products: body.filters ? answers.under : answers.all });
@@ -57,7 +57,7 @@ afterEach(() => {
 
 it("shows up to three listings Haiku picked, with Channel3's names, prices and links", async () => {
   stubServices({
-    need: { kind: "product", query: "warm slippers easy to put on size 8" },
+    need: { things: [{ words, query: "warm slippers easy to put on size 8" }] },
     under: [kohls, muji, ikea, avenue],
     all: [kohls, sheepskin],
     choice: {
@@ -91,7 +91,7 @@ it("shows up to three listings Haiku picked, with Channel3's names, prices and l
 
 it("says nothing under the limit when the thing only exists above it", async () => {
   stubServices({
-    need: { kind: "product", query: "tablet for video calls with front camera" },
+    need: { things: [{ words: "a tablet for video calls", query: "tablet for video calls with front camera" }] },
     under: [product("prod_1Cs4eB", "Universal Tablet Case", 20.89, "walmart.com")],
     all: [product("prod_6Tb8aQ", "10.1 inch Tablet with Front Camera", 149.99, "bestbuy.com")],
     choice: { picks: [], aboveLimit: true },
@@ -102,7 +102,7 @@ it("says nothing under the limit when the thing only exists above it", async () 
 
 it("says it couldn't find anything when nothing fits at any price", async () => {
   const fetch = stubServices({
-    need: { kind: "product", query: "left-handed teapot for a cat" },
+    need: { things: [{ words: "a left-handed teapot for a cat", query: "left-handed teapot for a cat" }] },
     under: [],
     all: [],
   });
@@ -111,14 +111,20 @@ it("says it couldn't find anything when nothing fits at any price", async () => 
   expect(searches(fetch)).toBe(2);
 });
 
-it("asks for one thing at a time for a list, and searches for nothing that isn't a product", async () => {
-  const list = stubServices({ need: { kind: "list", query: "milk bread eggs" } });
-  expect(await find("milk, bread and eggs", 5000)).toEqual({ outcome: "several" });
+it("says too many for more than five things, and searches for nothing that isn't a product", async () => {
+  const six = ["batteries", "a night light", "a phone charger", "a doormat", "a kettle", "a flashlight"];
+  const list = stubServices({ need: { things: six.map((thing) => ({ words: thing, query: thing })) } });
+  expect(await find(six.join(", "), 5000)).toEqual({ outcome: "too many" });
   expect(searches(list)).toBe(0);
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=too-many listings=0 ms=\d+$/));
 
-  const notAProduct = stubServices({ need: { kind: "not a product", query: "time in Ohio" } });
+  const notAProduct = stubServices({ need: { things: [] } });
   expect(await find("what time is it in Ohio", 5000)).toEqual({ outcome: "nothing found" });
   expect(searches(notAProduct)).toBe(0);
+
+  const blank = stubServices({ need: { things: [{ words: "something nice", query: " " }] } });
+  expect(await find("something nice", 5000)).toEqual({ outcome: "nothing found" });
+  expect(searches(blank)).toBe(0);
 });
 
 it("says it couldn't find anything when Haiku or Channel3 fails, and logs why", async () => {
@@ -134,10 +140,108 @@ it("says it couldn't find anything when Haiku or Channel3 fails, and logs why", 
     "fetch",
     vi.fn(async (url: string) =>
       url.includes("anthropic")
-        ? Response.json({ content: [{ type: "text", text: '{"kind":"product","query":"slippers"}' }], stop_reason: "end_turn" })
+        ? Response.json({
+            content: [{ type: "text", text: '{"things":[{"words":"slippers","query":"slippers"}]}' }],
+            stop_reason: "end_turn",
+          })
         : Response.json({ error: "rate limited" }, { status: 429 }),
     ),
   );
   expect(await find(words, 5000)).toEqual({ outcome: "nothing found" });
   expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/reason=channel3 429$/));
+});
+
+type Thing = { words: string; query: string; under?: unknown[]; all?: unknown[]; choice?: unknown; fails?: boolean };
+
+// Each thing's searches and pick are answered by its own query and words.
+function stubBasket(things: Thing[]) {
+  const fetch = vi.fn(async (url: string, init: RequestInit) => {
+    const body = JSON.parse(String(init.body));
+    if (url.includes("anthropic")) {
+      const data =
+        body.max_tokens === 600
+          ? { things: things.map(({ words, query }) => ({ words, query })) }
+          : things.find((thing) => body.messages[0].content.startsWith(`They asked: ${JSON.stringify(thing.words)}`))
+              ?.choice;
+      return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
+    }
+    const thing = things.find(({ query }) => query === body.query)!;
+    if (thing.fails) return Response.json({ error: "rate limited" }, { status: 429 });
+    return Response.json({ products: (body.filters ? thing.under : thing.all) ?? [] });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+const aa24 = product("prod_3Ba7aA", "Amazon Basics 24-Pack AA Alkaline Batteries", 9.99, "amazon.com");
+const aa8 = product("prod_1Dc8aA", "Duracell Coppertop AA Batteries, 8 Pack", 8.79, "target.com");
+const plugLight = product("prod_6Nl2tL", "Plug-In LED Night Light with Dusk-to-Dawn Sensor, 2 Pack", 12.49, "target.com");
+const anker = product("prod_2Ak5cH", "Anker USB-C Wall Charger with 6 ft Cable", 15.99, "amazon.com");
+const tabletCase = product("prod_1Cs4eB", "Universal Tablet Case", 20.89, "walmart.com");
+const tablet = product("prod_6Tb8aQ", "10.1 inch Tablet with Front Camera", 149.99, "bestbuy.com");
+
+const batteries = { words: "AA batteries", query: "AA batteries", under: [aa24, aa8], all: [aa24], choice: { picks: [pick("prod_3Ba7aA"), pick("prod_1Dc8aA")], aboveLimit: false } };
+const nightLight = { words: "a night light", query: "night light", under: [plugLight], all: [plugLight], choice: { picks: [pick("prod_6Nl2tL")], aboveLimit: false } };
+const charger = { words: "a phone charger", query: "phone charger", under: [anker], all: [anker], choice: { picks: [pick("prod_2Ak5cH")], aboveLimit: false } };
+
+it("searches every thing at once and shows a group of listings for each, under Rose's words", async () => {
+  const fetch = stubBasket([batteries, nightLight, charger]);
+
+  const result = await find("AA batteries, a night light and a phone charger", 5000);
+
+  expect(result).toEqual({
+    outcome: "basket",
+    groups: [
+      {
+        thing: "AA batteries",
+        options: [
+          expect.objectContaining({ id: "prod_3Ba7aA", name: aa24.title, cents: 999, shop: "amazon.com" }),
+          expect.objectContaining({ id: "prod_1Dc8aA", cents: 879, why: pick("prod_1Dc8aA").why }),
+        ],
+      },
+      { thing: "a night light", options: [expect.objectContaining({ id: "prod_6Nl2tL", cents: 1249 })] },
+      { thing: "a phone charger", options: [expect.objectContaining({ id: "prod_2Ak5cH", cents: 1599 })] },
+    ],
+  });
+  const calls = fetch.mock.calls.map(([url, init]) => ({ url: String(url), body: JSON.parse(String(init.body)) }));
+  const lastSearch = calls.findLastIndex(({ url }) => url.includes("trychannel3"));
+  const firstPick = calls.findIndex(({ url, body }) => url.includes("anthropic") && body.max_tokens === 1000);
+  expect(searches(fetch)).toBe(6);
+  expect(lastSearch).toBeLessThan(firstPick);
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 ms=\d+$/),
+  );
+});
+
+it("still shows the things it found when some can't be shown, and says why for each", async () => {
+  stubBasket([
+    batteries,
+    { words: "a tablet for video calls", query: "tablet for video calls", under: [tabletCase], all: [tablet], choice: { picks: [], aboveLimit: true } },
+    { words: "a left-handed teapot for a cat", query: "left-handed teapot for a cat" },
+    { words: "a phone charger", query: "phone charger", fails: true },
+  ]);
+
+  expect(await find("AA batteries, a tablet for video calls, a left-handed teapot for a cat and a phone charger", 3000)).toEqual({
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })] },
+      { thing: "a tablet for video calls", options: [], problem: "over limit" },
+      { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found" },
+      { thing: "a phone charger", options: [], problem: "nothing found" },
+    ],
+  });
+  expect(console.log).toHaveBeenLastCalledWith(
+    expect.stringMatching(/^find outcome=basket things=4 shown=1 listings=2 ms=\d+ reason=channel3 429$/),
+  );
+});
+
+it("says it couldn't find anything when no thing in the list has listings", async () => {
+  stubBasket([
+    { words: "a left-handed teapot for a cat", query: "left-handed teapot for a cat" },
+    { words: "a tablet for video calls", query: "tablet for video calls", under: [tabletCase], all: [tablet], choice: { picks: [], aboveLimit: true } },
+  ]);
+
+  expect(await find("a left-handed teapot for a cat and a tablet for video calls", 3000)).toEqual({
+    outcome: "nothing found",
+  });
 });

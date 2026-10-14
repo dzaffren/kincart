@@ -36,10 +36,26 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-it("asks Haiku whether Rose's words are one product, and for a search query", async () => {
-  const fetch = stubHaiku(() => reply({ kind: "product", query: "warm slippers easy to put on size 8" }));
+it("asks Haiku for each thing in Rose's own words, with a search query for each", async () => {
+  const things = [
+    { words: "AA batteries", query: "AA batteries" },
+    { words: "a night light", query: "night light" },
+  ];
+  const fetch = stubHaiku(() => reply({ things }));
 
-  expect(await readNeed(words)).toEqual({ kind: "product", query: "warm slippers easy to put on size 8" });
+  expect(await readNeed("AA batteries and a night light")).toEqual({ things });
+
+  const { body } = sent(fetch);
+  expect(body.messages).toEqual([{ role: "user", content: "AA batteries and a night light" }]);
+  expect(body.system).toContain("their own words");
+  expect(body.output_config.format.schema.required).toEqual(["things"]);
+  expect(body.max_tokens).toBe(600);
+});
+
+it("calls Haiku 5.5 with low effort and a fixed answer shape", async () => {
+  const fetch = stubHaiku(() => reply({ things: [{ words, query: "warm slippers easy to put on size 8" }] }));
+
+  await readNeed(words);
 
   const { url, headers, body } = sent(fetch);
   expect(url).toBe("https://api.anthropic.com/v1/messages");
@@ -78,6 +94,6 @@ it("throws when Haiku fails or its answer is cut off", async () => {
   stubHaiku(() => Response.json({ type: "error", error: { type: "overloaded_error" } }, { status: 529 }));
   await expect(readNeed(words)).rejects.toThrow("anthropic 529");
 
-  stubHaiku(() => reply({ kind: "product" }, "max_tokens"));
+  stubHaiku(() => reply({ things: [] }, "max_tokens"));
   await expect(readNeed(words)).rejects.toThrow("anthropic max_tokens");
 });

@@ -1,15 +1,16 @@
 import { useId, type ReactNode } from "react";
-import type { Item } from "../../lib/shop/items";
-import type { Source } from "../../lib/shop/requests";
+import { things, type Item } from "../../lib/shop/items";
+import type { Line, Source } from "../../lib/shop/requests";
+import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
+import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
 
 export type SamState =
-  | { kind: "nothing"; declined?: Item }
-  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source }
+  | { kind: "nothing"; declined?: Item; lines?: Line[] }
+  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source; lines?: Line[] }
   | { kind: "paid"; receipt: Receipt }
-  | { kind: "failed"; item: Item };
+  | { kind: "failed"; item: Item; lines?: Line[] };
 
 export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
 
@@ -18,6 +19,14 @@ type Action = (formData: FormData) => void | Promise<void>;
 type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action; notify?: ReactNode };
 
 export function SamView({ state, answer, limit, setLimit, notify }: Props) {
+  if (state.kind === "request" && state.lines) {
+    return (
+      <div className="screen">
+        <BasketAnswer lines={state.lines} askedAt={state.askedAt} answer={answer} busy={state.busy} />
+      </div>
+    );
+  }
+
   if (state.kind === "request") {
     const { found } = state;
     return (
@@ -74,6 +83,12 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
       <>
         <h1>Paid from {RELATIVE}&apos;s PayPal</h1>
         <ReceiptCard receipt={state.receipt} />
+        {state.receipt.leftOut && (
+          <Notice tone="neutral">
+            You left out {listed(state.receipt.leftOut)}. {RELATIVE} can ask for{" "}
+            {state.receipt.leftOut.length > 1 ? "them" : "it"} again.
+          </Notice>
+        )}
         <p className="small">{RELATIVE} sees this receipt too.</p>
       </>
     );
@@ -84,7 +99,8 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
       <>
         <h1>Payment didn&apos;t go through</h1>
         <Notice tone="danger">
-          Nothing was taken from {RELATIVE}&apos;s PayPal for {state.item.name}. {RELATIVE} can ask again.
+          Nothing was taken from {RELATIVE}&apos;s PayPal for{" "}
+          {state.lines ? `the ${things(state.lines.length)}` : state.item.name}. {RELATIVE} can ask again.
         </Notice>
       </>
     );
@@ -94,7 +110,8 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
     <>
       {state.declined && (
         <Notice tone="neutral">
-          You said no to {state.declined.name}. {RELATIVE} can see that.
+          You said no to {state.lines ? `${RELATIVE}'s ${things(state.lines.length)}` : state.declined.name}.{" "}
+          {RELATIVE} can see that.
         </Notice>
       )}
       <div className="heading">

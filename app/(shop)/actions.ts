@@ -2,8 +2,8 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { find as findOptions, searchOn } from "../../lib/shop/find";
-import { findItem } from "../../lib/shop/items";
+import { find as findOptions, searchOn, type Group, type Option } from "../../lib/shop/find";
+import { findItem, things } from "../../lib/shop/items";
 import { pay } from "../../lib/shop/pay";
 import { createSetupToken } from "../../lib/shop/paypal";
 import { whoIs } from "../../lib/shop/people";
@@ -64,16 +64,32 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
   if (searchOn()) {
     const saved = await getSearch();
     const option = saved?.options.find((listing) => listing.id === formData.get("listing"));
-    if (!option) redirect(`/r/${token}?pick=missing`);
+    const picks = saved?.outcome === "basket" ? basketPicks(saved.groups, formData) : option ? [{ thing: "", option }] : [];
+    if (!picks.length) redirect(`/r/${token}?pick=missing`);
     if (await getVault()) {
-      if (await ask(option, { shop: option.shop, url: option.url, reason: option.why })) sendPing("asked", option);
+      if (picks.length === 1) {
+        const [{ option }] = picks;
+        if (await ask(option, { shop: option.shop, url: option.url, reason: option.why })) sendPing("asked", { item: option });
+      } else {
+        const lines = picks.map(({ thing, option: { id, name, cents, shop, url, why } }) => ({
+          id,
+          name,
+          cents,
+          shop,
+          url,
+          reason: why,
+          thing,
+        }));
+        const item = { id: "basket", name: things(lines.length), cents: lines.reduce((sum, line) => sum + line.cents, 0) };
+        if (await ask(item, undefined, lines)) sendPing("asked", { item, lines });
+      }
       await clearSearch();
     }
     redirect(`/r/${token}`);
   }
   const item = findItem(formData.get("item"));
   if (!item) redirect(`/r/${token}?pick=missing`);
-  if ((await getVault()) && (await ask(item))) sendPing("asked", item);
+  if ((await getVault()) && (await ask(item))) sendPing("asked", { item });
   redirect(`/r/${token}`);
 }
 
@@ -83,10 +99,10 @@ export async function answer(token: string, requestId: number, formData: FormDat
   const declined = choice === "no" ? await decline(requestId) : null;
   if (declined) {
     console.log(`purchase id=${requestId} status=declined`);
-    sendPing("declined", declined.item);
+    sendPing("declined", declined);
   } else if (choice === "ok") {
-    const claimed = await claim(requestId);
-    if (claimed) sendPayment(await pay(claimed), claimed.item);
+    const claimed = await claim(requestId, formData.getAll("line").map(String));
+    if (claimed) sendPayment(await pay(claimed), claimed);
   }
   redirect(`/h/${token}`);
 }
@@ -105,6 +121,16 @@ export async function subscribe(token: string, json: unknown): Promise<boolean> 
   if (!person || !subscription || !pushOn()) return false;
   await saveSubscription(person, subscription);
   return true;
+}
+
+// Each group's radio is pick-<index>, and a listing picked under two things counts once.
+function basketPicks(groups: Group[], formData: FormData): { thing: string; option: Option }[] {
+  const picks: { thing: string; option: Option }[] = [];
+  groups.forEach(({ thing, options }, index) => {
+    const option = options.find((listing) => listing.id === formData.get(`pick-${index}`));
+    if (option && !picks.some((pick) => pick.option.id === option.id)) picks.push({ thing, option });
+  });
+  return picks;
 }
 
 async function origin(): Promise<string> {

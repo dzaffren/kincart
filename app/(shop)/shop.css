@@ -354,3 +354,87 @@ body {
     transform: rotate(1turn);
   }
 }
+
+.screen h2 {
+  font: var(--type-title);
+  margin: 0;
+}
+
+.groups {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.line-items {
+  margin: var(--space-2) 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.line-items li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.line-price {
+  font-variant-numeric: tabular-nums;
+}
+
+.groups h2::first-letter {
+  text-transform: uppercase;
+}
+
+/* Sam's basket form joins the screen's grid, so its parts keep the screen's spacing. */
+.flow {
+  display: contents;
+}
+
+.options legend {
+  padding: 0;
+  margin-bottom: var(--space-3);
+}
+
+.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.lines li {
+  display: grid;
+}
+
+.option-box {
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: var(--border-selected) solid var(--color-control);
+  border-radius: var(--radius-control);
+  display: grid;
+  place-items: center;
+}
+
+.listing .option-box {
+  grid-area: ring;
+  align-self: center;
+}
+
+.option-input:checked + .option-body .option-box {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.option-input:checked + .option-body .option-box::after {
+  content: "";
+  width: var(--space-2);
+  height: var(--space-3);
+  border: solid var(--color-on-accent);
+  border-width: 0 var(--border-selected) var(--border-selected) 0;
+  transform: rotate(45deg);
+}

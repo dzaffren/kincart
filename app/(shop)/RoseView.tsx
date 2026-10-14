@@ -1,11 +1,13 @@
 import { useId, type ReactNode } from "react";
-import type { Option } from "../../lib/shop/find";
-import type { Item } from "../../lib/shop/items";
+import type { Group, Option } from "../../lib/shop/find";
+import { things, type Item } from "../../lib/shop/items";
+import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
 import {
   HELPER,
   ItemPicker,
+  listed,
   ListingPicker,
   Notice,
   ReceiptCard,
@@ -14,7 +16,7 @@ import {
   wholeDollars,
 } from "./ui";
 
-type Outcome = { kind: "declined" | "failed"; item: Item };
+type Outcome = { kind: "declined" | "failed"; item: Item; lines?: Line[] };
 
 export type RoseState =
   | { kind: "not linked"; cancelled?: boolean; busy?: boolean }
@@ -30,7 +32,7 @@ export type RoseState =
       limitCents: number;
       words?: string;
       outcome?: Outcome;
-      problem?: "empty" | "nothing found" | "over limit" | "several";
+      problem?: "empty" | "nothing found" | "over limit" | "too many";
       busy?: boolean;
     }
   | {
@@ -42,7 +44,16 @@ export type RoseState =
       error?: boolean;
       busy?: boolean;
     }
-  | { kind: "waiting"; item: Item; askedAt: Date; shop?: string }
+  | {
+      kind: "basket";
+      limitCents: number;
+      words: string;
+      groups: Group[];
+      picked?: string[];
+      error?: boolean;
+      busy?: boolean;
+    }
+  | { kind: "waiting"; item: Item; askedAt: Date; shop?: string; lines?: Line[] }
   | { kind: "paid"; receipt: Receipt };
 
 type Action = (formData: FormData) => void | Promise<void>;
@@ -90,7 +101,12 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
           Asked at <LocalTime at={state.askedAt} format="clock" />. This page changes by itself when {HELPER}{" "}
           answers.
         </Notice>
-        <Summary title={state.item.name} cents={state.item.cents} note={state.shop && `From ${state.shop}`} />
+        <Summary
+          title={state.lines ? things(state.lines.length) : state.item.name}
+          cents={state.item.cents}
+          lines={state.lines}
+          note={state.shop && `From ${state.shop}`}
+        />
         {notify}
       </div>
     );
@@ -104,8 +120,8 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
         {state.problem === "nothing found" && (
           <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>
         )}
-        {state.problem === "several" && (
-          <Notice tone="neutral">One thing at a time for now. What would you like first?</Notice>
+        {state.problem === "too many" && (
+          <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
         )}
         {state.problem === "over limit" && (
           <Notice tone="neutral">
@@ -115,7 +131,8 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
         <div className="heading">
           <h1 id={headingId}>What do you need?</h1>
           <p className="small" id={hintId}>
-            Say it the way you&apos;d tell {HELPER}. For example: warm slippers that are easy to put on, size 8.
+            Say it the way you&apos;d tell {HELPER}, one thing or up to 5. For example: AA batteries, a night light
+            and a phone charger.
           </p>
         </div>
         <form className="stack" action={find}>
@@ -182,11 +199,51 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
     );
   }
 
+  if (state.kind === "basket") {
+    return (
+      <div className="screen">
+        <div className="heading">
+          <h1>Which ones would you like?</h1>
+          <p className="small">For &ldquo;{state.words}&rdquo;. Pick one for each thing you want.</p>
+        </div>
+        <form className="stack" action={ask}>
+          <div className="groups">
+            {state.groups.map((group, index) => (
+              <BasketGroup
+                key={index}
+                group={group}
+                name={`pick-${index}`}
+                limitCents={state.limitCents}
+                picked={state.picked}
+              />
+            ))}
+          </div>
+          {state.error && <p className="field-error">Pick at least one first.</p>}
+          <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
+            Ask {HELPER}
+          </Button>
+        </form>
+        {!state.busy && (
+          <form action={tryAgain}>
+            <Button type="submit" kind="secondary">
+              Try other words
+            </Button>
+          </form>
+        )}
+      </div>
+    );
+  }
+
   if (state.kind === "paid") {
     return (
       <div className="screen">
         <h1>{HELPER} said OK. It&apos;s paid.</h1>
         <ReceiptCard receipt={state.receipt} />
+        {state.receipt.leftOut && (
+          <Notice tone="neutral">
+            {HELPER} left out {listed(state.receipt.leftOut)}.
+          </Notice>
+        )}
         <a className="button button-secondary" href="?ask=1">
           Ask for something else
         </a>
@@ -212,7 +269,38 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
   );
 }
 
+type GroupProps = { group: Group; name: string; limitCents: number; picked?: string[] };
+
+function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
+  const headingId = useId();
+  return (
+    <section className="stack">
+      <h2 id={headingId}>{group.thing}</h2>
+      {group.problem === "nothing found" && <Notice tone="neutral">Couldn&apos;t find this one.</Notice>}
+      {group.problem === "over limit" && (
+        <Notice tone="neutral">Nothing under {wholeDollars(limitCents)} for this one.</Notice>
+      )}
+      {group.options.length > 0 && (
+        <ListingPicker
+          listings={group.options}
+          labelledBy={headingId}
+          name={name}
+          picked={group.options.find((option) => picked?.includes(option.id))?.id}
+          none="None of these"
+        />
+      )}
+    </section>
+  );
+}
+
 function OutcomeNotice({ outcome }: { outcome?: Outcome }) {
+  if (outcome?.kind === "declined" && outcome.lines) {
+    return (
+      <Notice tone="neutral">
+        {HELPER} said no to your {things(outcome.lines.length)}. Nothing was taken.
+      </Notice>
+    );
+  }
   if (outcome?.kind === "declined") {
     return (
       <Notice tone="neutral">

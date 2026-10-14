@@ -12,3 +12,5 @@
 - Pipe {} into zuko's Stop-hook scripts when running them by hand
 - Set three prefs for push in Playwright's Firefox
 - Lint the tracked files when pnpm lint fails on design caches
+- Check Vercel's env before calling a flag off
+- Build chunks one after another when their tests share the local database

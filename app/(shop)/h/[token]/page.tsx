@@ -27,7 +27,7 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
   const query = await searchParams;
 
   const settled = await settleStuck();
-  if (settled) sendPayment(settled.result, settled.request.item);
+  if (settled) sendPayment(settled.result, settled.request);
   const [request, limitCents] = await Promise.all([latest(), searchOn() ? getLimit() : null]);
   const limit =
     limitCents === null

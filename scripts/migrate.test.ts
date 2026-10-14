@@ -39,12 +39,17 @@ it("migrates up, back down, and up again", async () => {
     expect(await tableExists(table)).toBe(true);
   }
   expect(await columnExists("purchase_requests", "listing_url")).toBe(true);
+  expect(await columnExists("purchase_requests", "lines")).toBe(true);
+  expect(await columnExists("rose_search", "groups")).toBe(true);
 
   await migrate("down", url);
-  expect(await tableExists("push_subscriptions")).toBe(false);
-  expect(await tableExists("rose_search")).toBe(true);
+  expect(await columnExists("purchase_requests", "lines")).toBe(false);
+  expect(await columnExists("purchase_requests", "left_out")).toBe(false);
+  expect(await columnExists("rose_search", "groups")).toBe(false);
+  expect(await tableExists("push_subscriptions")).toBe(true);
   expect(await columnExists("purchase_requests", "reason")).toBe(true);
 
   await migrate("up", url);
-  expect(await tableExists("push_subscriptions")).toBe(true);
+  expect(await columnExists("purchase_requests", "left_out")).toBe(true);
+  expect(await columnExists("rose_search", "groups")).toBe(true);
 });
