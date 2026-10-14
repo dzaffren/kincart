@@ -63,8 +63,8 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
             {links ? (
               <>
                 <p className="home-guide">
-                  Your {RELATIVE} and {HELPER} are on the right. Ask for something as {RELATIVE}, then say OK as{" "}
-                  {HELPER}.
+                  Your {RELATIVE} and {HELPER} are in the two phones. Ask for something as {RELATIVE}, then say OK
+                  as {HELPER}.
                 </p>
                 <div className="stack home-ways">
                   <p className="small">Each opens in a new tab. Come back here to open them again.</p>
