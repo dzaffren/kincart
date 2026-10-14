@@ -28,7 +28,7 @@ Be Rose and Be Sam each open a new tab. On a laptop, a judge asks as Rose, then 
 
 ## User story
 
-As a hackathon judge on a laptop, I want to see my Rose and Sam side by side and read what each one does, so that I see Sam's OK arrive as if from another phone, in a few minutes.
+As someone who helps an older parent shop online, or a judge trying KinCart for the first time, I want to see what it does and try both sides in a few minutes, so that I can tell whether it ends the logins and the shared passwords.
 
 ## Flow
 
@@ -50,11 +50,12 @@ A judge reads what KinCart does and taps Try KinCart. On a laptop, Rose and Sam 
 Pause 2 sets the exact words and layout.
 
 ```gherkin
-Scenario: A judge reads what KinCart does before trying it
-  Given a judge with only "kincart.vercel.app", on a phone or a laptop
+Scenario: A newcomer reads what KinCart does before trying it
+  Given a newcomer with only "kincart.vercel.app", on a phone or a laptop
   When they open it
-  Then they read what Rose does, what the AI does and what Sam does, in a few plain sentences
+  Then they read "Mom asks. You say OK. PayPal pays." and one plain sentence on what that means
   And they see "Sandbox money only. Nothing real is bought." and "Try KinCart"
+  And further down, how it works in three steps, and three ways the helper stays in charge
   And on a laptop, Rose's and Sam's phones show a sample ask for AA batteries at $9.99, marked "Sample, not live", until they tap "Try KinCart"
 
 Scenario: A judge on a laptop plays both people side by side
@@ -82,7 +83,8 @@ Scenario: Start a new one on a laptop swaps both phones
 ## Scope
 
 **In:**
-- More words on `/`: what Rose does, what the AI does and what Sam does. Every width, before and after Try KinCart.
+- Selling words on `/`, written for the helper who would adopt KinCart: a headline, one sentence on the pain it ends, then how it works and how the helper stays in charge. Every width, before and after Try KinCart.
+- A page description and link-preview title, so a shared link says what KinCart is.
 - A premium look for `/` and `/status`, from the design system's showcase extension (O10, O11, D50).
 - Before Try KinCart, a laptop's two phones show Rose's and Sam's real screens with a sample ask, still and marked as a sample (O13).
 - From 880px wide and 480px high, once this browser has a household, Rose's and Sam's real pages show side by side in two phone frames, live, in place of Be Rose and Be Sam (D39, D40). From 1280px wide, the words sit in a column to their left.
@@ -98,6 +100,8 @@ Scenario: Start a new one on a laptop swaps both phones
 ## Interface
 
 Two public pages in the showcase look (D50): `/` and `/status`. Both put their words on a full-bleed violet block in 800-weight display type. Rose's and Sam's own pages do not change.
+
+The words on `/` sell to the person who would adopt KinCart: the adult child who is asked to buy things for a parent. The headline says the whole product in three beats. The sentence under it names the pain it ends. The section under the block answers the two questions a newcomer has next: how does it work, and do I keep control? Every claim there is a shipped feature: up to three listings under the limit, the what, why and watch notes, the push, unticking a basket, both limits, and the saved PayPal. The page's title is "KinCart: Mom asks, you say OK", and a shared link previews "KinCart: Mom asks. You say OK. PayPal pays." with the same description.
 
 `/` has three shapes. On a phone it is one column on violet: the KinCart mark and name, the headline, who Rose and Sam are, the sandbox line, then Try KinCart, or Be Rose, Be Sam and Start a new one. From 880px wide and 480px high, two phones appear under the words, and Be Rose and Be Sam go. From 1280px the words sit in a column to the left of the phones, so everything fits on one laptop screen. Before Try KinCart the phones show a still sample. After it, they show this browser's own Rose and Sam, live.
 
@@ -116,12 +120,13 @@ The phones swap from sample to live once this browser has a household (O13).
 
 | Width | State | What's on it |
 | ----- | ----- | ------------ |
-| any | new | on violet: the mark at 48px and "KinCart"; the headline in three lines, "Rose asks." "Sam says OK." "PayPal pays."; "Rose is an older shopper, and Sam is family. AI finds real listings and explains each one, and Sam taps OK on their own phone. Nobody shares a password."; "**Sandbox money only.** Nothing real is bought."; "You get your own Rose and Sam to try. Rose's sandbox PayPal is already linked."; Try KinCart (white, violet text); "System status" link |
+| any | new | on violet: the mark at 48px and "KinCart"; the headline in three lines, "Mom asks." "You say OK." "PayPal pays."; "Your parent shops from their own phone, and you approve from yours. No more logging in as them or reading out card numbers."; "**Sandbox money only.** Nothing real is bought."; "Try both sides now, with no sign-up: Rose, who asks, and Sam, who says OK. Rose's sandbox PayPal is already linked."; Try KinCart (white, violet text) |
 | 880px and up, 480px high | new | the words, then "Rose's phone" and "Sam's phone", each captioned "Sample, not live": Rose's "Waiting for Sam" and Sam's "Rose would like this" with "OK, pay $9.99", for Amazon Basics 24-Pack AA Alkaline Batteries at $9.99. Nobody can tap or focus them |
 | any | starting | Try KinCart becomes "Starting…" with the spinner |
 | any | failed | red notice at the top: "Your Rose and Sam didn't start. Nothing was saved. Try again in a moment."; then new |
-| phone | yours | the words of new without its last line; small: "Each opens in a new tab. Come back here to open them again."; Be Rose (white) and Be Sam (secondary), links that open a new tab; small: "Want a clean start? A new Rose and Sam have nothing asked and no limits. Your old links keep working."; Start a new one (secondary); "System status" link |
-| 880px and up, 480px high | yours | the words of yours without the new-tab line, Be Rose and Be Sam; the two phones, each with "Open Rose's page" or "Open Sam's page" and the real page, live |
+| phone | yours | the words of new without the try-it line and Try KinCart; small: "Each opens in a new tab. Come back here to open them again."; Be Rose (white) and Be Sam (secondary), links that open a new tab; small: "Want a clean start? A new Rose and Sam have nothing asked and no limits. Your old links keep working."; Start a new one (secondary) |
+| 880px and up, 480px high | yours | the words of yours, with "Your Rose and Sam are on the right. Ask for something as Rose, then say OK as Sam." in place of the new-tab line, Be Rose and Be Sam; the two phones, each with "Open Rose's page" or "Open Sam's page" and the real page, live |
+| any | any | under the block, on the page colour: "How it works", three numbered steps: "**Your parent says what they need.** In their own words, typed or spoken: batteries, a night light, a phone charger." "**AI finds real options.** Up to three listings for each thing, under your limit, each explained plainly: what it is, why it fits, and what to watch for." "**You say OK from your phone.** Your phone buzzes with the ask. One tap pays with their saved PayPal, and you both get the receipt." Then "You stay in charge": "**Nothing is bought without your OK.** Untick anything you don't want, and it goes back to your parent." "**You set the limits.** A price for each item, and a total for each ask." "**No passwords change hands.** PayPal keeps the payment details, linked once from your parent's phone." Then the "System status" link. From 880px, the two lists sit side by side |
 | 1280px and up, 480px high | new, yours | the words in a column up to 480px wide on the left, the two phones on the right, the headline at 56px |
 | any | ready | grey notice at the top: "Your Rose and Sam are ready."; then yours |
 | any | restarting | Start a new one becomes "Starting…" with the spinner |
@@ -142,7 +147,7 @@ Checked on the preview, 2026-10-15, in Chromium and Firefox:
 
 The keyboard order follows the page: the words' controls, System status, then each phone's link and its page. The sample phones take no focus. On the block, focus rings are `showcase-on-stage`, because `text` on violet is 2.2:1.
 
-Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here there is no gradient, no card grid and no screenshot: one flat brand block, a headline that is the product in three steps, and the real product running beside it. Against Monzo: the full-bleed flat brand colour and heavy, plain headline, with no shadows. Against Vercel's restraint: one accent, and nothing that does not explain or run the product.
+Craft checks: a one-line "landing page for a demo app" prompt gives a gradient hero, three feature cards with icons, a "Get started" button and a screenshot. Here there is no gradient, no card grid and no screenshot: one flat brand block, a headline that is the product in three steps, and the real product running beside it. The steps are numbered because they are a sequence; the three points in charge are plain lines with a violet rule, not cards with icons. Against Monzo: the full-bleed flat brand colour and heavy, plain headline, with no shadows. Against Vercel's restraint: one accent, and nothing that does not explain or run the product.
 
 **Motion tier:** 2 on `/` only (D50), 1 everywhere else. One reveal as the page arrives: the words, the body, then the phones rise 24px and fade in, 120ms apart, over 640ms. Then nothing moves. Under reduced motion, nothing moves at all. The notices and "Starting…" behave as in tier 1.
 
@@ -264,7 +269,7 @@ Cut: a client component that adds the frames by window width (O14 proved lazy en
 **E2E:** `e2e/demo-home.spec.ts`, test "a judge plays Rose and Sam side by side", at 1280 by 800 with `test.use`.
 
 1. `reset()` saves household 1's PayPal.
-2. The judge opens `/` and sees "Rose asks." and two "Sample, not live" captions. They tap Try KinCart and see "Your Rose and Sam are ready.".
+2. The judge opens `/` and sees "Mom asks." and two "Sample, not live" captions. They tap Try KinCart and see "Your Rose and Sam are ready.".
 3. Rose's phone, `frameLocator('iframe[title="Rose\'s phone"]')`, shows "What do you need?". Sam's phone shows "Nothing to approve" and no "Notifications" heading.
 4. `searchFor()` gives the new household AA batteries at $9.99. Within 5 s, Rose's phone refreshes to "Which one would you like?". The judge picks it and taps Ask Sam.
 5. Within 5 s, Sam's phone shows "Rose would like this" and "OK, pay $9.99". The judge taps it.
