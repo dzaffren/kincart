@@ -27,6 +27,8 @@ test.describe("on a laptop", () => {
     const sam = samFrame.contentFrame();
     await expect(heading(rose)).toHaveText("What do you need?");
     await expect(heading(sam)).toHaveText("Nothing to approve");
+    // The page's reveal can still be moving the phones, so measure once it has finished.
+    await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState === "finished"));
     const words = (await heading(page).boundingBox())!;
     const roseBox = (await roseFrame.boundingBox())!;
     const samBox = (await samFrame.boundingBox())!;
