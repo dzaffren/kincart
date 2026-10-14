@@ -6,7 +6,7 @@ import { listed, type Receipt } from "./ui";
 
 type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean; emptyFind?: boolean };
 
-type SearchOn = { saved: SavedSearch | null; limitCents: number };
+type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null };
 
 export function roseState(
   vault: string | null,
@@ -29,11 +29,26 @@ export function roseState(
 
   const current = search.saved && (!request || search.saved.searchedAt > request.askedAt) ? search.saved : null;
   const { limitCents } = search;
+  const totalCents = search.totalCents ?? undefined;
   if (current?.outcome === "options") {
-    return { kind: "options", limitCents, words: current.words, listings: current.options, error: params.pickMissing ?? false };
+    return {
+      kind: "options",
+      limitCents,
+      totalCents,
+      words: current.words,
+      listings: current.options,
+      error: params.pickMissing ?? false,
+    };
   }
   if (current?.outcome === "basket") {
-    return { kind: "basket", limitCents, words: current.words, groups: current.groups, error: params.pickMissing ?? false };
+    return {
+      kind: "basket",
+      limitCents,
+      totalCents,
+      words: current.words,
+      groups: current.groups,
+      error: params.pickMissing ?? false,
+    };
   }
   if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
     return { kind: "paid", receipt: receiptOf(request) };
@@ -49,7 +64,14 @@ export function roseState(
     : current?.outcome === "retry"
       ? undefined
       : current?.outcome;
-  return { kind: "ask", limitCents, words: current?.words ?? (leftOut ? listed(leftOut) : undefined), outcome, problem };
+  return {
+    kind: "ask",
+    limitCents,
+    totalCents,
+    words: current?.words ?? (leftOut ? listed(leftOut) : undefined),
+    outcome,
+    problem,
+  };
 }
 
 function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {

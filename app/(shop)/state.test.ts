@@ -88,7 +88,11 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   groups: [],
   searchedAt,
 });
-const on = (search: SavedSearch | null = null, limitCents = 5000) => ({ saved: search, limitCents });
+const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
+  saved: search,
+  limitCents,
+  totalCents,
+});
 
 it("shows Rose the request box with Sam's limit once search is on, and the error after an empty Find", () => {
   expect(roseState(vault, null, {}, on())).toEqual({ kind: "ask", limitCents: 5000 });
@@ -108,6 +112,21 @@ it("shows Rose the current search's options, with the error after Ask Sam withou
     error: false,
   });
   expect(roseState(vault, null, { pickMissing: true }, on(saved("options")))).toMatchObject({ error: true });
+});
+
+it("names Sam's total limit on Rose's box, options and groups once Sam sets one", () => {
+  const groups = [{ thing: "AA batteries", options: [strap] }];
+
+  expect(roseState(vault, null, {}, on(null, 5000, 4000))).toEqual({ kind: "ask", limitCents: 5000, totalCents: 4000 });
+  expect(roseState(vault, null, {}, on(saved("options"), 5000, 4000))).toMatchObject({
+    kind: "options",
+    totalCents: 4000,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("basket"), groups }, 5000, 4000))).toMatchObject({
+    kind: "basket",
+    totalCents: 4000,
+  });
+  expect(roseState(vault, null, {}, on(null, 5000, null))).toEqual({ kind: "ask", limitCents: 5000 });
 });
 
 it("keeps Rose's words in the box when a search found nothing, too much, too many things, or Rose tries again", () => {

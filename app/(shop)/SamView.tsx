@@ -14,11 +14,21 @@ export type SamState =
 
 export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
 
+export type Total = { cents: number | null; saved?: boolean; error?: boolean; busy?: boolean };
+
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { state: SamState; answer?: Action; limit?: Limit; setLimit?: Action; notify?: ReactNode };
+type Props = {
+  state: SamState;
+  answer?: Action;
+  limit?: Limit;
+  setLimit?: Action;
+  total?: Total;
+  setTotal?: Action;
+  notify?: ReactNode;
+};
 
-export function SamView({ state, answer, limit, setLimit, notify }: Props) {
+export function SamView({ state, answer, limit, setLimit, total, setTotal, notify }: Props) {
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
@@ -72,7 +82,35 @@ export function SamView({ state, answer, limit, setLimit, notify }: Props) {
     <div className="screen">
       <SamOutcome state={state} />
       {notify}
-      {limit && <LimitForm limit={limit} setLimit={setLimit} />}
+      {limit && (
+        <LimitForm
+          label="Price limit"
+          name="limit"
+          hint={`${RELATIVE} is only shown items at or under this price.`}
+          value={limit.cents / 100}
+          error={limit.error && "Pick a whole-dollar amount from $5 to $500."}
+          saved={limit.saved && `Saved. ${RELATIVE}'s next search stays at ${wholeDollars(limit.cents)} or less.`}
+          busy={limit.busy}
+          action={setLimit}
+        />
+      )}
+      {total && (
+        <LimitForm
+          label="Total limit"
+          name="total"
+          hint={`The most ${RELATIVE} can ask for at once. Leave it empty for no total limit.`}
+          value={total.cents === null ? "" : total.cents / 100}
+          error={total.error && "Pick a whole-dollar amount from $5 to $2,500, or leave it empty."}
+          saved={
+            total.saved &&
+            (total.cents === null
+              ? "Saved. No total limit."
+              : `Saved. ${RELATIVE} can ask for up to ${wholeDollars(total.cents)} at once.`)
+          }
+          busy={total.busy}
+          action={setTotal}
+        />
+      )}
     </div>
   );
 }
@@ -122,18 +160,29 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
   );
 }
 
-function LimitForm({ limit, setLimit }: { limit: Limit; setLimit?: Action }) {
+type LimitFormProps = {
+  label: string;
+  name: string;
+  hint: string;
+  value: number | string;
+  error?: string | false;
+  saved?: string | false;
+  busy?: boolean;
+  action?: Action;
+};
+
+function LimitForm({ label, name, hint, value, error, saved, busy, action }: LimitFormProps) {
   const inputId = useId();
   const hintId = useId();
   const errorId = useId();
   return (
-    <form className="stack limit" action={setLimit}>
+    <form className="stack limit" action={action}>
       <div className="heading">
         <label className="field-label" htmlFor={inputId}>
-          Price limit
+          {label}
         </label>
         <p className="small" id={hintId}>
-          {RELATIVE} is only shown items at or under this price.
+          {hint}
         </p>
       </div>
       <div className="limit-row">
@@ -142,25 +191,25 @@ function LimitForm({ limit, setLimit }: { limit: Limit; setLimit?: Action }) {
           <input
             className="field-input"
             id={inputId}
-            name="limit"
+            name={name}
             inputMode="numeric"
-            defaultValue={limit.cents / 100}
-            aria-describedby={limit.error ? `${hintId} ${errorId}` : hintId}
-            aria-invalid={limit.error || undefined}
+            defaultValue={value}
+            aria-describedby={error ? `${hintId} ${errorId}` : hintId}
+            aria-invalid={!!error || undefined}
           />
         </span>
-        <Button type="submit" kind="secondary" busy={limit.busy} busyLabel="Saving…">
+        <Button type="submit" kind="secondary" busy={busy} busyLabel="Saving…">
           Save
         </Button>
       </div>
-      {limit.error && (
+      {error && (
         <p className="field-error" id={errorId}>
-          Pick a whole-dollar amount from $5 to $500.
+          {error}
         </p>
       )}
-      {limit.saved && (
+      {saved && (
         <p className="small" role="status">
-          Saved. {RELATIVE}&apos;s next search stays at {wholeDollars(limit.cents)} or less.
+          {saved}
         </p>
       )}
     </form>

@@ -10,6 +10,7 @@ import {
   forgetSubscription,
   getLimit,
   getSearch,
+  getTotal,
   getVault,
   keep,
   latest,
@@ -18,6 +19,7 @@ import {
   saveSubscription,
   saveVault,
   setLimit,
+  setTotal,
   stuck,
   subscriptionsFor,
 } from "./requests";
@@ -39,7 +41,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions");
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
@@ -256,6 +258,19 @@ it("keeps Sam's price limit, $50 until Sam sets one", async () => {
 
   await expect(setLimit(300)).rejects.toThrow();
   expect(await getLimit()).toBe(3000);
+});
+
+it("keeps no total limit until Sam sets one, and clears it", async () => {
+  expect(await getTotal()).toBeNull();
+
+  await setTotal(4000);
+  expect(await getTotal()).toBe(4000);
+
+  await expect(setTotal(300)).rejects.toThrow();
+  expect(await getTotal()).toBe(4000);
+
+  await setTotal(null);
+  expect(await getTotal()).toBeNull();
 });
 
 const samPhone = {

@@ -142,6 +142,24 @@ export async function setLimit(cents: number): Promise<void> {
   );
 }
 
+// No row means no total limit.
+export async function getTotal(): Promise<number | null> {
+  const rows = await query<{ cents: number }>("SELECT cents FROM total_limit WHERE id = 1");
+  return rows[0]?.cents ?? null;
+}
+
+export async function setTotal(cents: number | null): Promise<void> {
+  if (cents === null) {
+    await query("DELETE FROM total_limit");
+    return;
+  }
+  await query(
+    `INSERT INTO total_limit (id, cents) VALUES (1, $1)
+     ON CONFLICT (id) DO UPDATE SET cents = EXCLUDED.cents, set_at = now()`,
+    [cents],
+  );
+}
+
 export async function decline(id: number): Promise<PurchaseRequest | null> {
   const rows = await query<Row>(
     `UPDATE purchase_requests SET status = 'declined', answered_at = now()

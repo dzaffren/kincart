@@ -16,6 +16,7 @@ export async function reset(paypal: string | null, search?: { words: string; opt
   await sql("DELETE FROM paypal_vault");
   await sql("DELETE FROM rose_search");
   await sql("DELETE FROM price_limit");
+  await sql("DELETE FROM total_limit");
   await sql("DELETE FROM push_subscriptions");
   if (paypal) await sql("INSERT INTO paypal_vault (payment_token) VALUES ($1)", [paypal]);
   if (search) {

@@ -6,7 +6,7 @@ import { ITEMS } from "../../../../lib/shop/items";
 import { settleStuck } from "../../../../lib/shop/pay";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
-import { getLimit, getSearch, getVault, latest } from "../../../../lib/shop/requests";
+import { getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
 import { askSam, find, startLink, tryAgain } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
@@ -32,11 +32,12 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
   const settled = await settleStuck();
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
-  const [vault, request, saved, limitCents] = await Promise.all([
+  const [vault, request, saved, limitCents, totalCents] = await Promise.all([
     getVault(),
     latest(),
     on ? getSearch() : null,
     on ? getLimit() : 0,
+    on ? getTotal() : null,
   ]);
   const state = roseState(
     vault,
@@ -47,7 +48,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
       askAgain: query.ask === "1",
       emptyFind: query.find === "empty",
     },
-    on ? { saved, limitCents } : undefined,
+    on ? { saved, limitCents, totalCents } : undefined,
   );
 
   return (

@@ -19,6 +19,7 @@ import {
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
+  setTotal as saveTotal,
 } from "../../lib/shop/requests";
 import { sendPayment, sendPing } from "./pings";
 
@@ -113,6 +114,16 @@ export async function setLimit(token: string, formData: FormData): Promise<void>
   if (!Number.isInteger(dollars) || dollars < 5 || dollars > 500) redirect(`/h/${token}?limit=invalid`);
   await saveLimit(dollars * 100);
   redirect(`/h/${token}?limit=saved`);
+}
+
+// An empty box clears the total limit.
+export async function setTotal(token: string, formData: FormData): Promise<void> {
+  if (whoIs(token) !== "sam") return;
+  const typed = String(formData.get("total") ?? "").trim();
+  const dollars = Number(typed);
+  if (typed && (!Number.isInteger(dollars) || dollars < 5 || dollars > 2500)) redirect(`/h/${token}?total=invalid`);
+  await saveTotal(typed ? dollars * 100 : null);
+  redirect(`/h/${token}?total=saved`);
 }
 
 export async function subscribe(token: string, json: unknown): Promise<boolean> {

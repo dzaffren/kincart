@@ -3,8 +3,17 @@ import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
 import { notify } from "../../lib/shop/push";
-import { ask, getLimit, getSearch, latest, saveSearch, saveVault, subscriptionsFor } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, startLink, subscribe, tryAgain } from "./actions";
+import {
+  ask,
+  getLimit,
+  getSearch,
+  getTotal,
+  latest,
+  saveSearch,
+  saveVault,
+  subscriptionsFor,
+} from "../../lib/shop/requests";
+import { answer, askSam, find, setLimit, setTotal, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -36,7 +45,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
+  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions");
   await client.end();
   await saveVault("1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
@@ -158,6 +167,20 @@ it("saves Sam's limit in whole dollars from $5 to $500, and refuses anything els
     expect(await redirectOf(setLimit(sam, form({ limit })))).toBe(`/h/${sam}?limit=invalid`);
   }
   expect(await getLimit()).toBe(3000);
+});
+
+it("saves Sam's total limit in whole dollars from $5 to $2,500, clears it when empty, and refuses anything else", async () => {
+  expect(await redirectOf(setTotal(sam, form({ total: "40" })))).toBe(`/h/${sam}?total=saved`);
+  expect(await getTotal()).toBe(4000);
+
+  for (const total of ["3", "2501", "12.50", "abc"]) {
+    expect(await redirectOf(setTotal(sam, form({ total })))).toBe(`/h/${sam}?total=invalid`);
+  }
+  await expect(setTotal(rose, form({ total: "100" }))).resolves.toBeUndefined();
+  expect(await getTotal()).toBe(4000);
+
+  expect(await redirectOf(setTotal(sam, form({ total: " " })))).toBe(`/h/${sam}?total=saved`);
+  expect(await getTotal()).toBeNull();
 });
 
 const keys = {
