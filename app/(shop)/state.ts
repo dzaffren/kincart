@@ -1,10 +1,17 @@
+import type { Option } from "../../lib/shop/find";
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
 import type { RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
 import { listed, type Receipt } from "./ui";
 
-type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean; emptyFind?: boolean };
+type RoseParams = {
+  cancelled?: boolean;
+  pickMissing?: boolean;
+  askAgain?: boolean;
+  emptyFind?: boolean;
+  over?: string[];
+};
 
 type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null };
 
@@ -31,6 +38,7 @@ export function roseState(
   const { limitCents } = search;
   const totalCents = search.totalCents ?? undefined;
   if (current?.outcome === "options") {
+    const over = overOf(current.options, params.over, totalCents);
     return {
       kind: "options",
       limitCents,
@@ -38,9 +46,12 @@ export function roseState(
       words: current.words,
       listings: current.options,
       error: params.pickMissing ?? false,
+      picked: over?.ids[0],
+      overCents: over?.cents,
     };
   }
   if (current?.outcome === "basket") {
+    const over = overOf(current.groups.flatMap((group) => group.options), params.over, totalCents);
     return {
       kind: "basket",
       limitCents,
@@ -48,6 +59,8 @@ export function roseState(
       words: current.words,
       groups: current.groups,
       error: params.pickMissing ?? false,
+      picked: over?.ids,
+      overCents: over?.cents,
     };
   }
   if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
@@ -72,6 +85,14 @@ export function roseState(
     outcome,
     problem,
   };
+}
+
+// The picks Ask Sam sent back for going over Sam's total limit, while their saved prices still do (D36).
+function overOf(options: Option[], ids: string[] | undefined, totalCents: number | undefined) {
+  const picked = [...new Set(ids)].flatMap((id) => options.find((option) => option.id === id) ?? []);
+  const cents = picked.reduce((sum, option) => sum + option.cents, 0);
+  if (totalCents === undefined || cents <= totalCents) return undefined;
+  return { ids: picked.map((option) => option.id), cents };
 }
 
 function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {

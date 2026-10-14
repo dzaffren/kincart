@@ -15,6 +15,7 @@ import {
   decline,
   getLimit,
   getSearch,
+  getTotal,
   getVault,
   saveSearch,
   saveSubscription,
@@ -67,6 +68,13 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
     const option = saved?.options.find((listing) => listing.id === formData.get("listing"));
     const picks = saved?.outcome === "basket" ? basketPicks(saved.groups, formData) : option ? [{ thing: "", option }] : [];
     if (!picks.length) redirect(`/r/${token}?pick=missing`);
+    // Sam's total limit counts everything asked for at once, one pick or several (D34).
+    const cents = picks.reduce((sum, { option }) => sum + option.cents, 0);
+    const total = await getTotal();
+    if (total !== null && cents > total) {
+      console.log(`ask status=over cents=${cents} total=${total}`);
+      redirect(`/r/${token}?over=${picks.map(({ option }) => encodeURIComponent(option.id)).join(",")}`);
+    }
     if (await getVault()) {
       if (picks.length === 1) {
         const [{ option }] = picks;
@@ -81,7 +89,7 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
           reason: why,
           thing,
         }));
-        const item = { id: "basket", name: things(lines.length), cents: lines.reduce((sum, line) => sum + line.cents, 0) };
+        const item = { id: "basket", name: things(lines.length), cents };
         if (await ask(item, undefined, lines)) sendPing("asked", { item, lines });
       }
       await clearSearch();
