@@ -1,31 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
-import type { Option } from "../lib/shop/find";
-import { reset, sql } from "./db";
+import { listing, reset, searchFor } from "./db";
 
 const savedPaypal = process.env.PAYPAL_E2E_VAULT_ID ?? "";
 
 const heading = (page: Page) => page.getByRole("heading", { level: 1 });
-
-const listing = (id: string, name: string, cents: number, shop: string): Option => ({
-  id,
-  name,
-  cents,
-  shop,
-  url: `https://www.${shop}/`,
-  what: `${name}.`,
-  why: "It is what Rose asked for.",
-  watch: "Check the pack before you buy.",
-});
-
-// The newest household gets a one-listing search, so its Rose asks at a fixed price.
-async function searchFor(words: string, option: Option) {
-  const [{ id }] = await sql("SELECT max(id) AS id FROM households");
-  await sql("INSERT INTO rose_search (id, words, outcome, listings) VALUES ($1, $2, 'options', $3)", [
-    id,
-    words,
-    JSON.stringify([option]),
-  ]);
-}
 
 async function startOwn(home: Page) {
   await home.goto("/");
