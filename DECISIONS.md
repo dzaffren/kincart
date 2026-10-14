@@ -213,3 +213,24 @@ Why: it proves our server's encrypted, signed send end to end on every push, mat
 Rejected: running the push e2e by hand only (CI would never catch a broken notification).
 Source: docs/specs/ping-helper.md
 Status: active
+
+## D31 · 2026-10-14 · A basket searches all its things at once, each with find-and-explain's two calls
+
+Why: a 5-thing basket must show within 20 s (O5); searched all at once, it took 7.2 to 7.7 s in the spike with no rate limit (O12), where one after another would add up every thing's time. Each thing keeps its own searches and Haiku pick, so a thing that fails blanks only its own group (scenario 3).
+Rejected: one thing after another (about 27 s for five at the spike's 4.3 to 5.9 s a thing, past the 20 s budget), one Haiku call choosing for every thing at once (one long answer, and one bad thing spoils the whole basket).
+Source: docs/specs/basket.md
+Status: active
+
+## D32 · 2026-10-14 · A basket is one purchase request, with its lines in a jsonb column
+
+Why: one OK and one charge per basket (scenario 2), and the one-open index already keeps Rose to one request at a time; the lines are only ever read with their request, like Rose's saved listings (D23).
+Rejected: a `request_lines` table (a join on every 3 s render, for rows nothing reads alone), one request per thing (Sam answers each one, the problem this slice removes).
+Source: docs/specs/basket.md
+Status: active
+
+## D33 · 2026-10-14 · A basket is charged as one PayPal purchase unit for the ticked total
+
+Why: `charge()` stays as it is, and our receipt already lists every line (scenario 2).
+Rejected: PayPal line items with an amount breakdown (Rose's PayPal activity would list each thing, but no scenario needs it, and the item amounts must add up to the total exactly or PayPal refuses the order).
+Source: docs/specs/basket.md
+Status: active
