@@ -47,8 +47,13 @@ test("Sam's phone buzzes on an ask, Rose's on the payment", async ({ baseURL }) 
     baseURL,
     viewport: { width: 390, height: 844 },
     permissions: ["notifications"],
-    // Playwright's Firefox turns its push service off; these two turn it back on.
-    firefoxUserPrefs: { "dom.push.serverURL": "wss://push.services.mozilla.com/", "dom.push.connection.enabled": true },
+    // Playwright's Firefox turns its push service off; the first two turn it back on. The third shows
+    // notifications without a desktop's notification service, which CI's runner doesn't have.
+    firefoxUserPrefs: {
+      "dom.push.serverURL": "wss://push.services.mozilla.com/",
+      "dom.push.connection.enabled": true,
+      "alerts.useSystemBackend": false,
+    },
   });
 
   try {
