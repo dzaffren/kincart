@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { things } from "../../lib/shop/items";
+import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, RELATIVE, Summary, type Line } from "./ui";
+import { money, RELATIVE, Summary } from "./ui";
 
 type Action = (formData: FormData) => void | Promise<void>;
 
@@ -22,7 +24,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [] }: Pr
   return (
     <>
       <h1>
-        {RELATIVE} would like {lines.length} things
+        {RELATIVE} would like {things(lines.length)}
       </h1>
       <form className="flow" action={answer}>
         {busy ? (

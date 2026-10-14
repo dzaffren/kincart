@@ -1,29 +1,50 @@
 import { after } from "next/server";
-import type { Item } from "../../lib/shop/items";
+import { things, type Item } from "../../lib/shop/items";
 import type { PayResult } from "../../lib/shop/pay";
 import type { Person } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
-import { HELPER, money, RELATIVE } from "./ui";
+import type { Line } from "../../lib/shop/requests";
+import { HELPER, listed, money, RELATIVE } from "./ui";
 
 export type PingKind = "asked" | "paid" | "declined" | "failed";
 
+// A request, or what Rose just asked for: a basket has lines.
+type Subject = { item: Item; lines?: Line[] | null; leftOut?: string[] | null };
+
 // The item goes in the text, not the title: Android shows one line of title.
-export function ping(kind: PingKind, item: Item): { to: Person; title: string; body: string } {
+export function ping(kind: PingKind, { item, lines, leftOut }: Subject): { to: Person; title: string; body: string } {
+  const count = lines && things(lines.length);
   switch (kind) {
     case "asked":
-      return {
-        to: "sam",
-        title: `${RELATIVE} would like something`,
-        body: `${item.name}, ${money(item.cents)}. Tap to see it and say OK or No.`,
-      };
+      return count
+        ? {
+            to: "sam",
+            title: `${RELATIVE} would like ${count}`,
+            body: `${money(item.cents)} in total. Tap to see them and say OK or No.`,
+          }
+        : {
+            to: "sam",
+            title: `${RELATIVE} would like something`,
+            body: `${item.name}, ${money(item.cents)}. Tap to see it and say OK or No.`,
+          };
     case "paid":
       return {
         to: "rose",
         title: `${HELPER} said OK`,
-        body: `${item.name} is paid: ${money(item.cents)}. Tap to see the receipt.`,
+        body: `${
+          leftOut
+            ? `${HELPER} paid ${money(item.cents)} for ${count} and left out ${listed(leftOut)}.`
+            : count
+              ? `Your ${count} are paid: ${money(item.cents)}.`
+              : `${item.name} is paid: ${money(item.cents)}.`
+        } Tap to see the receipt.`,
       };
     case "declined":
-      return { to: "rose", title: `${HELPER} said no`, body: `${HELPER} said no to ${item.name}. Nothing was taken.` };
+      return {
+        to: "rose",
+        title: `${HELPER} said no`,
+        body: `${HELPER} said no to ${count ? `your ${count}` : item.name}. Nothing was taken.`,
+      };
     case "failed":
       return {
         to: "rose",
@@ -34,13 +55,13 @@ export function ping(kind: PingKind, item: Item): { to: Person; title: string; b
 }
 
 // Sent once the response is out, so a slow push service never holds Rose's or Sam's tap (D29).
-export function sendPing(kind: PingKind, item: Item): void {
-  const { to, title, body } = ping(kind, item);
+export function sendPing(kind: PingKind, subject: Subject): void {
+  const { to, title, body } = ping(kind, subject);
   after(() => notify(to, { title, body }));
 }
 
 // An unknown charge sends nothing; Rose hears once the stuck-payment check settles it.
-export function sendPayment(result: PayResult, item: Item): void {
-  if (result === "paid") sendPing("paid", item);
-  if (result === "refused") sendPing("failed", item);
+export function sendPayment(result: PayResult, subject: Subject): void {
+  if (result === "paid") sendPing("paid", subject);
+  if (result === "refused") sendPing("failed", subject);
 }

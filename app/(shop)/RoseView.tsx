@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from "react";
-import type { Option } from "../../lib/shop/find";
-import type { Item } from "../../lib/shop/items";
+import type { Group, Option } from "../../lib/shop/find";
+import { things, type Item } from "../../lib/shop/items";
+import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
 import {
@@ -11,14 +12,11 @@ import {
   Notice,
   ReceiptCard,
   Summary,
-  type Line,
   type Receipt,
   wholeDollars,
 } from "./ui";
 
 type Outcome = { kind: "declined" | "failed"; item: Item; lines?: Line[] };
-
-export type Group = { thing: string; options: Option[]; problem?: "nothing found" | "over limit" };
 
 export type RoseState =
   | { kind: "not linked"; cancelled?: boolean; busy?: boolean }
@@ -34,7 +32,7 @@ export type RoseState =
       limitCents: number;
       words?: string;
       outcome?: Outcome;
-      problem?: "empty" | "nothing found" | "over limit" | "several" | "too many";
+      problem?: "empty" | "nothing found" | "over limit" | "too many";
       busy?: boolean;
     }
   | {
@@ -104,7 +102,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
           answers.
         </Notice>
         <Summary
-          title={state.lines ? `${state.lines.length} things` : state.item.name}
+          title={state.lines ? things(state.lines.length) : state.item.name}
           cents={state.item.cents}
           lines={state.lines}
           note={state.shop && `From ${state.shop}`}
@@ -121,9 +119,6 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
         <OutcomeNotice outcome={state.outcome} />
         {state.problem === "nothing found" && (
           <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>
-        )}
-        {state.problem === "several" && (
-          <Notice tone="neutral">One thing at a time for now. What would you like first?</Notice>
         )}
         {state.problem === "too many" && (
           <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
@@ -302,7 +297,7 @@ function OutcomeNotice({ outcome }: { outcome?: Outcome }) {
   if (outcome?.kind === "declined" && outcome.lines) {
     return (
       <Notice tone="neutral">
-        {HELPER} said no to your {outcome.lines.length} things. Nothing was taken.
+        {HELPER} said no to your {things(outcome.lines.length)}. Nothing was taken.
       </Notice>
     );
   }

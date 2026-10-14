@@ -18,6 +18,8 @@ function request(status: RequestStatus, item = glasses): PurchaseRequest {
     orderId: status === "paid" ? "3BP30887MC6972056" : null,
     captureId: status === "paid" ? "7BM91101S1572292D" : null,
     failureReason: status === "failed" ? "PERMISSION_DENIED" : null,
+    lines: null,
+    leftOut: null,
   };
 }
 
@@ -83,6 +85,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   words,
   outcome,
   options,
+  groups: [],
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000) => ({ saved: search, limitCents });
@@ -107,7 +110,7 @@ it("shows Rose the current search's options, with the error after Ask Sam withou
   expect(roseState(vault, null, { pickMissing: true }, on(saved("options")))).toMatchObject({ error: true });
 });
 
-it("keeps Rose's words in the box when a search found nothing, too much, a list, or Rose tries again", () => {
+it("keeps Rose's words in the box when a search found nothing, too much, too many things, or Rose tries again", () => {
   expect(roseState(vault, null, {}, on(saved("nothing found")))).toEqual({
     kind: "ask",
     limitCents: 5000,
@@ -115,7 +118,7 @@ it("keeps Rose's words in the box when a search found nothing, too much, a list,
     problem: "nothing found",
   });
   expect(roseState(vault, null, {}, on(saved("over limit")))).toMatchObject({ problem: "over limit", words });
-  expect(roseState(vault, null, {}, on(saved("several")))).toMatchObject({ problem: "several", words });
+  expect(roseState(vault, null, {}, on(saved("too many")))).toMatchObject({ problem: "too many", words });
   expect(roseState(vault, null, {}, on(saved("retry")))).toEqual({ kind: "ask", limitCents: 5000, words });
 });
 
@@ -153,6 +156,83 @@ it("shows Sam where a found item comes from and why it fits", () => {
     busy: false,
     found,
   });
+});
+
+const aa = {
+  id: "prod_3Ba7aA",
+  name: "Amazon Basics 24-Pack AA Alkaline Batteries",
+  cents: 999,
+  shop: "amazon.com",
+  url: "https://www.amazon.com/dp/B00MNV8E0C",
+  reason: "Enough for the remotes and clocks for a long while.",
+  thing: "AA batteries",
+};
+const light = {
+  id: "prod_6Nl2tL",
+  name: "Plug-In LED Night Light with Dusk-to-Dawn Sensor, 2 Pack",
+  cents: 1249,
+  shop: "target.com",
+  url: "https://www.target.com/p/A-81532901",
+  reason: "They come on by themselves when it gets dark.",
+  thing: "a night light",
+};
+const basket = { id: "basket", name: "2 things", cents: 2248 };
+const asked = (status: RequestStatus): PurchaseRequest => ({ ...request(status, basket), lines: [aa, light] });
+const trimmed = (status: RequestStatus): PurchaseRequest => ({
+  ...request(status, { id: "basket", name: "1 thing", cents: 999 }),
+  lines: [aa],
+  leftOut: ["a night light"],
+});
+const trimmedReceipt = {
+  item: { id: "basket", name: "1 thing", cents: 999 },
+  paidAt: answeredAt,
+  transactionId: "7BM91101S1572292D",
+  lines: [aa],
+  leftOut: ["a night light"],
+};
+
+it("shows Rose a group of listings for each thing, with the error after Ask Sam without a pick", () => {
+  const groups = [
+    { thing: "AA batteries", options: [strap] },
+    { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found" as const },
+  ];
+  const search = { ...saved("basket"), words: "AA batteries and a left-handed teapot for a cat", groups };
+
+  expect(roseState(vault, null, {}, on(search))).toEqual({
+    kind: "basket",
+    limitCents: 5000,
+    words: "AA batteries and a left-handed teapot for a cat",
+    groups,
+    error: false,
+  });
+  expect(roseState(vault, null, { pickMissing: true }, on(search))).toMatchObject({ kind: "basket", error: true });
+});
+
+it("shows Rose a basket's lines while waiting, on the receipt and under Sam's no", () => {
+  expect(roseState(vault, asked("waiting"), {}, on())).toEqual({ kind: "waiting", item: basket, askedAt, lines: [aa, light] });
+  expect(roseState(vault, asked("declined"), {}, on())).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    outcome: { kind: "declined", item: basket, lines: [aa, light] },
+  });
+  expect(roseState(vault, trimmed("paid"), {}, on())).toEqual({ kind: "paid", receipt: trimmedReceipt });
+});
+
+it("puts what Sam left out back in Rose's box when Rose asks for something else", () => {
+  expect(roseState(vault, trimmed("paid"), { askAgain: true }, on())).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words: "a night light",
+  });
+  expect(roseState(vault, asked("paid"), { askAgain: true }, on())).toEqual({ kind: "ask", limitCents: 5000 });
+});
+
+it("shows Sam a basket's lines to tick, the paid lines, or the outcome", () => {
+  expect(samState(asked("waiting"))).toEqual({ kind: "request", item: basket, askedAt, busy: false, lines: [aa, light] });
+  expect(samState(trimmed("paying"))).toMatchObject({ kind: "request", busy: true, lines: [aa] });
+  expect(samState(trimmed("paid"))).toEqual({ kind: "paid", receipt: trimmedReceipt });
+  expect(samState(trimmed("failed"))).toEqual({ kind: "failed", item: trimmedReceipt.item, lines: [aa] });
+  expect(samState(asked("declined"))).toEqual({ kind: "nothing", declined: basket, lines: [aa, light] });
 });
 
 const android: NotifyEnv = {

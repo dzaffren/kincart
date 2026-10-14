@@ -1,14 +1,11 @@
 import { useId, type ReactNode } from "react";
 import type { Option } from "../../lib/shop/find";
 import type { Item } from "../../lib/shop/items";
-import type { Source } from "../../lib/shop/requests";
+import type { Line } from "../../lib/shop/requests";
 import { LocalTime } from "./LocalTime";
 
 export const RELATIVE = "Rose";
 export const HELPER = "Sam";
-
-// thing is what Rose called it, such as "a night light"; name is the listing's own.
-export type Line = Item & Source & { thing: string };
 
 export type Receipt = { item: Item; paidAt: Date; transactionId: string; lines?: Line[]; leftOut?: string[] };
 

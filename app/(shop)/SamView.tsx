@@ -1,10 +1,10 @@
 import { useId, type ReactNode } from "react";
-import type { Item } from "../../lib/shop/items";
-import type { Source } from "../../lib/shop/requests";
+import { things, type Item } from "../../lib/shop/items";
+import type { Line, Source } from "../../lib/shop/requests";
 import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Line, type Receipt } from "./ui";
+import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
 
 export type SamState =
   | { kind: "nothing"; declined?: Item; lines?: Line[] }
@@ -100,7 +100,7 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
         <h1>Payment didn&apos;t go through</h1>
         <Notice tone="danger">
           Nothing was taken from {RELATIVE}&apos;s PayPal for{" "}
-          {state.lines ? `the ${state.lines.length} things` : state.item.name}. {RELATIVE} can ask again.
+          {state.lines ? `the ${things(state.lines.length)}` : state.item.name}. {RELATIVE} can ask again.
         </Notice>
       </>
     );
@@ -110,7 +110,7 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
     <>
       {state.declined && (
         <Notice tone="neutral">
-          You said no to {state.lines ? `${RELATIVE}'s ${state.lines.length} things` : state.declined.name}.{" "}
+          You said no to {state.lines ? `${RELATIVE}'s ${things(state.lines.length)}` : state.declined.name}.{" "}
           {RELATIVE} can see that.
         </Notice>
       )}

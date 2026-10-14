@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { BasketAnswer } from "../../BasketAnswer";
-import { RoseView, type Group } from "../../RoseView";
+import { RoseView } from "../../RoseView";
 import { SamView } from "../../SamView";
-import type { Option } from "../../../../lib/shop/find";
-import type { Line, Receipt } from "../../ui";
+import type { Group, Option } from "../../../../lib/shop/find";
+import type { Line } from "../../../../lib/shop/requests";
+import type { Receipt } from "../../ui";
 import "../approve-and-pay/preview.css";
 
 // The photos are an empty image, so each shows the grey square a photo sits on while it loads.
