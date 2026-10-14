@@ -20,3 +20,4 @@
 - Break the code once when pause 2 already built it
 - Check a client-only control is absent only after it would have shown
 - Give verifiers app/?shop?/ paths, not app/(shop)/
+- Wait for the page's animations to finish before measuring layout
