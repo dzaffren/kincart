@@ -63,13 +63,14 @@ test("Sam sets the price limit, and Rose's page shows it", async ({ page }) => {
   await reset(savedPaypal);
   await page.goto(`/h/${sam}`);
   const limit = page.getByRole("textbox", { name: "Price limit" });
+  const save = page.locator("form", { has: limit }).getByRole("button", { name: "Save" });
 
   await limit.fill("3");
-  await page.getByRole("button", { name: "Save" }).click();
+  await save.click();
   await expect(page.getByText("Pick a whole-dollar amount from $5 to $500.")).toBeVisible();
 
   await limit.fill("30");
-  await page.getByRole("button", { name: "Save" }).click();
+  await save.click();
   await expect(page.getByText("Saved. Rose's next search stays at $30 or less.")).toBeVisible();
 
   await page.goto(`/r/${rose}`);

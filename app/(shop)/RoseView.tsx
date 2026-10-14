@@ -9,6 +9,7 @@ import {
   ItemPicker,
   listed,
   ListingPicker,
+  money,
   Notice,
   ReceiptCard,
   Summary,
@@ -30,6 +31,7 @@ export type RoseState =
   | {
       kind: "ask";
       limitCents: number;
+      totalCents?: number;
       words?: string;
       outcome?: Outcome;
       problem?: "empty" | "nothing found" | "over limit" | "too many";
@@ -38,19 +40,23 @@ export type RoseState =
   | {
       kind: "options";
       limitCents: number;
+      totalCents?: number;
       words: string;
       listings: Option[];
       picked?: string;
       error?: boolean;
+      overCents?: number;
       busy?: boolean;
     }
   | {
       kind: "basket";
       limitCents: number;
+      totalCents?: number;
       words: string;
       groups: Group[];
       picked?: string[];
       error?: boolean;
+      overCents?: number;
       busy?: boolean;
     }
   | { kind: "waiting"; item: Item; askedAt: Date; shop?: string; lines?: Line[] }
@@ -158,16 +164,21 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
           </Button>
         </form>
         <p className="small">
-          {HELPER}&apos;s limit is {limit} an item. Nothing is paid until {HELPER} says OK.
+          {HELPER}&apos;s limit is {limit} an item
+          {state.totalCents !== undefined && ` and ${wholeDollars(state.totalCents)} in all`}. Nothing is paid until{" "}
+          {HELPER} says OK.
         </p>
         {notify}
       </div>
     );
   }
 
+  // The page comes back scrolled to the top after Ask Sam, so its notices go at the top.
   if (state.kind === "options") {
     return (
       <div className="screen">
+        {state.error && <Notice tone="neutral">Pick one first.</Notice>}
+        <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
         <div className="heading">
           <h1 id={headingId}>Which one would you like?</h1>
           <p className="small">
@@ -182,8 +193,8 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
             listings={state.listings}
             labelledBy={headingId}
             picked={state.picked}
-            error={state.error}
           />
+          <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
             Ask {HELPER}
           </Button>
@@ -202,6 +213,12 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
   if (state.kind === "basket") {
     return (
       <div className="screen">
+        {state.error && <Notice tone="neutral">Pick at least one first.</Notice>}
+        <OverNotice
+          totalCents={state.totalCents}
+          overCents={state.overCents}
+          several={new Set(state.picked?.filter(Boolean)).size > 1}
+        />
         <div className="heading">
           <h1>Which ones would you like?</h1>
           <p className="small">For &ldquo;{state.words}&rdquo;. Pick one for each thing you want.</p>
@@ -214,11 +231,11 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
                 group={group}
                 name={`pick-${index}`}
                 limitCents={state.limitCents}
-                picked={state.picked}
+                picked={state.picked?.[index]}
               />
             ))}
           </div>
-          {state.error && <p className="field-error">Pick at least one first.</p>}
+          <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
             Ask {HELPER}
           </Button>
@@ -269,7 +286,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
   );
 }
 
-type GroupProps = { group: Group; name: string; limitCents: number; picked?: string[] };
+type GroupProps = { group: Group; name: string; limitCents: number; picked?: string };
 
 function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
   const headingId = useId();
@@ -285,11 +302,30 @@ function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
           listings={group.options}
           labelledBy={headingId}
           name={name}
-          picked={group.options.find((option) => picked?.includes(option.id))?.id}
+          picked={picked}
           none="None of these"
         />
       )}
     </section>
+  );
+}
+
+function TotalLine({ totalCents }: { totalCents?: number }) {
+  if (totalCents === undefined) return null;
+  return (
+    <p className="small">
+      {HELPER}&apos;s limit is {wholeDollars(totalCents)} in all.
+    </p>
+  );
+}
+
+function OverNotice({ totalCents, overCents, several }: { totalCents?: number; overCents?: number; several: boolean }) {
+  if (totalCents === undefined || overCents === undefined) return null;
+  return (
+    <Notice tone="neutral">
+      That comes to {money(overCents)}. {HELPER}&apos;s limit is {wholeDollars(totalCents)} in all.{" "}
+      {several ? "Leave something out." : "Pick a cheaper one."}
+    </Notice>
   );
 }
 

@@ -88,7 +88,11 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   groups: [],
   searchedAt,
 });
-const on = (search: SavedSearch | null = null, limitCents = 5000) => ({ saved: search, limitCents });
+const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
+  saved: search,
+  limitCents,
+  totalCents,
+});
 
 it("shows Rose the request box with Sam's limit once search is on, and the error after an empty Find", () => {
   expect(roseState(vault, null, {}, on())).toEqual({ kind: "ask", limitCents: 5000 });
@@ -108,6 +112,55 @@ it("shows Rose the current search's options, with the error after Ask Sam withou
     error: false,
   });
   expect(roseState(vault, null, { pickMissing: true }, on(saved("options")))).toMatchObject({ error: true });
+});
+
+it("names Sam's total limit on Rose's box, options and groups once Sam sets one", () => {
+  const groups = [{ thing: "AA batteries", options: [strap] }];
+
+  expect(roseState(vault, null, {}, on(null, 5000, 4000))).toEqual({ kind: "ask", limitCents: 5000, totalCents: 4000 });
+  expect(roseState(vault, null, {}, on(saved("options"), 5000, 4000))).toMatchObject({
+    kind: "options",
+    totalCents: 4000,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("basket"), groups }, 5000, 4000))).toMatchObject({
+    kind: "basket",
+    totalCents: 4000,
+  });
+  expect(roseState(vault, null, {}, on(null, 5000, null))).toEqual({ kind: "ask", limitCents: 5000 });
+});
+
+it("keeps Rose's picks and names their sum after Ask Sam went over the total limit", () => {
+  const charger = { ...strap, id: "prod_7Bk2wC", cents: 2499 };
+  const lamp = { ...strap, id: "prod_5Lp8dK", cents: 4499 };
+  const groups = [
+    { thing: "AA batteries", options: [{ ...strap, id: "prod_3Ba7aA", cents: 999 }] },
+    { thing: "a night light", options: [{ ...strap, id: "prod_6Nl2tL", cents: 1249 }] },
+    { thing: "a phone charger", options: [charger] },
+  ];
+  const basket = on({ ...saved("basket"), groups }, 5000, 4000);
+  const over = ["prod_3Ba7aA", "prod_6Nl2tL", "prod_7Bk2wC"];
+
+  expect(roseState(vault, null, { over }, basket)).toMatchObject({ kind: "basket", picked: over, overCents: 4747 });
+  expect(roseState(vault, null, { over: [...over, "prod_madeUp1"] }, basket)).toMatchObject({
+    picked: over,
+    overCents: 4747,
+  });
+  expect(roseState(vault, null, { over: ["prod_3Ba7aA", "", "prod_7Bk2wC"] }, on({ ...saved("basket"), groups }, 5000, 3000))).toMatchObject({
+    picked: ["prod_3Ba7aA", "", "prod_7Bk2wC"],
+    overCents: 3498,
+  });
+  const shared = [groups[0], { thing: "batteries for the remote", options: groups[0].options }, groups[2]];
+  expect(
+    roseState(vault, null, { over: ["prod_3Ba7aA", "prod_3Ba7aA", "prod_7Bk2wC"] }, on({ ...saved("basket"), groups: shared }, 5000, 3000)),
+  ).toMatchObject({ picked: ["prod_3Ba7aA", "prod_3Ba7aA", "prod_7Bk2wC"], overCents: 3498 });
+  expect(roseState(vault, null, { over }, on({ ...saved("basket"), groups }, 5000, 5000))).toEqual(
+    roseState(vault, null, {}, on({ ...saved("basket"), groups }, 5000, 5000)),
+  );
+  expect(roseState(vault, null, { over: ["prod_5Lp8dK"] }, on({ ...saved("options"), options: [strap, lamp] }, 5000, 4000))).toMatchObject({
+    kind: "options",
+    picked: "prod_5Lp8dK",
+    overCents: 4499,
+  });
 });
 
 it("keeps Rose's words in the box when a search found nothing, too much, too many things, or Rose tries again", () => {

@@ -5,8 +5,8 @@ import { searchOn } from "../../../../lib/shop/find";
 import { settleStuck } from "../../../../lib/shop/pay";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
-import { getLimit, latest } from "../../../../lib/shop/requests";
-import { answer, setLimit } from "../../actions";
+import { getLimit, getTotal, latest } from "../../../../lib/shop/requests";
+import { answer, setLimit, setTotal } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -28,11 +28,17 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
 
   const settled = await settleStuck();
   if (settled) sendPayment(settled.result, settled.request);
-  const [request, limitCents] = await Promise.all([latest(), searchOn() ? getLimit() : null]);
+  const on = searchOn();
+  const [request, limitCents, totalCents] = await Promise.all([
+    latest(),
+    on ? getLimit() : null,
+    on ? getTotal() : null,
+  ]);
   const limit =
     limitCents === null
       ? undefined
       : { cents: limitCents, saved: query.limit === "saved", error: query.limit === "invalid" };
+  const total = on ? { cents: totalCents, saved: query.total === "saved", error: query.total === "invalid" } : undefined;
 
   return (
     <main>
@@ -41,6 +47,8 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
         answer={request ? answer.bind(null, token, request.id) : undefined}
         limit={limit}
         setLimit={setLimit.bind(null, token)}
+        total={total}
+        setTotal={setTotal.bind(null, token)}
         notify={pushOn() ? <NotifyControl who="sam" token={token} publicKey={publicKey()} /> : undefined}
       />
       <Refresher />

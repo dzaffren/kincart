@@ -76,7 +76,7 @@ test("Sam says no and nothing is charged", async ({ page, context }) => {
   await reset(savedPaypal);
   await page.goto(`/r/${rose}`);
   await page.getByRole("button", { name: "Ask Sam" }).click();
-  await expect(page.getByText("Pick one first.")).toBeVisible();
+  await expect(page.getByText("Pick one first.")).toBeInViewport();
 
   await roseAsksFor(page, /AA batteries, pack of 8/);
   const samPage = await context.newPage();

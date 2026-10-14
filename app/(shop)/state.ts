@@ -1,12 +1,19 @@
+import type { Option } from "../../lib/shop/find";
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
 import type { RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
 import { listed, type Receipt } from "./ui";
 
-type RoseParams = { cancelled?: boolean; pickMissing?: boolean; askAgain?: boolean; emptyFind?: boolean };
+type RoseParams = {
+  cancelled?: boolean;
+  pickMissing?: boolean;
+  askAgain?: boolean;
+  emptyFind?: boolean;
+  over?: string[];
+};
 
-type SearchOn = { saved: SavedSearch | null; limitCents: number };
+type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null };
 
 export function roseState(
   vault: string | null,
@@ -29,11 +36,35 @@ export function roseState(
 
   const current = search.saved && (!request || search.saved.searchedAt > request.askedAt) ? search.saved : null;
   const { limitCents } = search;
+  const totalCents = search.totalCents ?? undefined;
   if (current?.outcome === "options") {
-    return { kind: "options", limitCents, words: current.words, listings: current.options, error: params.pickMissing ?? false };
+    const over = overOf([current.options.find(({ id }) => id === params.over?.[0])], totalCents);
+    return {
+      kind: "options",
+      limitCents,
+      totalCents,
+      words: current.words,
+      listings: current.options,
+      error: params.pickMissing ?? false,
+      picked: over?.ids[0],
+      overCents: over?.cents,
+    };
   }
   if (current?.outcome === "basket") {
-    return { kind: "basket", limitCents, words: current.words, groups: current.groups, error: params.pickMissing ?? false };
+    const over = overOf(
+      current.groups.map(({ options }, index) => options.find(({ id }) => id === params.over?.[index])),
+      totalCents,
+    );
+    return {
+      kind: "basket",
+      limitCents,
+      totalCents,
+      words: current.words,
+      groups: current.groups,
+      error: params.pickMissing ?? false,
+      picked: over?.ids,
+      overCents: over?.cents,
+    };
   }
   if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
     return { kind: "paid", receipt: receiptOf(request) };
@@ -49,7 +80,23 @@ export function roseState(
     : current?.outcome === "retry"
       ? undefined
       : current?.outcome;
-  return { kind: "ask", limitCents, words: current?.words ?? (leftOut ? listed(leftOut) : undefined), outcome, problem };
+  return {
+    kind: "ask",
+    limitCents,
+    totalCents,
+    words: current?.words ?? (leftOut ? listed(leftOut) : undefined),
+    outcome,
+    problem,
+  };
+}
+
+// The picks Ask Sam sent back for going over Sam's total limit, one place per group, while their
+// saved prices still do (D36). A listing picked in two groups counts once, as in askSam.
+function overOf(picks: (Option | undefined)[], totalCents: number | undefined) {
+  const prices = new Map(picks.flatMap((option) => (option ? [[option.id, option.cents] as const] : [])));
+  const cents = [...prices.values()].reduce((sum, price) => sum + price, 0);
+  if (totalCents === undefined || cents <= totalCents) return undefined;
+  return { ids: picks.map((option) => option?.id ?? ""), cents };
 }
 
 function fixedListState(request: PurchaseRequest | null, params: RoseParams): RoseState {

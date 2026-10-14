@@ -35,6 +35,7 @@ it("migrates up, back down, and up again", async () => {
     "rose_search",
     "price_limit",
     "push_subscriptions",
+    "total_limit",
   ]) {
     expect(await tableExists(table)).toBe(true);
   }
@@ -43,13 +44,11 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "groups")).toBe(true);
 
   await migrate("down", url);
-  expect(await columnExists("purchase_requests", "lines")).toBe(false);
-  expect(await columnExists("purchase_requests", "left_out")).toBe(false);
-  expect(await columnExists("rose_search", "groups")).toBe(false);
-  expect(await tableExists("push_subscriptions")).toBe(true);
-  expect(await columnExists("purchase_requests", "reason")).toBe(true);
+  expect(await tableExists("total_limit")).toBe(false);
+  expect(await tableExists("price_limit")).toBe(true);
+  expect(await columnExists("purchase_requests", "lines")).toBe(true);
+  expect(await columnExists("rose_search", "groups")).toBe(true);
 
   await migrate("up", url);
-  expect(await columnExists("purchase_requests", "left_out")).toBe(true);
-  expect(await columnExists("rose_search", "groups")).toBe(true);
+  expect(await tableExists("total_limit")).toBe(true);
 });

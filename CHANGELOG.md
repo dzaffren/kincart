@@ -18,3 +18,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - On iPhone, Rose's or Sam's link can be added to the Home Screen as KinCart, and opens their own page.
 - Rose can ask for up to five things at once and pick a listing for each, and Sam answers them all with one OK and one payment.
 - Sam can untick anything Rose asked for before paying, and what Sam leaves out goes back in Rose's box for the next ask.
+- Sam can set a total limit for everything Rose asks for at once, or leave it empty for none.
+- When Rose's picks come to more than Sam's total limit, Rose sees the total and leaves something out before anything reaches Sam.
+
+### Fixed
+
+- After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.

@@ -15,10 +15,12 @@ import {
   decline,
   getLimit,
   getSearch,
+  getTotal,
   getVault,
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
+  setTotal as saveTotal,
 } from "../../lib/shop/requests";
 import { sendPayment, sendPing } from "./pings";
 
@@ -66,6 +68,18 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
     const option = saved?.options.find((listing) => listing.id === formData.get("listing"));
     const picks = saved?.outcome === "basket" ? basketPicks(saved.groups, formData) : option ? [{ thing: "", option }] : [];
     if (!picks.length) redirect(`/r/${token}?pick=missing`);
+    // Sam's total limit counts everything asked for at once, one pick or several (D34).
+    const cents = picks.reduce((sum, { option }) => sum + option.cents, 0);
+    const total = await getTotal();
+    if (total !== null && cents > total) {
+      console.log(`ask status=over cents=${cents} total=${total}`);
+      // One place per group, empty for a group left out, so each group gets its own pick back.
+      const over =
+        saved?.outcome === "basket"
+          ? saved.groups.map(({ options }, index) => options.find(({ id }) => id === formData.get(`pick-${index}`))?.id ?? "")
+          : picks.map(({ option }) => option.id);
+      redirect(`/r/${token}?over=${over.map(encodeURIComponent).join(",")}`);
+    }
     if (await getVault()) {
       if (picks.length === 1) {
         const [{ option }] = picks;
@@ -80,7 +94,7 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
           reason: why,
           thing,
         }));
-        const item = { id: "basket", name: things(lines.length), cents: lines.reduce((sum, line) => sum + line.cents, 0) };
+        const item = { id: "basket", name: things(lines.length), cents };
         if (await ask(item, undefined, lines)) sendPing("asked", { item, lines });
       }
       await clearSearch();
@@ -113,6 +127,16 @@ export async function setLimit(token: string, formData: FormData): Promise<void>
   if (!Number.isInteger(dollars) || dollars < 5 || dollars > 500) redirect(`/h/${token}?limit=invalid`);
   await saveLimit(dollars * 100);
   redirect(`/h/${token}?limit=saved`);
+}
+
+// An empty box clears the total limit.
+export async function setTotal(token: string, formData: FormData): Promise<void> {
+  if (whoIs(token) !== "sam") return;
+  const typed = String(formData.get("total") ?? "").trim();
+  const dollars = Number(typed);
+  if (typed && (!Number.isInteger(dollars) || dollars < 5 || dollars > 2500)) redirect(`/h/${token}?total=invalid`);
+  await saveTotal(typed ? dollars * 100 : null);
+  redirect(`/h/${token}?total=saved`);
 }
 
 export async function subscribe(token: string, json: unknown): Promise<boolean> {

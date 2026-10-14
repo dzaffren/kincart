@@ -3,8 +3,18 @@ import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
 import { notify } from "../../lib/shop/push";
-import { ask, getLimit, getSearch, latest, saveSearch, saveVault, subscriptionsFor } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, startLink, subscribe, tryAgain } from "./actions";
+import {
+  ask,
+  getLimit,
+  getSearch,
+  getTotal,
+  latest,
+  saveSearch,
+  saveVault,
+  setTotal as saveTotal,
+  subscriptionsFor,
+} from "../../lib/shop/requests";
+import { answer, askSam, find, setLimit, setTotal, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -36,7 +46,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM push_subscriptions");
+  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions");
   await client.end();
   await saveVault("1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
@@ -158,6 +168,20 @@ it("saves Sam's limit in whole dollars from $5 to $500, and refuses anything els
     expect(await redirectOf(setLimit(sam, form({ limit })))).toBe(`/h/${sam}?limit=invalid`);
   }
   expect(await getLimit()).toBe(3000);
+});
+
+it("saves Sam's total limit in whole dollars from $5 to $2,500, clears it when empty, and refuses anything else", async () => {
+  expect(await redirectOf(setTotal(sam, form({ total: "40" })))).toBe(`/h/${sam}?total=saved`);
+  expect(await getTotal()).toBe(4000);
+
+  for (const total of ["3", "2501", "12.50", "abc"]) {
+    expect(await redirectOf(setTotal(sam, form({ total })))).toBe(`/h/${sam}?total=invalid`);
+  }
+  await expect(setTotal(rose, form({ total: "100" }))).resolves.toBeUndefined();
+  expect(await getTotal()).toBe(4000);
+
+  expect(await redirectOf(setTotal(sam, form({ total: " " })))).toBe(`/h/${sam}?total=saved`);
+  expect(await getTotal()).toBeNull();
 });
 
 const keys = {
@@ -362,6 +386,87 @@ it("counts a listing picked under two things once", async () => {
 
   await redirectOf(askSam(rose, form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_3Ba7aA" })));
   expect(await latest()).toMatchObject({ item: { id: "prod_3Ba7aA", cents: 999 }, lines: null });
+});
+
+const belkin = option("prod_7Bk2wC", "Belkin 25W USB-C Wall Charger with 6 ft Cable", 2499, "bestbuy.com");
+const capped = [
+  { thing: "AA batteries", options: [aa24] },
+  { thing: "a night light", options: [plugLight] },
+  { thing: "a phone charger", options: [belkin] },
+];
+
+it("stops picks over Sam's total limit before they reach Sam, and asks once Rose leaves one out", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveTotal(4000);
+  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
+
+  const three = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_6Nl2tL", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, three))).toBe(`/r/${rose}?over=prod_3Ba7aA,prod_6Nl2tL,prod_7Bk2wC`);
+  expect(await latest()).toBeNull();
+  expect(notify).not.toHaveBeenCalled();
+  expect(console.log).toHaveBeenCalledWith("ask status=over cents=4747 total=4000");
+  expect(await getSearch()).toMatchObject({ outcome: "basket" });
+
+  const two = form({ "pick-0": "prod_3Ba7aA", "pick-1": "", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, two))).toBe(`/r/${rose}`);
+  expect(await latest()).toMatchObject({ item: { id: "basket", name: "2 things", cents: 3498 }, status: "waiting" });
+});
+
+it("sends each group's pick back in its own place, with an empty place for a group left out", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const aa16 = option("prod_8En1rG", "Energizer MAX AA Batteries, 16 Count", 1449, "walmart.com");
+  await saveTotal(3000);
+  await saveSearch("AA batteries, batteries for the remote and a phone charger", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24, aa16] },
+      { thing: "batteries for the remote", options: [aa24] },
+      { thing: "a phone charger", options: [belkin] },
+    ],
+  });
+
+  const leftOut = form({ "pick-0": "prod_8En1rG", "pick-1": "", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, leftOut))).toBe(`/r/${rose}?over=prod_8En1rG,,prod_7Bk2wC`);
+  const shared = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_3Ba7aA", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, shared))).toBe(`/r/${rose}?over=prod_3Ba7aA,prod_3Ba7aA,prod_7Bk2wC`);
+  expect(await latest()).toBeNull();
+});
+
+it("lets picks that come to exactly Sam's total limit through", async () => {
+  searchOn();
+  const dimmer = option("prod_4Dm1nL", "Dimmable Plug-In Night Light", 1501, "walmart.com");
+  await saveTotal(4000);
+  await saveSearch("a phone charger and a night light", {
+    outcome: "basket",
+    groups: [
+      { thing: "a phone charger", options: [belkin] },
+      { thing: "a night light", options: [dimmer] },
+    ],
+  });
+
+  expect(await redirectOf(askSam(rose, form({ "pick-0": "prod_7Bk2wC", "pick-1": "prod_4Dm1nL" })))).toBe(`/r/${rose}`);
+  expect(await latest()).toMatchObject({ item: { id: "basket", cents: 4000 } });
+});
+
+it("stops one listing over Sam's total limit too", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveTotal(3000);
+  await saveSearch("warm slippers that are easy to put on, size 8", { outcome: "options", options: [strap] });
+
+  expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY" })))).toBe(`/r/${rose}?over=prod_9Wz4hY`);
+  expect(await latest()).toBeNull();
+});
+
+it("lets any total through when Sam has set no total limit", async () => {
+  searchOn();
+  await saveSearch("AA batteries, a night light and a phone charger", { outcome: "basket", groups: capped });
+
+  const three = form({ "pick-0": "prod_3Ba7aA", "pick-1": "prod_6Nl2tL", "pick-2": "prod_7Bk2wC" });
+  expect(await redirectOf(askSam(rose, three))).toBe(`/r/${rose}`);
+  expect(await latest()).toMatchObject({ item: { name: "3 things", cents: 4747 } });
 });
 
 function ticked(...lines: string[]) {
