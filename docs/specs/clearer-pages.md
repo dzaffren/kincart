@@ -300,5 +300,6 @@ _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
+- **Backfill**: filling a new column from the data already there, before the code reads it.
 - **e2e**: end-to-end. One test that walks the whole slice as a user would.
 - **Good to know**: the AI's one-sentence warning about a listing, such as size, pack count, fit or delivery (`lib/shop/ai.ts:28`).
