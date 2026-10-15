@@ -172,6 +172,9 @@ Status: active
 | O2 | What happens with a photo of a handwritten shopping list? | question | spec p1 | user | Resolved | Each item on the list becomes a thing in a basket, up to 5, as typed words do. A photo of a product is one thing. 2026-10-16 |
 | O3 | Is Rose's photo kept after Find, and does Sam see it? | question | spec p1 | user | Resolved | No. The photo goes to Claude once. Rose and Sam see the AI's words for it. 2026-10-16 |
 | O4 | A judge on a laptop may have no product photo. Add sample photos? | question | spec p1 | user | Resolved | No. Any image file works from the laptop's file picker, and the video shows a real phone camera. 2026-10-16 |
+| O5 | Haiku 5.5 at low effort reads a phone photo of a CR2032 battery as a CR2032 coin battery, and a photo of a 3-item handwritten list as 3 things, within the 10 s timeout | unproven | spec p3 | poc | Open | — |
+| O6 | The browser shrinks a full-size camera photo to a JPEG under Next's 1 MB server action limit on real phones, including an iPhone's HEIC photos, and puts it back in the form | unproven | spec p3 | poc | Open | — |
+| O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | The owner takes two phone photos: a CR2032 battery, and a handwritten list of AA batteries, night light and phone charger. Their location data is stripped before they go into `e2e/photos/`. 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
