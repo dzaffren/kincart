@@ -73,16 +73,16 @@ Scenario: Rose takes a photo of a handwritten list
   And it shows three groups: AA batteries, a night light and a phone charger
   And one Ask Sam sends Rose's picks to Sam as one ask, as a typed list does
 
-Scenario Outline: KinCart can't search from what Rose picked
+Scenario Outline: KinCart can't use what Rose picked
   Given Rose's page shows "What do you need?"
-  When Rose picks <file> and taps Find
+  When Rose <does>
   Then Rose's page shows "<message>"
   And no photo is picked, and the box keeps any words that Rose typed
 
   Examples:
-    | file                                          | message                                                                            |
-    | a photo of Rose's garden, with nothing to buy | Couldn't tell what to buy from that photo. Try another photo, or type what you need. |
-    | a PDF, picked on a laptop                     | That file isn't a photo. Pick a photo, or type what you need.                      |
+    | does                                                               | message                                                                              |
+    | picks a photo of Rose's garden, with nothing to buy, and taps Find | Couldn't tell what to buy from that photo. Try another photo, or type what you need. |
+    | picks a PDF on a laptop                                            | That file isn't a photo. Pick a photo, or type what you need.                        |
 
 Scenario: Rose changes the AI's words after a photo
   Given Rose's page shows CR2032 listings for the AI's words "CR2032 coin battery"
@@ -110,6 +110,40 @@ Scenario: Rose changes the AI's words after a photo
 - A photo on the fixed-item screen, which shows only when search is off. Not planned.
 - A photo scene in the demo video. Separate work on `feat/demo-video`.
 
+## Interface
+
+```mermaid
+flowchart LR
+    A["What do you need?<br/>box · Take or pick a photo · Find"] -- "picks an image" --> P["Photo card<br/>photo · Your photo · Remove photo"]
+    A -- "picks a PDF" --> E["Under the photo button:<br/>That file isn't a photo."]
+    P -- "Remove photo" --> A
+    P -- "Find (busy: Looking…)" --> R["Which one would you like?<br/>For '…', from your photo."]
+    P -- "Find, a written list" --> B["Which ones would you like?<br/>For '…', from your photo."]
+    P -- "Find, nothing to buy" --> N["What do you need?<br/>notice: Couldn't tell what to buy"]
+    R -- "Try other words" --> A
+```
+
+The photo button sits under Rose's text box. A picked photo turns it into a card, and Find takes the card's photo and the box's words together.
+
+Screens, all in `app/(shop)/RoseView.tsx` unless named:
+
+- **Ask.** The heading, hint and box stay as today. Under the box is "Take or pick a photo" (secondary), then the line "A photo of the thing, or of your written list.", then Find. On a phone, the button opens the phone's own choice of camera or photos. On a laptop, it opens the file picker.
+- **Photo card** (`app/(shop)/PhotoPicker.tsx`). The picked photo at 128px, beside "Your photo" and "Add words above if you need to, such as a size." "Remove photo" (secondary) runs under both. The card enters with the existing enter animation.
+- **Busy.** Find shows "Looking…" with the spinner, as today. The photo stays, and its buttons go while Find runs, as Try other words does.
+- **Not a photo.** A file that isn't an image is dropped at once. The error "That file isn't a photo. Pick a photo, or type what you need." shows under the photo button, and the button points to it with `aria-describedby`.
+- **Nothing in the photo.** A neutral notice at the top: "Couldn't tell what to buy from that photo. Try another photo, or type what you need." Neutral, because nothing is broken.
+- **Neither words nor a photo.** The box's error changes from "Type what you need first." to "Type what you need, or add a photo, first."
+- **Results.** The line under "Which one would you like?" and "Which ones would you like?" adds ", from your photo" after the AI's words, such as: For "CR2032 coin battery", from your photo.
+- **Try other words.** The box holds the AI's words, and no photo is picked.
+
+**Motion tier:** 1. Only the photo card moves, with the existing enter animation (`opacity` and `transform`), and under reduced motion it does not.
+
+**Components used:** `Button` (primary), the `button button-secondary` classes on two plain buttons, `Notice` (neutral), `field-error`, `field-label`, `listing-photo`, `heading`, `small`, `stack`, `PageHead` and `PhoneFrame`. The two photo buttons are plain `<button>`s. `Button` shows its busy label on every unnamed button in a pending form. One new class, `photo-pick`, lays out the card on the `sunken` surface. It uses only existing tokens.
+
+**Design system:** `docs/design/design-system/` (D15). This slice adds no token. The reference is Stripe's forms: each error sits under the control it is about, and the card shows up only after a pick.
+
+**Preview:** `/preview/photo-ask` on `pnpm dev`, built from the real components (`app/(shop)/preview/photo-ask/page.tsx`). In the first frame, Take or pick a photo works for real.
+
 ## Decisions to record
 
 Drafted at pause 1. Pause 3 moves them under the technical plan, and `/build` appends them.
@@ -124,7 +158,7 @@ Status: active
 
 ## D64 · 2026-10-16 · Rose's photo goes to Claude once and is not kept
 
-Why: Rose's and Sam's pages show the AI's words for the photo, so nothing needs the photo after Find, and a photo taken at home can show more than the thing.
+Why: Rose sees the AI's words for the photo and Sam sees the listings, so nothing needs the photo after Find. A photo taken at home can also show more than the thing.
 Rejected: keep the photo and show it to Sam beside the listing (needs photo storage and a rule for deleting it, so a slice of its own).
 Source: docs/specs/photo-ask.md
 Status: active
