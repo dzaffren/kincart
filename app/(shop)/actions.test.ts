@@ -650,3 +650,13 @@ it("says a Skip failed when household 1 has no saved PayPal, and leaves Rose at 
   expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=failed reason=no demo PayPal`);
 });
 
+
+it("keeps the PayPal Rose linked in a new tab when she taps Skip in the old one, and says so", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await saveVault(ben, "8kf02113h7720954x");
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await getVault(ben)).toBe("8kf02113h7720954x");
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=kept`);
+});

@@ -62,8 +62,13 @@ export async function startLink(token: string): Promise<void> {
 export async function skipLink(token: string): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
-  const copied = await copyDemoVault(who.household);
-  console.log(`paypal skip household=${who.household} status=${copied ? "copied" : "failed reason=no demo PayPal"}`);
+  // A copy fails also when Rose linked her own in a new tab and then tapped Skip in the old one; that one stays.
+  const status = (await copyDemoVault(who.household))
+    ? "copied"
+    : (await getVault(who.household))
+      ? "kept"
+      : "failed reason=no demo PayPal";
+  console.log(`paypal skip household=${who.household} status=${status}`);
   redirect(`/r/${token}`);
 }
 
