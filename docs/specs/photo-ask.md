@@ -1,6 +1,6 @@
 # Photo ask
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** find-and-explain and basket, both shipped
@@ -221,6 +221,7 @@ The photo leaves Rose's phone without its location data, and only the AI's words
 | `app/(shop)/state.ts:41` | Options and basket pass `fromPhoto`. The ask state turns `"nothing in photo"` into its problem, and `notPhoto` into `"not a photo"`. Try other words saves `retry` with `fromPhoto` false, so the box holds the AI's words | 1, 3, 4, 5 |
 | `app/(shop)/r/[token]/page.tsx:54` | `notPhoto: query.find === "notphoto"` | 4 |
 | `db/migrations/0009_photo_ask.up.sql`, `.down.sql` | Add `from_photo`, and add `'nothing in photo'` to the outcome check | 1, 4 |
+| `db/migrations/0005_basket.up.sql` | Its outcome check is added `NOT VALID`, so a rerun of `db:up` passes over `'nothing in photo'` rows (O10) | 4 |
 | `scripts/migrate.test.ts:29` | `downToHouseholds()` also runs `0008_clearer_pages.down.sql` by hand. The first test checks `from_photo` up, down and up | migration |
 | `e2e/photo-ask.spec.ts`, `e2e/photos/cr2032.jpg`, `e2e/photos/list.jpg` | The slice's e2e, and the owner's two photos | 1, 4 |
 
@@ -246,7 +247,7 @@ erDiagram
     }
 ```
 
-**Migration:** expand only. `0009_photo_ask.up.sql` adds `from_photo boolean NOT NULL DEFAULT false` and replaces `rose_search_outcome_check` with the same list plus `'nothing in photo'`. Old code ignores the column. Old code that reads a `'nothing in photo'` row shows the plain ask screen, because the outcome matches none of its branches. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
+**Migration:** expand only. `0009_photo_ask.up.sql` adds `from_photo boolean NOT NULL DEFAULT false` and replaces `rose_search_outcome_check` with the same list plus `'nothing in photo'`. `db:up` reruns every up file, so `0005_basket.up.sql` now adds its narrower check `NOT VALID` (O10). Old code ignores the column. Old code that reads a `'nothing in photo'` row shows the plain ask screen, because the outcome matches none of its branches. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
 
 **Reverse:** promote the previous deploy on Vercel. Then, if wanted, `pnpm db:down` runs `0009_photo_ask.down.sql`: it sets `'nothing in photo'` rows to `'nothing found'`, puts back the old check, and drops `from_photo`. `scripts/migrate.test.ts` tests this path.
 
@@ -321,6 +322,8 @@ Recorded as D63, D64, D65, D66, D67.
 | O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | Generated, on the owner's request: `e2e/photos/cr2032.jpg` (4032×3024, 1.8 MB, a coin cell printed CR2032) and `e2e/photos/list.jpg` (3024×4032, 2.2 MB, the list in a handwriting font on lined paper). Both are drawn in Chromium, so they have no EXIF. Their print is cleaner than a real photo's, so the real-camera check is O8. Changed from "the owner takes two phone photos", 2026-10-16 |
 | O8 | A real iPhone in Safari shrinks a camera photo, HEIC included, and sends it (split from O6) | unproven | spec p3 | user | Resolved | Yes. On the owner's iPhone (iOS 18.4.1, Safari), a camera photo arrived as `image.jpg`, `image/jpeg`, 3,341,859 bytes, so Safari never had to read HEIC. It shrank from 3024×4032 to 1200×1600 at 738,732 bytes in 382 ms, went back into the input, and the server got `image/jpeg` starting `ffd8ff`. Spike on a Vercel preview of a throwaway branch, deleted after, 2026-10-16 |
 | O9 | Can Rose send several photos in one Find, one for each thing? | question | spec p3 | user | Resolved | Not in this slice. Two shrunk photos (519 to 546 KB each in O6) pass Next's 1 MB limit together, and the screens need a card for each. Later slice `photo-ask-several`, only if time is left. 2026-10-16 |
+| O10 | The plan changed only 0009. `db:up` reruns every up file, and `0005_basket.up.sql` re-adds the outcome check without `'nothing in photo'`. Once such a row exists, the next `db:up` fails at 0005: "check constraint "rose_search_outcome_check" of relation "rose_search" is violated by some row" | flag | build | user | Decided alone | Chose: 0005 adds its check `NOT VALID`, so only 0009's wider check validates rows, as D49 changed 0002 for an index. `scripts/migrate.test.ts` reruns `db:up` over a `'nothing in photo'` row. Other: a migrations table, so each file runs once (a new runner). Undo: revert `07cb0ae`'s change to `0005_basket.up.sql`, and drop the rerun test. 2026-10-16 |
+| O11 | The feat commits on this branch add no CHANGELOG line | flag | build | user | Decided alone | Chose: leave the lines to /ship, as for every earlier slice. Other: add them in each commit. Undo: add them in a docs commit. 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
