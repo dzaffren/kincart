@@ -218,8 +218,8 @@ The new tab does the PayPal round trip, and the home tab picks up the saved PayP
 | `app/(shop)/r/[token]/link/route.ts` (new) | `POST` calls `beginLink()`. It answers 404 for no address and `NextResponse.redirect(address, 303)` otherwise. 303, so the new tab goes to PayPal with a GET | Scenario 2: a server action's redirect stays inside the frame (D61) |
 | `app/(shop)/r/[token]/linked/route.ts:12` | The success redirect adds `?linked=1` | Scenario 2's notice |
 | `app/(shop)/state.ts:18` | `RoseParams` gets `linked`. The `ask` state carries `linked: true` when it is set | Scenario 2 |
-| `app/(shop)/r/[token]/page.tsx:33` | Reads `in` and `linked` from the query. Passes `skip`, `login={demoLogin()}`, and `framedLink="/r/<token>/link"` when `in=phone` | Scenarios 1, 2 |
-| `app/(shop)/RoseView.tsx:76` | `framed` becomes `framedLink?: string`. With it, Link PayPal is `<form method="post" action={framedLink} target="_blank">` with the hint. Without it, the server action form stays as it is, with its busy state. The email renders as two `white-space: nowrap` parts with a `<wbr>` before `@` | Scenarios 1, 2, and the Interface's email rule |
+| `app/(shop)/r/[token]/page.tsx:33` | Reads `in` and `linked` from the query. Passes `skip`, the `login` from `demoLogin()`, and `framedLink` set to `/r/<token>/link` when `in=phone` | Scenarios 1, 2 |
+| `app/(shop)/RoseView.tsx:76` | `framed` becomes `framedLink?: string`. With it, Link PayPal is a plain form that posts to `framedLink` with `target="_blank"`, and the hint shows. Without it, the server action form stays as it is, with its busy state. The email renders as two `white-space: nowrap` parts with a `<wbr>` before `@` | Scenarios 1, 2, and the Interface's email rule |
 | `app/(shop)/shop.css` | One `nowrap` rule for the email parts | The Interface's email rule |
 | `app/(shop)/ui.tsx:199` | `PhoneFrame`'s iframe `src` gets `?in=phone`. The "Open … page" link keeps the bare address | Scenario 2 (D61) |
 | `app/(shop)/preview/link-paypal-onboarding/page.tsx` | `framed` becomes `framedLink`, and the sample email becomes a PayPal-style `sb-` address | The preview matches the code |

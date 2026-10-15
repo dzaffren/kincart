@@ -38,7 +38,7 @@ Used by older shoppers and the relative who helps them pay online.
 | ping-helper | Shipped | Sam's phone buzzes when Rose asks for something, and Rose's phone buzzes when Sam answers, so neither has to keep their page open. | docs/specs/ping-helper.md |
 | basket | Shipped | Rose types several things at once and picks a listing for each one they want. Sam ticks the ones to pay for, and one OK makes one charge; anything Sam leaves out goes back to Rose. | docs/specs/basket.md |
 | basket-cap | Shipped | Sam sets a total limit for everything Rose asks for at once, such as $40. Rose's picks that come to more than that never reach Sam. | docs/specs/basket-cap.md |
-| households | Shipped | Each visitor to kincart.vercel.app starts their own Rose and Sam, with the demo PayPal already linked, and sees only their own asks, limits and phones. | docs/specs/households.md |
+| households | Shipped | Each visitor to kincart.vercel.app starts their own Rose and Sam, and sees only their own asks, limits and phones. | docs/specs/households.md |
 | demo-home | Shipped | The home page says what KinCart does for the helper who would use it. On a laptop, a judge's own Rose and Sam then run side by side, live, so Sam's page changes as Rose asks. | docs/specs/demo-home.md |
 | clearer-pages | Shipped | Sam sees the photo and the AI's "Good to know" note for each thing before paying. Rose's and Sam's pages show the KinCart name, and the listing photos get bigger. | docs/specs/clearer-pages.md |
 | link-paypal-onboarding | Shipped | A new Rose starts at Link PayPal, with a demo sandbox login on screen, and links on PayPal's own page; on a laptop PayPal opens in a new tab. Skip pays from the demo PayPal, as every new Rose did before. | docs/specs/link-paypal-onboarding.md |
