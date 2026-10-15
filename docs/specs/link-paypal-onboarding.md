@@ -1,6 +1,6 @@
 # Link PayPal onboarding
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** households
@@ -36,7 +36,7 @@ As a judge trying KinCart, I want to link Rose's PayPal myself on PayPal's own p
 flowchart LR
     J((Judge)) -- "taps Try KinCart" --> L["Rose: Link your PayPal to start<br/>demo login shown"]
     L -- "taps Link PayPal" --> P["PayPal sandbox sign-in<br/>(new tab)"]
-    P -- "signs in, Agree and Continue" --> R["/r/&lt;token&gt;/linked"]
+    P -- "signs in, Save and Continue" --> R["/r/&lt;token&gt;/linked"]
     R -- "saves Rose's PayPal" --> A["Rose: Your PayPal is linked.<br/>What do you need?"]
     L -- "taps Skip: use the demo PayPal" --> D["Rose: What do you need?<br/>demo PayPal"]
     P -- "cancels" --> N["Rose: PayPal isn't linked yet<br/>Link PayPal or Skip"]
@@ -49,10 +49,10 @@ The judge starts at Link PayPal, signs in on PayPal's page in a new tab and come
 ```mermaid
 stateDiagram-v2
     [*] --> NotLinked: Try KinCart or Start a new one
-    NotLinked --> LinkedOwn: Agree and Continue on PayPal
+    NotLinked --> LinkedOwn: Save and Continue on PayPal
     NotLinked --> LinkedDemo: Skip
     NotLinked --> NotLinkedCancelled: cancel on PayPal, or PayPal unreachable
-    NotLinkedCancelled --> LinkedOwn: Link PayPal again, then Agree and Continue
+    NotLinkedCancelled --> LinkedOwn: Link PayPal again, then Save and Continue
     NotLinkedCancelled --> LinkedDemo: Skip
 ```
 
@@ -71,7 +71,8 @@ Scenario: The judge links Rose's PayPal on PayPal's own page
   Given Rose's phone on the home page shows "Link your PayPal to start"
   When the judge taps Link PayPal
   Then PayPal's sandbox sign-in page opens in a new tab
-  When the judge signs in with the demo login and taps "Agree and Continue"
+  And PayPal's page says "For future payments to KinCart"
+  When the judge signs in with the demo login and taps "Save and Continue"
   Then that tab shows Rose's page with "Your PayPal is linked." above "What do you need?"
   And within 3 seconds Rose's phone on the home page shows "What do you need?"
   And Sam's OK on Rose's $8.79 ask for AA batteries charges the PayPal that the judge linked
@@ -172,7 +173,7 @@ flowchart TB
     ROSE -- "form target=_blank" --> TAB
     TAB -- "POST" --> LINK
     LINK -- "createSetupToken()" --> PP
-    PP -- "Agree and Continue, then return" --> LINKED
+    PP -- "Save and Continue, then return" --> LINKED
     LINKED -- "saveVault()" --> DB
     ROSE -- "Skip" --> SKIP
     SKIP -- "copyDemoVault(): household 1's token" --> DB
@@ -193,7 +194,7 @@ sequenceDiagram
     K->>P: POST /v3/vault/setup-tokens
     P-->>K: setup token id, approve URL
     K-->>T: 303 approve URL, Set-Cookie setup_token
-    T->>P: sign in with the demo login, Agree and Continue
+    T->>P: sign in with the demo login, Save and Continue
     P-->>T: redirect /r/<token>/linked
     T->>K: GET /r/<token>/linked (cookie)
     K->>P: POST /v3/vault/payment-tokens
@@ -211,6 +212,7 @@ The new tab does the PayPal round trip, and the home tab picks up the saved PayP
 | ---- | ------------ | --- |
 | `lib/shop/requests.ts:67` | `startHousehold()` drops the `vault` step and inserts only the household. A new `copyDemoVault(household)` after `saveVault()` (`:96`) runs `INSERT … SELECT … FROM paypal_vault WHERE id = 1 ON CONFLICT (id) DO NOTHING`, and returns whether it copied a row | Scenarios 1, 3 (D58). `DO NOTHING` keeps a PayPal the judge already linked in another tab |
 | `lib/shop/paypal.ts` | `demoLogin()` reads `PAYPAL_DEMO_EMAIL` and `PAYPAL_DEMO_PASSWORD`, and returns nothing if either is empty. `DemoLogin` moves here from `RoseView.tsx` | Scenario 1 (D62), in the style of `searchOn()` and `pushOn()` |
+| `lib/shop/paypal.ts:14` | `createSetupToken()`'s `description` and `brand_name` say KinCart, not Shop-together. PayPal's page shows the brand name in "For future payments to …" and "Cancel and return to …" | Scenario 2. Every judge now sees this page (found by the O5 spike) |
 | `app/(shop)/paypalLink.ts` (new) | `beginLink(token)` holds `startLink()`'s body from `app/(shop)/actions.ts:52`: the Rose check, `createSetupToken()`, the `setup_token` cookie and the log line. It returns the address to send Rose to: PayPal's, `?cancelled=1`, or none for a link that isn't Rose's. It is not a `"use server"` file, so it is not callable from the browser | Scenarios 2, 4. One copy of the cookie settings for both ways in |
 | `app/(shop)/actions.ts:52` | `startLink()` becomes `redirect(await beginLink(token))`. A new `skipLink(token)` checks for Rose, calls `copyDemoVault()`, logs `paypal skip household=<n> status=copied` or `status=failed`, and redirects to `/r/<token>` | Scenario 3 |
 | `app/(shop)/r/[token]/link/route.ts` (new) | `POST` calls `beginLink()`. It answers 404 for no address and `NextResponse.redirect(address, 303)` otherwise. 303, so the new tab goes to PayPal with a GET | Scenario 2: a server action's redirect stays inside the frame (D61) |
@@ -261,7 +263,7 @@ No schema change. `paypal_vault` keeps its rows. Households started before this 
 
 **E2E:** `e2e/link-paypal-onboarding.spec.ts`, at 1280 × 800. It taps Try KinCart, and checks the card and the hint in Rose's frame. It taps Link PayPal and waits for the new tab to reach `www.sandbox.paypal.com`, then closes it. It opens Rose's `?cancelled=1` page, then taps Skip in the frame and sees "What do you need?". Last, it checks that the new household's vault row equals household 1's. `e2e/demo-home.spec.ts` and `e2e/households.spec.ts` gain a Skip step, so they still walk ask, OK and charge, which is scenario 3's charge. Command: `pnpm test:e2e`, with `pnpm dev` stopped first.
 
-**Live check, before release:** on kincart.vercel.app, in a private window, Try KinCart, Link PayPal, sign in with the demo login, Agree and Continue, then ask and OK. This covers the half of scenario 2 that D20 keeps out of CI.
+**Live check, before release:** on kincart.vercel.app, in a private window, Try KinCart, Link PayPal, sign in with the demo login, Save and Continue, then ask and OK. This covers the half of scenario 2 that D20 keeps out of CI.
 
 Run `pnpm exec next typegen` after adding the route, before `tsc`.
 
@@ -326,7 +328,7 @@ Status: active
 | O2  | The demo login is on a public page, so anyone can sign in to that sandbox account. They can change its password, which spoils linking for later judges. They can also cancel the permissions saved under it. If it is household 1's account, a cancel stops payment for every household that skipped | flag | spec p1 | user | Resolved | A new sandbox personal account, only for the page. A stranger can spoil linking but not payment. The owner makes it and puts its email and password in Vercel's env and `.env.local` before `/build`. 2026-10-15 |
 | O3  | PayPal's sign-in page refuses to load in a frame. From the home page's phone, PayPal must open in a new tab or take over the whole window | question | spec p1 | user | Resolved | A new tab. The home page stays open, and Rose's phone updates by itself within 3 s. 2026-10-15 |
 | O4  | The video shows the home page and Rose's page from before this change, with no link step. A judge who watches first doesn't see PayPal's page | flag | spec p1 | user | Resolved | Re-render after this ships: a short link scene on `feat/demo-video`, with new footage. About 35 min to render and 4 min to mix. 2026-10-15 |
-| O5  | PayPal may stop a sign-in to the shared sandbox account with a security check, such as a code sent to its email. Nobody has signed in to a new sandbox account from a judge's browser yet | unproven | spec p3 | poc | Open | — |
+| O5  | PayPal may stop a sign-in to the shared sandbox account with a security check, such as a code sent to its email. Nobody has signed in to a new sandbox account from a judge's browser yet | unproven | spec p3 | poc | Resolved | No check. A spike signed in with the demo login from fresh Chromium and Firefox contexts, 3 times in 20 minutes, and each reached the return URL with the setup token `APPROVED`. PayPal's button is "Save and Continue", and Firefox gets PayPal's newer email-first sign-in. The page language follows the IP: Malay here, English for a US judge. All runs came from one IP, so a burst from many judges' IPs is untested. Skip covers that. 2026-10-15 |
 | O6  | A rollback to v1.1.0 strands the households started since. The old link screen has no login and no Skip, so their Rose can't go on | flag | spec p3 | user | Accepted risk | Rollback is for a broken deploy. Start a new one gives a linked household under v1.1.0, and the data is sandbox only. 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
