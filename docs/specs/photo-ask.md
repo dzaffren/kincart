@@ -144,9 +144,166 @@ Screens, all in `app/(shop)/RoseView.tsx` unless named:
 
 **Preview:** `/preview/photo-ask` on `pnpm dev`, built from the real components (`app/(shop)/preview/photo-ask/page.tsx`). In the first frame, Take or pick a photo works for real.
 
-## Decisions to record
+## Technical plan
 
-Drafted at pause 1. Pause 3 moves them under the technical plan, and `/build` appends them.
+### Approach
+
+The photo never travels at full size. When Rose picks it, `PhotoPicker` draws it onto a canvas at 1600px on the long edge and saves it as a JPEG of about 0.5 MB. The JPEG goes back into the form's file input. Find's server action checks that it really is a JPEG, then calls a new `findPhoto()`. Its first step, `readPhoto()`, sends Haiku the photo and Rose's words with a prompt of its own. From there the search runs exactly as a typed Find does (D22, D31). The AI's words and a `from_photo` flag are saved in `rose_search`, and the photo is dropped (D64).
+
+Relies on: D10, D11, D12, D19, D22, D23, D24, D31, D63, D64, D65, D66, D67
+
+```mermaid
+flowchart TB
+    subgraph browser["Rose's browser"]
+        PP["PhotoPicker.tsx"] -- "1600px JPEG, about 0.5 MB" --> FORM["Find form"]
+    end
+    subgraph vercel["Vercel"]
+        ACT["find action (actions.ts)"] -- "words + JPEG" --> FP["findPhoto (find.ts)"]
+        FP -- "photo + words" --> RP["readPhoto (ai.ts)"]
+        FP -- "each thing's query" --> SL["searchListings (search.ts)"]
+        FP -- "listings" --> CH["choose (ai.ts)"]
+        ACT -- "AI's words, result, from_photo" --> DB[("rose_search")]
+    end
+    FORM -- "POST multipart" --> ACT
+    RP -- "image block + text" --> H["Claude Haiku 5.5"]
+    CH -- "listing text" --> H
+    SL -- "query + price limit" --> C3["Channel3"]
+```
+
+The browser shrinks the photo, and the server turns it into things with one Haiku call. Each thing then runs the same Channel3 search and Haiku pick as a typed ask.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's browser
+    participant A as find action
+    participant F as findPhoto
+    participant H as Haiku 5.5
+    participant C as Channel3
+    participant D as rose_search
+    R->>R: pick photo, shrink to 1600px JPEG, put it in the input
+    R->>A: POST words + photo (about 0.5 MB)
+    A->>A: JPEG? (starts ffd8ff) else redirect ?find=notphoto
+    A->>F: findPhoto(words, limit, jpeg)
+    F->>H: readPhoto: image block, then "They typed: ..."
+    H-->>F: things [{words: "CR2032 coin battery", query}]
+    F->>C: two searches for each thing, at once
+    C-->>F: listings
+    F->>H: choose (no photo)
+    H-->>F: picks
+    F-->>A: {words: "CR2032 coin battery", result}
+    A->>D: save words, result, from_photo = true
+    A-->>R: redirect /r/<token>
+```
+
+A photo Find costs one Haiku call with the image, then the calls of a typed Find.
+
+```mermaid
+flowchart LR
+    CAM["Camera photo<br/>2 to 12 MB, with EXIF"] -- "canvas redraw drops EXIF and GPS" --> JPG["1600px JPEG"]
+    JPG -- "HTTPS, Rose's link" --> SRV["Vercel function<br/>held in memory, not logged"]
+    SRV -- "base64 image block" --> ANT["Anthropic API"]
+    ANT -- "things: words + query" --> SRV
+    SRV -- "AI's words only" --> NEON[("Neon: rose_search")]
+```
+
+The photo leaves Rose's phone without its location data, and only the AI's words are stored.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `app/(shop)/PhotoPicker.tsx:24` | `picked()` empties the input at once, then shrinks: `createImageBitmap(file, { imageOrientation: "from-image" })`, a canvas at 1600px on the long edge, `toBlob("image/jpeg", 0.85)`. Over 900 KB, it encodes again at 0.7. The JPEG goes back into the input with `DataTransfer`, and the card shows it. A file that won't decode gets the not-a-photo error | 1, 2, 3, 4 (O6) |
+| `app/(shop)/actions.ts:80` | `find()` reads `photo`. A non-empty file that doesn't start `ffd8ff` redirects to `?find=notphoto`. Empty words with no photo still redirect to `?find=empty`. With a photo it calls `findPhoto()` and saves its words with `fromPhoto` true | 1 to 4 |
+| `lib/shop/ai.ts:48` | New `readPhoto(words, jpeg)` with a new `NEED_PHOTO` prompt and the existing `NEED_SCHEMA`. `haiku()` (`:64`) takes a string or content blocks. `readNeed()` and its prompt stay as they are (D66) | 1, 2, 3, 4 |
+| `lib/shop/find.ts:34` | `search()` splits into `readNeed()` and a shared `searchThings()`. New `findPhoto(words, limitCents, jpeg)` returns `{ words, result }`: the things' words joined by ", ", and a `Search`. No things gives the new outcome `"nothing in photo"`. It logs the same `find` line with ` photo=yes` | 1 to 4 |
+| `lib/shop/requests.ts:56` | `SavedSearch` gains `fromPhoto`. `saveSearch()` (`:155`) takes `fromPhoto = false`. `getSearch()` (`:141`) reads `from_photo` | 1, 3, 4, 5 |
+| `app/(shop)/state.ts:41` | Options and basket pass `fromPhoto`. The ask state turns `"nothing in photo"` into its problem, and `notPhoto` into `"not a photo"`. Try other words saves `retry` with `fromPhoto` false, so the box holds the AI's words | 1, 3, 4, 5 |
+| `app/(shop)/r/[token]/page.tsx:54` | `notPhoto: query.find === "notphoto"` | 4 |
+| `db/migrations/0009_photo_ask.up.sql`, `.down.sql` | Add `from_photo`, and add `'nothing in photo'` to the outcome check | 1, 4 |
+| `scripts/migrate.test.ts:29` | `downToHouseholds()` also runs `0008_clearer_pages.down.sql` by hand. The first test checks `from_photo` up, down and up | migration |
+| `e2e/photo-ask.spec.ts`, `e2e/photos/cr2032.jpg`, `e2e/photos/list.jpg` | The slice's e2e, and the owner's two photos | 1, 4 |
+
+Reusing: `searchListings()` and `choose()` unchanged, `reasonOf()` for the log, `reset()` from `e2e/db.ts`, the `Notice`, `field-error` and `photo-pick` pieces built at pause 2.
+
+`NEED_PHOTO`, the prompt that O5 tests:
+
+> You read a photo that an older person took to show what they want to buy, and any words they typed with it. If the photo shows a product, list that one product. If it shows a written shopping list, list every product on it, in order. For each, write a short plain name for it, such as "CR2032 coin battery", with anything their words add, such as a size or a count. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photo and their words. If the photo shows nothing they could buy, return an empty list.
+
+### Data
+
+```mermaid
+erDiagram
+    HOUSEHOLDS ||--o| ROSE_SEARCH : "has one current"
+    ROSE_SEARCH {
+        bigint id PK "household id"
+        text words "typed words, or the AI's words for a photo"
+        text outcome "adds 'nothing in photo'"
+        jsonb listings
+        jsonb groups
+        boolean from_photo "new, default false"
+        timestamptz searched_at
+    }
+```
+
+**Migration:** expand only. `0009_photo_ask.up.sql` adds `from_photo boolean NOT NULL DEFAULT false` and replaces `rose_search_outcome_check` with the same list plus `'nothing in photo'`. Old code ignores the column. Old code that reads a `'nothing in photo'` row shows the plain ask screen, because the outcome matches none of its branches. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
+
+**Reverse:** promote the previous deploy on Vercel. Then, if wanted, `pnpm db:down` runs `0009_photo_ask.down.sql`: it sets `'nothing in photo'` rows to `'nothing found'`, puts back the old check, and drops `from_photo`. `scripts/migrate.test.ts` tests this path.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| The shrink in `PhotoPicker` | Scenario 1's 4 MB photo. Next refuses bodies over 1 MB (O6: `POST 500`, "Body exceeded 1 MB limit") |
+| The 0.7 second try over 900 KB | O6's noisy 12 MP photo came out at 519 to 546 KB at 0.85, so a busier photo could pass 1 MB |
+| `readPhoto()` and `NEED_PHOTO` | Scenarios 1 to 4. A separate prompt keeps the typed path's prompt as tested (D66) |
+| `findPhoto()` | The action needs the AI's words to save and show. `find()` keeps its signature and its tests |
+| `from_photo` and `'nothing in photo'` | Scenario 1's "from your photo" and scenario 4's message. Both must survive the 3 s redraw (D19) and a reopened link (D67) |
+| The JPEG check in `find()` | Scenario 4. A crafted request could send any bytes, and Haiku rejects a media type that doesn't match them |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Judges and the video: tens of photo Finds a day. Each is one Haiku image call of about 2,500 tokens (about $0.00025 at $0.10 per million), then a typed Find's calls |
+| **Breaks first**     | Channel3's 1,000 free searches a month, as for a typed Find, because each thing costs two searches. A 5-item list photo costs 10. The fix is the same as for typed Finds (`docs/ROADMAP.md`) |
+| **Security surface** | Anyone with Rose's link can send a photo, up to Next's 1 MB. The server trusts only bytes that start like a JPEG, and sends that media type itself. The photo stays in memory, never in Neon or a log. Text in a photo can steer Haiku as typed words can, but the schema fixes the answer's shape, listings come from Channel3 by ID, and Sam approves every charge. Secrets: `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY`, as today. Stored: the AI's words and `from_photo` |
+| **Proof it works**   | `find outcome=options listings=3 ms=4210 photo=yes` in Vercel's logs, the number being whatever the run took. `photo=yes` with `outcome=nothing-in-photo` says Haiku saw nothing to buy |
+| **Rollout**          | No flag. CI migrates Neon, then Vercel promotes (D10, D11). Rollback: the two steps under Reverse |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 | `e2e/photo-ask.spec.ts`: the owner's full-size CR2032 photo, real Haiku and Channel3 (D24) | `pnpm test:e2e e2e/photo-ask.spec.ts` |
+| 1, 2 | `lib/shop/ai.test.ts`: `readPhoto()` sends the image block first, then "They typed: size 8", with `NEED_PHOTO` and `NEED_SCHEMA` | `pnpm test lib/shop/ai.test.ts` |
+| 1, 3, 4 | `lib/shop/find.test.ts`: one thing gives options under the AI's words; a list gives a basket with words joined by ", "; six things give `too many`; none gives `nothing in photo`; the log line has `photo=yes` | `pnpm test lib/shop/find.test.ts` |
+| 1, 4 | `app/(shop)/actions.test.ts`: a JPEG is passed on and saved with `fromPhoto`; a PDF redirects to `?find=notphoto` and calls nothing; a photo with an empty box searches | `pnpm test "app/(shop)/actions.test.ts"` |
+| 1, 4, 5 | `app/(shop)/state.test.ts`: `fromPhoto` reaches options and basket; `nothing in photo` and `notPhoto` become problems; a retry after a photo holds the AI's words | `pnpm test "app/(shop)/state.test.ts"` |
+| 1, 4 | `app/(shop)/RoseView.test.tsx`: ", from your photo", the nothing-in-photo notice, the photo button and the new empty-box error | `pnpm test "app/(shop)/RoseView.test.tsx"` |
+| storage | `lib/shop/requests.test.ts`: `fromPhoto` round trip; `scripts/migrate.test.ts`: 0009 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
+| 3 | The list photo through real Haiku, once by hand at /build, as O5 did | O5's script |
+
+**E2E:** `e2e/photo-ask.spec.ts`. Rose's page gets `e2e/photos/cr2032.jpg` at full size, so it passes only if the shrink ran. It waits 4 s for a redraw and checks that the card and the file are still there. Find shows "Which one would you like?" within 25 s, with ", from your photo" and at least one listing name matching `/2032/` at or under the limit. Ask Sam reaches Sam's page. A PDF picked next shows the not-a-photo error, with no network call.
+
+### Chunks
+
+| Chunk | Scenarios | Files owned |
+| ----- | --------- | ----------- |
+| A | 1 to 5, server side | `db/migrations/0009_photo_ask.*`, `scripts/migrate.test.ts`, `lib/shop/ai.ts`, `lib/shop/find.ts`, `lib/shop/requests.ts` and their tests, `app/(shop)/actions.ts`, `app/(shop)/state.ts` and their tests, `app/(shop)/r/[token]/page.tsx`, `app/(shop)/RoseView.test.tsx` |
+| B | 1, 4, browser and e2e | `app/(shop)/PhotoPicker.tsx`, `e2e/photo-ask.spec.ts`, `e2e/photos/` |
+
+Build A, then B, one after the other. B's e2e needs A, and both chunks' tests use the local database.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Haiku misreads a blurry or tilted photo, and the search is for the wrong thing | Rose sees the AI's words marked as from the photo, and Try other words puts them in the box. Sam approves every charge |
+| Rose taps Find in the 150 to 200 ms before the shrink ends | `picked()` empties the input first, so Find sends no photo and gets "Type what you need, or add a photo, first." The 5 MB original never goes |
+| A real iPhone, or HEIC, doesn't shrink (O8) | Open until the owner tries it on a phone |
+| Haiku is slower with an image, and a 5-thing list hits Find's limit | `readPhoto()` keeps the 10 s timeout. O5 times both photos. The page's `maxDuration` is 30 s |
+
+### Decisions to record
 
 ```
 ## D63 · 2026-10-16 · Find reads a photo the way it reads typed words: with any words, and a written list is a basket
@@ -162,6 +319,27 @@ Why: Rose sees the AI's words for the photo and Sam sees the listings, so nothin
 Rejected: keep the photo and show it to Sam beside the listing (needs photo storage and a rule for deleting it, so a slice of its own).
 Source: docs/specs/photo-ask.md
 Status: active
+
+## D65 · 2026-10-16 · Rose's photo shrinks in the browser to a 1600px JPEG, and Next's 1 MB body limit stays
+
+Why: phone camera photos are 2 to 12 MB, and Next refuses a server action body over 1 MB. In the O6 spike, a 5.2 MB photo failed with "Body exceeded 1 MB limit", and shrunk it was 519 KB in 136 ms.
+Rejected: raise `serverActions.bodySizeLimit` to fit camera photos (a 12 MB upload on a phone's connection, and more for anyone with the link to send), upload to a file store first (a store for a photo that D64 says is not kept).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D66 · 2026-10-16 · A photo Find sends the photo to Haiku in the first step only, with a prompt of its own
+
+Why: the second step picks from Channel3's listing text, which a photo does not change. A separate prompt leaves the typed path's prompt exactly as its tests and CI check it.
+Rejected: one prompt for words and photos (it changes the typed path's tested prompt), the photo in both steps (more image tokens, and no scenario needs it).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D67 · 2026-10-16 · rose_search keeps a from_photo flag and a "nothing in photo" outcome
+
+Why: "from your photo" and the photo's own nothing-found message must survive the 3 s redraw (D19) and a reopened link, like the rest of Rose's search (D23).
+Rejected: a `?photo=1` in the page address (lost after Ask Sam's error redirects and when Rose opens the link again).
+Source: docs/specs/photo-ask.md
+Status: active
 ```
 
 ## Open items
@@ -173,8 +351,9 @@ Status: active
 | O3 | Is Rose's photo kept after Find, and does Sam see it? | question | spec p1 | user | Resolved | No. The photo goes to Claude once. Rose and Sam see the AI's words for it. 2026-10-16 |
 | O4 | A judge on a laptop may have no product photo. Add sample photos? | question | spec p1 | user | Resolved | No. Any image file works from the laptop's file picker, and the video shows a real phone camera. 2026-10-16 |
 | O5 | Haiku 5.5 at low effort reads a phone photo of a CR2032 battery as a CR2032 coin battery, and a photo of a 3-item handwritten list as 3 things, within the 10 s timeout | unproven | spec p3 | poc | Open | — |
-| O6 | The browser shrinks a full-size camera photo to a JPEG under Next's 1 MB server action limit on real phones, including an iPhone's HEIC photos, and puts it back in the form | unproven | spec p3 | poc | Open | — |
+| O6 | The browser shrinks a full-size camera photo to a JPEG under Next's 1 MB server action limit on real phones, including an iPhone's HEIC photos, and puts it back in the form | unproven | spec p3 | poc | Resolved | Yes in Chromium and Firefox. A generated 12 MP, 5.2 MB JPEG shrank to 1600×1200 at 519 KB in 136 ms (Chromium) and 546 KB in 194 ms (Firefox). It went back into the form with `DataTransfer`, and the server action got `image/jpeg` starting `ffd8ff`. The same file unshrunk failed: `POST 500`, "Body exceeded 1 MB limit", and "This page couldn't load". WebKit didn't launch on this machine (missing system libraries), so Safari moves to O8. Spike, 2026-10-16 |
 | O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | The owner takes two phone photos: a CR2032 battery, and a handwritten list of AA batteries, night light and phone charger. Their location data is stripped before they go into `e2e/photos/`. 2026-10-16 |
+| O8 | A real iPhone in Safari shrinks a camera photo, HEIC included, and sends it (split from O6) | unproven | spec p3 | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -183,4 +362,8 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Basket**: an ask for several things at once, with one pick for each, paid as one charge.
 - **Channel3**: a hackathon sponsor whose API returns real product listings.
 - **Claude Haiku**: the small Claude model that reads Rose's ask and explains each listing.
+- **DataTransfer**: a browser object that holds files. A page can use it to put a new file into a file input.
 - **e2e**: end-to-end: one test that walks the whole slice as a person would.
+- **EXIF**: data that a camera writes inside a photo file, such as the time, the phone's model and the place it was taken.
+- **HEIC**: the photo format that iPhones save by default. Not every browser can open it.
+- **Server action**: a Next.js function that runs on the server when a form is sent. Next limits what one request can carry to 1 MB by default.
