@@ -12,6 +12,7 @@ import {
   ask,
   claim,
   clearSearch,
+  copyDemoVault,
   decline,
   getLimit,
   getSearch,
@@ -55,6 +56,15 @@ export async function startLink(token: string): Promise<void> {
   const link = await beginLink(token, await origin());
   if (link.setupToken) (await cookies()).set("setup_token", link.setupToken, setupCookie(token));
   redirect(link.to);
+}
+
+// Skip: this household pays from a copy of household 1's saved PayPal, as every household did before D58.
+export async function skipLink(token: string): Promise<void> {
+  const who = await whoIs(token);
+  if (who?.person !== "rose") return;
+  const copied = await copyDemoVault(who.household);
+  console.log(`paypal skip household=${who.household} status=${copied ? "copied" : "failed reason=no demo PayPal"}`);
+  redirect(`/r/${token}`);
 }
 
 export async function find(token: string, formData: FormData): Promise<void> {

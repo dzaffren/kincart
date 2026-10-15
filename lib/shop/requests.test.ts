@@ -4,6 +4,7 @@ import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
 import {
   ask,
+  copyDemoVault,
   claim,
   clearSearch,
   decline,
@@ -323,6 +324,25 @@ it("starts a household with no saved PayPal, even when household 1 has one, and 
   expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: fresh, person: "rose" });
   expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: fresh, person: "sam" });
   expect(await findHousehold("rose-hash-ffff")).toBeNull();
+});
+
+it("copies household 1's saved PayPal into a household that skips, but never over one it linked", async () => {
+  await saveVault(owner, "1j970427g9944212v");
+  const skipped = await startHousehold("rose-hash-4e5f", "sam-hash-4e5f");
+  const linked = await startHousehold("rose-hash-6a7b", "sam-hash-6a7b");
+  await saveVault(linked, "8kf02113h7720954x");
+
+  expect(await copyDemoVault(skipped)).toBe(true);
+  expect(await getVault(skipped)).toBe("1j970427g9944212v");
+  expect(await copyDemoVault(linked)).toBe(false);
+  expect(await getVault(linked)).toBe("8kf02113h7720954x");
+});
+
+it("copies nothing when household 1 has no saved PayPal", async () => {
+  const skipped = await startHousehold("rose-hash-8c9d", "sam-hash-8c9d");
+
+  expect(await copyDemoVault(skipped)).toBe(false);
+  expect(await getVault(skipped)).toBeNull();
 });
 
 it("keeps each household's asks, searches, limits, saved PayPal and phones apart", async () => {

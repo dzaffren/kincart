@@ -96,6 +96,18 @@ export async function saveVault(household: number, paymentToken: string): Promis
   );
 }
 
+// Skip gives a household a copy of household 1's saved PayPal (D58), and never replaces one it linked.
+export async function copyDemoVault(household: number): Promise<boolean> {
+  const rows = await query(
+    `INSERT INTO paypal_vault (id, payment_token)
+     SELECT $1, payment_token FROM paypal_vault WHERE id = 1
+     ON CONFLICT (id) DO NOTHING
+     RETURNING id`,
+    [household],
+  );
+  return rows.length > 0;
+}
+
 export async function latest(household: number): Promise<PurchaseRequest | null> {
   const rows = await query<Row>("SELECT * FROM purchase_requests WHERE household_id = $1 ORDER BY id DESC LIMIT 1", [
     household,

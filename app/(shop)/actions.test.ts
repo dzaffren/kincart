@@ -17,7 +17,7 @@ import {
   startHousehold,
   subscriptionsFor,
 } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, setTotal, start, startLink, subscribe, tryAgain } from "./actions";
+import { answer, askSam, find, setLimit, setTotal, skipLink, start, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -624,3 +624,29 @@ it("saves nothing, and says so, when the database can't be reached", async () =>
   expect(jar.has("household")).toBe(false);
   expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^household status=failed reason=\S+/));
 });
+
+it("skips Rose to a copy of household 1's saved PayPal, and only for Rose", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+
+  await expect(skipLink("ben-sam-link-9Lm4")).resolves.toBeUndefined();
+  expect(await getVault(ben)).toBeNull();
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await getVault(ben)).toBe("1j970427g9944212v");
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=copied`);
+});
+
+it("says a Skip failed when household 1 has no saved PayPal, and leaves Rose at Link PayPal", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  await client.query("DELETE FROM paypal_vault");
+  await client.end();
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await getVault(ben)).toBeNull();
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=failed reason=no demo PayPal`);
+});
+
