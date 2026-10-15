@@ -112,16 +112,19 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
     if (await getVault(household)) {
       if (picks.length === 1) {
         const [{ option }] = picks;
-        if (await ask(household, option, { shop: option.shop, url: option.url, reason: option.why }))
+        const { shop, url, why, watch, imageUrl } = option;
+        if (await ask(household, option, { shop, url, reason: why, watch, imageUrl }))
           sendPing(household, "asked", { item: option });
       } else {
-        const lines = picks.map(({ thing, option: { id, name, cents, shop, url, why } }) => ({
+        const lines = picks.map(({ thing, option: { id, name, cents, shop, url, why, watch, imageUrl } }) => ({
           id,
           name,
           cents,
           shop,
           url,
           reason: why,
+          watch,
+          imageUrl,
           thing,
         }));
         const item = { id: "basket", name: things(lines.length), cents };
