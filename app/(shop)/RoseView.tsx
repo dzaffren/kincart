@@ -30,6 +30,7 @@ export type RoseState =
     }
   | {
       kind: "ask";
+      linked?: boolean;
       limitCents: number;
       totalCents?: number;
       words?: string;
@@ -64,20 +65,26 @@ export type RoseState =
 
 type Action = (formData: FormData) => void | Promise<void>;
 
+export type DemoLogin = { email: string; password: string };
+
 type Props = {
   state: RoseState;
   items: Item[];
   link?: Action;
+  skip?: Action;
+  login?: DemoLogin;
+  framed?: boolean;
   ask?: Action;
   find?: Action;
   tryAgain?: Action;
   notify?: ReactNode;
 };
 
-export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Props) {
+export function RoseView({ state, items, link, skip, login, framed, ask, find, tryAgain, notify }: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
+  const loginId = useId();
 
   if (state.kind === "not linked") {
     return (
@@ -90,9 +97,29 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
               : `You do this once. After that, you pick what you need, ${HELPER} says OK, and your PayPal pays. No passwords to share.`}
           </p>
         </div>
-        <form action={link}>
+        {login && (
+          <section className="summary login" aria-labelledby={loginId}>
+            <h2 className="summary-title" id={loginId}>
+              Sign in on PayPal with this demo login
+            </h2>
+            <dl>
+              <dt className="small">Email</dt>
+              <dd>{login.email}</dd>
+              <dt className="small">Password</dt>
+              <dd>{login.password}</dd>
+            </dl>
+            <p className="small">It&apos;s a PayPal sandbox account. No real money moves.</p>
+          </section>
+        )}
+        <form className="stack" action={link}>
           <Button type="submit" busy={state.busy} busyLabel="Opening PayPal…">
             Link PayPal
+          </Button>
+          {framed && <p className="small">PayPal opens in a new tab. Come back here when you&apos;re done.</p>}
+        </form>
+        <form action={skip}>
+          <Button type="submit" kind="secondary" busyLabel="Setting up…">
+            Skip: use the demo PayPal
           </Button>
         </form>
       </div>
@@ -122,6 +149,7 @@ export function RoseView({ state, items, link, ask, find, tryAgain, notify }: Pr
     const limit = wholeDollars(state.limitCents);
     return (
       <div className="screen">
+        {state.linked && <Notice tone="neutral">Your PayPal is linked. You won&apos;t need to do this again.</Notice>}
         <OutcomeNotice outcome={state.outcome} />
         {state.problem === "nothing found" && (
           <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>

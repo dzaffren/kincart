@@ -95,6 +95,32 @@ body {
   font: var(--type-title);
 }
 
+.login {
+  gap: var(--space-3);
+}
+
+.login h2,
+.login dl,
+.login dd {
+  margin: 0;
+}
+
+.login dl {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.login dd + dt {
+  margin-top: var(--space-2);
+}
+
+/* One click selects the whole value, ready to copy into PayPal's sign-in. */
+.login dd {
+  font: var(--type-button);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
 .amount {
   font: var(--type-amount);
   font-variant-numeric: tabular-nums;

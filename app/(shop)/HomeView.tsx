@@ -66,8 +66,8 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
             {links ? (
               <>
                 <p className="home-guide">
-                  Your {RELATIVE} and {HELPER} are in the two phones. Ask for something as {RELATIVE}, then say OK
-                  as {HELPER}.
+                  Your {RELATIVE} and {HELPER} are in the two phones. Link {RELATIVE}&apos;s PayPal or skip it. Then
+                  ask for something as {RELATIVE}, and say OK as {HELPER}.
                 </p>
                 <div className="stack home-ways">
                   <p className="small">Each opens in a new tab. Come back here to open them again.</p>
@@ -92,7 +92,7 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
               <form className="stack" action={start}>
                 <p>
                   Try both sides now, with no sign-up: {RELATIVE}, who asks, and {HELPER}, who says OK.{" "}
-                  {RELATIVE}&apos;s sandbox PayPal is already linked.
+                  First, link {RELATIVE}&apos;s sandbox PayPal on PayPal&apos;s own page, or skip to a demo one.
                 </p>
                 <Button type="submit" busy={busy} busyLabel="Starting…">
                   Try KinCart
