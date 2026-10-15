@@ -284,6 +284,13 @@ Single chunk. `RoseView.tsx`, the page and the e2e specs each serve several scen
 
 Recorded as D58, D59, D60, D61, D62.
 
+## Review
+
+2026-10-15 · 2 raw findings, 2 survived, 2 fixed.
+
+- correctness · `app/(shop)/actions.ts:67` · a phone's Skip keeps `?in=phone`, and a failed Skip comes back not linked · `c370db6`
+- correctness · `app/(shop)/actions.ts:66` · Skip logs `status=kept`, not `failed`, when the household already has a PayPal · `4634f20`
+
 ## Open items
 
 | ID  | What | Type     | Raised at | Owner | Status | Answer |
@@ -297,6 +304,7 @@ Recorded as D58, D59, D60, D61, D62.
 | O7  | The plan put the Rose check inside `beginLink()`. `startLink()` then read the request headers before it knew the link was Rose's, and Sam's refusal test failed with "`headers` was called outside a request" | flag | build | user | Decided alone | Chose: each caller checks `whoIs()` first, and `beginLink()` assumes Rose. Other: keep the check in `beginLink()` and pass it a function that reads the origin only when needed. Undo: move the `whoIs()` check from `startLink()` and the route into `beginLink()`. 2026-10-15 |
 | O8  | The local e2e ran only the 4 specs this slice touches. `.env.local` has no `CHANNEL3_API_KEY` or `PAYPAL_E2E_VAULT_ID`, so they ran with a placeholder Channel3 key (they seed their searches) and the spike's vault id `1j970427g9944212v`. find-and-explain, basket, basket-cap, ping-helper and status did not run locally | flag | build | user | Decided alone | Chose: run the 4 specs locally, and leave the full suite to CI, which has every key. Other: put the real keys in `.env.local` and run all of it. Undo: run `pnpm test:e2e` with the real keys, or push and read CI. 2026-10-15 |
 | O9  | The feat commits on this branch add no CHANGELOG line | flag | build | user | Decided alone | Chose: leave the lines to /ship, as for every earlier slice. Other: add them in each commit. Undo: add them in a docs commit. 2026-10-15 |
+| O10 | A failed Skip showed the link screen again with no reason. The spec gave a failed Skip no message | flag | review | user | Decided alone | Chose: a failed Skip comes back with `?cancelled=1`, so Rose sees scenario 4's "PayPal isn't linked yet. Nothing was saved.", with Link PayPal and Skip. Other: a message only for Skip, such as "The demo PayPal isn't set up yet." Undo: drop the `cancelled` line from `skipLink()` in `app/(shop)/actions.ts`. 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
