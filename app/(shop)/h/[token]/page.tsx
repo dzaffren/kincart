@@ -12,6 +12,7 @@ import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
 import { SamView } from "../../SamView";
 import { samState } from "../../state";
+import { PageHead } from "../../ui";
 
 // The Home Screen icon opens this person's own link, not the site's front page (D28).
 export async function generateMetadata({ params }: PageProps<"/h/[token]">): Promise<Metadata> {
@@ -43,17 +44,20 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
   const total = on ? { cents: totalCents, saved: query.total === "saved", error: query.total === "invalid" } : undefined;
 
   return (
-    <main>
-      <SamView
-        state={samState(request)}
-        answer={request ? answer.bind(null, token, request.id) : undefined}
-        limit={limit}
-        setLimit={setLimit.bind(null, token)}
-        total={total}
-        setTotal={setTotal.bind(null, token)}
-        notify={pushOn() ? <NotifyControl who="sam" token={token} publicKey={publicKey()} /> : undefined}
-      />
-      <Refresher />
-    </main>
+    <>
+      <PageHead />
+      <main>
+        <SamView
+          state={samState(request)}
+          answer={request ? answer.bind(null, token, request.id) : undefined}
+          limit={limit}
+          setLimit={setLimit.bind(null, token)}
+          total={total}
+          setTotal={setTotal.bind(null, token)}
+          notify={pushOn() ? <NotifyControl who="sam" token={token} publicKey={publicKey()} /> : undefined}
+        />
+        <Refresher />
+      </main>
+    </>
   );
 }

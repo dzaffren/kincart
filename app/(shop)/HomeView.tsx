@@ -43,7 +43,7 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
             </Notice>
           )}
           <div className="home-head home-reveal">
-            <p className="home-brand">
+            <p className="brand">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="brand-mark" src="/icon.svg" alt="" />
               KinCart
@@ -60,9 +60,8 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
             <p>
               <strong>Sandbox money only.</strong> Nothing real is bought. This is a hackathon build:{" "}
               <a className="link" href="https://github.com/dzaffren/kincart/blob/main/docs/ROADMAP.md">
-                what&apos;s real, what stands in, and what comes next
+                what&apos;s real, what stands in, and what comes next.
               </a>
-              .
             </p>
             {links ? (
               <>

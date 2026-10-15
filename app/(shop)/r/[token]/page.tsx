@@ -13,6 +13,7 @@ import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
 import { RoseView } from "../../RoseView";
 import { roseState } from "../../state";
+import { PageHead } from "../../ui";
 
 // Find waits on Haiku and Channel3: about 10 s in the spike.
 export const maxDuration = 30;
@@ -55,17 +56,20 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
   );
 
   return (
-    <main>
-      <RoseView
-        state={state}
-        items={ITEMS}
-        link={startLink.bind(null, token)}
-        ask={askSam.bind(null, token)}
-        find={find.bind(null, token)}
-        tryAgain={tryAgain.bind(null, token)}
-        notify={pushOn() ? <NotifyControl who="rose" token={token} publicKey={publicKey()} /> : undefined}
-      />
-      <Refresher />
-    </main>
+    <>
+      <PageHead />
+      <main>
+        <RoseView
+          state={state}
+          items={ITEMS}
+          link={startLink.bind(null, token)}
+          ask={askSam.bind(null, token)}
+          find={find.bind(null, token)}
+          tryAgain={tryAgain.bind(null, token)}
+          notify={pushOn() ? <NotifyControl who="rose" token={token} publicKey={publicKey()} /> : undefined}
+        />
+        <Refresher />
+      </main>
+    </>
   );
 }

@@ -5,7 +5,8 @@ import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
 
-export type Source = { shop: string; url: string; reason: string };
+// watch and imageUrl are missing on asks made before Sam saw them.
+export type Source = { shop: string; url: string; reason: string; watch?: string; imageUrl?: string };
 
 // thing is what Rose called it, such as "a night light"; name is the listing's own.
 export type Line = Item & Source & { thing: string };

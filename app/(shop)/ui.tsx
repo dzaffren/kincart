@@ -140,7 +140,7 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
             </span>
             <span className="listing-text">
               {listing.imageUrl && (
-                // A 64px photo from Channel3's CDN gains nothing from Vercel's image optimizer.
+                // A 128px photo from Channel3's CDN gains nothing from Vercel's image optimizer.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img className="listing-photo" src={listing.imageUrl} alt="" />
               )}
@@ -165,6 +165,19 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
         </label>
       )}
     </fieldset>
+  );
+}
+
+// Rose's and Sam's pages say whose app they are, also inside the home page's phones (D55).
+export function PageHead() {
+  return (
+    <header className="page-head">
+      <p className="brand">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="brand-mark" src="/icon.svg" alt="" />
+        KinCart
+      </p>
+    </header>
   );
 }
 
