@@ -15,6 +15,12 @@ async function startOwn(home: Page) {
   };
 }
 
+async function skipsLinking(rose: Page) {
+  await expect(heading(rose)).toHaveText("Link your PayPal to start");
+  await rose.getByRole("button", { name: "Skip: use the demo PayPal" }).click();
+  await expect(heading(rose)).toHaveText("What do you need?");
+}
+
 async function asksSam(rose: Page) {
   await rose.reload();
   await expect(heading(rose)).toHaveText("Which one would you like?");
@@ -33,7 +39,7 @@ test("two judges each get their own KinCart", async ({ page, context, browser, b
   const ana = await startOwn(page);
   const anaRose = await context.newPage();
   await anaRose.goto(ana.rose);
-  await expect(heading(anaRose)).toHaveText("What do you need?");
+  await skipsLinking(anaRose);
   await expect(anaRose.getByText(/Sam's limit is \$50 an item/)).toBeVisible();
   await searchFor("AA batteries", listing("prod_3Ba7aA", "Amazon Basics 24-Pack AA Alkaline Batteries", 999, "amazon.com"));
   await asksSam(anaRose);
@@ -49,6 +55,7 @@ test("two judges each get their own KinCart", async ({ page, context, browser, b
   await expect(heading(benSam)).toHaveText("Nothing to approve");
   const benRose = await ben.newPage();
   await benRose.goto(benLinks.rose);
+  await skipsLinking(benRose);
   await searchFor(
     "a night light",
     listing("prod_6Nl2tL", "Plug-In LED Night Light with Dusk-to-Dawn Sensor, 2 Pack", 1249, "target.com"),
