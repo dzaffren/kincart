@@ -44,6 +44,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 10 | `clearer-pages` | Sam sees each thing's photo and "Good to know" note before OK. Rose's and Sam's pages show the KinCart name, and the photos get bigger. | Found in a judge's UI pass of v1.0.0, 2026-10-15. |
 | 11 | `link-paypal-onboarding` | A new Rose starts at Link PayPal, with a demo sandbox login on screen and a Skip button under it. | Found in a friend's feedback on v1.1.0, 2026-10-15: judges can't see where PayPal comes in. |
 | 12 | `photo-ask` | Rose takes or picks a photo of the thing, and AI turns it into a search. | Only if time is left. Same feedback: older people find a photo easier than words. |
+| 13 | `photo-ask-several` | Rose sends several photos in one Find, one for each thing she needs. | Only if time is left. Split from `photo-ask` at its pause 3 (O9): two shrunk photos pass Next's 1 MB limit together. |
 
 ## Not doing
 

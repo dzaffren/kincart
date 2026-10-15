@@ -106,7 +106,7 @@ Scenario: Rose changes the AI's words after a photo
 
 - Keeping Rose's photo, or showing it to Sam. Not planned (O3).
 - Sample photos for a judge on a laptop. Not planned (O4).
-- More than one photo in one Find. Not planned.
+- More than one photo in one Find. Later slice `photo-ask-several` (O9).
 - A photo on the fixed-item screen, which shows only when search is off. Not planned.
 - A photo scene in the demo video. Separate work on `feat/demo-video`.
 
@@ -352,8 +352,9 @@ Status: active
 | O4 | A judge on a laptop may have no product photo. Add sample photos? | question | spec p1 | user | Resolved | No. Any image file works from the laptop's file picker, and the video shows a real phone camera. 2026-10-16 |
 | O5 | Haiku 5.5 at low effort reads a phone photo of a CR2032 battery as a CR2032 coin battery, and a photo of a 3-item handwritten list as 3 things, within the 10 s timeout | unproven | spec p3 | poc | Open | — |
 | O6 | The browser shrinks a full-size camera photo to a JPEG under Next's 1 MB server action limit on real phones, including an iPhone's HEIC photos, and puts it back in the form | unproven | spec p3 | poc | Resolved | Yes in Chromium and Firefox. A generated 12 MP, 5.2 MB JPEG shrank to 1600×1200 at 519 KB in 136 ms (Chromium) and 546 KB in 194 ms (Firefox). It went back into the form with `DataTransfer`, and the server action got `image/jpeg` starting `ffd8ff`. The same file unshrunk failed: `POST 500`, "Body exceeded 1 MB limit", and "This page couldn't load". WebKit didn't launch on this machine (missing system libraries), so Safari moves to O8. Spike, 2026-10-16 |
-| O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | The owner takes two phone photos: a CR2032 battery, and a handwritten list of AA batteries, night light and phone charger. Their location data is stripped before they go into `e2e/photos/`. 2026-10-16 |
+| O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | Generated, on the owner's request: `e2e/photos/cr2032.jpg` (4032×3024, 1.8 MB, a coin cell printed CR2032) and `e2e/photos/list.jpg` (3024×4032, 2.2 MB, the list in a handwriting font on lined paper). Both are drawn in Chromium, so they have no EXIF. Their print is cleaner than a real photo's, so the real-camera check is O8. Changed from "the owner takes two phone photos", 2026-10-16 |
 | O8 | A real iPhone in Safari shrinks a camera photo, HEIC included, and sends it (split from O6) | unproven | spec p3 | user | Open | — |
+| O9 | Can Rose send several photos in one Find, one for each thing? | question | spec p3 | user | Resolved | Not in this slice. Two shrunk photos (519 to 546 KB each in O6) pass Next's 1 MB limit together, and the screens need a card for each. Later slice `photo-ask-several`, only if time is left. 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
