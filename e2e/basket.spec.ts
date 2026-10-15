@@ -31,6 +31,11 @@ test("Rose asks for three things, Sam pays for one, and the other goes back to R
   const samPage = await context.newPage();
   await samPage.goto(`/h/${sam}`);
   await expect(heading(samPage)).toHaveText("Nothing to approve");
+  await page.goto(`/r/${rose}`);
+  for (const phone of [page, samPage]) {
+    await expect(phone.getByRole("banner")).toHaveText("KinCart");
+    await expect(phone.getByRole("banner").locator('img[src="/icon.svg"]')).toBeVisible();
+  }
 
   await roseFinds(page, "AA batteries, a night light and a phone charger");
   await expect(heading(page)).toHaveText("Which ones would you like?", { timeout: 20_000 });
@@ -43,6 +48,7 @@ test("Rose asks for three things, Sam pays for one, and the other goes back to R
 
   // Results vary (D24), so the test picks from the first two groups that have listings; the third is left out.
   const picked: { thing: string; cents: number }[] = [];
+  let photos = 0;
   for (let index = 0; index < 3 && picked.length < 2; index++) {
     const group = groups.nth(index);
     if ((await group.getByRole("radio").count()) < 2) continue;
@@ -51,6 +57,7 @@ test("Rose asks for three things, Sam pays for one, and the other goes back to R
       thing: (await group.getByRole("heading", { level: 2 }).textContent()) ?? "",
       cents: cents((await group.locator(".option-price").first().textContent()) ?? ""),
     });
+    photos += await group.locator(".option").first().locator(".listing-photo").count();
   }
   expect(picked).toHaveLength(2);
   const [kept, leftOut] = picked;
@@ -63,6 +70,8 @@ test("Rose asks for three things, Sam pays for one, and the other goes back to R
   await expect(ticks).toHaveCount(2);
   await expect(ticks.nth(0)).toBeChecked();
   await expect(ticks.nth(1)).toBeChecked();
+  await expect(samPage.getByText("Good to know:")).toHaveCount(2);
+  await expect(samPage.locator(".listing-photo")).toHaveCount(photos);
   await expect(samPage.getByRole("button", { name: `OK, pay ${dollars(kept.cents + leftOut.cents)}` })).toBeVisible();
 
   await ticks.nth(1).uncheck();

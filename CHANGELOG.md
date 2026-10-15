@@ -6,6 +6,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Before Sam says OK, Sam sees each thing's photo and its "Good to know" note, such as batteries that aren't included.
+
+### Changed
+
+- Rose's and Sam's pages show the KinCart name and mark at the top, also inside the home page's phones.
+- Listing photos are twice as big, on Rose's results and on Sam's page.
+
+### Fixed
+
+- On a phone, the home page's full stop after "what comes next" no longer wraps onto a line of its own.
+
 ## [1.0.0] - 2026-10-15
 
 ### Added

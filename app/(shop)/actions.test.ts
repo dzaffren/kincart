@@ -106,6 +106,7 @@ const strap = {
   cents: 3250,
   shop: "amazon.com",
   url: "https://www.amazon.com/dp/B0C7WIDE21",
+  imageUrl: "https://cdn.trychannel3.com/prod_9Wz4hY",
   what: "Wide slippers that open across the top and close with a strap.",
   why: "You open them right up to put them on, then press the strap shut.",
   watch: "They're a wide fit, so they may feel loose on a narrow foot.",
@@ -163,7 +164,7 @@ it("asks Sam for the picked listing at the saved search's price, never the form'
   expect(await redirectOf(askSam(rose, form({ listing: "prod_9Wz4hY", cents: "1" })))).toBe(`/r/${rose}`);
   expect(await latest(owner)).toMatchObject({
     item: { id: "prod_9Wz4hY", cents: 3250 },
-    found: { shop: "amazon.com", url: strap.url, reason: strap.why },
+    found: { shop: "amazon.com", url: strap.url, reason: strap.why, watch: strap.watch, imageUrl: strap.imageUrl },
   });
   expect(await getSearch(owner)).toBeNull();
 });
@@ -349,6 +350,7 @@ const option = (id: string, name: string, cents: number, shop: string) => ({
   cents,
   shop,
   url: `https://www.${shop}/p/${id}`,
+  imageUrl: `https://cdn.trychannel3.com/${id}`,
   what: `${name}.`,
   why: `Why ${name} fits.`,
   watch: "Check the pack size.",
@@ -361,13 +363,15 @@ const groups = [
   { thing: "a night light", options: [plugLight] },
   { thing: "a phone charger", options: [anker] },
 ];
-const lineOf = (thing: string, { id, name, cents, shop, url, why }: typeof aa24) => ({
+const lineOf = (thing: string, { id, name, cents, shop, url, why, watch, imageUrl }: typeof aa24) => ({
   id,
   name,
   cents,
   shop,
   url,
   reason: why,
+  watch,
+  imageUrl,
   thing,
 });
 const aaLine = lineOf("AA batteries", aa24);
@@ -404,7 +408,13 @@ it("asks Sam for one pick from a basket as one item, and for no pick asks Rose t
   expect(await redirectOf(askSam(rose, form({ "pick-1": "prod_6Nl2tL" })))).toBe(`/r/${rose}`);
   expect(await latest(owner)).toMatchObject({
     item: { id: "prod_6Nl2tL", cents: 1249 },
-    found: { shop: "target.com", url: plugLight.url, reason: plugLight.why },
+    found: {
+      shop: "target.com",
+      url: plugLight.url,
+      reason: plugLight.why,
+      watch: plugLight.watch,
+      imageUrl: plugLight.imageUrl,
+    },
     lines: null,
   });
 });

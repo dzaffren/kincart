@@ -231,10 +231,10 @@ body {
 }
 
 .listing-photo {
-  float: left;
-  margin: 0 var(--space-3) var(--space-2) 0;
-  width: var(--space-16);
-  height: var(--space-16);
+  display: block;
+  margin: 0 0 var(--space-2);
+  width: var(--photo-size);
+  height: var(--photo-size);
   object-fit: cover;
   background: var(--color-sunken);
   border: var(--border-width) solid var(--color-line);
@@ -504,7 +504,7 @@ body {
   gap: var(--space-3);
 }
 
-.home-brand {
+.brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -514,6 +514,22 @@ body {
 .brand-mark {
   width: var(--space-12);
   height: var(--space-12);
+}
+
+.page-head {
+  box-sizing: border-box;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--page-inline) 0;
+}
+
+.page-head .brand {
+  margin: 0;
+}
+
+.page-head .brand-mark {
+  width: var(--space-8);
+  height: var(--space-8);
 }
 
 .home .home-display {

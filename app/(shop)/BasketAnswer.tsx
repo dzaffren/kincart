@@ -59,9 +59,18 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [] }: Pr
                           </span>
                         </span>
                         <span className="listing-text">
+                          {line.imageUrl && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img className="listing-photo" src={line.imageUrl} alt="" />
+                          )}
                           <span>
                             <strong>Why it fits:</strong> {line.reason}
                           </span>
+                          {line.watch && (
+                            <span>
+                              <strong>Good to know:</strong> {line.watch}
+                            </span>
+                          )}
                         </span>
                       </span>
                     </label>

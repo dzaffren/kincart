@@ -8,6 +8,12 @@ const savedPaypal = process.env.PAYPAL_E2E_VAULT_ID ?? "";
 const heading = (page: Page) => page.getByRole("heading", { level: 1 });
 const box = (page: Page) => page.getByRole("textbox", { name: "What do you need?" });
 
+async function photosAreBig(page: Page) {
+  for (const photo of await page.locator(".listing-photo").all()) {
+    expect((await photo.boundingBox())!.width).toBeGreaterThanOrEqual(120);
+  }
+}
+
 async function roseFinds(page: Page, words: string) {
   await page.goto(`/r/${rose}`);
   await expect(heading(page)).toHaveText("What do you need?");
@@ -42,6 +48,9 @@ test("Rose finds slippers, Sam checks the listing and pays", async ({ page, cont
     expect(Number(price.replace(/[$,]/g, ""))).toBeLessThanOrEqual(50);
   }
   await expect(page.getByText("Good to know:")).toHaveCount(count);
+  await photosAreBig(page);
+  // Results vary (D24), and a listing may have no photo, so Sam's page shows as many as Rose's pick had.
+  const photos = await page.locator(".option").first().locator(".listing-photo").count();
 
   await options.first().check();
   await page.getByRole("button", { name: "Ask Sam" }).click();
@@ -49,6 +58,9 @@ test("Rose finds slippers, Sam checks the listing and pays", async ({ page, cont
 
   await expect(heading(samPage)).toHaveText("Rose would like this", { timeout: 5000 });
   await expect(samPage.getByText(/^Why it fits:/)).toBeVisible();
+  await expect(samPage.getByText("Good to know:")).toHaveCount(1);
+  await expect(samPage.locator(".listing-photo")).toHaveCount(photos);
+  await photosAreBig(samPage);
   await expect(samPage.getByRole("link", { name: /^See it on / })).toHaveAttribute("href", /^https:\/\//);
   await samPage.getByRole("button", { name: /^OK, pay \$/ }).click();
 

@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.0.0 · **Updated:** 2026-10-15 by /ship demo-home
+**Status:** Active · **Release:** v1.0.0 · **Updated:** 2026-10-15 by /ship clearer-pages
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -40,6 +40,7 @@ Used by older shoppers and the relative who helps them pay online.
 | basket-cap | Shipped | Sam sets a total limit for everything Rose asks for at once, such as $40. Rose's picks that come to more than that never reach Sam. | docs/specs/basket-cap.md |
 | households | Shipped | Each visitor to kincart.vercel.app starts their own Rose and Sam, with the demo PayPal already linked, and sees only their own asks, limits and phones. | docs/specs/households.md |
 | demo-home | Shipped | The home page says what KinCart does for the helper who would use it. On a laptop, a judge's own Rose and Sam then run side by side, live, so Sam's page changes as Rose asks. | docs/specs/demo-home.md |
+| clearer-pages | Shipped | Sam sees the photo and the AI's "Good to know" note for each thing before paying. Rose's and Sam's pages show the KinCart name, and the listing photos get bigger. | docs/specs/clearer-pages.md |
 
 ## More
 

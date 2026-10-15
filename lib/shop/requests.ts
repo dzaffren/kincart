@@ -5,7 +5,8 @@ import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
 
-export type Source = { shop: string; url: string; reason: string };
+// watch and imageUrl are missing on asks made before Sam saw them.
+export type Source = { shop: string; url: string; reason: string; watch?: string; imageUrl?: string };
 
 // thing is what Rose called it, such as "a night light"; name is the listing's own.
 export type Line = Item & Source & { thing: string };
@@ -44,6 +45,8 @@ type Row = {
   shop: string | null;
   listing_url: string | null;
   reason: string | null;
+  watch: string | null;
+  image_url: string | null;
   lines: Line[] | null;
   left_out: string[] | null;
 };
@@ -108,8 +111,8 @@ export async function latest(household: number): Promise<PurchaseRequest | null>
 // A second ask while one is open hits purchase_requests_one_open_per_household and is dropped.
 export async function ask(household: number, item: Item, source?: Source, lines?: Line[]): Promise<boolean> {
   const rows = await query(
-    `INSERT INTO purchase_requests (household_id, item_id, item_name, amount_cents, shop, listing_url, reason, lines)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO purchase_requests (household_id, item_id, item_name, amount_cents, shop, listing_url, reason, lines, watch, image_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT DO NOTHING
      RETURNING id`,
     [
@@ -121,6 +124,8 @@ export async function ask(household: number, item: Item, source?: Source, lines?
       source?.url ?? null,
       source?.reason ?? null,
       lines ? JSON.stringify(lines) : null,
+      source?.watch ?? null,
+      source?.imageUrl ?? null,
     ],
   );
   return rows.length === 1;
@@ -303,7 +308,16 @@ function toRequest(row: Row): PurchaseRequest {
     id: Number(row.id),
     household: Number(row.household_id),
     item: { id: row.item_id, name: row.item_name, cents: row.amount_cents },
-    found: row.shop && row.listing_url && row.reason ? { shop: row.shop, url: row.listing_url, reason: row.reason } : null,
+    found:
+      row.shop && row.listing_url && row.reason
+        ? {
+            shop: row.shop,
+            url: row.listing_url,
+            reason: row.reason,
+            ...(row.watch && { watch: row.watch }),
+            ...(row.image_url && { imageUrl: row.image_url }),
+          }
+        : null,
     status: row.status,
     askedAt: row.asked_at,
     answeredAt: row.answered_at,

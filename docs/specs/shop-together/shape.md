@@ -41,6 +41,7 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 7 | `basket-cap` | You set a total cap for one basket, such as $100. | Only if time is left. Split from `basket` at `/spec basket`. |
 | 8 | `households` | A visitor taps a button on `/` and gets their own Rose and Sam links, with the demo sandbox PayPal already linked. Every ask, search, limit and phone belongs to that household, so two visitors never see each other's. | Found at `/spec demo-home` pause 3 (its O8): judges share one Rose and Sam today, and in production every family is its own. |
 | 9 | `demo-home` | `/` says what KinCart is. On a laptop, the visitor's own Rose and Sam run side by side, live. | The URL is what judges get. Waits on `households`. |
+| 10 | `clearer-pages` | Sam sees each thing's photo and "Good to know" note before OK. Rose's and Sam's pages show the KinCart name, and the photos get bigger. | Found in a judge's UI pass of v1.0.0, 2026-10-15. |
 
 ## Not doing
 

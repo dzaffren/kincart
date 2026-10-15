@@ -137,17 +137,29 @@ const strap = {
   watch: "They're a wide fit, so they may feel loose on a narrow foot.",
 };
 
-it("records an ask from a search with the shop, the link and the reason it fits", async () => {
-  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+it("records an ask from a search with the shop, the link, the reason it fits, the note and the photo", async () => {
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why, watch: strap.watch, imageUrl: strap.imageUrl });
 
   expect(await latest(owner)).toMatchObject({
     item: { id: "prod_9Wz4hY", name: "Adjustable Wide Slippers with Hook-and-Loop Strap", cents: 3250 },
-    found: { shop: "amazon.com", url: "https://www.amazon.com/dp/B0C7WIDE21", reason: strap.why },
+    found: {
+      shop: "amazon.com",
+      url: "https://www.amazon.com/dp/B0C7WIDE21",
+      reason: strap.why,
+      watch: strap.watch,
+      imageUrl: "https://cdn.trychannel3.com/prod_9Wz4hY",
+    },
   });
 
   await sql("TRUNCATE purchase_requests");
   await ask(owner, glasses);
   expect((await latest(owner))?.found).toBeNull();
+});
+
+it("leaves out the note and the photo of an ask that has none, as an ask from before they were kept", async () => {
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+
+  expect((await latest(owner))?.found).toEqual({ shop: "amazon.com", url: strap.url, reason: strap.why });
 });
 
 it("keeps Rose's one current search until the next one or a clear", async () => {

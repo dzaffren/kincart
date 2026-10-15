@@ -49,9 +49,18 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, notif
         />
         {found && (
           <div className="heading">
+            {found.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="listing-photo" src={found.imageUrl} alt="" />
+            )}
             <p>
               <strong>Why it fits:</strong> {found.reason}
             </p>
+            {found.watch && (
+              <p>
+                <strong>Good to know:</strong> {found.watch}
+              </p>
+            )}
             <a className="link" href={found.url} target="_blank" rel="noopener noreferrer">
               See it on {found.shop}
             </a>
