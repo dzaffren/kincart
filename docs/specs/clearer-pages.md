@@ -257,33 +257,7 @@ Single chunk. The change is small, and `requests.ts`, `actions.ts` and their tes
 
 ### Decisions to record
 
-## D54 · 2026-10-15 · Sam sees each thing's photo and "Good to know", not Rose's "what it is" sentence
-
-Why: the listing name and the photo already say what the thing is, and Sam's page stays short with a warning to read before OK.
-Rejected: every sentence Rose sees (each item gets about two lines longer on Sam's phone).
-Source: docs/specs/clearer-pages.md
-Status: active
-
-## D55 · 2026-10-15 · The KinCart header shows on Rose's and Sam's pages inside the home page's phones too
-
-Why: the phones show the real page, so no check for a frame is needed.
-Rejected: leave it out inside the phones (needs a frame check like D52's, and the brand already sits beside them).
-Source: docs/specs/clearer-pages.md
-Status: active
-
-## D56 · 2026-10-15 · Listing photos are 128px, from a new --photo-size token
-
-Why: at 64px an older eye can't tell what the thing is, and 128px under the name keeps the text at full card width. Each card grows about 140px.
-Rejected: the photo at full card width, 4:3 (each card grows about 210px, and Rose's three-thing page about 1,900px), a one-off 128px in shop.css (the system has no such size, so it would drift).
-Source: docs/specs/clearer-pages.md
-Status: active
-
-## D57 · 2026-10-15 · A one-thing ask stores its note and photo in two new columns
-
-Why: a one-thing ask already keeps its shop, link and reason in columns on `purchase_requests`, so two nullable columns follow the same shape, and old code ignores them.
-Rejected: store a one-thing ask as a one-line basket in `lines` (Sam's one-thing screen would turn into the tick-list screen), a jsonb column for the extras (a second shape for the same request).
-Source: docs/specs/clearer-pages.md
-Status: active
+Recorded as D54, D55, D56, D57.
 
 ## Open items
 
