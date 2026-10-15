@@ -8,6 +8,9 @@ const MODEL = "claude-haiku-5-5";
 
 const NEED = `You read what an older person typed into a shopping box. List every product they want to buy, in the order they gave. For each, copy their own words for it exactly, such as "a night light", and write a short shop search query that keeps the sizes, colours and other must-haves they gave. Something sold as one product, such as salt and pepper shakers, is one thing. If they typed nothing to buy, return an empty list.`;
 
+// A photo has a prompt of its own, so the typed path's prompt stays as tested (D66).
+const NEED_PHOTO = `You read a photo that an older person took to show what they want to buy, and any words they typed with it. If the photo shows a product, list that one product. If it shows a written shopping list, list every product on it, in order. For each, write a short plain name for it, such as "CR2032 coin battery", with anything their words add, such as a size or a count. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photo and their words. If the photo shows nothing they could buy, return an empty list.`;
+
 const NEED_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -49,6 +52,15 @@ export function readNeed(words: string): Promise<Need> {
   return haiku(NEED, words, NEED_SCHEMA, 2000);
 }
 
+// jpeg is Rose's photo as the browser shrank it. The find action checked that it starts like a JPEG.
+export function readPhoto(words: string, jpeg: Buffer): Promise<Need> {
+  const content = [
+    { type: "image", source: { type: "base64", media_type: "image/jpeg", data: jpeg.toString("base64") } },
+    { type: "text", text: words ? `They typed: ${words}` : "They typed nothing." },
+  ];
+  return haiku(NEED_PHOTO, content, NEED_SCHEMA, 2000);
+}
+
 export function choose(words: string, under: Found[], above: Found[]): Promise<Choice> {
   const listings = under.map(({ id, name, details }) => ({ id, name, details }));
   const message = [
@@ -61,7 +73,7 @@ export function choose(words: string, under: Found[], above: Found[]): Promise<C
 
 // Low effort still thinks now and then, and the thinking counts toward max_tokens: a pick that
 // thought used about 700 of them, against about 360 without.
-async function haiku<T>(system: string, message: string, schema: object, maxTokens: number): Promise<T> {
+async function haiku<T>(system: string, message: string | object[], schema: object, maxTokens: number): Promise<T> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
