@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-15
+
 ### Added
 
 - Before Sam says OK, Sam sees each thing's photo and its "Good to know" note, such as batteries that aren't included.
@@ -49,5 +51,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.
 
-[unreleased]: https://github.com/dzaffren/kincart/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/dzaffren/kincart/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/dzaffren/kincart/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/dzaffren/kincart/releases/tag/v1.0.0
