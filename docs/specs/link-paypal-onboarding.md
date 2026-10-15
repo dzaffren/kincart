@@ -114,6 +114,39 @@ Scenario: Households started before this change keep their PayPal
 - Signing in on PayPal's page in the e2e. D20 rejects it.
 - The roadmap's "One demo PayPal, copied" row. `/ship` updates it.
 
+## Interface
+
+```mermaid
+flowchart LR
+    H["/ before start<br/>'link Rose's sandbox PayPal ... or skip'"] -- "Try KinCart" --> L["Rose: Link your PayPal to start<br/>demo login card · Link PayPal · Skip"]
+    L -- "Link PayPal (in a phone: new tab)" --> B["Link PayPal busy:<br/>Opening PayPal…"]
+    B -- "back, agreed" --> A["Rose: notice 'Your PayPal is linked.'<br/>What do you need?"]
+    B -- "back, not agreed" --> C["Rose: PayPal isn't linked yet<br/>same card and buttons"]
+    L -- "Skip (busy: Setting up…)" --> Q["Rose: What do you need?"]
+    C -- "Skip" --> Q
+```
+
+Rose's first screen holds the demo login card above Link PayPal. PayPal either sends Rose back linked, with a notice above "What do you need?", or not linked, to the same screen under a new heading.
+
+Screens, all in `app/(shop)/RoseView.tsx` unless named:
+
+- **Link screen.** The heading and lead stay as today. Under them is a card titled "Sign in on PayPal with this demo login", with the email and the password as a list. One click selects a whole value, ready to copy. A line says "It's a PayPal sandbox account. No real money moves." Then Link PayPal (primary) and "Skip: use the demo PayPal" (secondary). With no login in the env, the card is left out.
+- **Inside a home page phone.** The same screen, with "PayPal opens in a new tab. Come back here when you're done." under Link PayPal.
+- **Busy.** Link PayPal shows "Opening PayPal…" with the spinner, as today. Skip shows "Setting up…".
+- **Not linked yet.** The heading is "PayPal isn't linked yet", and the lead is "Nothing was saved. Link it when you're ready. You only do this once." The card and both buttons stay.
+- **Linked.** A neutral notice "Your PayPal is linked. You won't need to do this again." above "What do you need?", once, on the return from PayPal.
+- **Home page** (`app/(shop)/HomeView.tsx`). Before a start: "First, link Rose's sandbox PayPal on PayPal's own page, or skip to a demo one." After a start: "Link Rose's PayPal or skip it. Then ask for something as Rose, and say OK as Sam."
+
+The demo login's email must fit on one line in a home page phone. The owner picks one of 28 characters or fewer, with no hyphen. A hyphen gives the browser a place to break the line, and "sb-rose-" on a line by itself looks like the whole email.
+
+**Motion tier:** 1. Nothing new moves. The notice uses the existing enter animation, and the buttons use the existing spinner.
+
+**Components used:** `Button` (primary, secondary), `Notice` (neutral), `PageHead`, `PhoneFrame`, the `summary` surface with `summary-title`, and `heading`, `lead`, `small`, `stack`. One new class, `login`, lays the summary surface out as a list of label and value. It uses only existing tokens.
+
+**Design system:** `docs/design/design-system/` (D15). This slice adds no token.
+
+**Preview:** `/preview/link-paypal-onboarding` on `pnpm dev`, built from the real components (`app/(shop)/preview/link-paypal-onboarding/page.tsx`). The home page words show at `/`.
+
 ## Open items
 
 | ID  | What | Type     | Raised at | Owner | Status | Answer |
