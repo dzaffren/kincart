@@ -1,6 +1,6 @@
 # Clearer pages
 
-**Version:** v1 · **Status:** Refined · **Type:** Enhancement · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Enhancement · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** None
@@ -269,6 +269,7 @@ Recorded as D54, D55, D56, D57.
 | O4 | The video shows today's Sam page. After this ships, the live page shows more than the video. | flag | spec p1 | user | Accepted risk | The rules ask that the app does what the video shows, and this slice only adds to it. No new footage. 2026-10-15 |
 | O5 | The system's largest size is 64px (`--space-16`). How do the photos get bigger? | question | spec p2 | user | Resolved | Add `--photo-size: 128px` to the system's spacing tokens, with the photo under the name and price. 2026-10-15 |
 | O6 | The Claude Design copy of the system has no `--photo-size` and no new photo layout. | flag | spec p2 | user | Accepted risk | The repo tokens drive the app, and the copy matters only for work in Claude Design. Re-sync at the next system change. 2026-10-15 |
+| O7 | The plan did not name `scripts/migrate.test.ts`. Its households test called `db:down` once to undo 0007. With 0008 in place, that call undoes only 0008, and the test failed. | flag | build | user | Decided alone | Chose: the first test checks that 0008 adds, drops and adds back its two columns. The households test steps down past 0008, then runs 0007's down file. Other: delete the households test, because 0007 has shipped. Undo: delete `downToHouseholds` and the households test from `scripts/migrate.test.ts`. 2026-10-15 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
