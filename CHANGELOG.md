@@ -6,6 +6,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Rose links a sandbox PayPal on PayPal's own page, with a demo login shown on Rose's first screen. On a laptop, PayPal opens in a new tab from Rose's phone.
+
+### Changed
+
+- A new Rose starts with no PayPal linked. Skip pays from the demo PayPal, as every new Rose did before.
+- PayPal's approval page names KinCart, not Shop-together.
+
 ## [1.1.0] - 2026-10-15
 
 ### Added

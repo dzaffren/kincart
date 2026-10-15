@@ -7,6 +7,7 @@ import { listed, type Receipt } from "./ui";
 
 type RoseParams = {
   cancelled?: boolean;
+  linked?: boolean;
   pickMissing?: boolean;
   askAgain?: boolean;
   emptyFind?: boolean;
@@ -82,6 +83,7 @@ export function roseState(
       : current?.outcome;
   return {
     kind: "ask",
+    linked: params.linked || undefined,
     limitCents,
     totalCents,
     words: current?.words ?? (leftOut ? listed(leftOut) : undefined),

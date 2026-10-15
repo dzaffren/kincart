@@ -4,6 +4,7 @@ import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
 import {
   ask,
+  copyDemoVault,
   claim,
   clearSearch,
   decline,
@@ -314,18 +315,34 @@ it("keeps each phone once under the person who turned it on, until it's forgotte
   expect(await subscriptionsFor(owner, "rose")).toEqual([rosePhone]);
 });
 
-it("starts a household with household 1's saved PayPal, or with none, and finds it by either link's hash", async () => {
-  const bare = await startHousehold("rose-hash-0a1b", "sam-hash-0a1b");
-  expect(await getVault(bare)).toBeNull();
-
+it("starts a household with no saved PayPal, even when household 1 has one, and finds it by either link's hash", async () => {
   await saveVault(owner, "1j970427g9944212v");
-  const linked = await startHousehold("rose-hash-2c3d", "sam-hash-2c3d");
-  expect(linked).toBeGreaterThan(bare);
-  expect(await getVault(linked)).toBe("1j970427g9944212v");
+  const fresh = await startHousehold("rose-hash-2c3d", "sam-hash-2c3d");
+  expect(await getVault(fresh)).toBeNull();
+  expect(await getVault(owner)).toBe("1j970427g9944212v");
 
-  expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: linked, person: "rose" });
-  expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: linked, person: "sam" });
+  expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: fresh, person: "rose" });
+  expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: fresh, person: "sam" });
   expect(await findHousehold("rose-hash-ffff")).toBeNull();
+});
+
+it("copies household 1's saved PayPal into a household that skips, but never over one it linked", async () => {
+  await saveVault(owner, "1j970427g9944212v");
+  const skipped = await startHousehold("rose-hash-4e5f", "sam-hash-4e5f");
+  const linked = await startHousehold("rose-hash-6a7b", "sam-hash-6a7b");
+  await saveVault(linked, "8kf02113h7720954x");
+
+  expect(await copyDemoVault(skipped)).toBe(true);
+  expect(await getVault(skipped)).toBe("1j970427g9944212v");
+  expect(await copyDemoVault(linked)).toBe(false);
+  expect(await getVault(linked)).toBe("8kf02113h7720954x");
+});
+
+it("copies nothing when household 1 has no saved PayPal", async () => {
+  const skipped = await startHousehold("rose-hash-8c9d", "sam-hash-8c9d");
+
+  expect(await copyDemoVault(skipped)).toBe(false);
+  expect(await getVault(skipped)).toBeNull();
 });
 
 it("keeps each household's asks, searches, limits, saved PayPal and phones apart", async () => {
@@ -350,7 +367,7 @@ it("keeps each household's asks, searches, limits, saved PayPal and phones apart
   expect(await getTotal(ben)).toBeNull();
   expect(await subscriptionsFor(ben, "sam")).toEqual([]);
   expect(await subscriptionsFor(ana, "sam")).toEqual([samPhone]);
-  expect(await getVault(ana)).toBe("1j970427g9944212v");
+  expect(await getVault(ana)).toBeNull();
   expect(await getVault(ben)).toBe("8kf02113h7720954x");
   expect(await getVault(owner)).toBe("1j970427g9944212v");
 });

@@ -17,7 +17,7 @@ import {
   startHousehold,
   subscriptionsFor,
 } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, setTotal, start, startLink, subscribe, tryAgain } from "./actions";
+import { answer, askSam, find, setLimit, setTotal, skipLink, start, startLink, subscribe, tryAgain } from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -256,6 +256,7 @@ it("pings Sam for an item from the fixed list too", async () => {
 it("asks and pings only Ben's own Sam, and Ben's Sam can't answer another household's ask", async () => {
   vi.stubEnv("CHANNEL3_API_KEY", "");
   const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await saveVault(ben, "8kf02113h7720954x");
   await ask(owner, glasses);
   const theirs = (await latest(owner))!;
 
@@ -581,7 +582,7 @@ it("charges nothing when Sam's OK has nothing ticked, and tells Rose when Sam sa
   });
 });
 
-it("starts a household with its own two links and household 1's saved PayPal, and keeps the links in this browser", async () => {
+it("starts a household with its own two links and no saved PayPal, and keeps the links in this browser", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
 
   expect(await redirectOf(start())).toBe("/?started=ready");
@@ -592,7 +593,7 @@ it("starts a household with its own two links and household 1's saved PayPal, an
   expect(rose.person).toBe("rose");
   expect(rose.household).not.toBe(owner);
   expect(await whoIs(samLink)).toEqual({ household: rose.household, person: "sam" });
-  expect(await getVault(rose.household)).toBe("1j970427g9944212v");
+  expect(await getVault(rose.household)).toBeNull();
   expect(options).toEqual({ httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 90 * 24 * 60 * 60 });
   expect(console.log).toHaveBeenCalledWith(`household id=${rose.household} status=started`);
 });
@@ -622,4 +623,43 @@ it("saves nothing, and says so, when the database can't be reached", async () =>
   vi.stubEnv("DATABASE_URL", database);
   expect(jar.has("household")).toBe(false);
   expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^household status=failed reason=\S+/));
+});
+
+it("skips Rose to a copy of household 1's saved PayPal, and only for Rose", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+
+  await expect(skipLink("ben-sam-link-9Lm4", form({}))).resolves.toBeUndefined();
+  expect(await getVault(ben)).toBeNull();
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({ in: "phone" })))).toBe("/r/ben-rose-link-7Qx2?in=phone");
+  expect(await getVault(ben)).toBe("1j970427g9944212v");
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=copied`);
+});
+
+it("says a Skip failed when household 1 has no saved PayPal, and sends Rose back not linked, still in her phone", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  await client.query("DELETE FROM paypal_vault");
+  await client.end();
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({})))).toBe("/r/ben-rose-link-7Qx2?cancelled=1");
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({ in: "phone" })))).toBe(
+    "/r/ben-rose-link-7Qx2?in=phone&cancelled=1",
+  );
+  expect(await getVault(ben)).toBeNull();
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=failed reason=no demo PayPal`);
+});
+
+
+it("keeps the PayPal Rose linked in a new tab when she taps Skip in the old one, and says so", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await saveVault(ben, "8kf02113h7720954x");
+
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({})))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await getVault(ben)).toBe("8kf02113h7720954x");
+  expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=kept`);
 });

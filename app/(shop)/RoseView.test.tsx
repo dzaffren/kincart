@@ -43,3 +43,48 @@ it("ticks each group's own pick, also when one listing sits in two groups", () =
   ]);
   expect(ticked(["prod_8En1rG", "", "prod_7Bk2wC"])).toEqual(["pick-0=prod_8En1rG", "pick-1=", "pick-2=prod_7Bk2wC"]);
 });
+
+const login = { email: "sb-rose7d2k91@personal.example.com", password: "kincart-rose-1" };
+
+it("starts at Link PayPal, with the demo login and a Skip button", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "not linked" }} items={[]} login={login} />);
+
+  expect(html).toContain("<h1>Link your PayPal to start</h1>");
+  expect(html).toContain("Sign in on PayPal with this demo login");
+  expect(html).toContain("<dd><span>sb-rose7d2k91</span><wbr/><span>@personal.example.com</span></dd>");
+  expect(html).toContain("<dd>kincart-rose-1</dd>");
+  expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
+  expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
+  expect(html).not.toContain("opens in a new tab");
+  expect(html).not.toContain('name="in"');
+});
+
+it("leaves the login out when none is set, and keeps both buttons after a cancel", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "not linked", cancelled: true }} items={[]} />);
+
+  expect(html).toContain("<h1>PayPal isn&#x27;t linked yet</h1>");
+  expect(html).not.toContain("demo login");
+  expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
+  expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
+});
+
+it("in a home page phone, posts Link PayPal to its route in a new tab, and says so", () => {
+  const html = renderToStaticMarkup(
+    <RoseView state={{ kind: "not linked" }} items={[]} login={login} framedLink="/r/rose-link-4f9c2a7e/link" />,
+  );
+
+  expect(html).toMatch(
+    /<form [^>]*action="\/r\/rose-link-4f9c2a7e\/link" method="post" target="_blank">.*Link PayPal<\/button>/,
+  );
+  expect(html).toContain("PayPal opens in a new tab. Come back here when you&#x27;re done.");
+  expect(html).toMatch(/<form[^>]*><input type="hidden" name="in" value="phone"\/><button[^>]*>Skip: use the demo PayPal/);
+});
+
+it("says PayPal is linked above What do you need?, once Rose is back from PayPal", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "ask", linked: true, limitCents: 5000 }} items={[]} />);
+
+  expect(html).toMatch(/Your PayPal is linked\. You won&#x27;t need to do this again\.<\/p>.*<h1[^>]*>What do you need\?<\/h1>/);
+  expect(renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000 }} items={[]} />)).not.toContain(
+    "PayPal is linked",
+  );
+});

@@ -104,6 +104,11 @@ it("shows Rose the request box with Sam's limit once search is on, and the error
   });
 });
 
+it("tells Rose once that PayPal is linked, on the return from PayPal", () => {
+  expect(roseState(vault, null, { linked: true }, on())).toEqual({ kind: "ask", linked: true, limitCents: 5000 });
+  expect(roseState(vault, null, {}, on())).not.toHaveProperty("linked", true);
+});
+
 it("shows Rose the current search's options, with the error after Ask Sam without a pick", () => {
   expect(roseState(vault, null, {}, on(saved("options")))).toEqual({
     kind: "options",

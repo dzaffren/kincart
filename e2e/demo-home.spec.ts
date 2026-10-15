@@ -25,7 +25,7 @@ test.describe("on a laptop", () => {
     const samFrame = page.locator('iframe[title="Sam\'s phone"]');
     const rose = roseFrame.contentFrame();
     const sam = samFrame.contentFrame();
-    await expect(heading(rose)).toHaveText("What do you need?");
+    await expect(heading(rose)).toHaveText("Link your PayPal to start");
     await expect(heading(sam)).toHaveText("Nothing to approve");
     for (const phone of [rose, sam]) await expect(phone.getByRole("banner")).toHaveText("KinCart");
     // The page's reveal can still be moving the phones, so measure once it has finished.
@@ -37,6 +37,8 @@ test.describe("on a laptop", () => {
     expect(roseBox.x + roseBox.width).toBeLessThanOrEqual(samBox.x);
     expect(samBox.y).toBe(roseBox.y);
 
+    await rose.getByRole("button", { name: "Skip: use the demo PayPal" }).click();
+    await expect(heading(rose)).toHaveText("What do you need?");
     await searchFor("AA batteries", listing("prod_3Ba7aA", "Amazon Basics 24-Pack AA Alkaline Batteries", 999, "amazon.com"));
     await expect(heading(rose)).toHaveText("Which one would you like?", { timeout: 5000 });
     await rose.getByRole("radio").first().check();
@@ -58,7 +60,7 @@ test.describe("on a laptop", () => {
     await expect(page.getByText("Your new Rose and Sam are ready.")).toBeVisible();
     await expect(roseFrame).not.toHaveAttribute("src", oldRose!);
     await expect(samFrame).not.toHaveAttribute("src", oldSam!);
-    await expect(heading(rose)).toHaveText("What do you need?");
+    await expect(heading(rose)).toHaveText("Link your PayPal to start");
     await expect(heading(sam)).toHaveText("Nothing to approve");
   });
 });
@@ -82,7 +84,7 @@ test("a phone gets a button for each", async ({ page, context }) => {
   expect(loaded).toEqual([]);
 
   for (const [who, first] of [
-    ["Rose", "What do you need?"],
+    ["Rose", "Link your PayPal to start"],
     ["Sam", "Nothing to approve"],
   ]) {
     const [tab] = await Promise.all([context.waitForEvent("page"), page.getByRole("link", { name: `Be ${who}` }).click()]);

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { charge, createPaymentToken, createSetupToken } from "./paypal";
+import { charge, createPaymentToken, createSetupToken, demoLogin } from "./paypal";
 
 const glasses = { id: "glasses", name: "Reading glasses, +2.00", cents: 1899 };
 
@@ -50,7 +50,10 @@ it("creates a setup token and hands back its approve link", async () => {
   const [url, init] = apiCall(fetch);
   expect(url).toBe("https://api-m.sandbox.paypal.com/v3/vault/setup-tokens");
   expect((init.headers as Record<string, string>).Authorization).toBe("Bearer A21AA-sandbox");
-  const context = JSON.parse(String(init.body)).payment_source.paypal.experience_context;
+  const paypal = JSON.parse(String(init.body)).payment_source.paypal;
+  const context = paypal.experience_context;
+  expect(paypal.description).toBe("KinCart: pay when your helper says OK");
+  expect(context.brand_name).toBe("KinCart");
   expect(context.return_url).toBe("https://kincart.vercel.app/r/abc/linked");
   expect(context.cancel_url).toBe("https://kincart.vercel.app/r/abc?cancelled=1");
 });
@@ -141,4 +144,13 @@ it("reports refused when the keys are rejected, since no order was sent", async 
   vi.stubGlobal("fetch", vi.fn(async () => new Response('{"error":"invalid_client"}', { status: 401 })));
 
   expect(await charge("1j970427g9944212v", glasses, "purchase-16-1792491300000")).toEqual({ state: "refused", reason: "token HTTP 401" });
+});
+
+it("hands back the demo login only when both its email and password are set", () => {
+  vi.stubEnv("PAYPAL_DEMO_EMAIL", "sb-rose7d2k91@personal.example.com");
+  vi.stubEnv("PAYPAL_DEMO_PASSWORD", "kincart-rose-1");
+  expect(demoLogin()).toEqual({ email: "sb-rose7d2k91@personal.example.com", password: "kincart-rose-1" });
+
+  vi.stubEnv("PAYPAL_DEMO_PASSWORD", "");
+  expect(demoLogin()).toBeUndefined();
 });

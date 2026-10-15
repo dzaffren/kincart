@@ -4,10 +4,11 @@ import { connection } from "next/server";
 import { searchOn } from "../../../../lib/shop/find";
 import { ITEMS } from "../../../../lib/shop/items";
 import { settleStuck } from "../../../../lib/shop/pay";
+import { demoLogin } from "../../../../lib/shop/paypal";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
-import { askSam, find, startLink, tryAgain } from "../../actions";
+import { askSam, find, skipLink, startLink, tryAgain } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -47,6 +48,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
     request,
     {
       cancelled: query.cancelled === "1",
+      linked: query.linked === "1",
       pickMissing: query.pick === "missing",
       askAgain: query.ask === "1",
       emptyFind: query.find === "empty",
@@ -63,6 +65,9 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
           state={state}
           items={ITEMS}
           link={startLink.bind(null, token)}
+          skip={skipLink.bind(null, token)}
+          login={demoLogin()}
+          framedLink={query.in === "phone" ? `/r/${token}/link` : undefined}
           ask={askSam.bind(null, token)}
           find={find.bind(null, token)}
           tryAgain={tryAgain.bind(null, token)}

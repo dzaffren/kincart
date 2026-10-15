@@ -42,6 +42,8 @@ Slices 0 to 2 are the minimum entry: the rules require AI, and it arrives in sli
 | 8 | `households` | A visitor taps a button on `/` and gets their own Rose and Sam links, with the demo sandbox PayPal already linked. Every ask, search, limit and phone belongs to that household, so two visitors never see each other's. | Found at `/spec demo-home` pause 3 (its O8): judges share one Rose and Sam today, and in production every family is its own. |
 | 9 | `demo-home` | `/` says what KinCart is. On a laptop, the visitor's own Rose and Sam run side by side, live. | The URL is what judges get. Waits on `households`. |
 | 10 | `clearer-pages` | Sam sees each thing's photo and "Good to know" note before OK. Rose's and Sam's pages show the KinCart name, and the photos get bigger. | Found in a judge's UI pass of v1.0.0, 2026-10-15. |
+| 11 | `link-paypal-onboarding` | A new Rose starts at Link PayPal, with a demo sandbox login on screen and a Skip button under it. | Found in a friend's feedback on v1.1.0, 2026-10-15: judges can't see where PayPal comes in. |
+| 12 | `photo-ask` | Rose takes or picks a photo of the thing, and AI turns it into a search. | Only if time is left. Same feedback: older people find a photo easier than words. |
 
 ## Not doing
 

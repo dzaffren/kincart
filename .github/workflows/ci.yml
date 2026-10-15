@@ -33,6 +33,9 @@ jobs:
       # These links only guard CI's throwaway database.
       ROSE_LINK_TOKEN: ci-rose-link
       SAM_LINK_TOKEN: ci-sam-link
+      # Only shown on Rose's link screen; CI never signs in on PayPal (D20).
+      PAYPAL_DEMO_EMAIL: sb-ci7rose@personal.example.com
+      PAYPAL_DEMO_PASSWORD: not-a-real-password
       VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7

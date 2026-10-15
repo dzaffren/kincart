@@ -15,6 +15,7 @@ export async function GET(request: NextRequest, { params }: RouteContext<"/r/[to
     if (!setupToken) throw new Error("no setup token");
     await saveVault(who.household, await createPaymentToken(setupToken));
     console.log("paypal link status=linked");
+    page.searchParams.set("linked", "1");
   } catch (error) {
     console.log(`paypal link status=failed reason=${error instanceof Error ? error.message : error}`);
     page.searchParams.set("cancelled", "1");

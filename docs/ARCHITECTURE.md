@@ -1,6 +1,6 @@
 # PayPalHackathon · architecture
 
-**Status:** Active · **Updated:** 2026-10-15 by /ship demo-home
+**Status:** Active · **Updated:** 2026-10-16 by /ship link-paypal-onboarding
 
 ## Context
 
@@ -12,6 +12,7 @@ flowchart LR
     S((Sam's phone)) -- "OK or No, price and total limits" --> APP
     APP -- "check rows, households, saved PayPal, requests, search, limits, phones" --> NEON[(Neon Postgres)]
     APP -- "token, vault, orders" --> PP[PayPal sandbox]
+    J -- "new tab: signs in with the demo login, Save and Continue" --> PP
     APP -- "product search" --> C3[Channel3]
     APP -- "read words, explain listings" --> CL[Claude Haiku 5.5]
     APP -- "encrypted, signed pushes" --> PS[Apple / Google / Mozilla push services]
@@ -43,8 +44,8 @@ flowchart TB
 | --------- | ------ | ------------ |
 | Status page | `app/status/` | Runs the checks in parallel, logs one line, renders the three lines under the KinCart showcase head |
 | Checks | `lib/status/` | Database insert, PayPal token request, build commit |
-| Shop pages | `app/(shop)/` | The home page `/`, where Try KinCart starts a household and this browser keeps its two links in an httpOnly cookie. From 880px wide the home page shows two phones: still samples of Rose's and Sam's screens before Try KinCart, then their real pages in lazy frames, which leave out Notifications; Rose's and Sam's pages behind each household's secret links, the server actions behind each tap (Find, Ask Sam, OK or No, the price and total limits, Turn on notifications), Ask Sam's stop when the picks come to more than Sam's total limit, Sam's tick list for a basket, the PayPal return route, a manifest per link, the words of each ping, and a refresh every 3 s |
-| Shop logic | `lib/shop/` | Households: `whoIs()` turns a link into a household and a person (the env's links are household 1, any other is found by its SHA-256 hash), and `startHousehold()` saves a new one with a copy of household 1's saved PayPal. Every query below takes the household. Link check, PayPal vault and charge calls, `find()` (Haiku splits the words into up to five things; each thing gets two Channel3 searches and a Haiku pick of up to three, all at once), storage for requests and their basket lines, Rose's search, Sam's two limits and saved phones, `claim()`, which keeps only the lines Sam ticked, `pay()` with its stuck-request retry, and `notify()`, which sends one push per saved phone with `web-push` and forgets dead ones |
+| Shop pages | `app/(shop)/` | The home page `/`, where Try KinCart starts a household and this browser keeps its two links in an httpOnly cookie. From 880px wide the home page shows two phones: still samples of Rose's and Sam's screens before Try KinCart, then their real pages in lazy frames, which leave out Notifications; Rose's and Sam's pages behind each household's secret links, the server actions behind each tap (Find, Ask Sam, OK or No, the price and total limits, Turn on notifications), Ask Sam's stop when the picks come to more than Sam's total limit, Sam's tick list for a basket, Rose's link screen with the demo sandbox login and Skip, `POST /r/<token>/link`, where a home page phone sends Link PayPal in a new tab because PayPal refuses frames, the PayPal return route, a manifest per link, the words of each ping, and a refresh every 3 s |
+| Shop logic | `lib/shop/` | Households: `whoIs()` turns a link into a household and a person (the env's links are household 1, any other is found by its SHA-256 hash), `startHousehold()` saves a new one with no saved PayPal, and `copyDemoVault()` gives it a copy of household 1's when Rose taps Skip. Every query below takes the household. Link check, PayPal vault and charge calls, `find()` (Haiku splits the words into up to five things; each thing gets two Channel3 searches and a Haiku pick of up to three, all at once), storage for requests and their basket lines, Rose's search, Sam's two limits and saved phones, `claim()`, which keeps only the lines Sam ticked, `pay()` with its stuck-request retry, and `notify()`, which sends one push per saved phone with `web-push` and forgets dead ones |
 | Service worker | `public/sw.js` | Registered under each person's link; shows a push and opens that link on tap |
 | Migrations | `db/migrations/`, `scripts/migrate.mjs` | Plain SQL up and down files, and the runner behind `pnpm db:up` and `db:down` |
 | CI | `.github/workflows/ci.yml` | `test` job on every push and PR; `migrate` job on main after `test` passes |

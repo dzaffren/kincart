@@ -12,6 +12,8 @@ it("sells KinCart and shows two still sample phones before a household starts", 
   expect(html).toContain("<strong>Sandbox money only.</strong> Nothing real is bought.");
   expect(html).toMatch(/>what&#x27;s real, what stands in, and what comes next\.<\/a><\/p>/);
   expect(html).toContain("Try KinCart");
+  expect(html).toContain("First, link Rose&#x27;s sandbox PayPal on PayPal&#x27;s own page, or skip to a demo one.");
+  expect(html).not.toContain("already linked");
   expect(html).toContain("<h2>How it works</h2>");
   expect(html).toContain("<strong>Your parent says what they need.</strong>");
   expect(html).toContain("<strong>AI finds real options.</strong>");
@@ -30,14 +32,14 @@ it("sells KinCart and shows two still sample phones before a household starts", 
 it("shows the household's two pages in lazy frames, and a button for each", () => {
   const html = renderToStaticMarkup(<HomeView state={{ links: { rose: "/r/rose-link", sam: "/h/sam-link" } }} />);
 
-  expect(html).toMatch(/<iframe [^>]*src="\/r\/rose-link"[^>]*loading="lazy"/);
-  expect(html).toMatch(/<iframe [^>]*src="\/h\/sam-link"[^>]*loading="lazy"/);
-  expect(html).toContain("Open Rose&#x27;s page");
+  expect(html).toMatch(/<iframe [^>]*src="\/r\/rose-link\?in=phone"[^>]*loading="lazy"/);
+  expect(html).toMatch(/<iframe [^>]*src="\/h\/sam-link\?in=phone"[^>]*loading="lazy"/);
+  expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Open Rose&#x27;s page<\/a>/);
   expect(html).toContain("Open Sam&#x27;s page");
   expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Be Rose<\/a>/);
   expect(html).toMatch(/<a [^>]*href="\/h\/sam-link" target="_blank"[^>]*>Be Sam<\/a>/);
   expect(html).toContain("Start a new one");
-  expect(html).toContain("Your Rose and Sam are in the two phones.");
+  expect(html).toContain("Your Rose and Sam are in the two phones. Link Rose&#x27;s PayPal or skip it.");
   expect(html).not.toContain("on the right");
   expect(html).not.toContain("Try KinCart");
   expect(html).not.toContain("Sample");

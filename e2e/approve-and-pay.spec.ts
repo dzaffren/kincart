@@ -118,6 +118,10 @@ test("Rose links PayPal from the first screen", async ({ page }) => {
 
   await page.goto(`/r/${rose}?cancelled=1`);
   await expect(heading(page)).toHaveText("PayPal isn't linked yet");
+  await expect(page.getByRole("region", { name: "Sign in on PayPal with this demo login" })).toContainText(
+    process.env.PAYPAL_DEMO_EMAIL ?? "set PAYPAL_DEMO_EMAIL",
+  );
+  await expect(page.getByRole("button", { name: "Skip: use the demo PayPal" })).toBeVisible();
 });
 
 test("a wrong link says it doesn't work", async ({ page }) => {
