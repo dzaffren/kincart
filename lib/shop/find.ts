@@ -11,7 +11,7 @@ export type Group = { thing: string; options: Option[]; problem?: Problem };
 
 type Single = { outcome: "options"; options: Option[] } | { outcome: Problem };
 
-export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" };
+export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" | "nothing in photo" };
 
 const MOST_THINGS = 5;
 
