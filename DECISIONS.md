@@ -312,7 +312,7 @@ Status: active
 Why: a judge meets no PayPal login (scenario 1), and the vault the owner keeps linked is the one every judge pays from.
 Rejected: a vault id in a new env setting (one more value to keep in step with the vault), a PayPal login for each household (judges would need sandbox logins).
 Source: docs/specs/households.md
-Status: active
+Status: superseded by D58
 
 ## D49 · 2026-10-15 · A migration file drops an index that a later migration replaces
 
@@ -376,4 +376,40 @@ Status: active
 Why: a one-thing ask already keeps its shop, link and reason in columns on `purchase_requests`, so two nullable columns follow the same shape, and old code ignores them.
 Rejected: store a one-thing ask as a one-line basket in `lines` (Sam's one-thing screen would turn into the tick-list screen), a jsonb column for the extras (a second shape for the same request).
 Source: docs/specs/clearer-pages.md
+Status: active
+
+## D58 · 2026-10-15 · A new household starts with no saved PayPal, and Skip copies household 1's
+
+Why: while every household started linked, no judge saw PayPal's own approval page (a friend's feedback on v1.1.0, 2026-10-15). Skip keeps today's one-tap path, paying from household 1's PayPal, which the owner keeps linked.
+Rejected: start linked and add a second home page button for linking (fewer judges would see PayPal), keep D48 as it is (PayPal stays out of sight).
+Supersedes: D48
+Source: docs/specs/link-paypal-onboarding.md
+Status: active
+
+## D59 · 2026-10-15 · Rose's link screen shows a sandbox login of its own, not household 1's
+
+Why: anyone can sign in with a login on a public page. On its own account, a stranger can only spoil linking. Household 1's account backs the payments of every household that skipped.
+Rejected: household 1's sandbox login (one cancel of its saved permissions stops payment for every household that skipped).
+Source: docs/specs/link-paypal-onboarding.md
+Status: active
+
+## D60 · 2026-10-15 · From the home page's phone, PayPal opens in a new tab
+
+Why: PayPal's sign-in page refuses frames (x-frame-options: SAMEORIGIN). A new tab keeps both phones on screen, and Rose's phone updates by itself within 3 s (D19).
+Rejected: the whole window (the judge leaves the home page and has to come back to /).
+Source: docs/specs/link-paypal-onboarding.md
+Status: active
+
+## D61 · 2026-10-15 · In a home page phone, Link PayPal posts a plain form to POST /r/<token>/link, found by ?in=phone
+
+Why: React runs a server action and its redirect inside the frame, whatever the form's target. The page must know at render that it is in a frame, and the 3 s refresh keeps ?in=phone in the address.
+Rejected: a server action form with target="_blank" (React ignores the target), a window.top check in the browser as NotifyControl does (the first paint shows the wrong form), the Sec-Fetch-Dest header (the 3 s refresh sends "empty", not "iframe").
+Source: docs/specs/link-paypal-onboarding.md
+Status: active
+
+## D62 · 2026-10-15 · The demo login lives in the env as PAYPAL_DEMO_EMAIL and PAYPAL_DEMO_PASSWORD
+
+Why: the password stays out of the repo. With no value set, the card is left out, so local runs need nothing.
+Rejected: a constant in the code (a password in a tracked file), a row in the database (a migration to hold one pair of values).
+Source: docs/specs/link-paypal-onboarding.md
 Status: active
