@@ -28,6 +28,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Sam sets a total limit for everything Rose asks for at once, such as $40. Rose's picks that come to more than that never reach Sam.
 - Each visitor to kincart.vercel.app starts their own Rose and Sam, with the demo PayPal already linked, and sees only their own asks, limits and phones.
 - The home page says what KinCart does for the helper who would use it. On a laptop, a judge's own Rose and Sam then run side by side, live, so Sam's page changes as Rose asks.
+- Sam sees the photo and the AI's "Good to know" note for each thing before paying. Rose's and Sam's pages show the KinCart name, and the listing photos get bigger.
 
 ## Docs
 
