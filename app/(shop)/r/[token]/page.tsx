@@ -52,6 +52,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
       pickMissing: query.pick === "missing",
       askAgain: query.ask === "1",
       emptyFind: query.find === "empty",
+      notPhoto: query.find === "notphoto",
       over: typeof query.over === "string" ? query.over.split(",") : undefined,
     },
     on ? { saved, limitCents, totalCents } : undefined,

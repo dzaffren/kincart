@@ -2,7 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { find as findOptions, searchOn, type Group, type Option } from "../../lib/shop/find";
+import { find as findOptions, findPhoto, searchOn, type Group, type Option } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
 import { pay } from "../../lib/shop/pay";
 import { reasonOf } from "../../lib/shop/paypal";
@@ -81,8 +81,20 @@ export async function find(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
   const words = String(formData.get("words") ?? "").trim().slice(0, 200);
-  if (!words) redirect(`/r/${token}?find=empty`);
-  await saveSearch(who.household, words, await findOptions(words, await getLimit(who.household)));
+  // An empty file input still sends an empty file. Rose's browser shrank the photo to a JPEG (D65).
+  const photo = formData.get("photo");
+  const jpeg = photo instanceof File && photo.size ? Buffer.from(await photo.arrayBuffer()) : null;
+  // Haiku refuses an image whose bytes don't match its media type, so only a real JPEG goes on.
+  if (jpeg && jpeg.toString("hex", 0, 3) !== "ffd8ff") redirect(`/r/${token}?find=notphoto`);
+  if (!words && !jpeg) redirect(`/r/${token}?find=empty`);
+  const limitCents = await getLimit(who.household);
+  if (jpeg) {
+    // The photo goes no further than Haiku: only the AI's words for it are kept (D64).
+    const found = await findPhoto(words, limitCents, jpeg);
+    await saveSearch(who.household, found.words, found.result, true);
+  } else {
+    await saveSearch(who.household, words, await findOptions(words, limitCents));
+  }
   redirect(`/r/${token}`);
 }
 
