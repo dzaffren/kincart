@@ -413,3 +413,38 @@ Why: the password stays out of the repo. With no value set, the card is left out
 Rejected: a constant in the code (a password in a tracked file), a row in the database (a migration to hold one pair of values).
 Source: docs/specs/link-paypal-onboarding.md
 Status: active
+
+## D63 · 2026-10-16 · Find reads a photo the way it reads typed words: with any words, and a written list is a basket
+
+Why: a photo alone can't say a size or a count, such as "size 8", and an older person's paper shopping list is the same ask as a typed list of up to 5 things.
+Rejected: a photo replaces the typed words (Rose can't add a size or a count), one thing for each photo (a photo of a paper list finds one thing or nothing).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D64 · 2026-10-16 · Rose's photo goes to Claude once and is not kept
+
+Why: Rose sees the AI's words for the photo and Sam sees the listings, so nothing needs the photo after Find. A photo taken at home can also show more than the thing.
+Rejected: keep the photo and show it to Sam beside the listing (needs photo storage and a rule for deleting it, so a slice of its own).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D65 · 2026-10-16 · Rose's photo shrinks in the browser to a 1600px JPEG, and Next's 1 MB body limit stays
+
+Why: phone camera photos are 2 to 12 MB, and Next refuses a server action body over 1 MB. In the O6 spike, a 5.2 MB photo failed with "Body exceeded 1 MB limit", and shrunk it was 519 KB in 136 ms.
+Rejected: raise `serverActions.bodySizeLimit` to fit camera photos (a 12 MB upload on a phone's connection, and more for anyone with the link to send), upload to a file store first (a store for a photo that D64 says is not kept).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D66 · 2026-10-16 · A photo Find sends the photo to Haiku in the first step only, with a prompt of its own
+
+Why: the second step picks from Channel3's listing text, which a photo does not change. A separate prompt leaves the typed path's prompt exactly as its tests and CI check it.
+Rejected: one prompt for words and photos (it changes the typed path's tested prompt), the photo in both steps (more image tokens, and no scenario needs it).
+Source: docs/specs/photo-ask.md
+Status: active
+
+## D67 · 2026-10-16 · rose_search keeps a from_photo flag and a "nothing in photo" outcome
+
+Why: "from your photo" and the photo's own nothing-found message must survive the 3 s redraw (D19) and a reopened link, like the rest of Rose's search (D23).
+Rejected: a `?photo=1` in the page address (lost after Ask Sam's error redirects and when Rose opens the link again).
+Source: docs/specs/photo-ask.md
+Status: active
