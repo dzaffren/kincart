@@ -50,7 +50,10 @@ it("creates a setup token and hands back its approve link", async () => {
   const [url, init] = apiCall(fetch);
   expect(url).toBe("https://api-m.sandbox.paypal.com/v3/vault/setup-tokens");
   expect((init.headers as Record<string, string>).Authorization).toBe("Bearer A21AA-sandbox");
-  const context = JSON.parse(String(init.body)).payment_source.paypal.experience_context;
+  const paypal = JSON.parse(String(init.body)).payment_source.paypal;
+  const context = paypal.experience_context;
+  expect(paypal.description).toBe("KinCart: pay when your helper says OK");
+  expect(context.brand_name).toBe("KinCart");
   expect(context.return_url).toBe("https://kincart.vercel.app/r/abc/linked");
   expect(context.cancel_url).toBe("https://kincart.vercel.app/r/abc?cancelled=1");
 });

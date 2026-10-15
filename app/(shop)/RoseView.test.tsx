@@ -66,3 +66,23 @@ it("leaves the login out when none is set, and keeps both buttons after a cancel
   expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
   expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
 });
+
+it("in a home page phone, posts Link PayPal to its route in a new tab, and says so", () => {
+  const html = renderToStaticMarkup(
+    <RoseView state={{ kind: "not linked" }} items={[]} login={login} framedLink="/r/rose-link-4f9c2a7e/link" />,
+  );
+
+  expect(html).toMatch(
+    /<form [^>]*action="\/r\/rose-link-4f9c2a7e\/link" method="post" target="_blank">.*Link PayPal<\/button>/,
+  );
+  expect(html).toContain("PayPal opens in a new tab. Come back here when you&#x27;re done.");
+});
+
+it("says PayPal is linked above What do you need?, once Rose is back from PayPal", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "ask", linked: true, limitCents: 5000 }} items={[]} />);
+
+  expect(html).toMatch(/Your PayPal is linked\. You won&#x27;t need to do this again\.<\/p>.*<h1[^>]*>What do you need\?<\/h1>/);
+  expect(renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000 }} items={[]} />)).not.toContain(
+    "PayPal is linked",
+  );
+});

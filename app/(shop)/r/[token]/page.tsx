@@ -48,6 +48,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
     request,
     {
       cancelled: query.cancelled === "1",
+      linked: query.linked === "1",
       pickMissing: query.pick === "missing",
       askAgain: query.ask === "1",
       emptyFind: query.find === "empty",
@@ -65,6 +66,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
           items={ITEMS}
           link={startLink.bind(null, token)}
           login={demoLogin()}
+          framedLink={query.in === "phone" ? `/r/${token}/link` : undefined}
           ask={askSam.bind(null, token)}
           find={find.bind(null, token)}
           tryAgain={tryAgain.bind(null, token)}

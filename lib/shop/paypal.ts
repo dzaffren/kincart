@@ -20,11 +20,11 @@ export async function createSetupToken(returnUrl: string, cancelUrl: string): Pr
   const body = await call("/v3/vault/setup-tokens", {
     payment_source: {
       paypal: {
-        description: "Shop-together: pay when your helper says OK",
+        description: "KinCart: pay when your helper says OK",
         usage_type: "MERCHANT",
         customer_type: "CONSUMER",
         experience_context: {
-          brand_name: "Shop-together",
+          brand_name: "KinCart",
           shipping_preference: "NO_SHIPPING",
           return_url: returnUrl,
           cancel_url: cancelUrl,

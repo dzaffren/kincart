@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { find as findOptions, searchOn, type Group, type Option } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
 import { pay } from "../../lib/shop/pay";
-import { createSetupToken, reasonOf } from "../../lib/shop/paypal";
+import { reasonOf } from "../../lib/shop/paypal";
 import { hashOf, newLink, whoIs } from "../../lib/shop/people";
 import { parseSubscription, pushOn } from "../../lib/shop/push";
 import {
@@ -23,6 +23,7 @@ import {
   setTotal as saveTotal,
   startHousehold,
 } from "../../lib/shop/requests";
+import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
 
 // Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44).
@@ -51,24 +52,9 @@ export async function start(): Promise<void> {
 
 export async function startLink(token: string): Promise<void> {
   if ((await whoIs(token))?.person !== "rose") return;
-  const page = `${await origin()}/r/${token}`;
-
-  let approveUrl: string;
-  try {
-    const setup = await createSetupToken(`${page}/linked`, `${page}?cancelled=1`);
-    (await cookies()).set("setup_token", setup.id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: `/r/${token}`,
-      maxAge: 3600,
-    });
-    approveUrl = setup.approveUrl;
-  } catch (error) {
-    console.log(`paypal link status=failed reason=${error instanceof Error ? error.message : error}`);
-    redirect(`/r/${token}?cancelled=1`);
-  }
-  redirect(approveUrl);
+  const link = await beginLink(token, await origin());
+  if (link.setupToken) (await cookies()).set("setup_token", link.setupToken, setupCookie(token));
+  redirect(link.to);
 }
 
 export async function find(token: string, formData: FormData): Promise<void> {

@@ -72,14 +72,14 @@ type Props = {
   link?: Action;
   skip?: Action;
   login?: DemoLogin;
-  framed?: boolean;
+  framedLink?: string;
   ask?: Action;
   find?: Action;
   tryAgain?: Action;
   notify?: ReactNode;
 };
 
-export function RoseView({ state, items, link, skip, login, framed, ask, find, tryAgain, notify }: Props) {
+export function RoseView({ state, items, link, skip, login, framedLink, ask, find, tryAgain, notify }: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -112,12 +112,19 @@ export function RoseView({ state, items, link, skip, login, framed, ask, find, t
             <p className="small">It&apos;s a PayPal sandbox account. No real money moves.</p>
           </section>
         )}
-        <form className="stack" action={link}>
-          <Button type="submit" busy={state.busy} busyLabel="Opening PayPal…">
-            Link PayPal
-          </Button>
-          {framed && <p className="small">PayPal opens in a new tab. Come back here when you&apos;re done.</p>}
-        </form>
+        {framedLink ? (
+          // PayPal refuses to load in a frame, so a home page phone opens it in a new tab (D61).
+          <form className="stack" method="post" action={framedLink} target="_blank">
+            <Button type="submit">Link PayPal</Button>
+            <p className="small">PayPal opens in a new tab. Come back here when you&apos;re done.</p>
+          </form>
+        ) : (
+          <form action={link}>
+            <Button type="submit" busy={state.busy} busyLabel="Opening PayPal…">
+              Link PayPal
+            </Button>
+          </form>
+        )}
         <form action={skip}>
           <Button type="submit" kind="secondary" busyLabel="Setting up…">
             Skip: use the demo PayPal

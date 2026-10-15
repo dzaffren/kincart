@@ -32,9 +32,9 @@ it("sells KinCart and shows two still sample phones before a household starts", 
 it("shows the household's two pages in lazy frames, and a button for each", () => {
   const html = renderToStaticMarkup(<HomeView state={{ links: { rose: "/r/rose-link", sam: "/h/sam-link" } }} />);
 
-  expect(html).toMatch(/<iframe [^>]*src="\/r\/rose-link"[^>]*loading="lazy"/);
-  expect(html).toMatch(/<iframe [^>]*src="\/h\/sam-link"[^>]*loading="lazy"/);
-  expect(html).toContain("Open Rose&#x27;s page");
+  expect(html).toMatch(/<iframe [^>]*src="\/r\/rose-link\?in=phone"[^>]*loading="lazy"/);
+  expect(html).toMatch(/<iframe [^>]*src="\/h\/sam-link\?in=phone"[^>]*loading="lazy"/);
+  expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Open Rose&#x27;s page<\/a>/);
   expect(html).toContain("Open Sam&#x27;s page");
   expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Be Rose<\/a>/);
   expect(html).toMatch(/<a [^>]*href="\/h\/sam-link" target="_blank"[^>]*>Be Sam<\/a>/);

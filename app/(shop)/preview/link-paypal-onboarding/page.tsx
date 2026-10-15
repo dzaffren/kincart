@@ -5,7 +5,7 @@ import { SamView } from "../../SamView";
 import { PageHead, PhoneFrame } from "../../ui";
 import "../approve-and-pay/preview.css";
 
-const login = { email: "rose.kincart@example.com", password: "kincart-rose-1" };
+const login = { email: "sb-rose7d2k91@personal.example.com", password: "kincart-rose-1" };
 const limit = { cents: 3000 };
 const total = { cents: null };
 
@@ -53,7 +53,7 @@ export default function LinkPaypalOnboardingPreview() {
         <div className="frames">
           <PhoneFrame who="Rose">
             <PageHead />
-            <RoseView state={{ kind: "not linked" }} items={[]} login={login} framed />
+            <RoseView state={{ kind: "not linked" }} items={[]} login={login} framedLink="/r/rose/link" />
           </PhoneFrame>
           <PhoneFrame who="Sam">
             <PageHead />

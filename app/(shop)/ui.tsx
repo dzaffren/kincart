@@ -196,7 +196,7 @@ export function PhoneFrame({ who, href, children }: { who: string; href?: string
         )}
       </figcaption>
       {href ? (
-        <iframe className="phone-screen" src={href} title={`${who}'s phone`} loading="lazy" />
+        <iframe className="phone-screen" src={`${href}?in=phone`} title={`${who}'s phone`} loading="lazy" />
       ) : (
         <div className="phone-screen" inert>
           {children}
