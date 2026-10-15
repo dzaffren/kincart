@@ -5,7 +5,16 @@ export type ChargeResult =
   | { state: "refused"; reason: string }
   | { state: "unknown"; reason: string };
 
+export type DemoLogin = { email: string; password: string };
+
 const API = "https://api-m.sandbox.paypal.com";
+
+// The sandbox buyer that Rose's link screen shows to judges (D59, D62).
+export function demoLogin(): DemoLogin | undefined {
+  const email = process.env.PAYPAL_DEMO_EMAIL;
+  const password = process.env.PAYPAL_DEMO_PASSWORD;
+  return email && password ? { email, password } : undefined;
+}
 
 export async function createSetupToken(returnUrl: string, cancelUrl: string): Promise<{ id: string; approveUrl: string }> {
   const body = await call("/v3/vault/setup-tokens", {

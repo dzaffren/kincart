@@ -256,6 +256,7 @@ it("pings Sam for an item from the fixed list too", async () => {
 it("asks and pings only Ben's own Sam, and Ben's Sam can't answer another household's ask", async () => {
   vi.stubEnv("CHANNEL3_API_KEY", "");
   const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await saveVault(ben, "8kf02113h7720954x");
   await ask(owner, glasses);
   const theirs = (await latest(owner))!;
 
@@ -581,7 +582,7 @@ it("charges nothing when Sam's OK has nothing ticked, and tells Rose when Sam sa
   });
 });
 
-it("starts a household with its own two links and household 1's saved PayPal, and keeps the links in this browser", async () => {
+it("starts a household with its own two links and no saved PayPal, and keeps the links in this browser", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
 
   expect(await redirectOf(start())).toBe("/?started=ready");
@@ -592,7 +593,7 @@ it("starts a household with its own two links and household 1's saved PayPal, an
   expect(rose.person).toBe("rose");
   expect(rose.household).not.toBe(owner);
   expect(await whoIs(samLink)).toEqual({ household: rose.household, person: "sam" });
-  expect(await getVault(rose.household)).toBe("1j970427g9944212v");
+  expect(await getVault(rose.household)).toBeNull();
   expect(options).toEqual({ httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 90 * 24 * 60 * 60 });
   expect(console.log).toHaveBeenCalledWith(`household id=${rose.household} status=started`);
 });

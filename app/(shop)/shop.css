@@ -121,6 +121,10 @@ body {
   user-select: all;
 }
 
+.login dd span {
+  white-space: nowrap;
+}
+
 .amount {
   font: var(--type-amount);
   font-variant-numeric: tabular-nums;

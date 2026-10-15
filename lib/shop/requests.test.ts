@@ -314,17 +314,14 @@ it("keeps each phone once under the person who turned it on, until it's forgotte
   expect(await subscriptionsFor(owner, "rose")).toEqual([rosePhone]);
 });
 
-it("starts a household with household 1's saved PayPal, or with none, and finds it by either link's hash", async () => {
-  const bare = await startHousehold("rose-hash-0a1b", "sam-hash-0a1b");
-  expect(await getVault(bare)).toBeNull();
-
+it("starts a household with no saved PayPal, even when household 1 has one, and finds it by either link's hash", async () => {
   await saveVault(owner, "1j970427g9944212v");
-  const linked = await startHousehold("rose-hash-2c3d", "sam-hash-2c3d");
-  expect(linked).toBeGreaterThan(bare);
-  expect(await getVault(linked)).toBe("1j970427g9944212v");
+  const fresh = await startHousehold("rose-hash-2c3d", "sam-hash-2c3d");
+  expect(await getVault(fresh)).toBeNull();
+  expect(await getVault(owner)).toBe("1j970427g9944212v");
 
-  expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: linked, person: "rose" });
-  expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: linked, person: "sam" });
+  expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: fresh, person: "rose" });
+  expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: fresh, person: "sam" });
   expect(await findHousehold("rose-hash-ffff")).toBeNull();
 });
 
@@ -350,7 +347,7 @@ it("keeps each household's asks, searches, limits, saved PayPal and phones apart
   expect(await getTotal(ben)).toBeNull();
   expect(await subscriptionsFor(ben, "sam")).toEqual([]);
   expect(await subscriptionsFor(ana, "sam")).toEqual([samPhone]);
-  expect(await getVault(ana)).toBe("1j970427g9944212v");
+  expect(await getVault(ana)).toBeNull();
   expect(await getVault(ben)).toBe("8kf02113h7720954x");
   expect(await getVault(owner)).toBe("1j970427g9944212v");
 });

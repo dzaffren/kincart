@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { charge, createPaymentToken, createSetupToken } from "./paypal";
+import { charge, createPaymentToken, createSetupToken, demoLogin } from "./paypal";
 
 const glasses = { id: "glasses", name: "Reading glasses, +2.00", cents: 1899 };
 
@@ -141,4 +141,13 @@ it("reports refused when the keys are rejected, since no order was sent", async 
   vi.stubGlobal("fetch", vi.fn(async () => new Response('{"error":"invalid_client"}', { status: 401 })));
 
   expect(await charge("1j970427g9944212v", glasses, "purchase-16-1792491300000")).toEqual({ state: "refused", reason: "token HTTP 401" });
+});
+
+it("hands back the demo login only when both its email and password are set", () => {
+  vi.stubEnv("PAYPAL_DEMO_EMAIL", "sb-rose7d2k91@personal.example.com");
+  vi.stubEnv("PAYPAL_DEMO_PASSWORD", "kincart-rose-1");
+  expect(demoLogin()).toEqual({ email: "sb-rose7d2k91@personal.example.com", password: "kincart-rose-1" });
+
+  vi.stubEnv("PAYPAL_DEMO_PASSWORD", "");
+  expect(demoLogin()).toBeUndefined();
 });

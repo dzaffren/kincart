@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { searchOn } from "../../../../lib/shop/find";
 import { ITEMS } from "../../../../lib/shop/items";
 import { settleStuck } from "../../../../lib/shop/pay";
+import { demoLogin } from "../../../../lib/shop/paypal";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
@@ -63,6 +64,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
           state={state}
           items={ITEMS}
           link={startLink.bind(null, token)}
+          login={demoLogin()}
           ask={askSam.bind(null, token)}
           find={find.bind(null, token)}
           tryAgain={tryAgain.bind(null, token)}

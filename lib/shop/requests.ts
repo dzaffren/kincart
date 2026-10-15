@@ -63,17 +63,12 @@ export type SavedSearch = {
 
 const DEFAULT_LIMIT_CENTS = 5000;
 
-// One statement, so a household never exists without the copy of household 1's saved PayPal (D48).
+// A new household has no saved PayPal: Rose links one, or Skip copies household 1's (D58).
 export async function startHousehold(roseHash: string, samHash: string): Promise<number> {
-  const rows = await query<{ id: string }>(
-    `WITH household AS (INSERT INTO households (rose_hash, sam_hash) VALUES ($1, $2) RETURNING id),
-     vault AS (
-       INSERT INTO paypal_vault (id, payment_token)
-       SELECT household.id, payment_token FROM household, paypal_vault WHERE paypal_vault.id = 1
-     )
-     SELECT id FROM household`,
-    [roseHash, samHash],
-  );
+  const rows = await query<{ id: string }>("INSERT INTO households (rose_hash, sam_hash) VALUES ($1, $2) RETURNING id", [
+    roseHash,
+    samHash,
+  ]);
   return Number(rows[0].id);
 }
 

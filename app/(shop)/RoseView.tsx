@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from "react";
 import type { Group, Option } from "../../lib/shop/find";
 import { things, type Item } from "../../lib/shop/items";
+import type { DemoLogin } from "../../lib/shop/paypal";
 import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
@@ -65,8 +66,6 @@ export type RoseState =
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-export type DemoLogin = { email: string; password: string };
-
 type Props = {
   state: RoseState;
   items: Item[];
@@ -104,7 +103,9 @@ export function RoseView({ state, items, link, skip, login, framed, ask, find, t
             </h2>
             <dl>
               <dt className="small">Email</dt>
-              <dd>{login.email}</dd>
+              <dd>
+                <EmailLines email={login.email} />
+              </dd>
               <dt className="small">Password</dt>
               <dd>{login.password}</dd>
             </dl>
@@ -354,6 +355,19 @@ function OverNotice({ totalCents, overCents, several }: { totalCents?: number; o
       That comes to {money(overCents)}. {HELPER}&apos;s limit is {wholeDollars(totalCents)} in all.{" "}
       {several ? "Leave something out." : "Pick a cheaper one."}
     </Notice>
+  );
+}
+
+// A long sandbox email wraps only before its @, never at the hyphen in "sb-".
+function EmailLines({ email }: { email: string }) {
+  const at = email.indexOf("@");
+  if (at < 1) return email;
+  return (
+    <>
+      <span>{email.slice(0, at)}</span>
+      <wbr />
+      <span>{email.slice(at)}</span>
+    </>
   );
 }
 

@@ -43,3 +43,26 @@ it("ticks each group's own pick, also when one listing sits in two groups", () =
   ]);
   expect(ticked(["prod_8En1rG", "", "prod_7Bk2wC"])).toEqual(["pick-0=prod_8En1rG", "pick-1=", "pick-2=prod_7Bk2wC"]);
 });
+
+const login = { email: "sb-rose7d2k91@personal.example.com", password: "kincart-rose-1" };
+
+it("starts at Link PayPal, with the demo login and a Skip button", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "not linked" }} items={[]} login={login} />);
+
+  expect(html).toContain("<h1>Link your PayPal to start</h1>");
+  expect(html).toContain("Sign in on PayPal with this demo login");
+  expect(html).toContain("<dd><span>sb-rose7d2k91</span><wbr/><span>@personal.example.com</span></dd>");
+  expect(html).toContain("<dd>kincart-rose-1</dd>");
+  expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
+  expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
+  expect(html).not.toContain("opens in a new tab");
+});
+
+it("leaves the login out when none is set, and keeps both buttons after a cancel", () => {
+  const html = renderToStaticMarkup(<RoseView state={{ kind: "not linked", cancelled: true }} items={[]} />);
+
+  expect(html).toContain("<h1>PayPal isn&#x27;t linked yet</h1>");
+  expect(html).not.toContain("demo login");
+  expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
+  expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
+});
