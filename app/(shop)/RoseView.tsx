@@ -126,6 +126,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           </form>
         )}
         <form action={skip}>
+          {framedLink && <input type="hidden" name="in" value="phone" />}
           <Button type="submit" kind="secondary" busyLabel="Setting up…">
             Skip: use the demo PayPal
           </Button>

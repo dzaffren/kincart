@@ -629,15 +629,15 @@ it("skips Rose to a copy of household 1's saved PayPal, and only for Rose", asyn
   vi.spyOn(console, "log").mockImplementation(() => {});
   const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
 
-  await expect(skipLink("ben-sam-link-9Lm4")).resolves.toBeUndefined();
+  await expect(skipLink("ben-sam-link-9Lm4", form({}))).resolves.toBeUndefined();
   expect(await getVault(ben)).toBeNull();
 
-  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({ in: "phone" })))).toBe("/r/ben-rose-link-7Qx2?in=phone");
   expect(await getVault(ben)).toBe("1j970427g9944212v");
   expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=copied`);
 });
 
-it("says a Skip failed when household 1 has no saved PayPal, and leaves Rose at Link PayPal", async () => {
+it("says a Skip failed when household 1 has no saved PayPal, and sends Rose back not linked, still in her phone", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -645,7 +645,10 @@ it("says a Skip failed when household 1 has no saved PayPal, and leaves Rose at 
   await client.query("DELETE FROM paypal_vault");
   await client.end();
 
-  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({})))).toBe("/r/ben-rose-link-7Qx2?cancelled=1");
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({ in: "phone" })))).toBe(
+    "/r/ben-rose-link-7Qx2?in=phone&cancelled=1",
+  );
   expect(await getVault(ben)).toBeNull();
   expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=failed reason=no demo PayPal`);
 });
@@ -656,7 +659,7 @@ it("keeps the PayPal Rose linked in a new tab when she taps Skip in the old one,
   const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
   await saveVault(ben, "8kf02113h7720954x");
 
-  expect(await redirectOf(skipLink("ben-rose-link-7Qx2"))).toBe("/r/ben-rose-link-7Qx2");
+  expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({})))).toBe("/r/ben-rose-link-7Qx2");
   expect(await getVault(ben)).toBe("8kf02113h7720954x");
   expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=kept`);
 });

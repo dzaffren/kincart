@@ -59,7 +59,7 @@ export async function startLink(token: string): Promise<void> {
 }
 
 // Skip: this household pays from a copy of household 1's saved PayPal, as every household did before D58.
-export async function skipLink(token: string): Promise<void> {
+export async function skipLink(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
   // A copy fails also when Rose linked her own in a new tab and then tapped Skip in the old one; that one stays.
@@ -69,7 +69,12 @@ export async function skipLink(token: string): Promise<void> {
       ? "kept"
       : "failed reason=no demo PayPal";
   console.log(`paypal skip household=${who.household} status=${status}`);
-  redirect(`/r/${token}`);
+
+  // A home page phone keeps ?in=phone, so its Link PayPal still opens a new tab (D61).
+  const back = new URLSearchParams();
+  if (formData.get("in") === "phone") back.set("in", "phone");
+  if (status.startsWith("failed")) back.set("cancelled", "1");
+  redirect(back.size ? `/r/${token}?${back}` : `/r/${token}`);
 }
 
 export async function find(token: string, formData: FormData): Promise<void> {

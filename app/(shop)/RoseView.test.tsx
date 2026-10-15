@@ -56,6 +56,7 @@ it("starts at Link PayPal, with the demo login and a Skip button", () => {
   expect(html).toMatch(/<button[^>]*>Link PayPal<\/button>/);
   expect(html).toMatch(/<button[^>]*>Skip: use the demo PayPal<\/button>/);
   expect(html).not.toContain("opens in a new tab");
+  expect(html).not.toContain('name="in"');
 });
 
 it("leaves the login out when none is set, and keeps both buttons after a cancel", () => {
@@ -76,6 +77,7 @@ it("in a home page phone, posts Link PayPal to its route in a new tab, and says 
     /<form [^>]*action="\/r\/rose-link-4f9c2a7e\/link" method="post" target="_blank">.*Link PayPal<\/button>/,
   );
   expect(html).toContain("PayPal opens in a new tab. Come back here when you&#x27;re done.");
+  expect(html).toMatch(/<form[^>]*><input type="hidden" name="in" value="phone"\/><button[^>]*>Skip: use the demo PayPal/);
 });
 
 it("says PayPal is linked above What do you need?, once Rose is back from PayPal", () => {
