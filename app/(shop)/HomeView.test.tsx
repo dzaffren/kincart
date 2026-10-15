@@ -10,6 +10,7 @@ it("sells KinCart and shows two still sample phones before a household starts", 
   expect(html).toContain("<span>Mom asks.</span> <span>You say OK.</span> <span>PayPal pays.</span>");
   expect(html).toContain("No more logging in as them or reading out card numbers.");
   expect(html).toContain("<strong>Sandbox money only.</strong> Nothing real is bought.");
+  expect(html).toMatch(/>what&#x27;s real, what stands in, and what comes next\.<\/a><\/p>/);
   expect(html).toContain("Try KinCart");
   expect(html).toContain("<h2>How it works</h2>");
   expect(html).toContain("<strong>Your parent says what they need.</strong>");
