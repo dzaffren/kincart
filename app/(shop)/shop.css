@@ -718,3 +718,23 @@ body {
     letter-spacing: var(--showcase-tracking);
   }
 }
+
+/* Rose's photo before Find: the photo and its words side by side, Remove under both. */
+.photo-pick {
+  display: grid;
+  grid-template-columns: var(--photo-size) 1fr;
+  align-items: start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-sunken);
+  border-radius: var(--radius-surface);
+  animation: enter var(--motion-slow) var(--ease-out);
+}
+
+.photo-pick .listing-photo {
+  margin: 0;
+}
+
+.photo-pick .button {
+  grid-column: 1 / -1;
+}
