@@ -1,9 +1,10 @@
 # Photo ask
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** find-and-explain and basket, both shipped
+**Page:** none. Skipped: you read the `.md` directly.
 
 Rose takes or picks a photo of the thing they need, and AI turns it into a search. It comes now because a friend's feedback on v1.1.0, on 2026-10-15, said that older people find a photo easier than words.
 
@@ -254,7 +255,7 @@ erDiagram
 | Added | Triggered by |
 | ----- | ------------ |
 | The shrink in `PhotoPicker` | Scenario 1's 4 MB photo. Next refuses bodies over 1 MB (O6: `POST 500`, "Body exceeded 1 MB limit") |
-| The 0.7 second try over 900 KB | O6's noisy 12 MP photo came out at 519 to 546 KB at 0.85, so a busier photo could pass 1 MB |
+| The 0.7 second try over 900 KB | A real iPhone photo came out at 739 KB at 0.85 (O8), 72% of the limit, so a busier photo could pass 1 MB |
 | `readPhoto()` and `NEED_PHOTO` | Scenarios 1 to 4. A separate prompt keeps the typed path's prompt as tested (D66) |
 | `findPhoto()` | The action needs the AI's words to save and show. `find()` keeps its signature and its tests |
 | `from_photo` and `'nothing in photo'` | Scenario 1's "from your photo" and scenario 4's message. Both must survive the 3 s redraw (D19) and a reopened link (D67) |
@@ -300,7 +301,7 @@ Build A, then B, one after the other. B's e2e needs A, and both chunks' tests us
 | ---- | ---------- |
 | Haiku misreads a blurry or tilted photo, and the search is for the wrong thing | Rose sees the AI's words marked as from the photo, and Try other words puts them in the box. Sam approves every charge |
 | Rose taps Find in the 150 to 200 ms before the shrink ends | `picked()` empties the input first, so Find sends no photo and gets "Type what you need, or add a photo, first." The 5 MB original never goes |
-| A real iPhone, or HEIC, doesn't shrink (O8) | Open until the owner tries it on a phone |
+| A real phone photo comes out over 1 MB at 0.85 | The owner's iPhone photo was 739 KB (O8). Over 900 KB, `picked()` encodes again at 0.7. The e2e's photo passes only if the shrink ran |
 | Haiku is slower with an image, and a 5-thing list hits Find's limit | O5's image calls took 1.3 to 1.9 s against the 10 s timeout. The searches then run at once (D31), and the page's `maxDuration` is 30 s |
 
 ### Decisions to record
@@ -353,7 +354,7 @@ Status: active
 | O5 | Haiku 5.5 at low effort reads a phone photo of a CR2032 battery as a CR2032 coin battery, and a photo of a 3-item handwritten list as 3 things, within the 10 s timeout | unproven | spec p3 | poc | Resolved | Yes, with the two generated photos shrunk as the browser will (1600px JPEG at 0.85: 138 KB and 198 KB). Three runs each, all right. The battery gave one thing, "CR2032 3V lithium coin battery", in 1.4 to 1.9 s. The list gave "AA batteries", "night light" and "phone charger" in 1.3 to 1.7 s. With "2 of them" typed, it gave "CR2032 3V lithium coin battery, pack of 2". Each call used about 2,950 input tokens and 50 to 64 output tokens. The photos' print is cleaner than a real camera's (O7, O8). Spike, 2026-10-16 |
 | O6 | The browser shrinks a full-size camera photo to a JPEG under Next's 1 MB server action limit on real phones, including an iPhone's HEIC photos, and puts it back in the form | unproven | spec p3 | poc | Resolved | Yes in Chromium and Firefox. A generated 12 MP, 5.2 MB JPEG shrank to 1600×1200 at 519 KB in 136 ms (Chromium) and 546 KB in 194 ms (Firefox). It went back into the form with `DataTransfer`, and the server action got `image/jpeg` starting `ffd8ff`. The same file unshrunk failed: `POST 500`, "Body exceeded 1 MB limit", and "This page couldn't load". WebKit didn't launch on this machine (missing system libraries), so Safari moves to O8. Spike, 2026-10-16 |
 | O7 | Where do the e2e's photos come from? | question | spec p3 | user | Resolved | Generated, on the owner's request: `e2e/photos/cr2032.jpg` (4032×3024, 1.8 MB, a coin cell printed CR2032) and `e2e/photos/list.jpg` (3024×4032, 2.2 MB, the list in a handwriting font on lined paper). Both are drawn in Chromium, so they have no EXIF. Their print is cleaner than a real photo's, so the real-camera check is O8. Changed from "the owner takes two phone photos", 2026-10-16 |
-| O8 | A real iPhone in Safari shrinks a camera photo, HEIC included, and sends it (split from O6) | unproven | spec p3 | user | Open | — |
+| O8 | A real iPhone in Safari shrinks a camera photo, HEIC included, and sends it (split from O6) | unproven | spec p3 | user | Resolved | Yes. On the owner's iPhone (iOS 18.4.1, Safari), a camera photo arrived as `image.jpg`, `image/jpeg`, 3,341,859 bytes, so Safari never had to read HEIC. It shrank from 3024×4032 to 1200×1600 at 738,732 bytes in 382 ms, went back into the input, and the server got `image/jpeg` starting `ffd8ff`. Spike on a Vercel preview of a throwaway branch, deleted after, 2026-10-16 |
 | O9 | Can Rose send several photos in one Find, one for each thing? | question | spec p3 | user | Resolved | Not in this slice. Two shrunk photos (519 to 546 KB each in O6) pass Next's 1 MB limit together, and the screens need a card for each. Later slice `photo-ask-several`, only if time is left. 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
