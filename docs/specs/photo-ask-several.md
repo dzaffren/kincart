@@ -243,7 +243,7 @@ The photos leave Rose's phone without location data. Only the AI's words and two
 
 | File | What changes | Why |
 | ---- | ------------ | --- |
-| `app/(shop)/PhotoPicker.tsx:11` | `LONG_EDGE` 1600 to 1200, and `MOST_BYTES` 900 KB to 180 KB. `shrink()` (`:143`) tries 0.85, 0.7 and 0.55, then 1000px and 800px at 0.55, and stops at the first JPEG under 180 KB. `picked()` (`:58`) shrinks one photo at a time, not with `Promise.all`. After Find, Next mounts the form again, so the picker starts empty with no code of its own (O8, O14) | 1, 3, 4, 5 (O10) |
+| `app/(shop)/PhotoPicker.tsx:11` | `LONG_EDGE` gives way to `STEPS`, and `MOST_BYTES` goes from 900 KB to 180 KB. `shrink()` (`:143`) tries 1200px at 0.85, 0.7 and 0.55, then 1000px and 800px at 0.55, and stops at the first JPEG under 180 KB. `picked()` (`:58`) shrinks one photo at a time, not with `Promise.all`. A count holds the photos kept or still shrinking, so a second pick during the first has the right room, and a pick that fills the 5 moves focus to the line in Add's place (O18). After Find, Next mounts the form again, so the picker starts empty with no code of its own (O8, O14) | 1, 3, 4, 5 (O10) |
 | `app/(shop)/actions.ts:80` | `find()` reads `formData.getAll("photo")`, keeps the non-empty files, and takes the first 5. Any file that doesn't start `ffd8ff` redirects to `?find=notphoto`. It calls `findPhoto()` with all of them, and saves `photos` and `blank` | 1 to 3 |
 | `lib/shop/ai.ts:12` | `NEED_PHOTO` is rewritten for 1 to 5 photos (below). `readPhoto(words, jpegs)` (`:56`) sends "Photo n:" before each image, then the words. A new `NEED_PHOTO_SCHEMA` gives each thing `photos`, the numbers of the photos it is in, and adds `blank`, a list of photo numbers. `readNeed()` and `NEED` stay as they are (D66) | 1 to 3 |
 | `lib/shop/find.ts:34` | `findPhoto(words, limitCents, jpegs)` returns `{ words, result, photos, blank }`. The things are sorted by their smallest photo number, and a list keeps its own order inside one photo. `blank` counts the different photo numbers in range that no thing's `photos` names, and is 0 when there are no things. The log line's ` photo=yes` becomes ` photos=2 blank=0` | 1 to 3 |
@@ -253,6 +253,7 @@ The photos leave Rose's phone without location data. Only the AI's words and two
 | `db/migrations/0010_photo_ask_several.up.sql`, `.down.sql` | Add `photos` and `blank_photos`, `smallint NOT NULL DEFAULT 0`, with `IF NOT EXISTS`, so a rerun of `db:up` passes | 1, 3 |
 | `scripts/migrate.test.ts:27` | The first test checks both columns up, down and up. `downToHouseholds()` also runs `0009_photo_ask.down.sql` by hand | migration |
 | `e2e/photo-ask-several.spec.ts`, `e2e/photos/blank.jpg` | The slice's e2e, and a generated photo of a blank wall | 1, 3, 4, 5 |
+| `app/(shop)/shop.css`, `app/(shop)/preview/photo-ask-several/page.tsx`, `app/(shop)/preview/photo-ask/page.tsx` | Built at pause 2: the `photo-tiles` and `photo-tile` classes, this slice's preview, and photo-ask's preview passing `previews` in place of `photo` | 1, 4, 5 |
 
 Reusing: `searchThings()`, `searchListings()` and `choose()` unchanged, `haiku()` with content blocks, `reasonOf()` for the log, `reset()` from `e2e/db.ts`, and the pause 2 picker and notices.
 
