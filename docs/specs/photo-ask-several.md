@@ -401,6 +401,7 @@ _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
+- **Backfill**: filling a new column from the data already there, before the code reads it. This slice needs none.
 - **Basket**: an ask for several things at once, with one pick for each, paid as one charge.
 - **Channel3**: a hackathon sponsor whose API returns real product listings.
 - **Claude Haiku**: the small Claude model that reads Rose's ask and explains each listing.
