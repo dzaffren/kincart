@@ -158,7 +158,7 @@ Screens, all in `app/(shop)/RoseView.tsx` unless named:
 - **Ask.** It is the same as in photo-ask: "Take or pick a photo", the line "A photo of the thing, or of your written list.", then Find. The input now takes several files, so the phone's photos let Rose tick more than one.
 - **Photos panel** (`app/(shop)/PhotoPicker.tsx`). This is a `sunken` panel with "Your photo", or "Your 3 photos", and the hint "Add words above if you need to, such as a size." Under the hint, the photos sit in 128px tiles, two to a row on a phone. Each tile has its own Remove button under it. The visible label is "Remove", because a 128px tile can't fit "Remove photo". The accessible name is "Remove photo 2".
 - **Add another photo** (secondary) sits under the panel while there are fewer than 5 photos. After Remove, focus goes to it.
-- **Five photos.** The Add button goes. In its place: "Up to 5 photos at a time.", or "Up to 5 photos. The first 5 are kept." when the last pick had more than would fit.
+- **Five photos.** The Add button goes. In its place: "Up to 5 photos at a time.", or "Up to 5 photos. The first 5 are kept." when a pick since the last Remove had more than would fit. Focus goes to that line, or to the error when it shows (O18).
 - **Not a photo.** A file that isn't an image is dropped, and the other photos in the same pick stay. The error "That file isn't a photo. Pick a photo, or type what you need." shows under the Add button, which points to it with `aria-describedby`. At 5 photos, the error takes the place of the five-photo line.
 - **Busy.** Find shows "Looking…" with the spinner. The tiles stay, and every Remove button and the Add button go.
 - **Results.** The line under the heading says ", from your photos" when Find read more than one photo, and ", from your photo" for one.
@@ -315,11 +315,12 @@ erDiagram
 | storage | `lib/shop/requests.test.ts`: `photos` and `blankPhotos` round trip; `scripts/migrate.test.ts`: 0010 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
 | 2, 3 | The slippers, the two battery photos and the garden through real Haiku: done by the O11 spike, 3 runs each | none kept |
 
-**E2E:** `e2e/photo-ask-several.spec.ts`, three tests:
+**E2E:** `e2e/photo-ask-several.spec.ts`, four tests:
 
 1. Rose picks `e2e/photos/cr2032.jpg` with "Take or pick a photo", then `e2e/photos/list.jpg` with "Add another photo". The form holds two JPEGs of 180 KB or less. Both tiles outlast a 4 s redraw. Find shows "Which ones would you like?" within 30 s, with ", from your photos" and four groups, the first matching `/2032/`. Rose picks the first listing in each group that has one, at least 2, and Ask Sam shows "Rose would like n things" on Sam's page, for that count (O15).
-2. Rose ticks six photos at once. Five tiles show, with "Up to 5 photos. The first 5 are kept." and no Add button. Remove photo 2 leaves four, and focus is on "Add another photo". A PDF ticked with a photo gives five tiles and the not-a-photo error. No request goes out.
+2. Rose ticks six photos at once. Five tiles show, with "Up to 5 photos. The first 5 are kept." and no Add button, and focus is on that line. Remove photo 2 leaves four, and focus is on "Add another photo". A PDF ticked with a photo gives five tiles and the not-a-photo error, with focus on the error. No request goes out.
 3. Rose sends `e2e/photos/blank.jpg` twice. The page shows "Couldn't tell what to buy from those photos", and no tile is left (O8).
+4. Rose picks four photos, then two more before the first four show. Five tiles show, with "Up to 5 photos. The first 5 are kept."
 
 ### Chunks
 
@@ -366,6 +367,7 @@ Recorded as D68, D69, D70, D71, D72.
 | O15 | The plan's e2e test 1 said Ask Sam shows "Rose would like 4 things". Channel3 and Haiku vary (D24), and a group can come back with no listing under $25 | flag | build | user | Decided alone | Chose: Rose picks from each group that has a listing, at least 2, and Sam's heading names that count. Four groups, the first for `/2032/`, are still required. Other: require 4 picks. Undo: `expect(picked).toBe(4)` in `e2e/photo-ask-several.spec.ts`. 2026-10-16 |
 | O16 | The feat commits on this branch add no CHANGELOG line | flag | build | user | Decided alone | Chose: leave the lines to /ship, as for every earlier slice. Other: add them in each commit. Undo: add them in a docs commit. 2026-10-16 |
 | O17 | E2E test 1 can't run to the end locally. `.env.local` has no `CHANNEL3_API_KEY` or `PAYPAL_E2E_VAULT_ID`. With a placeholder key and the spike's vault id, it passed up to Find: two JPEGs of 180 KB or less outlast a redraw, and real Haiku read 4 things (`photos=2 blank=0`). Then Channel3 answered 403. Tests 2 and 3 passed. CI has both secrets (D24), and the branch is not pushed. How does test 1 run to the end? | question | build | user | Resolved | Locally, with nothing to add. `.env.local` had both keys all along: the build's check matched names with `^[A-Z_]*=`, which skips a name with a digit. With the real keys, all 3 tests passed in 42.8 s, and test 1 logged `find outcome=basket things=4 shown=4 listings=12 ms=12667 photos=2 blank=0`. 2026-10-16 |
+| O18 | /review found that a pick that fills the 5 takes the focused Add button away, and focus fell to the page. The spec said only where focus goes after Remove | flag | review | user | Decided alone | Chose: focus goes to the line that takes Add's place, the five-photo line or the not-a-photo error, so a screen reader says why Add went. Other: focus the last tile's Remove button. Undo: drop `focusLine` and the two `ref={line}` in `PhotoPicker.tsx`. 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

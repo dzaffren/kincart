@@ -162,7 +162,7 @@ it("offers a photo under the box, and says when a photo showed nothing to buy or
 
 it("points the photo button at the not-a-photo error under it", () => {
   const html = renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000, problem: "not a photo" }} items={[]} />);
-  const id = /<p class="field-error" id="([^"]+)">That file isn&#x27;t a photo\. Pick a photo, or type what you need\.<\/p>/.exec(html)?.[1];
+  const id = /<p tabindex="-1" class="field-error" id="([^"]+)">That file isn&#x27;t a photo\. Pick a photo, or type what you need\.<\/p>/.exec(html)?.[1];
 
   expect(id).toBeTruthy();
   expect(html).toContain(`aria-describedby="${id}">Take or pick a photo</button>`);

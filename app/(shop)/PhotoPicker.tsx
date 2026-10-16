@@ -24,7 +24,9 @@ const MOST_PHOTOS = 5;
 export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const add = useRef<HTMLButtonElement>(null);
+  const line = useRef<HTMLParagraphElement>(null);
   const focusAdd = useRef(false);
+  const focusLine = useRef(false);
   // Photos kept or still shrinking. Add stays on screen while a pick shrinks, so a second pick counts the first.
   const count = useRef(previews.length);
   const made = useRef(new Set<string>());
@@ -44,10 +46,15 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
   // Only shrunk photos stay in the input, so Find never sends a full-size one.
   useEffect(() => {
     if (input.current) input.current.files = filesOf(photos);
-    if (!focusAdd.current) return;
-    // After Remove, focus goes to Add another photo, which is always there with fewer than 5.
-    focusAdd.current = false;
-    add.current?.focus();
+    if (focusAdd.current) {
+      // After Remove, focus goes to Add another photo, which is always there with fewer than 5.
+      focusAdd.current = false;
+      add.current?.focus();
+    } else if (focusLine.current) {
+      // A pick that fills the 5 takes Add away, so focus goes to the line in its place.
+      focusLine.current = false;
+      line.current?.focus();
+    }
   }, [photos]);
 
   function remove(photo: Photo) {
@@ -80,6 +87,7 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
     setError(images.length < chosen.length || added.length < taken.length);
     // Only Remove clears it, as a pick that started first can finish last.
     if (images.length > room) setCapped(true);
+    focusLine.current = count.current === MOST_PHOTOS;
     setPhotos((now) => [...now, ...added]);
   }
 
@@ -135,11 +143,13 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
             </button>
           )}
           {error ? (
-            <p className="field-error" id={errorId}>
+            <p ref={line} tabIndex={-1} className="field-error" id={errorId}>
               That file isn&apos;t a photo. Pick a photo, or type what you need.
             </p>
           ) : full ? (
-            <p className="small">{capped ? "Up to 5 photos. The first 5 are kept." : "Up to 5 photos at a time."}</p>
+            <p ref={line} tabIndex={-1} className="small">
+              {capped ? "Up to 5 photos. The first 5 are kept." : "Up to 5 photos at a time."}
+            </p>
           ) : (
             !photos.length && <p className="small">A photo of the thing, or of your written list.</p>
           )}
