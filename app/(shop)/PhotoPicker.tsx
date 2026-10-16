@@ -7,9 +7,16 @@ type Props = { previews?: string[]; notPhoto?: boolean; busy?: boolean };
 
 type Photo = { key: string; url: string; file?: File };
 
-// Next refuses a server action body over 1 MB, so the photo shrinks here first (D65).
-const LONG_EDGE = 1600;
-const MOST_BYTES = 900_000;
+// Next refuses a server action body over 1 MB, so each photo shrinks here first, and 5 of them fit (D70).
+const MOST_BYTES = 180_000;
+// The long edge and the JPEG quality of each try. The last is about half the pixels of the first.
+const STEPS = [
+  [1200, 0.85],
+  [1200, 0.7],
+  [1200, 0.55],
+  [1000, 0.55],
+  [800, 0.55],
+] as const;
 // A basket holds up to 5 things, so one Find takes up to 5 photos (D68).
 const MOST_PHOTOS = 5;
 
@@ -55,13 +62,15 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
     field.files = filesOf(photos);
     const images = chosen.filter((file) => file.type.startsWith("image/"));
     const room = MOST_PHOTOS - photos.length;
-    const shrunk = await Promise.all(images.slice(0, room).map((file) => shrink(file).catch(() => null)));
-    const added = shrunk.flatMap((file) => {
-      if (!file) return [];
+    // One photo at a time: five 12 MP photos decoded at once hold about 240 MB of pixels.
+    const added: Photo[] = [];
+    for (const image of images.slice(0, room)) {
+      const file = await shrink(image).catch(() => null);
+      if (!file) continue;
       const url = URL.createObjectURL(file);
       made.current.add(url);
-      return [{ key: url, url, file }];
-    });
+      added.push({ key: url, url, file });
+    }
     setError(images.length < chosen.length || added.length < Math.min(images.length, room));
     setCapped(images.length > room);
     setPhotos((now) => [...now, ...added].slice(0, MOST_PHOTOS));
@@ -139,18 +148,29 @@ function filesOf(photos: Photo[]): FileList {
   return files.files;
 }
 
-// Drawing the photo again also drops its EXIF, with the place it was taken.
+// Drawing the photo again also drops its EXIF, with the place it was taken. The first try that
+// comes to 180 KB or less is kept, else the last.
 async function shrink(file: File): Promise<File> {
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const scale = Math.min(1, LONG_EDGE / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  let jpeg = await encode(canvas, 0.85);
-  if (jpeg.size > MOST_BYTES) jpeg = await encode(canvas, 0.7);
-  return new File([jpeg], "photo.jpg", { type: "image/jpeg" });
+  let drawn = 0;
+  let jpeg: Blob | null = null;
+  try {
+    for (const [edge, quality] of STEPS) {
+      if (edge !== drawn) {
+        const scale = Math.min(1, edge / Math.max(bitmap.width, bitmap.height));
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        drawn = edge;
+      }
+      jpeg = await encode(canvas, quality);
+      if (jpeg.size <= MOST_BYTES) break;
+    }
+  } finally {
+    bitmap.close();
+  }
+  return new File([jpeg!], "photo.jpg", { type: "image/jpeg" });
 }
 
 function encode(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
