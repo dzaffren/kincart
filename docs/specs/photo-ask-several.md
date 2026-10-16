@@ -138,6 +138,42 @@ Scenario: One of Rose's files isn't a photo
 - Putting the photos in a different order. Not planned.
 - A photo scene in the demo video. Separate work on `feat/demo-video`.
 
+## Interface
+
+```mermaid
+flowchart LR
+    A["What do you need?<br/>box · Take or pick a photo · Find"] -- "picks 1 or more images" --> P["Your 2 photos<br/>a tile for each · Remove under each<br/>Add another photo"]
+    P -- "Add another photo" --> P
+    P -- "reaches 5" --> F["Your 5 photos<br/>no Add button<br/>Up to 5 photos at a time."]
+    P -- "a PDF with the photos" --> E["Under Add another photo:<br/>That file isn't a photo."]
+    F -- "Remove (focus goes to Add)" --> P
+    P -- "Find (busy: Looking…)" --> B["Which ones would you like?<br/>For '…', from your photos."]
+    P -- "Find, a photo showed nothing" --> N["Same screen, with the note<br/>One of your photos showed nothing to buy."]
+```
+
+The first pick turns the photo button into a panel of tiles. Find takes every tile's photo and the box's words together.
+
+Screens, all in `app/(shop)/RoseView.tsx` unless named:
+
+- **Ask.** It is the same as in photo-ask: "Take or pick a photo", the line "A photo of the thing, or of your written list.", then Find. The input now takes several files, so the phone's photos let Rose tick more than one.
+- **Photos panel** (`app/(shop)/PhotoPicker.tsx`). This is a `sunken` panel with "Your photo", or "Your 3 photos", and the hint "Add words above if you need to, such as a size." Under the hint, the photos sit in 128px tiles, two to a row on a phone. Each tile has its own Remove button under it. The visible label is "Remove", because a 128px tile can't fit "Remove photo". The accessible name is "Remove photo 2".
+- **Add another photo** (secondary) sits under the panel while there are fewer than 5 photos. After Remove, focus goes to it.
+- **Five photos.** The Add button goes. In its place: "Up to 5 photos at a time.", or "Up to 5 photos. The first 5 are kept." when the last pick had more than would fit.
+- **Not a photo.** A file that isn't an image is dropped, and the other photos in the same pick stay. The error "That file isn't a photo. Pick a photo, or type what you need." shows under the Add button, which points to it with `aria-describedby`. At 5 photos, the error takes the place of the five-photo line.
+- **Busy.** Find shows "Looking…" with the spinner. The tiles stay, and every Remove button and the Add button go.
+- **Results.** The line under the heading says ", from your photos" when Find read more than one photo, and ", from your photo" for one.
+- **A photo showed nothing.** A neutral notice at the top of the results: "One of your photos showed nothing to buy.", or "2 of your photos showed nothing to buy."
+- **Nothing in any photo.** The photo-ask notice, made plural for several photos: "Couldn't tell what to buy from those photos. Try other photos, or type what you need."
+- **More than 5 things.** The notice "Up to 5 things at a time. Which 5 do you need most?" shows, as for typed words. The box holds the AI's words for all the things.
+
+**Motion tier:** 1. Each new tile enters with the existing enter animation (`opacity` and `transform`). Remove is instant. Under reduced motion, nothing moves.
+
+**Components used:** `Button` (primary), the `button button-secondary` classes on the plain Remove and Add buttons, `Notice` (neutral), `field-error`, `field-label`, `listing-photo`, `heading`, `small`, `stack`, `PageHead` and `PhoneFrame`. The `photo-pick` class changes from a side-by-side card to a panel. Two new classes, `photo-tiles` and `photo-tile`, lay out the tiles with `--photo-size` and `--space-4`. This slice adds no token.
+
+**Design system:** `docs/design/design-system/` (D15). The reference is Stripe's forms: each message sits under the control it is about. The five-photo line and the error take the place of the Add button.
+
+**Preview:** `/preview/photo-ask-several` on `pnpm dev`, built from the real components (`app/(shop)/preview/photo-ask-several/page.tsx`). In the first frame, the picker works for real: pick several, add more, go past 5, and pick a PDF.
+
 ## Technical plan
 
 ### Decisions to record
