@@ -27,3 +27,4 @@
 - Read a wide home page's links from the phone captions, not Be Rose
 - Drive PayPal's sandbox approval page by role, with the labels it really shows
 - Add an older migration's check NOT VALID when a later one widens it
+- Match a listing name exactly in an e2e when the AI writes about it
