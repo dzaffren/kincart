@@ -186,12 +186,12 @@ sequenceDiagram
     A->>A: JPEG? (starts ffd8ff) else redirect ?find=notphoto
     A->>F: findPhoto(words, limit, jpeg)
     F->>H: readPhoto: image block, then "They typed: ..."
-    H-->>F: things [{words: "CR2032 coin battery", query}]
+    H-->>F: things, each with words such as "CR2032 coin battery" and a query
     F->>C: two searches for each thing, at once
     C-->>F: listings
     F->>H: choose (no photo)
     H-->>F: picks
-    F-->>A: {words: "CR2032 coin battery", result}
+    F-->>A: words "CR2032 coin battery" and the result
     A->>D: save words, result, from_photo = true
     A-->>R: redirect /r/<token>
 ```
