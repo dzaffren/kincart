@@ -160,7 +160,10 @@ const photo = (bytes: Uint8Array<ArrayBuffer> | string, type = "image/jpeg") => 
 
 // Haiku reads one thing from the photo, and Channel3 has no listings for it.
 function stubPhotoServices() {
-  const things = JSON.stringify({ things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery" }] });
+  const things = JSON.stringify({
+    things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery", photos: [1] }],
+    blank: [],
+  });
   const fetch = vi.fn(async (url: string) =>
     url.includes("anthropic")
       ? Response.json({ content: [{ type: "text", text: things }], stop_reason: "end_turn" })
@@ -180,6 +183,7 @@ it("finds from Rose's photo with an empty box, and keeps the AI's words marked a
   const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
   expect(url).toContain("anthropic");
   expect(JSON.parse(String(init.body)).messages[0].content).toEqual([
+    { type: "text", text: "Photo 1:" },
     { type: "image", source: { type: "base64", media_type: "image/jpeg", data: Buffer.from(jpeg).toString("base64") } },
     { type: "text", text: "They typed nothing." },
   ]);
@@ -193,7 +197,7 @@ it("sends Rose's words with the photo, and a typed Find with an empty photo inpu
 
   await redirectOf(find(rose, form({ words: " size 8 ", photo: photo(jpeg) })));
   const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
-  expect(JSON.parse(String(init.body)).messages[0].content[1]).toEqual({ type: "text", text: "They typed: size 8" });
+  expect(JSON.parse(String(init.body)).messages[0].content[2]).toEqual({ type: "text", text: "They typed: size 8" });
 
   fetch.mockClear();
   await redirectOf(find(rose, form({ words: "CR2032 coin battery", photo: photo("", "application/octet-stream") })));

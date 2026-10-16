@@ -1,6 +1,8 @@
 import type { Found } from "./search";
 
 export type Need = { things: { words: string; query: string }[] };
+// photos and blank are the numbers of Rose's photos, from 1.
+export type PhotoNeed = { things: { words: string; query: string; photos: number[] }[]; blank: number[] };
 export type Pick = { id: string; what: string; why: string; watch: string };
 export type Choice = { picks: Pick[]; aboveLimit: boolean };
 
@@ -8,8 +10,9 @@ const MODEL = "claude-haiku-5-5";
 
 const NEED = `You read what an older person typed into a shopping box. List every product they want to buy, in the order they gave. For each, copy their own words for it exactly, such as "a night light", and write a short shop search query that keeps the sizes, colours and other must-haves they gave. Something sold as one product, such as salt and pepper shakers, is one thing. If they typed nothing to buy, return an empty list.`;
 
-// A photo has a prompt of its own, so the typed path's prompt stays as tested (D66).
-const NEED_PHOTO = `You read a photo that an older person took to show what they want to buy, and any words they typed with it. If the photo shows a product, list that one product. If it shows a written shopping list, list every product on it, in order. For each, write a short plain name for it, such as "CR2032 coin battery", with anything their words add, such as a size or a count. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photo and their words. If the photo shows nothing they could buy, return an empty list.`;
+// Photos have a prompt of their own, so the typed path's prompt stays as tested (D66). One call reads
+// every photo, so two photos of one pack make one thing (D71).
+const NEED_PHOTO = `You read photos that an older person took to show what they want to buy, labelled Photo 1, Photo 2 and so on, and any words they typed with them. A photo of a product shows one product. A photo of a written shopping list shows every product on it, in order. List the products in photo order, and list a product once when two photos show it. For each, list the numbers of the photos it is in, and write a short plain name for it, such as "CR2032 coin battery", with anything their words add to it, such as a size or a count. Their words only add details to products in the photos, so never list a product that only their words name. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photos and their words. In blank, list the number of each photo that shows nothing they could buy.`;
 
 const NEED_SCHEMA = {
   type: "object",
@@ -25,6 +28,26 @@ const NEED_SCHEMA = {
         properties: { words: { type: "string" }, query: { type: "string" } },
       },
     },
+  },
+};
+
+const PHOTO_NUMBERS = { type: "array", items: { type: "integer" } };
+
+const NEED_PHOTO_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["things", "blank"],
+  properties: {
+    things: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["words", "query", "photos"],
+        properties: { words: { type: "string" }, query: { type: "string" }, photos: PHOTO_NUMBERS },
+      },
+    },
+    blank: PHOTO_NUMBERS,
   },
 };
 
@@ -52,13 +75,17 @@ export function readNeed(words: string): Promise<Need> {
   return haiku(NEED, words, NEED_SCHEMA, 2000);
 }
 
-// jpeg is Rose's photo as the browser shrank it. The find action checked that it starts like a JPEG.
-export function readPhoto(words: string, jpeg: Buffer): Promise<Need> {
+// jpegs are Rose's photos as the browser shrank them. The find action checked that each starts like a JPEG.
+// Each goes under its own "Photo n:" label, so Haiku can say which photos a thing is in.
+export function readPhoto(words: string, jpegs: Buffer[]): Promise<PhotoNeed> {
   const content = [
-    { type: "image", source: { type: "base64", media_type: "image/jpeg", data: jpeg.toString("base64") } },
+    ...jpegs.flatMap((jpeg, index) => [
+      { type: "text", text: `Photo ${index + 1}:` },
+      { type: "image", source: { type: "base64", media_type: "image/jpeg", data: jpeg.toString("base64") } },
+    ]),
     { type: "text", text: words ? `They typed: ${words}` : "They typed nothing." },
   ];
-  return haiku(NEED_PHOTO, content, NEED_SCHEMA, 2000);
+  return haiku(NEED_PHOTO, content, NEED_PHOTO_SCHEMA, 2000);
 }
 
 export function choose(words: string, under: Found[], above: Found[]): Promise<Choice> {
