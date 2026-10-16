@@ -346,6 +346,13 @@ Build A, then B, one after the other. B's e2e needs A, and both chunks' tests us
 
 Recorded as D68, D69, D70, D71, D72.
 
+## Review
+
+2026-10-16 · 4 raw findings, 2 survived, 2 fixed.
+
+- correctness · `app/(shop)/PhotoPicker.tsx:74` · a pick during another pick's shrink counts the photos still shrinking, and only Remove clears the first-5 line · `468bb14`
+- correctness · `app/(shop)/PhotoPicker.tsx:134` · focus goes to the line in Add's place when a pick fills the 5 · `7ae14a9`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |

@@ -19,7 +19,7 @@
 - Change a file's content when pnpm dev serves an old copy after a branch switch
 - Break the code once when pause 2 already built it
 - Check a client-only control is absent only after it would have shown
-- Give verifiers app/?shop?/ paths, not app/(shop)/
+- Give verifiers a git diff of app/, not a path with parentheses or ?
 - Wait for the page's animations to finish before measuring layout
 - Write the release commit as one line of -m flags
 - Run the live pentest on a build, and send its checks with curl
