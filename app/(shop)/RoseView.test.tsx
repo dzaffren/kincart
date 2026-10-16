@@ -114,7 +114,7 @@ it("says the AI's words came from Rose's photo, on one thing and on a list", () 
 
 it("offers a photo under the box, and says when a photo showed nothing to buy or the box and photo were both empty", () => {
   const ask = renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000 }} items={[]} />);
-  expect(ask).toMatch(/<textarea[^>]*name="words"[^>]*><\/textarea><\/div><div class="stack"><input type="file" accept="image\/\*" hidden="" name="photo"\/>/);
+  expect(ask).toMatch(/<textarea[^>]*name="words"[^>]*><\/textarea><\/div><div class="stack"><input type="file" accept="image\/\*" multiple="" hidden="" name="photo"\/>/);
   expect(ask).toMatch(/<button type="button"[^>]*>Take or pick a photo<\/button><p class="small">A photo of the thing, or of your written list\.<\/p>/);
 
   const nothing = renderToStaticMarkup(

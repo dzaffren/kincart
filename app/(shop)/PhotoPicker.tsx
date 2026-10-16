@@ -3,40 +3,68 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-type Props = { preview?: string; notPhoto?: boolean; busy?: boolean };
+type Props = { previews?: string[]; notPhoto?: boolean; busy?: boolean };
+
+type Photo = { key: string; url: string; file?: File };
 
 // Next refuses a server action body over 1 MB, so the photo shrinks here first (D65).
 const LONG_EDGE = 1600;
 const MOST_BYTES = 900_000;
+// A basket holds up to 5 things, so one Find takes up to 5 photos (D68).
+const MOST_PHOTOS = 5;
 
-// Rose's photo goes with Find and is never kept (D64). A phone offers its camera and its photos.
-export function PhotoPicker({ preview, notPhoto = false, busy }: Props) {
+// Rose's photos go with Find and are never kept (D64). A phone offers its camera and its photos.
+export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
   const input = useRef<HTMLInputElement>(null);
+  const add = useRef<HTMLButtonElement>(null);
+  const focusAdd = useRef(false);
+  const made = useRef(new Set<string>());
   const errorId = useId();
-  const [photo, setPhoto] = useState(preview);
+  const [photos, setPhotos] = useState<Photo[]>(() => previews.map((url, index) => ({ key: `preview-${index}`, url })));
   const [error, setError] = useState(notPhoto);
-  // While Find runs, the photo stays on screen and its buttons go, as Try other words does.
+  const [capped, setCapped] = useState(false);
+  // While Find runs, the photos stay on screen and their buttons go, as Try other words does.
   const looking = useFormStatus().pending || busy;
+  const full = photos.length >= MOST_PHOTOS;
 
-  useEffect(() => () => void (photo?.startsWith("blob:") && URL.revokeObjectURL(photo)), [photo]);
+  useEffect(() => {
+    const urls = made.current;
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
-  function remove() {
-    if (input.current) input.current.value = "";
-    setPhoto(undefined);
+  // Only shrunk photos stay in the input, so Find never sends a full-size one.
+  useEffect(() => {
+    if (input.current) input.current.files = filesOf(photos);
+    if (!focusAdd.current) return;
+    // After Remove, focus goes to Add another photo, which is always there with fewer than 5.
+    focusAdd.current = false;
+    add.current?.focus();
+  }, [photos]);
+
+  function remove(photo: Photo) {
+    if (made.current.delete(photo.url)) URL.revokeObjectURL(photo.url);
+    focusAdd.current = true;
+    setCapped(false);
+    setPhotos((now) => now.filter(({ key }) => key !== photo.key));
   }
 
-  async function picked(file?: File) {
-    const field = input.current;
-    if (!file || !field) return;
-    // The full-size photo never goes, even when Rose taps Find before the shrink ends.
-    field.value = "";
-    const small = file.type.startsWith("image/") ? await shrink(file).catch(() => null) : null;
-    setError(!small);
-    if (!small) return setPhoto(undefined);
-    const files = new DataTransfer();
-    files.items.add(small);
-    field.files = files.files;
-    setPhoto(URL.createObjectURL(small));
+  async function picked(field: HTMLInputElement) {
+    const chosen = Array.from(field.files ?? []);
+    if (!chosen.length) return;
+    // The phone put the full-size files in the input. The shrunk ones go back at once.
+    field.files = filesOf(photos);
+    const images = chosen.filter((file) => file.type.startsWith("image/"));
+    const room = MOST_PHOTOS - photos.length;
+    const shrunk = await Promise.all(images.slice(0, room).map((file) => shrink(file).catch(() => null)));
+    const added = shrunk.flatMap((file) => {
+      if (!file) return [];
+      const url = URL.createObjectURL(file);
+      made.current.add(url);
+      return [{ key: url, url, file }];
+    });
+    setError(images.length < chosen.length || added.length < Math.min(images.length, room));
+    setCapped(images.length > room);
+    setPhotos((now) => [...now, ...added].slice(0, MOST_PHOTOS));
   }
 
   return (
@@ -46,47 +74,69 @@ export function PhotoPicker({ preview, notPhoto = false, busy }: Props) {
         type="file"
         name="photo"
         accept="image/*"
+        multiple
         hidden
-        onChange={(event) => picked(event.target.files?.[0])}
+        onChange={(event) => picked(event.target)}
       />
-      {photo ? (
+      {photos.length > 0 && (
         <div className="photo-pick">
-          {/* A photo from this phone, shown before Find sends it. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="listing-photo" src={photo} alt="" />
           <div className="heading">
-            <p className="field-label">Your photo</p>
+            <p className="field-label">{photos.length === 1 ? "Your photo" : `Your ${photos.length} photos`}</p>
             <p className="small">Add words above if you need to, such as a size.</p>
           </div>
-          {!looking && (
-            <button type="button" className="button button-secondary" onClick={remove}>
-              Remove photo
-            </button>
-          )}
+          <ul className="photo-tiles">
+            {photos.map((photo, index) => (
+              <li className="photo-tile" key={photo.key}>
+                {/* A photo from this phone, shown before Find sends it. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="listing-photo" src={photo.url} alt="" />
+                {!looking && (
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    aria-label={`Remove photo ${index + 1}`}
+                    onClick={() => remove(photo)}
+                  >
+                    Remove
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
-      ) : (
-        !looking && (
-          <>
+      )}
+      {!looking && (
+        <>
+          {!full && (
             <button
+              ref={add}
               type="button"
               className="button button-secondary"
               aria-describedby={error ? errorId : undefined}
               onClick={() => input.current?.click()}
             >
-              Take or pick a photo
+              {photos.length ? "Add another photo" : "Take or pick a photo"}
             </button>
-            {error ? (
-              <p className="field-error" id={errorId}>
-                That file isn&apos;t a photo. Pick a photo, or type what you need.
-              </p>
-            ) : (
-              <p className="small">A photo of the thing, or of your written list.</p>
-            )}
-          </>
-        )
+          )}
+          {error ? (
+            <p className="field-error" id={errorId}>
+              That file isn&apos;t a photo. Pick a photo, or type what you need.
+            </p>
+          ) : full ? (
+            <p className="small">{capped ? "Up to 5 photos. The first 5 are kept." : "Up to 5 photos at a time."}</p>
+          ) : (
+            !photos.length && <p className="small">A photo of the thing, or of your written list.</p>
+          )}
+        </>
       )}
     </div>
   );
+}
+
+function filesOf(photos: Photo[]): FileList {
+  const files = new DataTransfer();
+  for (const { file } of photos) if (file) files.items.add(file);
+  return files.files;
 }
 
 // Drawing the photo again also drops its EXIF, with the place it was taken.

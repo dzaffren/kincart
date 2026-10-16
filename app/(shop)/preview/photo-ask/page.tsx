@@ -108,11 +108,11 @@ export default function PhotoAskPreview() {
           </Frame>
           <Frame label="A photo picked, with words (scenario 2)">
             <PageHead />
-            <RoseView state={{ ...ask, words: "size 8", photo }} items={[]} />
+            <RoseView state={{ ...ask, words: "size 8", previews: [photo] }} items={[]} />
           </Frame>
           <Frame label="Find pressed with a photo">
             <PageHead />
-            <RoseView state={{ ...ask, photo, busy: true }} items={[]} />
+            <RoseView state={{ ...ask, previews: [photo], busy: true }} items={[]} />
           </Frame>
           <Frame label="A PDF picked on a laptop (scenario 4)">
             <PageHead />
