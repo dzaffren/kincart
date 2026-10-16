@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Rose links a sandbox PayPal on PayPal's own page, with a demo login shown on Rose's first screen. On a laptop, PayPal opens in a new tab from Rose's phone.
 - Rose can take or pick a photo of what they need, such as an old battery or a handwritten list, with or without words, and Find searches for what it shows. The photo itself is not kept.
+- Rose can send up to 5 photos in one Find, such as an old battery and a handwritten list, and gets one basket with a group for each thing. If a photo shows nothing to buy, a note says so and the other things still show.
 
 ### Changed
 

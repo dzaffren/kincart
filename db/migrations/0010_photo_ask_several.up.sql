@@ -1,0 +1,3 @@
+ALTER TABLE rose_search
+  ADD COLUMN IF NOT EXISTS photos smallint NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS blank_photos smallint NOT NULL DEFAULT 0;

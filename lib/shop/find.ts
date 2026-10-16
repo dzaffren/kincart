@@ -1,4 +1,4 @@
-import { choose, readNeed, readPhoto, type Need } from "./ai";
+import { choose, readNeed, readPhoto, type Need, type PhotoNeed } from "./ai";
 import { reasonOf } from "./paypal";
 import { searchListings, type Found, type Listing } from "./search";
 
@@ -13,8 +13,11 @@ type Single = { outcome: "options"; options: Option[] } | { outcome: Problem };
 
 export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" | "nothing in photo" };
 
-// words are what the search was for: Rose's own, or the AI's words for Rose's photo.
-type Searched = { words: string; result: Search };
+// words are what the search was for: Rose's own, or the AI's words for Rose's photos. blank counts
+// the photos that showed nothing to buy.
+type Searched = { words: string; result: Search; blank?: number };
+
+export type PhotoSearch = { words: string; result: Search; photos: number; blank: number };
 
 const MOST_THINGS = 5;
 
@@ -23,25 +26,39 @@ export function searchOn(): boolean {
 }
 
 export async function find(words: string, limitCents: number): Promise<Search> {
-  const { result } = await logged(words, "", async (reasons) => {
+  const { result } = await logged(words, 0, async (reasons) => {
     const { things } = await readNeed(words);
     return { words, result: await searchThings(words, things, limitCents, reasons) };
   });
   return result;
 }
 
-// The photo goes to the first call only (D66). The things' words, joined, name the search for Rose.
-export function findPhoto(words: string, limitCents: number, jpeg: Buffer): Promise<Searched> {
-  return logged(words, " photo=yes", async (reasons) => {
-    const { things } = await readPhoto(words, jpeg);
-    if (!things.length) return { words, result: { outcome: "nothing in photo" } };
+// The photos go to the first call only (D66). The things' words, joined, name the search for Rose.
+export async function findPhoto(words: string, limitCents: number, jpegs: Buffer[]): Promise<PhotoSearch> {
+  const searched = await logged(words, jpegs.length, async (reasons) => {
+    const need = await readPhoto(words, jpegs);
+    if (!need.things.length) return { words, result: { outcome: "nothing in photo" } };
+    // In the order Rose added the photos. sort() is stable, so a list keeps its own order (D71).
+    const things = [...need.things].sort((a, b) => Math.min(...a.photos) - Math.min(...b.photos));
     const named = things.map((thing) => thing.words).join(", ");
-    return { words: named, result: await searchThings(named, things, limitCents, reasons) };
+    return {
+      words: named,
+      result: await searchThings(named, things, limitCents, reasons),
+      blank: blankOf(need, jpegs.length),
+    };
   });
+  return { words: searched.words, result: searched.result, photos: jpegs.length, blank: searched.blank ?? 0 };
+}
+
+// A photo that a thing is in is never blank, and a number past Rose's photos never counts (D69).
+function blankOf({ things, blank }: PhotoNeed, photos: number): number {
+  const covered = new Set(things.flatMap((thing) => thing.photos));
+  const counted = blank.filter((photo) => Number.isInteger(photo) && photo >= 1 && photo <= photos && !covered.has(photo));
+  return new Set(counted).size;
 }
 
 // A search that fails says nothing found under Rose's own words, and the log line says why.
-async function logged(words: string, photo: string, run: (reasons: string[]) => Promise<Searched>): Promise<Searched> {
+async function logged(words: string, photos: number, run: (reasons: string[]) => Promise<Searched>): Promise<Searched> {
   const started = Date.now();
   const reasons: string[] = [];
   const searched = await run(reasons).catch((error): Searched => {
@@ -49,6 +66,7 @@ async function logged(words: string, photo: string, run: (reasons: string[]) => 
     return { words, result: { outcome: "nothing found" } };
   });
   const { result } = searched;
+  const photo = photos ? ` photos=${photos} blank=${searched.blank ?? 0}` : "";
   const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
   console.log(
     `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} ms=${Date.now() - started}${photo}${reason}`,

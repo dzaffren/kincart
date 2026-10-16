@@ -198,15 +198,24 @@ it("keeps Rose's one current search until the next one or a clear", async () => 
   expect(await getSearch(owner)).toBeNull();
 });
 
-it("keeps whether Rose's current search came from a photo, and a photo that showed nothing to buy", async () => {
-  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, true);
-  expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", outcome: "options", fromPhoto: true });
+it("keeps how many photos Rose's current search read and how many showed nothing to buy", async () => {
+  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, 1);
+  expect(await getSearch(owner)).toMatchObject({
+    words: "CR2032 coin battery",
+    outcome: "options",
+    fromPhoto: true,
+    photos: 1,
+    blankPhotos: 0,
+  });
 
-  await saveSearch(owner, "", { outcome: "nothing in photo" }, true);
-  expect(await getSearch(owner)).toMatchObject({ words: "", outcome: "nothing in photo", fromPhoto: true });
+  await saveSearch(owner, "CR2032 coin battery, grey slippers", { outcome: "basket", groups: [] }, 3, 1);
+  expect(await getSearch(owner)).toMatchObject({ outcome: "basket", fromPhoto: true, photos: 3, blankPhotos: 1 });
+
+  await saveSearch(owner, "", { outcome: "nothing in photo" }, 2);
+  expect(await getSearch(owner)).toMatchObject({ words: "", outcome: "nothing in photo", fromPhoto: true, photos: 2 });
 
   await saveSearch(owner, "CR2032 coin battery", { outcome: "retry" });
-  expect(await getSearch(owner)).toMatchObject({ outcome: "retry", fromPhoto: false });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "retry", fromPhoto: false, photos: 0, blankPhotos: 0 });
 });
 
 const aa = {

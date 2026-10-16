@@ -88,6 +88,8 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   options,
   groups: [],
   fromPhoto: false,
+  photos: 0,
+  blankPhotos: 0,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
@@ -194,6 +196,28 @@ it("marks options and groups found from Rose's photo, and only those", () => {
     fromPhoto: true,
   });
   expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ kind: "options", fromPhoto: undefined });
+});
+
+it("says how many photos Find read and how many showed nothing, on options, groups and the ask screen", () => {
+  const groups = [{ thing: "CR2032 coin battery", options: [strap] }];
+  const fromPhotos = { fromPhoto: true, photos: 3, blankPhotos: 1 };
+
+  expect(roseState(vault, null, {}, on({ ...saved("options"), ...fromPhotos }))).toMatchObject({
+    kind: "options",
+    ...fromPhotos,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("basket"), groups, ...fromPhotos }))).toMatchObject({
+    kind: "basket",
+    ...fromPhotos,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("nothing in photo"), words: "", fromPhoto: true, photos: 2 }))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words: "",
+    photos: 2,
+    problem: "nothing in photo",
+  });
+  expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ photos: undefined, blankPhotos: undefined });
 });
 
 it("tells Rose a photo showed nothing to buy, or a file wasn't a photo, and keeps Rose's words in the box", () => {

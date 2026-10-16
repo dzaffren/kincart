@@ -433,7 +433,7 @@ Status: active
 Why: phone camera photos are 2 to 12 MB, and Next refuses a server action body over 1 MB. In the O6 spike, a 5.2 MB photo failed with "Body exceeded 1 MB limit", and shrunk it was 519 KB in 136 ms.
 Rejected: raise `serverActions.bodySizeLimit` to fit camera photos (a 12 MB upload on a phone's connection, and more for anyone with the link to send), upload to a file store first (a store for a photo that D64 says is not kept).
 Source: docs/specs/photo-ask.md
-Status: active
+Status: superseded by D70
 
 ## D66 · 2026-10-16 · A photo Find sends the photo to Haiku in the first step only, with a prompt of its own
 
@@ -447,4 +447,40 @@ Status: active
 Why: "from your photo" and the photo's own nothing-found message must survive the 3 s redraw (D19) and a reopened link, like the rest of Rose's search (D23).
 Rejected: a `?photo=1` in the page address (lost after Ask Sam's error redirects and when Rose opens the link again).
 Source: docs/specs/photo-ask.md
+Status: active
+
+## D68 · 2026-10-16 · Find takes up to 5 photos, and reads them together as one ask
+
+Why: a basket holds up to 5 things, so one photo for each thing fills it. Rose's words add details, two photos of one thing make one thing, and more than 5 things get today's notice.
+Rejected: up to 3 photos (a 4- or 5-thing ask needs a written list), one thing for each photo (the front and back of one pack become two groups), words that add things of their own (one photo and several would follow different rules), refusing photos past the fifth (Rose picks them all again).
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D69 · 2026-10-16 · A photo that shows nothing doesn't stop the others, and the results say so
+
+Why: one blurry photo out of 3 would otherwise throw away the 2 things found. The photos are gone after Find (D64), so the note is Rose's only sign that one was missed.
+Rejected: the whole Find stops (Rose adds all 3 photos again), the blank photo is dropped with no note (Rose may not see that a thing is missing).
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D70 · 2026-10-16 · Each of Rose's photos shrinks in the browser to a 1200px JPEG of at most 180 KB, and Next's 1 MB body limit stays
+
+Why: Find takes up to 5 photos (D68), and 5 photos at 180 KB stay under 1 MB with Rose's words. Haiku sees a 1200×900 photo as about 1,419 tokens, so the cost also goes down. Phone camera photos are 2 to 12 MB, and Next refuses a server action body over 1 MB.
+Rejected: raise `serverActions.bodySizeLimit` to 4 MB (uploads up to 4 MB on a phone's connection, 4 times more for anyone with the link to send, and close to Vercel's 4.5 MB request limit), shrink each photo to 900 KB divided by the number of photos (every photo shrinks again on each add, and a Find during it could pass 1 MB), upload to a file store first (a store for photos that D64 says are not kept).
+Supersedes: D65
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D71 · 2026-10-16 · One Haiku call reads all of Rose's photos, each labelled, with one photo prompt for 1 to 5 photos
+
+Why: only one call that sees every photo can list a pack once when two photos show it (D68), and put "size 8" on the slippers and not on the battery. Each thing names its photos, so the code sorts them by photo and never counts a covered photo as blank (D69). In the O11 spike, this got every case right in 3 of 3 runs.
+Rejected: one call for each photo, at once (it can't merge two photos of one pack or fit words to the right thing, and it makes up to 5 calls), a second prompt for several photos beside photo-ask's (two photo prompts to keep in step), a blank list alone (a photo merged into another came back blank in 3 of 3 runs), photo numbers alone with blank worked out in code (a garden's stone urn was listed as a thing in 3 of 3 runs).
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D72 · 2026-10-16 · rose_search keeps how many photos Find read and how many showed nothing
+
+Why: ", from your photos" and the note that a photo showed nothing must survive the 3 s redraw (D19) and a reopened link, like the rest of Rose's search (D23, D67).
+Rejected: counts in the page address (lost after Ask Sam's error redirects and when Rose opens the link again, as D67 says).
+Source: docs/specs/photo-ask-several.md
 Status: active

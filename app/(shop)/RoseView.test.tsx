@@ -112,9 +112,42 @@ it("says the AI's words came from Rose's photo, on one thing and on a list", () 
   expect(typed).not.toContain("from your photo");
 });
 
+it("says the AI's words came from Rose's photos, and how many of them showed nothing to buy", () => {
+  const one = renderToStaticMarkup(
+    <RoseView
+      state={{ kind: "options", limitCents: 2500, words: "CR2032 coin battery", fromPhoto: true, photos: 2, listings: [aa24, aa16, belkin] }}
+      items={[]}
+    />,
+  );
+  expect(one).toContain("For “CR2032 coin battery”, from your photos.");
+  expect(one).not.toContain("showed nothing to buy");
+
+  const list = renderToStaticMarkup(
+    <RoseView
+      state={{ kind: "basket", limitCents: 5000, words: "AA batteries, a phone charger", fromPhoto: true, photos: 3, blankPhotos: 1, groups }}
+      items={[]}
+    />,
+  );
+  expect(list).toContain("For “AA batteries, a phone charger”, from your photos. Pick one");
+  expect(list).toMatch(/One of your photos showed nothing to buy\.<\/p><div class="heading"><h1>Which ones would you like\?/);
+
+  const two = renderToStaticMarkup(
+    <RoseView
+      state={{ kind: "options", limitCents: 2500, words: "CR2032 coin battery", fromPhoto: true, photos: 3, blankPhotos: 2, listings: [aa24] }}
+      items={[]}
+    />,
+  );
+  expect(two).toContain("2 of your photos showed nothing to buy.");
+
+  const nothing = renderToStaticMarkup(
+    <RoseView state={{ kind: "ask", limitCents: 5000, words: "", photos: 2, problem: "nothing in photo" }} items={[]} />,
+  );
+  expect(nothing).toContain("Couldn&#x27;t tell what to buy from those photos. Try other photos, or type what you need.");
+});
+
 it("offers a photo under the box, and says when a photo showed nothing to buy or the box and photo were both empty", () => {
   const ask = renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000 }} items={[]} />);
-  expect(ask).toMatch(/<textarea[^>]*name="words"[^>]*><\/textarea><\/div><div class="stack"><input type="file" accept="image\/\*" hidden="" name="photo"\/>/);
+  expect(ask).toMatch(/<textarea[^>]*name="words"[^>]*><\/textarea><\/div><div class="stack"><input type="file" accept="image\/\*" multiple="" hidden="" name="photo"\/>/);
   expect(ask).toMatch(/<button type="button"[^>]*>Take or pick a photo<\/button><p class="small">A photo of the thing, or of your written list\.<\/p>/);
 
   const nothing = renderToStaticMarkup(
@@ -129,7 +162,7 @@ it("offers a photo under the box, and says when a photo showed nothing to buy or
 
 it("points the photo button at the not-a-photo error under it", () => {
   const html = renderToStaticMarkup(<RoseView state={{ kind: "ask", limitCents: 5000, problem: "not a photo" }} items={[]} />);
-  const id = /<p class="field-error" id="([^"]+)">That file isn&#x27;t a photo\. Pick a photo, or type what you need\.<\/p>/.exec(html)?.[1];
+  const id = /<p tabindex="-1" class="field-error" id="([^"]+)">That file isn&#x27;t a photo\. Pick a photo, or type what you need\.<\/p>/.exec(html)?.[1];
 
   expect(id).toBeTruthy();
   expect(html).toContain(`aria-describedby="${id}">Take or pick a photo</button>`);

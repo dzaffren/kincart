@@ -31,6 +31,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Sam sees the photo and the AI's "Good to know" note for each thing before paying. Rose's and Sam's pages show the KinCart name, and the listing photos get bigger.
 - A new Rose starts at Link PayPal, with a demo sandbox login on screen, and links on PayPal's own page; on a laptop PayPal opens in a new tab. Skip pays from the demo PayPal, as every new Rose did before.
 - Rose takes or picks a photo of the thing they need, or of a written list, and AI turns it into a search. The photo goes to the AI once and is not kept.
+- Rose sends up to 5 photos in one Find, one for each thing they need, and AI turns them into one basket.
 
 ## Docs
 

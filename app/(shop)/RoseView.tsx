@@ -36,7 +36,8 @@ export type RoseState =
       limitCents: number;
       totalCents?: number;
       words?: string;
-      photo?: string;
+      previews?: string[];
+      photos?: number;
       outcome?: Outcome;
       problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo";
       busy?: boolean;
@@ -47,6 +48,8 @@ export type RoseState =
       totalCents?: number;
       words: string;
       fromPhoto?: boolean;
+      photos?: number;
+      blankPhotos?: number;
       listings: Option[];
       picked?: string;
       error?: boolean;
@@ -59,6 +62,8 @@ export type RoseState =
       totalCents?: number;
       words: string;
       fromPhoto?: boolean;
+      photos?: number;
+      blankPhotos?: number;
       groups: Group[];
       picked?: string[];
       error?: boolean;
@@ -169,7 +174,9 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         )}
         {state.problem === "nothing in photo" && (
           <Notice tone="neutral">
-            Couldn&apos;t tell what to buy from that photo. Try another photo, or type what you need.
+            {state.photos && state.photos > 1
+              ? "Couldn't tell what to buy from those photos. Try other photos, or type what you need."
+              : "Couldn't tell what to buy from that photo. Try another photo, or type what you need."}
           </Notice>
         )}
         {state.problem === "too many" && (
@@ -205,7 +212,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
               </p>
             )}
           </div>
-          <PhotoPicker preview={state.photo} notPhoto={state.problem === "not a photo"} busy={state.busy} />
+          <PhotoPicker previews={state.previews} notPhoto={state.problem === "not a photo"} busy={state.busy} />
           <Button type="submit" busy={state.busy} busyLabel="Looking…">
             Find
           </Button>
@@ -226,11 +233,12 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick one first.</Notice>}
         <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
+        <BlankNotice blankPhotos={state.blankPhotos} />
         <div className="heading">
           <h1 id={headingId}>Which one would you like?</h1>
           <p className="small">
             For &ldquo;{state.words}&rdquo;
-            {state.fromPhoto && ", from your photo"}
+            {state.fromPhoto && fromPhotos(state.photos)}
             {state.listings.length < 3 &&
               `. Only ${state.listings.length} found at ${wholeDollars(state.limitCents)} or less`}
             .
@@ -267,10 +275,11 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           overCents={state.overCents}
           several={new Set(state.picked?.filter(Boolean)).size > 1}
         />
+        <BlankNotice blankPhotos={state.blankPhotos} />
         <div className="heading">
           <h1>Which ones would you like?</h1>
           <p className="small">
-            For &ldquo;{state.words}&rdquo;{state.fromPhoto && ", from your photo"}. Pick one for each thing you want.
+            For &ldquo;{state.words}&rdquo;{state.fromPhoto && fromPhotos(state.photos)}. Pick one for each thing you want.
           </p>
         </div>
         <form className="stack" action={ask}>
@@ -366,6 +375,20 @@ function TotalLine({ totalCents }: { totalCents?: number }) {
     <p className="small">
       {HELPER}&apos;s limit is {wholeDollars(totalCents)} in all.
     </p>
+  );
+}
+
+function fromPhotos(photos?: number): string {
+  return photos && photos > 1 ? ", from your photos" : ", from your photo";
+}
+
+// The photos are gone after Find (D64), so the note can only count the ones that showed nothing (D69).
+function BlankNotice({ blankPhotos }: { blankPhotos?: number }) {
+  if (!blankPhotos) return null;
+  return (
+    <Notice tone="neutral">
+      {blankPhotos === 1 ? "One of your photos" : `${blankPhotos} of your photos`} showed nothing to buy.
+    </Notice>
   );
 }
 

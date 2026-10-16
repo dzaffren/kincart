@@ -160,7 +160,10 @@ const photo = (bytes: Uint8Array<ArrayBuffer> | string, type = "image/jpeg") => 
 
 // Haiku reads one thing from the photo, and Channel3 has no listings for it.
 function stubPhotoServices() {
-  const things = JSON.stringify({ things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery" }] });
+  const things = JSON.stringify({
+    things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery", photos: [1] }],
+    blank: [],
+  });
   const fetch = vi.fn(async (url: string) =>
     url.includes("anthropic")
       ? Response.json({ content: [{ type: "text", text: things }], stop_reason: "end_turn" })
@@ -180,6 +183,7 @@ it("finds from Rose's photo with an empty box, and keeps the AI's words marked a
   const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
   expect(url).toContain("anthropic");
   expect(JSON.parse(String(init.body)).messages[0].content).toEqual([
+    { type: "text", text: "Photo 1:" },
     { type: "image", source: { type: "base64", media_type: "image/jpeg", data: Buffer.from(jpeg).toString("base64") } },
     { type: "text", text: "They typed nothing." },
   ]);
@@ -193,13 +197,60 @@ it("sends Rose's words with the photo, and a typed Find with an empty photo inpu
 
   await redirectOf(find(rose, form({ words: " size 8 ", photo: photo(jpeg) })));
   const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
-  expect(JSON.parse(String(init.body)).messages[0].content[1]).toEqual({ type: "text", text: "They typed: size 8" });
+  expect(JSON.parse(String(init.body)).messages[0].content[2]).toEqual({ type: "text", text: "They typed: size 8" });
 
   fetch.mockClear();
   await redirectOf(find(rose, form({ words: "CR2032 coin battery", photo: photo("", "application/octet-stream") })));
   const [, typed] = fetch.mock.calls[0] as unknown as [string, RequestInit];
   expect(JSON.parse(String(typed.body)).messages[0].content).toBe("CR2032 coin battery");
   expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", fromPhoto: false });
+});
+
+// A second JPEG, with other bytes, so each photo can be told apart.
+const second = new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0x00, 0x18, 0x45, 0x78, 0x69, 0x66]);
+
+function photos(words: string, files: File[]) {
+  const data = form({ words });
+  for (const file of files) data.append("photo", file);
+  return data;
+}
+
+const sentImages = (fetch: ReturnType<typeof stubPhotoServices>) => {
+  const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  const content: { type: string; source?: { data: string } }[] = JSON.parse(String(init.body)).messages[0].content;
+  return content.filter(({ type }) => type === "image").map(({ source }) => source!.data);
+};
+
+it("sends Rose's photos to Haiku in the order Rose added them, and keeps how many Find read", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const fetch = stubPhotoServices();
+
+  expect(await redirectOf(find(rose, photos("", [photo(jpeg), photo(second)])))).toBe(`/r/${rose}`);
+
+  expect(sentImages(fetch)).toEqual([Buffer.from(jpeg).toString("base64"), Buffer.from(second).toString("base64")]);
+  expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", fromPhoto: true, photos: 2, blankPhotos: 0 });
+});
+
+it("sends only the first 5 photos, whatever a request sends", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const fetch = stubPhotoServices();
+
+  await redirectOf(find(rose, photos("", [photo(jpeg), photo(jpeg), photo(jpeg), photo(jpeg), photo(jpeg), photo(second)])));
+
+  expect(sentImages(fetch)).toEqual(Array(5).fill(Buffer.from(jpeg).toString("base64")));
+  expect(await getSearch(owner)).toMatchObject({ photos: 5 });
+});
+
+it("refuses photos with a file among them that isn't a JPEG, and calls nothing", async () => {
+  searchOn();
+
+  expect(await redirectOf(find(rose, photos("", [photo(jpeg), photo("%PDF-1.7\n", "application/pdf")])))).toBe(
+    `/r/${rose}?find=notphoto`,
+  );
+  expect(await getSearch(owner)).toBeNull();
+  expect(fetch).not.toHaveBeenCalled();
 });
 
 it("refuses a file that isn't a JPEG, whatever it calls itself, and calls nothing", async () => {
@@ -215,7 +266,7 @@ it("refuses a file that isn't a JPEG, whatever it calls itself, and calls nothin
 
 it("puts the AI's words for a photo in the box when Rose tries other words", async () => {
   searchOn();
-  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, true);
+  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, 1);
 
   expect(await redirectOf(tryAgain(rose))).toBe(`/r/${rose}`);
   expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", outcome: "retry", fromPhoto: false });
