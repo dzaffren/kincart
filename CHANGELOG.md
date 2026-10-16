@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-16
+
 ### Added
 
 - Rose links a sandbox PayPal on PayPal's own page, with a demo login shown on Rose's first screen. On a laptop, PayPal opens in a new tab from Rose's phone.
@@ -62,6 +64,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.
 
-[unreleased]: https://github.com/dzaffren/kincart/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/dzaffren/kincart/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/dzaffren/kincart/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dzaffren/kincart/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/dzaffren/kincart/releases/tag/v1.0.0
