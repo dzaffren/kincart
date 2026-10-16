@@ -1,6 +1,6 @@
 # Photo ask, several
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/shop-together/shape.md
 **Depends on:** photo-ask, shipped
@@ -178,7 +178,7 @@ Screens, all in `app/(shop)/RoseView.tsx` unless named:
 
 ### Approach
 
-Each photo shrinks in the browser to a JPEG of at most 180 KB, so 5 photos and Rose's words stay under Next's 1 MB limit (O10). The shrink runs one photo at a time. Find's server action reads up to 5 files, checks each is a JPEG, and calls `findPhoto()` with all of them. One Haiku call reads every photo, each with its own "Photo 1:" label, and Rose's words. It returns the things in photo order and the numbers of the photos that showed nothing. From there the search runs as a typed basket does (D31). `rose_search` stores how many photos Find read and how many showed nothing. The photos are dropped (D64).
+Each photo shrinks in the browser to a JPEG of at most 180 KB, so 5 photos and Rose's words stay under Next's 1 MB limit (O10). The shrink runs one photo at a time. Find's server action reads up to 5 files, checks each is a JPEG, and calls `findPhoto()` with all of them. One Haiku call reads every photo, each with its own "Photo 1:" label, and Rose's words. It returns the things, each with the numbers of the photos it is in, and the numbers of the photos that showed nothing. The code sorts the things by photo, and a photo that a thing covers is never counted as blank (O11). From there the search runs as a typed basket does (D31). `rose_search` stores how many photos Find read and how many showed nothing. The photos are dropped (D64).
 
 Relies on: D10, D11, D12, D19, D22, D23, D24, D31, D63, D64, D66, D67, D68, D69, D70, D71, D72
 
@@ -215,7 +215,8 @@ sequenceDiagram
     A->>A: first 5 files, each starts ffd8ff, else ?find=notphoto
     A->>F: findPhoto(words, limit, [jpeg1, jpeg2])
     F->>H: readPhoto: "Photo 1:", image, "Photo 2:", image, "They typed: ..."
-    H-->>F: things in photo order, blank: photo numbers
+    H-->>F: things with their photo numbers, blank photo numbers
+    F->>F: sort things by first photo, drop covered photos from blank
     F->>C: two searches for each thing, at once
     C-->>F: listings
     F->>H: choose, once for each thing (no photo)
@@ -244,8 +245,8 @@ The photos leave Rose's phone without location data. Only the AI's words and two
 | ---- | ------------ | --- |
 | `app/(shop)/PhotoPicker.tsx:11` | `LONG_EDGE` 1600 to 1200, and `MOST_BYTES` 900 KB to 180 KB. `shrink()` (`:143`) tries 0.85, 0.7 and 0.55, then 1000px and 800px at 0.55, and stops at the first JPEG under 180 KB. `picked()` (`:58`) shrinks one photo at a time, not with `Promise.all`. When the pending Find ends (`useFormStatus().pending`, `:27`, goes from true to false), the picker empties itself (O8) | 1, 3, 4, 5 (O10) |
 | `app/(shop)/actions.ts:80` | `find()` reads `formData.getAll("photo")`, keeps the non-empty files, and takes the first 5. Any file that doesn't start `ffd8ff` redirects to `?find=notphoto`. It calls `findPhoto()` with all of them, and saves `photos` and `blank` | 1 to 3 |
-| `lib/shop/ai.ts:12` | `NEED_PHOTO` is rewritten for 1 to 5 photos (below). `readPhoto(words, jpegs)` (`:56`) sends "Photo n:" before each image, then the words. A new `NEED_PHOTO_SCHEMA` adds `blank`, a list of photo numbers. `readNeed()` and `NEED` stay as they are (D66) | 1 to 3 |
-| `lib/shop/find.ts:34` | `findPhoto(words, limitCents, jpegs)` returns `{ words, result, photos, blank }`. `blank` is the count of different photo numbers in range, and is 0 when there are no things. The log line's ` photo=yes` becomes ` photos=2 blank=0` | 1 to 3 |
+| `lib/shop/ai.ts:12` | `NEED_PHOTO` is rewritten for 1 to 5 photos (below). `readPhoto(words, jpegs)` (`:56`) sends "Photo n:" before each image, then the words. A new `NEED_PHOTO_SCHEMA` gives each thing `photos`, the numbers of the photos it is in, and adds `blank`, a list of photo numbers. `readNeed()` and `NEED` stay as they are (D66) | 1 to 3 |
+| `lib/shop/find.ts:34` | `findPhoto(words, limitCents, jpegs)` returns `{ words, result, photos, blank }`. The things are sorted by their smallest photo number, and a list keeps its own order inside one photo. `blank` counts the different photo numbers in range that no thing's `photos` names, and is 0 when there are no things. The log line's ` photo=yes` becomes ` photos=2 blank=0` | 1 to 3 |
 | `lib/shop/requests.ts:56` | `SavedSearch` gains `photos` and `blankPhotos`. `saveSearch()` (`:165`) takes `photos = 0` and `blank = 0` in place of `fromPhoto`, and writes `from_photo` as `photos > 0`, so the old code still reads it. `getSearch()` (`:142`) reads both columns | 1, 3 |
 | `app/(shop)/state.ts:49` | Options, basket and ask pass `photos` and `blankPhotos` from the saved search. `fromPhoto` stays | 1, 3 |
 | `app/(shop)/RoseView.tsx` | Built at pause 2. `/build` breaks each new line once, as the lesson says | 1, 3 |
@@ -255,9 +256,9 @@ The photos leave Rose's phone without location data. Only the AI's words and two
 
 Reusing: `searchThings()`, `searchListings()` and `choose()` unchanged, `haiku()` with content blocks, `reasonOf()` for the log, `reset()` from `e2e/db.ts`, and the pause 2 picker and notices.
 
-`NEED_PHOTO`, the prompt that O11 tests:
+`NEED_PHOTO`, as O11 tested it:
 
-> You read photos that an older person took to show what they want to buy, labelled Photo 1, Photo 2 and so on, and any words they typed with them. A photo of a product shows one product. A photo of a written shopping list shows every product on it, in order. List the products in photo order, and list a product once when two photos show it. For each, write a short plain name for it, such as "CR2032 coin battery", with anything their words add to it, such as a size or a count. Their words only add details to products in the photos, so never list a product that only their words name. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photos and their words. In blank, list the number of each photo that shows nothing they could buy.
+> You read photos that an older person took to show what they want to buy, labelled Photo 1, Photo 2 and so on, and any words they typed with them. A photo of a product shows one product. A photo of a written shopping list shows every product on it, in order. List the products in photo order, and list a product once when two photos show it. For each, list the numbers of the photos it is in, and write a short plain name for it, such as "CR2032 coin battery", with anything their words add to it, such as a size or a count. Their words only add details to products in the photos, so never list a product that only their words name. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photos and their words. In blank, list the number of each photo that shows nothing they could buy.
 
 ### Data
 
@@ -289,6 +290,7 @@ erDiagram
 | One photo at a time in `picked()` | Scenario 4's multi-pick on an iPhone. Five 12 MP photos decoded at once hold about 240 MB of pixels |
 | The picker empties when Find ends | O8. After a Find that ends at a notice, the ask screen stays, and so would the picker's tiles |
 | "Photo n:" labels and `blank` in the schema | Scenario 3's note needs the photo count that showed nothing. The vision docs say to label each image when a request has several |
+| `photos` on each thing, the sort, and dropping covered photos from `blank` | O11: without them, 1 of 3 five-photo runs put photo 5's thing before photo 4's. With `blank` alone, the close-up of a battery merged into photo 1 came back as blank in 3 of 3 runs |
 | `photos` and `blank_photos` | Scenario 1's ", from your photos" and scenario 3's note must survive the 3 s redraw (D19) and a reopened link (D67) |
 | The first 5 files only, in `find()` | A crafted request could send more images than the picker allows, and each one costs Haiku tokens |
 
@@ -308,11 +310,11 @@ erDiagram
 | -------- | ---- | ------- |
 | 1, 4, 5 | `e2e/photo-ask-several.spec.ts`, real Haiku and Channel3 (D24) | `pnpm test:e2e e2e/photo-ask-several.spec.ts` |
 | 1, 2 | `lib/shop/ai.test.ts`: `readPhoto()` sends "Photo 1:", the first image, "Photo 2:", the second, then "They typed: size 8", with `NEED_PHOTO` and `NEED_PHOTO_SCHEMA` | `pnpm test lib/shop/ai.test.ts` |
-| 1, 3 | `lib/shop/find.test.ts`: two photos give a basket under the AI's words; a blank photo gives `blank` 1; an out-of-range or repeated number counts once or not at all; six things give `too many`; no things give `nothing in photo` with `blank` 0; the log line has `photos=2 blank=0` | `pnpm test lib/shop/find.test.ts` |
+| 1, 3 | `lib/shop/find.test.ts`: two photos give a basket under the AI's words; things come back sorted by photo, and a list keeps its order; a blank photo gives `blank` 1; a blank number that a thing's `photos` covers, is out of range or is repeated counts once or not at all; six things give `too many`; no things give `nothing in photo` with `blank` 0; the log line has `photos=2 blank=0` | `pnpm test lib/shop/find.test.ts` |
 | 1, 3 | `app/(shop)/actions.test.ts`: two JPEGs reach `findPhoto()` in order and are saved with `photos` 2; a PDF among them redirects to `?find=notphoto` and calls nothing; six files pass only five on | `pnpm test "app/(shop)/actions.test.ts"` |
 | 1, 3 | `app/(shop)/state.test.ts` and `app/(shop)/RoseView.test.tsx`: `photos` and `blankPhotos` reach options, basket and ask; ", from your photos", the note, and "those photos" | `pnpm test "app/(shop)/state.test.ts" "app/(shop)/RoseView.test.tsx"` |
 | storage | `lib/shop/requests.test.ts`: `photos` and `blankPhotos` round trip; `scripts/migrate.test.ts`: 0010 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
-| 2, 3 | The slippers, the two pack photos and the garden through real Haiku, by the O11 spike | O11's script |
+| 2, 3 | The slippers, the two battery photos and the garden through real Haiku: done by the O11 spike, 3 runs each | none kept |
 
 **E2E:** `e2e/photo-ask-several.spec.ts`, three tests:
 
@@ -333,9 +335,10 @@ Build A, then B, one after the other. B's e2e needs A, and both chunks' tests us
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Haiku reads a 1200px photo worse than a 1600px one, and misses a code such as "CR2032" | O11 runs photo-ask's CR2032 photo at the new size. Rose sees the AI's words, Try other words puts them in the box, and Sam approves every charge |
-| A real phone photo doesn't reach 180 KB, and 5 of them pass 1 MB | O12 tests the owner's own photos. The last step, 800px at 0.55, is about a third of the pixels of 1200px |
-| Haiku with 5 images passes the 10 s timeout | O11 times it. Find then says nothing found and logs `reason=`, as a failed typed Find does. The page's `maxDuration` is 30 s |
+| Haiku reads a 1200px photo worse than a 1600px one, and misses a code such as "CR2032" | O11 read CR2032 at 1200px in 6 of 6 runs, and "6LP3146" on a 9V battery. Rose sees the AI's words, Try other words puts them in the box, and Sam approves every charge |
+| The photo's own label size goes into the search beside Rose's, such as "size 8 EU 43" for slippers labelled 43 | Seen in 2 of 3 O11 runs. Rose's "size 8" was always there, and Rose sees the AI's words. A prompt line that puts Rose's size first is untested, so it is not in this plan |
+| A real phone photo doesn't reach 180 KB, and 5 of them pass 1 MB | O12: five real camera photos all reached 180 KB by the fourth step at most. The last step, 800px at 0.55, is about half the pixels of 1200px |
+| Haiku with 5 images passes the 10 s timeout | O11's 5-photo calls took 2.3 to 5.7 s. If one passes 10 s, Find says nothing found and logs `reason=`, as a failed typed Find does. The page's `maxDuration` is 30 s |
 | Chrome on Android hides the camera when the input takes several files | O13 |
 | `useFormStatus().pending` doesn't go back to false after the action's redirect, and the tiles stay after a notice | E2E test 3 fails on it. The fix is a `key` on the picker, from the saved search's time |
 
@@ -366,8 +369,8 @@ Status: active
 
 ## D71 · 2026-10-16 · One Haiku call reads all of Rose's photos, each labelled, with one photo prompt for 1 to 5 photos
 
-Why: only one call that sees every photo can list a pack once when two photos show it (D68), and put "size 8" on the slippers and not on the battery. The "Photo n:" labels let it name the photos that showed nothing (D69).
-Rejected: one call for each photo, at once (it can't merge two photos of one pack or fit words to the right thing, and it makes up to 5 calls), a second prompt for several photos beside photo-ask's (two photo prompts to keep in step).
+Why: only one call that sees every photo can list a pack once when two photos show it (D68), and put "size 8" on the slippers and not on the battery. Each thing names its photos, so the code sorts them by photo and never counts a covered photo as blank (D69). In the O11 spike, this got every case right in 3 of 3 runs.
+Rejected: one call for each photo, at once (it can't merge two photos of one pack or fit words to the right thing, and it makes up to 5 calls), a second prompt for several photos beside photo-ask's (two photo prompts to keep in step), a blank list alone (a photo merged into another came back blank in 3 of 3 runs), photo numbers alone with blank worked out in code (a garden's stone urn was listed as a thing in 3 of 3 runs).
 Source: docs/specs/photo-ask-several.md
 Status: active
 
@@ -393,8 +396,8 @@ Status: active
 | O8 | After a Find that ends at a notice (more than 5 things, or nothing in any photo), do the photos stay on screen? The O6 question said they stay, but photo-ask's scenario 4 says no photo is picked after Find | question | spec p1 | user | Resolved | No, as with one photo today. After "Up to 5 things", the box holds the AI's words for all the things, so Rose deletes one and taps Find. After nothing in any photo, the box keeps Rose's own words. 2026-10-16 |
 | O9 | Rose ticks a photo and a PDF together. What happens? | question | spec p1 | user | Resolved | The photo gets its card, the PDF is dropped, and "That file isn't a photo" shows under "Add another photo". 2026-10-16 |
 | O10 | Five photos at today's 1600px and up to 900 KB each are 4.5 MB, and Next refuses a body over 1 MB. How do they fit? | question | spec p3 | user | Resolved | Each photo shrinks to a 1200px JPEG of 180 KB or less, one photo too, and the 1 MB limit stays. D70 supersedes D65. Raising the limit to 4 MB was rejected. 2026-10-16 |
-| O11 | Haiku 5.5 at low effort reads up to 5 photos at 1200px in one call within the 10 s timeout. It lists the things in photo order, lists a pack once when two photos show it, names a blank photo in `blank`, and puts "size 8" on the slippers only. It still reads photo-ask's CR2032 photo at 1200px | unproven | spec p3 | poc | Open | — |
-| O12 | A real phone photo shrinks to 180 KB or less at 1200px, and its print stays readable. The generated e2e photos are cleaner: 138 KB and 198 KB at 1600px. The owner's iPhone photo in photo-ask's O8 was 739 KB at 1600px and 0.85 | unproven | spec p3 | poc | Open | — |
+| O11 | Haiku 5.5 at low effort reads up to 5 photos at 1200px in one call within the 10 s timeout. It lists the things in photo order, lists a pack once when two photos show it, names a blank photo in `blank`, and puts "size 8" on the slippers only. It still reads photo-ask's CR2032 photo at 1200px | unproven | spec p3 | poc | Resolved | Yes, with one schema change. The photos were the e2e's CR2032 and list photos, plus real camera photos from Wikimedia Commons: slippers labelled 43, a garden, a 9V battery and a close crop of it, and a drink carton. All were shrunk as planned. With the planned schema, order was wrong in 1 of 3 five-photo runs, and the battery close-up came back blank in 3 of 3. Each thing now lists its `photos`, the code sorts by them, and a covered photo is never blank. Then 3 of 3 passed in every case: CR2032 alone (1.3 to 1.7 s, 2,043 tokens), CR2032 and the list (4 things in order), the two battery photos (1 thing, no blank), CR2032, garden and slippers (`blank` 2), and 5 photos in mixed order (4 things in photo order, `blank` 4, 3.0 to 3.9 s, 6,989 tokens). With "size 8 and a phone charger", size 8 went on the slippers only, and no charger was listed. In 2 of 3 runs the query also had the label's "EU 43" (Risks). Front and back photos of a real pack were not tried. Spike, 2026-10-16 |
+| O12 | A real phone photo shrinks to 180 KB or less at 1200px, and its print stays readable. The generated e2e photos are cleaner: 138 KB and 198 KB at 1600px. The owner's iPhone photo in photo-ask's O8 was 739 KB at 1600px and 0.85 | unproven | spec p3 | poc | Resolved | Yes, for five real camera photos from Wikimedia Commons, 2.6 to 10 MB each, shrunk with the planned steps in Chromium. Slippers (5097×3272): 1200px at 0.85, 116 KB. 9V battery (5184×3888): 1200px at 0.85, 104 KB. Drink carton label (2448×3264): 1200px at 0.7, 173 KB. Supermarket shelf (7296×5472): 1200px at 0.7, 180 KB. Garden full of leaves (3500×2333): 1000px at 0.55, 174 KB. Each took 106 to 293 ms. Five together were 652 KB. Haiku read "6LP3146", "Little Hug, 8 fl oz, 40 per pack" and the slippers' size 43. The owner did not supply photos, so none came from the owner's phone. Spike, 2026-10-16 |
 | O13 | Chrome on Android still offers the camera when the photo input takes several files (`multiple`) | unproven | spec p3 | user | Accepted risk | Not checked: no spike on Android. The video uses the owner's iPhone. If Android hides the camera, Rose can still pick saved photos, and a later fix adds a camera-only button. Agreed 2026-10-16 |
 
 _Never delete this section or its rows. See references/ledger.md._
