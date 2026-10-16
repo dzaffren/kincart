@@ -58,6 +58,7 @@ export type SavedSearch = {
   outcome: Search["outcome"] | "retry";
   options: Option[];
   groups: Group[];
+  fromPhoto: boolean;
   searchedAt: Date;
 };
 
@@ -144,26 +145,41 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
     outcome: SavedSearch["outcome"];
     listings: Option[];
     groups: Group[];
+    from_photo: boolean;
     searched_at: Date;
-  }>("SELECT words, outcome, listings, groups, searched_at FROM rose_search WHERE id = $1", [household]);
+  }>("SELECT words, outcome, listings, groups, from_photo, searched_at FROM rose_search WHERE id = $1", [household]);
   const row = rows[0];
   return row
-    ? { words: row.words, outcome: row.outcome, options: row.listings, groups: row.groups, searchedAt: row.searched_at }
+    ? {
+        words: row.words,
+        outcome: row.outcome,
+        options: row.listings,
+        groups: row.groups,
+        fromPhoto: row.from_photo,
+        searchedAt: row.searched_at,
+      }
     : null;
 }
 
-export async function saveSearch(household: number, words: string, result: Search | { outcome: "retry" }): Promise<void> {
+// fromPhoto: words are the AI's words for Rose's photo (D67).
+export async function saveSearch(
+  household: number,
+  words: string,
+  result: Search | { outcome: "retry" },
+  fromPhoto = false,
+): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups) VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo) VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
-         searched_at = now()`,
+         from_photo = EXCLUDED.from_photo, searched_at = now()`,
     [
       household,
       words,
       result.outcome,
       JSON.stringify(result.outcome === "options" ? result.options : []),
       JSON.stringify(result.outcome === "basket" ? result.groups : []),
+      fromPhoto,
     ],
   );
 }

@@ -87,6 +87,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   outcome,
   options,
   groups: [],
+  fromPhoto: false,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
@@ -179,6 +180,39 @@ it("keeps Rose's words in the box when a search found nothing, too much, too man
   expect(roseState(vault, null, {}, on(saved("over limit")))).toMatchObject({ problem: "over limit", words });
   expect(roseState(vault, null, {}, on(saved("too many")))).toMatchObject({ problem: "too many", words });
   expect(roseState(vault, null, {}, on(saved("retry")))).toEqual({ kind: "ask", limitCents: 5000, words });
+});
+
+it("marks options and groups found from Rose's photo, and only those", () => {
+  const groups = [{ thing: "AA batteries", options: [strap] }];
+
+  expect(roseState(vault, null, {}, on({ ...saved("options"), fromPhoto: true }))).toMatchObject({
+    kind: "options",
+    fromPhoto: true,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("basket"), groups, fromPhoto: true }))).toMatchObject({
+    kind: "basket",
+    fromPhoto: true,
+  });
+  expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ kind: "options", fromPhoto: undefined });
+});
+
+it("tells Rose a photo showed nothing to buy, or a file wasn't a photo, and keeps Rose's words in the box", () => {
+  expect(roseState(vault, null, {}, on({ ...saved("nothing in photo"), words: "size 8", fromPhoto: true }))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words: "size 8",
+    problem: "nothing in photo",
+  });
+  expect(roseState(vault, null, { notPhoto: true }, on())).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    problem: "not a photo",
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("retry"), words: "CR2032 coin battery" }))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words: "CR2032 coin battery",
+  });
 });
 
 it("shows a search newer than the paid request instead of the receipt, and not an older one", () => {

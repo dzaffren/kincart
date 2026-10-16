@@ -1,4 +1,4 @@
-import { choose, readNeed } from "./ai";
+import { choose, readNeed, readPhoto, type Need } from "./ai";
 import { reasonOf } from "./paypal";
 import { searchListings, type Found, type Listing } from "./search";
 
@@ -11,7 +11,10 @@ export type Group = { thing: string; options: Option[]; problem?: Problem };
 
 type Single = { outcome: "options"; options: Option[] } | { outcome: Problem };
 
-export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" };
+export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" | "nothing in photo" };
+
+// words are what the search was for: Rose's own, or the AI's words for Rose's photo.
+type Searched = { words: string; result: Search };
 
 const MOST_THINGS = 5;
 
@@ -20,19 +23,40 @@ export function searchOn(): boolean {
 }
 
 export async function find(words: string, limitCents: number): Promise<Search> {
-  const started = Date.now();
-  const reasons: string[] = [];
-  const result = await search(words, limitCents, reasons).catch((error): Search => {
-    reasons.push(reasonOf(error));
-    return { outcome: "nothing found" };
+  const { result } = await logged(words, "", async (reasons) => {
+    const { things } = await readNeed(words);
+    return { words, result: await searchThings(words, things, limitCents, reasons) };
   });
-  const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
-  console.log(`find outcome=${result.outcome.replace(" ", "-")} ${counts(result)} ms=${Date.now() - started}${reason}`);
   return result;
 }
 
-async function search(words: string, limitCents: number, reasons: string[]): Promise<Search> {
-  const { things } = await readNeed(words);
+// The photo goes to the first call only (D66). The things' words, joined, name the search for Rose.
+export function findPhoto(words: string, limitCents: number, jpeg: Buffer): Promise<Searched> {
+  return logged(words, " photo=yes", async (reasons) => {
+    const { things } = await readPhoto(words, jpeg);
+    if (!things.length) return { words, result: { outcome: "nothing in photo" } };
+    const named = things.map((thing) => thing.words).join(", ");
+    return { words: named, result: await searchThings(named, things, limitCents, reasons) };
+  });
+}
+
+// A search that fails says nothing found under Rose's own words, and the log line says why.
+async function logged(words: string, photo: string, run: (reasons: string[]) => Promise<Searched>): Promise<Searched> {
+  const started = Date.now();
+  const reasons: string[] = [];
+  const searched = await run(reasons).catch((error): Searched => {
+    reasons.push(reasonOf(error));
+    return { words, result: { outcome: "nothing found" } };
+  });
+  const { result } = searched;
+  const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
+  console.log(
+    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} ms=${Date.now() - started}${photo}${reason}`,
+  );
+  return searched;
+}
+
+async function searchThings(words: string, things: Need["things"], limitCents: number, reasons: string[]): Promise<Search> {
   if (things.length > MOST_THINGS) return { outcome: "too many" };
   if (!things.length) return { outcome: "nothing found" };
   if (things.length === 1) return searchThing(words, things[0].query, limitCents);

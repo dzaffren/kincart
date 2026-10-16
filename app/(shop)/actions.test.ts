@@ -48,7 +48,7 @@ const rose = "rose-link-4f9c2a7e";
 const sam = "sam-link-b81d5e30";
 const owner = 1;
 
-function form(fields: Record<string, string>) {
+function form(fields: Record<string, string | File>) {
   const data = new FormData();
   for (const [name, value] of Object.entries(fields)) data.set(name, value);
   return data;
@@ -152,6 +152,73 @@ it("finds with Rose's words and keeps the result, and asks for words when the bo
   expect(await getSearch(owner)).toMatchObject({ words: six.join(", "), outcome: "too many" });
 
   expect(await redirectOf(find(rose, form({ words: "   " })))).toBe(`/r/${rose}?find=empty`);
+});
+
+// The first bytes of a JPEG, as the browser's shrink makes it.
+const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
+const photo = (bytes: Uint8Array<ArrayBuffer> | string, type = "image/jpeg") => new File([bytes], "image.jpg", { type });
+
+// Haiku reads one thing from the photo, and Channel3 has no listings for it.
+function stubPhotoServices() {
+  const things = JSON.stringify({ things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery" }] });
+  const fetch = vi.fn(async (url: string) =>
+    url.includes("anthropic")
+      ? Response.json({ content: [{ type: "text", text: things }], stop_reason: "end_turn" })
+      : Response.json({ products: [] }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+it("finds from Rose's photo with an empty box, and keeps the AI's words marked as from the photo", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const fetch = stubPhotoServices();
+
+  expect(await redirectOf(find(rose, form({ words: "  ", photo: photo(jpeg) })))).toBe(`/r/${rose}`);
+
+  const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  expect(url).toContain("anthropic");
+  expect(JSON.parse(String(init.body)).messages[0].content).toEqual([
+    { type: "image", source: { type: "base64", media_type: "image/jpeg", data: Buffer.from(jpeg).toString("base64") } },
+    { type: "text", text: "They typed nothing." },
+  ]);
+  expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", outcome: "nothing found", fromPhoto: true });
+});
+
+it("sends Rose's words with the photo, and a typed Find with an empty photo input stays a typed Find", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const fetch = stubPhotoServices();
+
+  await redirectOf(find(rose, form({ words: " size 8 ", photo: photo(jpeg) })));
+  const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  expect(JSON.parse(String(init.body)).messages[0].content[1]).toEqual({ type: "text", text: "They typed: size 8" });
+
+  fetch.mockClear();
+  await redirectOf(find(rose, form({ words: "CR2032 coin battery", photo: photo("", "application/octet-stream") })));
+  const [, typed] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  expect(JSON.parse(String(typed.body)).messages[0].content).toBe("CR2032 coin battery");
+  expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", fromPhoto: false });
+});
+
+it("refuses a file that isn't a JPEG, whatever it calls itself, and calls nothing", async () => {
+  searchOn();
+
+  expect(await redirectOf(find(rose, form({ words: "batteries", photo: photo("%PDF-1.7\n", "application/pdf") })))).toBe(
+    `/r/${rose}?find=notphoto`,
+  );
+  expect(await redirectOf(find(rose, form({ words: "", photo: photo("%PDF-1.7\n") })))).toBe(`/r/${rose}?find=notphoto`);
+  expect(await getSearch(owner)).toBeNull();
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it("puts the AI's words for a photo in the box when Rose tries other words", async () => {
+  searchOn();
+  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, true);
+
+  expect(await redirectOf(tryAgain(rose))).toBe(`/r/${rose}`);
+  expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", outcome: "retry", fromPhoto: false });
 });
 
 it("asks Sam for the picked listing at the saved search's price, never the form's", async () => {

@@ -11,6 +11,7 @@ type RoseParams = {
   pickMissing?: boolean;
   askAgain?: boolean;
   emptyFind?: boolean;
+  notPhoto?: boolean;
   over?: string[];
 };
 
@@ -45,6 +46,7 @@ export function roseState(
       limitCents,
       totalCents,
       words: current.words,
+      fromPhoto: current.fromPhoto || undefined,
       listings: current.options,
       error: params.pickMissing ?? false,
       picked: over?.ids[0],
@@ -61,6 +63,7 @@ export function roseState(
       limitCents,
       totalCents,
       words: current.words,
+      fromPhoto: current.fromPhoto || undefined,
       groups: current.groups,
       error: params.pickMissing ?? false,
       picked: over?.ids,
@@ -78,9 +81,11 @@ export function roseState(
   const leftOut = request?.status === "paid" && params.askAgain && request.leftOut;
   const problem = params.emptyFind
     ? "empty"
-    : current?.outcome === "retry"
-      ? undefined
-      : current?.outcome;
+    : params.notPhoto
+      ? "not a photo"
+      : current?.outcome === "retry"
+        ? undefined
+        : current?.outcome;
   return {
     kind: "ask",
     linked: params.linked || undefined,

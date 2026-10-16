@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { choose, readNeed } from "./ai";
+import { choose, readNeed, readPhoto } from "./ai";
 import type { Found } from "./search";
 
 const words = "warm slippers that are easy to put on, size 8";
@@ -50,6 +50,41 @@ it("asks Haiku for each thing in Rose's own words, with a search query for each"
   expect(body.system).toContain("their own words");
   expect(body.output_config.format.schema.required).toEqual(["things"]);
   expect(body.max_tokens).toBe(2000);
+});
+
+// The first bytes of a JPEG, as the browser's shrink makes it.
+const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
+
+it("sends Haiku Rose's photo first, then what Rose typed, with a prompt of its own", async () => {
+  const things = [{ words: "grey slip-on slippers, size 8", query: "grey slip-on slippers size 8" }];
+  const fetch = stubHaiku(() => reply({ things }));
+
+  expect(await readPhoto("size 8", jpeg)).toEqual({ things });
+
+  const { body } = sent(fetch);
+  expect(body.messages).toEqual([
+    {
+      role: "user",
+      content: [
+        { type: "image", source: { type: "base64", media_type: "image/jpeg", data: jpeg.toString("base64") } },
+        { type: "text", text: "They typed: size 8" },
+      ],
+    },
+  ]);
+  expect(body.system).toContain("written shopping list");
+  expect(body.system).not.toContain("their own words");
+  expect(body.model).toBe("claude-haiku-5-5");
+  expect(body.output_config.effort).toBe("low");
+  expect(body.output_config.format.schema.required).toEqual(["things"]);
+  expect(body.max_tokens).toBe(2000);
+});
+
+it("tells Haiku that Rose typed nothing with a photo alone", async () => {
+  const fetch = stubHaiku(() => reply({ things: [] }));
+
+  expect(await readPhoto("", jpeg)).toEqual({ things: [] });
+
+  expect(sent(fetch).body.messages[0].content[1]).toEqual({ type: "text", text: "They typed nothing." });
 });
 
 it("calls Haiku 5.5 with low effort and a fixed answer shape", async () => {

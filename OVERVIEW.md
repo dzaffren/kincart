@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.1.0 · **Updated:** 2026-10-16 by /ship link-paypal-onboarding
+**Status:** Active · **Release:** v1.1.0 · **Updated:** 2026-10-16 by /ship photo-ask
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -42,6 +42,7 @@ Used by older shoppers and the relative who helps them pay online.
 | demo-home | Shipped | The home page says what KinCart does for the helper who would use it. On a laptop, a judge's own Rose and Sam then run side by side, live, so Sam's page changes as Rose asks. | docs/specs/demo-home.md |
 | clearer-pages | Shipped | Sam sees the photo and the AI's "Good to know" note for each thing before paying. Rose's and Sam's pages show the KinCart name, and the listing photos get bigger. | docs/specs/clearer-pages.md |
 | link-paypal-onboarding | Shipped | A new Rose starts at Link PayPal, with a demo sandbox login on screen, and links on PayPal's own page; on a laptop PayPal opens in a new tab. Skip pays from the demo PayPal, as every new Rose did before. | docs/specs/link-paypal-onboarding.md |
+| photo-ask | Shipped | Rose takes or picks a photo of the thing they need, or of a written list, and AI turns it into a search. The photo goes to the AI once and is not kept. | docs/specs/photo-ask.md |
 
 ## More
 

@@ -26,3 +26,4 @@
 - Name scripts/migrate.test.ts in a plan that adds a migration
 - Read a wide home page's links from the phone captions, not Be Rose
 - Drive PayPal's sandbox approval page by role, with the labels it really shows
+- Add an older migration's check NOT VALID when a later one widens it

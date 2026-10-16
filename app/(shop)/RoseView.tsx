@@ -5,6 +5,7 @@ import type { DemoLogin } from "../../lib/shop/paypal";
 import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
+import { PhotoPicker } from "./PhotoPicker";
 import {
   HELPER,
   ItemPicker,
@@ -35,8 +36,9 @@ export type RoseState =
       limitCents: number;
       totalCents?: number;
       words?: string;
+      photo?: string;
       outcome?: Outcome;
-      problem?: "empty" | "nothing found" | "over limit" | "too many";
+      problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo";
       busy?: boolean;
     }
   | {
@@ -44,6 +46,7 @@ export type RoseState =
       limitCents: number;
       totalCents?: number;
       words: string;
+      fromPhoto?: boolean;
       listings: Option[];
       picked?: string;
       error?: boolean;
@@ -55,6 +58,7 @@ export type RoseState =
       limitCents: number;
       totalCents?: number;
       words: string;
+      fromPhoto?: boolean;
       groups: Group[];
       picked?: string[];
       error?: boolean;
@@ -163,6 +167,11 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         {state.problem === "nothing found" && (
           <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>
         )}
+        {state.problem === "nothing in photo" && (
+          <Notice tone="neutral">
+            Couldn&apos;t tell what to buy from that photo. Try another photo, or type what you need.
+          </Notice>
+        )}
         {state.problem === "too many" && (
           <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
         )}
@@ -192,10 +201,11 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
             />
             {state.problem === "empty" && (
               <p className="field-error" id={errorId}>
-                Type what you need first.
+                Type what you need, or add a photo, first.
               </p>
             )}
           </div>
+          <PhotoPicker preview={state.photo} notPhoto={state.problem === "not a photo"} busy={state.busy} />
           <Button type="submit" busy={state.busy} busyLabel="Looking…">
             Find
           </Button>
@@ -220,6 +230,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           <h1 id={headingId}>Which one would you like?</h1>
           <p className="small">
             For &ldquo;{state.words}&rdquo;
+            {state.fromPhoto && ", from your photo"}
             {state.listings.length < 3 &&
               `. Only ${state.listings.length} found at ${wholeDollars(state.limitCents)} or less`}
             .
@@ -258,7 +269,9 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         />
         <div className="heading">
           <h1>Which ones would you like?</h1>
-          <p className="small">For &ldquo;{state.words}&rdquo;. Pick one for each thing you want.</p>
+          <p className="small">
+            For &ldquo;{state.words}&rdquo;{state.fromPhoto && ", from your photo"}. Pick one for each thing you want.
+          </p>
         </div>
         <form className="stack" action={ask}>
           <div className="groups">

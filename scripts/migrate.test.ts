@@ -25,10 +25,12 @@ async function clear() {
   );
 }
 
-// migrate("down") undoes only the newest file, so this steps back past 0008 to the households migration.
+// migrate("down") undoes only the newest file, so this steps back past 0009 and 0008 to the households migration.
 async function downToHouseholds() {
   await migrate("down", url);
-  await sql(await readFile(new URL("../db/migrations/0007_households.down.sql", import.meta.url), "utf8"));
+  for (const file of ["0008_clearer_pages.down.sql", "0007_households.down.sql"]) {
+    await sql(await readFile(new URL(`../db/migrations/${file}`, import.meta.url), "utf8"));
+  }
 }
 
 async function tableExists(name: string) {
@@ -64,15 +66,29 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("push_subscriptions", "household_id")).toBe(true);
   expect(await columnExists("purchase_requests", "watch")).toBe(true);
   expect(await columnExists("purchase_requests", "image_url")).toBe(true);
+  expect(await columnExists("rose_search", "from_photo")).toBe(true);
 
   await migrate("down", url);
-  expect(await columnExists("purchase_requests", "watch")).toBe(false);
-  expect(await columnExists("purchase_requests", "image_url")).toBe(false);
-  expect(await tableExists("households")).toBe(true);
+  expect(await columnExists("rose_search", "from_photo")).toBe(false);
+  expect(await columnExists("purchase_requests", "image_url")).toBe(true);
 
   await migrate("up", url);
-  expect(await columnExists("purchase_requests", "watch")).toBe(true);
-  expect(await columnExists("purchase_requests", "image_url")).toBe(true);
+  expect(await columnExists("rose_search", "from_photo")).toBe(true);
+});
+
+it("reruns with a photo search that saw nothing to buy, and goes back down to nothing found", async () => {
+  await migrate("up", url);
+  await clear();
+  await sql("INSERT INTO rose_search (id, words, outcome, from_photo) VALUES (1, '', 'nothing in photo', true)");
+
+  await expect(migrate("up", url)).resolves.toBeDefined();
+
+  await migrate("down", url);
+  expect(await sql("SELECT outcome FROM rose_search")).toEqual([{ outcome: "nothing found" }]);
+  await expect(sql("UPDATE rose_search SET outcome = 'nothing in photo'")).rejects.toThrow(/rose_search_outcome_check/);
+
+  await migrate("up", url);
+  await clear();
 });
 
 it("keeps the rows from before as household 1's, reruns with two households' asks, and goes back to household 1 alone", async () => {
