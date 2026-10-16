@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Rose links a sandbox PayPal on PayPal's own page, with a demo login shown on Rose's first screen. On a laptop, PayPal opens in a new tab from Rose's phone.
+- Rose can take or pick a photo of what they need, such as an old battery or a handwritten list, with or without words, and Find searches for what it shows. The photo itself is not kept.
 
 ### Changed
 
