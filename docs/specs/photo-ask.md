@@ -309,6 +309,10 @@ Build A, then B, one after the other. B's e2e needs A, and both chunks' tests us
 
 Recorded as D63, D64, D65, D66, D67.
 
+## Review
+
+2026-10-16 · 1 raw finding, 0 survived. Clean.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
