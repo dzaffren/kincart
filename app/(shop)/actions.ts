@@ -81,17 +81,18 @@ export async function find(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
   const words = String(formData.get("words") ?? "").trim().slice(0, 200);
-  // An empty file input still sends an empty file. Rose's browser shrank the photo to a JPEG (D65).
-  const photo = formData.get("photo");
-  const jpeg = photo instanceof File && photo.size ? Buffer.from(await photo.arrayBuffer()) : null;
-  // Haiku refuses an image whose bytes don't match its media type, so only a real JPEG goes on.
-  if (jpeg && jpeg.toString("hex", 0, 3) !== "ffd8ff") redirect(`/r/${token}?find=notphoto`);
-  if (!words && !jpeg) redirect(`/r/${token}?find=empty`);
+  // An empty file input still sends an empty file. Rose's browser shrank each photo to a JPEG (D70).
+  // A request can send more than the picker allows, and each photo costs Haiku tokens, so 5 at most (D68).
+  const files = formData.getAll("photo").filter((photo): photo is File => photo instanceof File && photo.size > 0);
+  const jpegs = await Promise.all(files.slice(0, 5).map(async (photo) => Buffer.from(await photo.arrayBuffer())));
+  // Haiku refuses an image whose bytes don't match its media type, so only real JPEGs go on.
+  if (jpegs.some((jpeg) => jpeg.toString("hex", 0, 3) !== "ffd8ff")) redirect(`/r/${token}?find=notphoto`);
+  if (!words && !jpegs.length) redirect(`/r/${token}?find=empty`);
   const limitCents = await getLimit(who.household);
-  if (jpeg) {
-    // The photo goes no further than Haiku: only the AI's words for it are kept (D64).
-    const found = await findPhoto(words, limitCents, [jpeg]);
-    await saveSearch(who.household, found.words, found.result, 1);
+  if (jpegs.length) {
+    // The photos go no further than Haiku: only the AI's words for them are kept (D64).
+    const found = await findPhoto(words, limitCents, jpegs);
+    await saveSearch(who.household, found.words, found.result, found.photos, found.blank);
   } else {
     await saveSearch(who.household, words, await findOptions(words, limitCents));
   }
