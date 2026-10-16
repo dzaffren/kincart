@@ -91,7 +91,7 @@ export async function find(token: string, formData: FormData): Promise<void> {
   if (jpeg) {
     // The photo goes no further than Haiku: only the AI's words for it are kept (D64).
     const found = await findPhoto(words, limitCents, jpeg);
-    await saveSearch(who.household, found.words, found.result, true);
+    await saveSearch(who.household, found.words, found.result, 1);
   } else {
     await saveSearch(who.household, words, await findOptions(words, limitCents));
   }

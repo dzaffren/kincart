@@ -215,7 +215,7 @@ it("refuses a file that isn't a JPEG, whatever it calls itself, and calls nothin
 
 it("puts the AI's words for a photo in the box when Rose tries other words", async () => {
   searchOn();
-  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, true);
+  await saveSearch(owner, "CR2032 coin battery", { outcome: "options", options: [strap] }, 1);
 
   expect(await redirectOf(tryAgain(rose))).toBe(`/r/${rose}`);
   expect(await getSearch(owner)).toMatchObject({ words: "CR2032 coin battery", outcome: "retry", fromPhoto: false });

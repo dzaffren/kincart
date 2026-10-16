@@ -59,6 +59,8 @@ export type SavedSearch = {
   options: Option[];
   groups: Group[];
   fromPhoto: boolean;
+  photos: number;
+  blankPhotos: number;
   searchedAt: Date;
 };
 
@@ -146,8 +148,13 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
     listings: Option[];
     groups: Group[];
     from_photo: boolean;
+    photos: number;
+    blank_photos: number;
     searched_at: Date;
-  }>("SELECT words, outcome, listings, groups, from_photo, searched_at FROM rose_search WHERE id = $1", [household]);
+  }>(
+    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, searched_at FROM rose_search WHERE id = $1",
+    [household],
+  );
   const row = rows[0];
   return row
     ? {
@@ -156,30 +163,38 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
         options: row.listings,
         groups: row.groups,
         fromPhoto: row.from_photo,
+        photos: row.photos,
+        blankPhotos: row.blank_photos,
         searchedAt: row.searched_at,
       }
     : null;
 }
 
-// fromPhoto: words are the AI's words for Rose's photo (D67).
+// photos: how many photos Find read, when words are the AI's words for them (D67). blank: how
+// many of them showed nothing to buy (D72). from_photo stays, so the code from before still reads it.
 export async function saveSearch(
   household: number,
   words: string,
   result: Search | { outcome: "retry" },
-  fromPhoto = false,
+  photos = 0,
+  blank = 0,
 ): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo) VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
-         from_photo = EXCLUDED.from_photo, searched_at = now()`,
+         from_photo = EXCLUDED.from_photo, photos = EXCLUDED.photos, blank_photos = EXCLUDED.blank_photos,
+         searched_at = now()`,
     [
       household,
       words,
       result.outcome,
       JSON.stringify(result.outcome === "options" ? result.options : []),
       JSON.stringify(result.outcome === "basket" ? result.groups : []),
-      fromPhoto,
+      photos > 0,
+      photos,
+      blank,
     ],
   );
 }

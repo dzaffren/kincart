@@ -88,6 +88,8 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   options,
   groups: [],
   fromPhoto: false,
+  photos: 0,
+  blankPhotos: 0,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
