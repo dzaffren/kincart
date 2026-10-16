@@ -119,6 +119,20 @@ test("Rose ticks six photos and keeps the first five, removes one, then picks a 
   expect(posts).toEqual([]);
 });
 
+test("Rose picks two more photos before the first four are ready, and keeps the first five", async ({ page }) => {
+  await reset(savedPaypal);
+  await page.goto(`/r/${rose}`);
+  const wall = readFileSync("e2e/photos/blank.jpg");
+  const six = Array.from({ length: 6 }, (_, index) => ({ name: `wall-${index + 1}.jpg`, mimeType: "image/jpeg", buffer: wall }));
+
+  // The first four still shrink, so no tile shows yet and the button still says Take or pick a photo.
+  await pick(page, "Take or pick a photo", six.slice(0, 4));
+  await pick(page, "Take or pick a photo", six.slice(4));
+  await expect(tiles(page)).toHaveCount(5);
+  await expect(page.getByText("Up to 5 photos. The first 5 are kept.")).toBeVisible();
+  expect(await inForm(page)).toHaveLength(5);
+});
+
 test("Rose sends two photos of a blank wall, hears that nothing could be told from them, and no photo is left", async ({
   page,
 }) => {

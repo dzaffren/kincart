@@ -25,6 +25,8 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const add = useRef<HTMLButtonElement>(null);
   const focusAdd = useRef(false);
+  // Photos kept or still shrinking. Add stays on screen while a pick shrinks, so a second pick counts the first.
+  const count = useRef(previews.length);
   const made = useRef(new Set<string>());
   const errorId = useId();
   const [photos, setPhotos] = useState<Photo[]>(() => previews.map((url, index) => ({ key: `preview-${index}`, url })));
@@ -51,6 +53,7 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
   function remove(photo: Photo) {
     if (made.current.delete(photo.url)) URL.revokeObjectURL(photo.url);
     focusAdd.current = true;
+    count.current -= 1;
     setCapped(false);
     setPhotos((now) => now.filter(({ key }) => key !== photo.key));
   }
@@ -61,19 +64,23 @@ export function PhotoPicker({ previews = [], notPhoto = false, busy }: Props) {
     // The phone put the full-size files in the input. The shrunk ones go back at once.
     field.files = filesOf(photos);
     const images = chosen.filter((file) => file.type.startsWith("image/"));
-    const room = MOST_PHOTOS - photos.length;
+    const room = MOST_PHOTOS - count.current;
+    const taken = images.slice(0, room);
+    count.current += taken.length;
     // One photo at a time: five 12 MP photos decoded at once hold about 240 MB of pixels.
     const added: Photo[] = [];
-    for (const image of images.slice(0, room)) {
+    for (const image of taken) {
       const file = await shrink(image).catch(() => null);
       if (!file) continue;
       const url = URL.createObjectURL(file);
       made.current.add(url);
       added.push({ key: url, url, file });
     }
-    setError(images.length < chosen.length || added.length < Math.min(images.length, room));
-    setCapped(images.length > room);
-    setPhotos((now) => [...now, ...added].slice(0, MOST_PHOTOS));
+    count.current -= taken.length - added.length;
+    setError(images.length < chosen.length || added.length < taken.length);
+    // Only Remove clears it, as a pick that started first can finish last.
+    if (images.length > room) setCapped(true);
+    setPhotos((now) => [...now, ...added]);
   }
 
   return (
