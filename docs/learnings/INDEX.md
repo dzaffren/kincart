@@ -29,3 +29,4 @@
 - Add an older migration's check NOT VALID when a later one widens it
 - Match a listing name exactly in an e2e when the AI writes about it
 - Check that a server action's redirect already clears a client control before writing reset code
+- Match env names with digits before calling a key missing
