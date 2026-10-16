@@ -70,7 +70,8 @@ test("Rose finds a battery from a full-size photo of the old one, and asks Sam",
   const samPage = await context.newPage();
   await samPage.goto(`/h/${sam}`);
   await expect(heading(samPage)).toHaveText("Rose would like this");
-  await expect(samPage.getByText(name!)).toBeVisible();
+  // Haiku's "Why it fits" can repeat the name, so only the line that is the name counts.
+  await expect(samPage.getByText(name!, { exact: true })).toBeVisible();
 });
 
 test("Rose picks a file that isn't a photo, and keeps the words in the box", async ({ page }) => {
