@@ -176,6 +176,169 @@ Screens, all in `app/(shop)/RoseView.tsx` unless named:
 
 ## Technical plan
 
+### Approach
+
+Each photo shrinks in the browser to a JPEG of at most 180 KB, so 5 photos and Rose's words stay under Next's 1 MB limit (O10). The shrink runs one photo at a time. Find's server action reads up to 5 files, checks each is a JPEG, and calls `findPhoto()` with all of them. One Haiku call reads every photo, each with its own "Photo 1:" label, and Rose's words. It returns the things in photo order and the numbers of the photos that showed nothing. From there the search runs as a typed basket does (D31). `rose_search` stores how many photos Find read and how many showed nothing. The photos are dropped (D64).
+
+Relies on: D10, D11, D12, D19, D22, D23, D24, D31, D63, D64, D66, D67, D68, D69, D70, D71, D72
+
+```mermaid
+flowchart TB
+    subgraph browser["Rose's browser"]
+        PP["PhotoPicker.tsx"] -- "up to 5 JPEGs, 180 KB each at most" --> FORM["Find form"]
+    end
+    subgraph vercel["Vercel"]
+        ACT["find action (actions.ts)"] -- "words + JPEGs" --> FP["findPhoto (find.ts)"]
+        FP -- "photos + words" --> RP["readPhoto (ai.ts)"]
+        FP -- "each thing's query" --> SL["searchListings (search.ts)"]
+        FP -- "listings" --> CH["choose (ai.ts)"]
+        ACT -- "AI's words, result, photos, blank" --> DB[("rose_search")]
+    end
+    FORM -- "POST multipart, under 1 MB" --> ACT
+    RP -- "Photo 1: image, Photo 2: image, words" --> H["Claude Haiku 5.5"]
+    CH -- "listing text" --> H
+    SL -- "query + price limit" --> C3["Channel3"]
+```
+
+The only new path is in the browser and the first Haiku call. Every step after it is the typed basket's.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's browser
+    participant A as find action
+    participant F as findPhoto
+    participant H as Haiku 5.5
+    participant C as Channel3
+    participant D as rose_search
+    R->>R: each pick: shrink one photo at a time to 1200px, 180 KB at most
+    R->>A: POST words + 2 photos (about 0.3 MB)
+    A->>A: first 5 files, each starts ffd8ff, else ?find=notphoto
+    A->>F: findPhoto(words, limit, [jpeg1, jpeg2])
+    F->>H: readPhoto: "Photo 1:", image, "Photo 2:", image, "They typed: ..."
+    H-->>F: things in photo order, blank: photo numbers
+    F->>C: two searches for each thing, at once
+    C-->>F: listings
+    F->>H: choose, once for each thing (no photo)
+    H-->>F: picks
+    F-->>A: words, result, photos 2, blank 0
+    A->>D: save words, result, photos, blank_photos
+    A-->>R: redirect /r/<token>, and the picker empties
+```
+
+A Find with 5 photos costs one Haiku call with 5 images, then a typed basket's calls.
+
+```mermaid
+flowchart LR
+    CAM["Camera photos<br/>2 to 12 MB each, with EXIF"] -- "canvas redraw drops EXIF and GPS" --> JPG["1200px JPEGs<br/>180 KB each at most"]
+    JPG -- "HTTPS, Rose's link" --> SRV["Vercel function<br/>held in memory, not logged"]
+    SRV -- "base64 image blocks" --> ANT["Anthropic API"]
+    ANT -- "things + blank photo numbers" --> SRV
+    SRV -- "AI's words and two counts" --> NEON[("Neon: rose_search")]
+```
+
+The photos leave Rose's phone without location data. Only the AI's words and two counts are stored.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `app/(shop)/PhotoPicker.tsx:11` | `LONG_EDGE` 1600 to 1200, and `MOST_BYTES` 900 KB to 180 KB. `shrink()` (`:143`) tries 0.85, 0.7 and 0.55, then 1000px and 800px at 0.55, and stops at the first JPEG under 180 KB. `picked()` (`:58`) shrinks one photo at a time, not with `Promise.all`. When the pending Find ends (`useFormStatus().pending`, `:27`, goes from true to false), the picker empties itself (O8) | 1, 3, 4, 5 (O10) |
+| `app/(shop)/actions.ts:80` | `find()` reads `formData.getAll("photo")`, keeps the non-empty files, and takes the first 5. Any file that doesn't start `ffd8ff` redirects to `?find=notphoto`. It calls `findPhoto()` with all of them, and saves `photos` and `blank` | 1 to 3 |
+| `lib/shop/ai.ts:12` | `NEED_PHOTO` is rewritten for 1 to 5 photos (below). `readPhoto(words, jpegs)` (`:56`) sends "Photo n:" before each image, then the words. A new `NEED_PHOTO_SCHEMA` adds `blank`, a list of photo numbers. `readNeed()` and `NEED` stay as they are (D66) | 1 to 3 |
+| `lib/shop/find.ts:34` | `findPhoto(words, limitCents, jpegs)` returns `{ words, result, photos, blank }`. `blank` is the count of different photo numbers in range, and is 0 when there are no things. The log line's ` photo=yes` becomes ` photos=2 blank=0` | 1 to 3 |
+| `lib/shop/requests.ts:56` | `SavedSearch` gains `photos` and `blankPhotos`. `saveSearch()` (`:165`) takes `photos = 0` and `blank = 0` in place of `fromPhoto`, and writes `from_photo` as `photos > 0`, so the old code still reads it. `getSearch()` (`:142`) reads both columns | 1, 3 |
+| `app/(shop)/state.ts:49` | Options, basket and ask pass `photos` and `blankPhotos` from the saved search. `fromPhoto` stays | 1, 3 |
+| `app/(shop)/RoseView.tsx` | Built at pause 2. `/build` breaks each new line once, as the lesson says | 1, 3 |
+| `db/migrations/0010_photo_ask_several.up.sql`, `.down.sql` | Add `photos` and `blank_photos`, `smallint NOT NULL DEFAULT 0`, with `IF NOT EXISTS`, so a rerun of `db:up` passes | 1, 3 |
+| `scripts/migrate.test.ts:27` | The first test checks both columns up, down and up. `downToHouseholds()` also runs `0009_photo_ask.down.sql` by hand | migration |
+| `e2e/photo-ask-several.spec.ts`, `e2e/photos/blank.jpg` | The slice's e2e, and a generated photo of a blank wall | 1, 3, 4, 5 |
+
+Reusing: `searchThings()`, `searchListings()` and `choose()` unchanged, `haiku()` with content blocks, `reasonOf()` for the log, `reset()` from `e2e/db.ts`, and the pause 2 picker and notices.
+
+`NEED_PHOTO`, the prompt that O11 tests:
+
+> You read photos that an older person took to show what they want to buy, labelled Photo 1, Photo 2 and so on, and any words they typed with them. A photo of a product shows one product. A photo of a written shopping list shows every product on it, in order. List the products in photo order, and list a product once when two photos show it. For each, write a short plain name for it, such as "CR2032 coin battery", with anything their words add to it, such as a size or a count. Their words only add details to products in the photos, so never list a product that only their words name. Then write a short shop search query that keeps the sizes, colours, codes and other must-haves from the photos and their words. In blank, list the number of each photo that shows nothing they could buy.
+
+### Data
+
+```mermaid
+erDiagram
+    HOUSEHOLDS ||--o| ROSE_SEARCH : "has one current"
+    ROSE_SEARCH {
+        bigint id PK "household id"
+        text words "typed words, or the AI's words for the photos"
+        text outcome
+        jsonb listings
+        jsonb groups
+        boolean from_photo "kept, written as photos > 0"
+        smallint photos "new, default 0: photos Find read"
+        smallint blank_photos "new, default 0: photos that showed nothing"
+        timestamptz searched_at
+    }
+```
+
+**Migration:** expand only. `0010_photo_ask_several.up.sql` adds the two columns with `IF NOT EXISTS`. `db:up` reruns every up file, and this one is rerun-safe. There is no backfill: an old photo row has `photos` 0, and it still reads ", from your photo", which is right for one photo. Old code ignores the columns, and it reads `from_photo` as before. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
+
+**Reverse:** promote the previous deploy on Vercel. Then, if wanted, `pnpm db:down` runs `0010_photo_ask_several.down.sql`, which drops both columns. `scripts/migrate.test.ts` tests this path.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| The 1200px, 180 KB shrink and its steps | Scenario 1 with 5 photos. Five photos at today's 900 KB each would be 4.5 MB, and Next refuses a body over 1 MB (O10) |
+| One photo at a time in `picked()` | Scenario 4's multi-pick on an iPhone. Five 12 MP photos decoded at once hold about 240 MB of pixels |
+| The picker empties when Find ends | O8. After a Find that ends at a notice, the ask screen stays, and so would the picker's tiles |
+| "Photo n:" labels and `blank` in the schema | Scenario 3's note needs the photo count that showed nothing. The vision docs say to label each image when a request has several |
+| `photos` and `blank_photos` | Scenario 1's ", from your photos" and scenario 3's note must survive the 3 s redraw (D19) and a reopened link (D67) |
+| The first 5 files only, in `find()` | A crafted request could send more images than the picker allows, and each one costs Haiku tokens |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Judges and the video: tens of photo Finds a day. A 1200×900 photo is about 1,419 image tokens, so 5 photos and the prompt are about 7,400 input tokens: $0.00074 at $0.10 per million. Then a typed basket's calls |
+| **Breaks first**     | Channel3's 1,000 free searches a month, as for a typed basket. Five photos with one thing each cost 10 searches. Each CI run adds 8 searches for this slice's e2e. The fix is the same as for typed Finds (`docs/ROADMAP.md`) |
+| **Security surface** | Anyone with Rose's link can send up to 1 MB. The server reads at most 5 files, trusts only bytes that start like a JPEG, and sends that media type itself. `blank` numbers from Haiku are counted only when they are in range. The photos stay in memory, never in Neon or a log. Text in a photo can steer Haiku as typed words can. The schema fixes the answer's shape, listings come from Channel3 by ID, and Sam approves every charge. Secrets: `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY`, as today. Stored: the AI's words and two counts |
+| **Proof it works**   | `find outcome=basket things=4 shown=4 listings=9 ms=6120 photos=2 blank=0` in Vercel's logs. The numbers are whatever the run gave. `blank=1` says the note showed |
+| **Rollout**          | No flag. CI migrates Neon, then Vercel promotes (D10, D11). Rollback: the two steps under Reverse |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1, 4, 5 | `e2e/photo-ask-several.spec.ts`, real Haiku and Channel3 (D24) | `pnpm test:e2e e2e/photo-ask-several.spec.ts` |
+| 1, 2 | `lib/shop/ai.test.ts`: `readPhoto()` sends "Photo 1:", the first image, "Photo 2:", the second, then "They typed: size 8", with `NEED_PHOTO` and `NEED_PHOTO_SCHEMA` | `pnpm test lib/shop/ai.test.ts` |
+| 1, 3 | `lib/shop/find.test.ts`: two photos give a basket under the AI's words; a blank photo gives `blank` 1; an out-of-range or repeated number counts once or not at all; six things give `too many`; no things give `nothing in photo` with `blank` 0; the log line has `photos=2 blank=0` | `pnpm test lib/shop/find.test.ts` |
+| 1, 3 | `app/(shop)/actions.test.ts`: two JPEGs reach `findPhoto()` in order and are saved with `photos` 2; a PDF among them redirects to `?find=notphoto` and calls nothing; six files pass only five on | `pnpm test "app/(shop)/actions.test.ts"` |
+| 1, 3 | `app/(shop)/state.test.ts` and `app/(shop)/RoseView.test.tsx`: `photos` and `blankPhotos` reach options, basket and ask; ", from your photos", the note, and "those photos" | `pnpm test "app/(shop)/state.test.ts" "app/(shop)/RoseView.test.tsx"` |
+| storage | `lib/shop/requests.test.ts`: `photos` and `blankPhotos` round trip; `scripts/migrate.test.ts`: 0010 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
+| 2, 3 | The slippers, the two pack photos and the garden through real Haiku, by the O11 spike | O11's script |
+
+**E2E:** `e2e/photo-ask-several.spec.ts`, three tests:
+
+1. Rose picks `e2e/photos/cr2032.jpg` with "Take or pick a photo", then `e2e/photos/list.jpg` with "Add another photo". The form holds two JPEGs of 180 KB or less. Both tiles outlast a 4 s redraw. Find shows "Which ones would you like?" within 30 s, with ", from your photos" and four groups, the first matching `/2032/`. Rose picks the first listing in each group that has one, and Ask Sam shows "Rose would like 4 things" on Sam's page.
+2. Rose ticks six photos at once. Five tiles show, with "Up to 5 photos. The first 5 are kept." and no Add button. Remove photo 2 leaves four, and focus is on "Add another photo". A PDF ticked with a photo gives five tiles and the not-a-photo error. No request goes out.
+3. Rose sends `e2e/photos/blank.jpg` twice. The page shows "Couldn't tell what to buy from those photos", and no tile is left (O8).
+
+### Chunks
+
+| Chunk | Scenarios | Files owned |
+| ----- | --------- | ----------- |
+| A | 1 to 3, server side | `db/migrations/0010_photo_ask_several.*`, `scripts/migrate.test.ts`, `lib/shop/ai.ts`, `lib/shop/find.ts`, `lib/shop/requests.ts` and their tests, `app/(shop)/actions.ts`, `app/(shop)/state.ts` and their tests, `app/(shop)/RoseView.tsx`, `app/(shop)/RoseView.test.tsx` |
+| B | 1, 4, 5, browser and e2e | `app/(shop)/PhotoPicker.tsx`, `e2e/photo-ask-several.spec.ts`, `e2e/photos/blank.jpg` |
+
+Build A, then B, one after the other. B's e2e needs A, and both chunks' tests use the local database.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Haiku reads a 1200px photo worse than a 1600px one, and misses a code such as "CR2032" | O11 runs photo-ask's CR2032 photo at the new size. Rose sees the AI's words, Try other words puts them in the box, and Sam approves every charge |
+| A real phone photo doesn't reach 180 KB, and 5 of them pass 1 MB | O12 tests the owner's own photos. The last step, 800px at 0.55, is about a third of the pixels of 1200px |
+| Haiku with 5 images passes the 10 s timeout | O11 times it. Find then says nothing found and logs `reason=`, as a failed typed Find does. The page's `maxDuration` is 30 s |
+| Chrome on Android hides the camera when the input takes several files | O13 |
+| `useFormStatus().pending` doesn't go back to false after the action's redirect, and the tiles stay after a notice | E2E test 3 fails on it. The fix is a `key` on the picker, from the saved search's time |
+
 ### Decisions to record
 
 ```
@@ -190,6 +353,28 @@ Status: active
 
 Why: one blurry photo out of 3 would otherwise throw away the 2 things found. The photos are gone after Find (D64), so the note is Rose's only sign that one was missed.
 Rejected: the whole Find stops (Rose adds all 3 photos again), the blank photo is dropped with no note (Rose may not see that a thing is missing).
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D70 · 2026-10-16 · Each of Rose's photos shrinks in the browser to a 1200px JPEG of at most 180 KB, and Next's 1 MB body limit stays
+
+Why: Find takes up to 5 photos (D68), and 5 photos at 180 KB stay under 1 MB with Rose's words. Haiku sees a 1200×900 photo as about 1,419 tokens, so the cost also goes down. Phone camera photos are 2 to 12 MB, and Next refuses a server action body over 1 MB.
+Rejected: raise `serverActions.bodySizeLimit` to 4 MB (uploads up to 4 MB on a phone's connection, 4 times more for anyone with the link to send, and close to Vercel's 4.5 MB request limit), shrink each photo to 900 KB divided by the number of photos (every photo shrinks again on each add, and a Find during it could pass 1 MB), upload to a file store first (a store for photos that D64 says are not kept).
+Supersedes: D65
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D71 · 2026-10-16 · One Haiku call reads all of Rose's photos, each labelled, with one photo prompt for 1 to 5 photos
+
+Why: only one call that sees every photo can list a pack once when two photos show it (D68), and put "size 8" on the slippers and not on the battery. The "Photo n:" labels let it name the photos that showed nothing (D69).
+Rejected: one call for each photo, at once (it can't merge two photos of one pack or fit words to the right thing, and it makes up to 5 calls), a second prompt for several photos beside photo-ask's (two photo prompts to keep in step).
+Source: docs/specs/photo-ask-several.md
+Status: active
+
+## D72 · 2026-10-16 · rose_search keeps how many photos Find read and how many showed nothing
+
+Why: ", from your photos" and the note that a photo showed nothing must survive the 3 s redraw (D19) and a reopened link, like the rest of Rose's search (D23, D67).
+Rejected: counts in the page address (lost after Ask Sam's error redirects and when Rose opens the link again, as D67 says).
 Source: docs/specs/photo-ask-several.md
 Status: active
 ```
@@ -207,6 +392,10 @@ Status: active
 | O7 | Rose takes two photos of one thing, such as the front and back of a pack. What does Find show? | question | spec p1 | user | Resolved | One thing. The AI lists a product once when two photos show it. 2026-10-16 |
 | O8 | After a Find that ends at a notice (more than 5 things, or nothing in any photo), do the photos stay on screen? The O6 question said they stay, but photo-ask's scenario 4 says no photo is picked after Find | question | spec p1 | user | Resolved | No, as with one photo today. After "Up to 5 things", the box holds the AI's words for all the things, so Rose deletes one and taps Find. After nothing in any photo, the box keeps Rose's own words. 2026-10-16 |
 | O9 | Rose ticks a photo and a PDF together. What happens? | question | spec p1 | user | Resolved | The photo gets its card, the PDF is dropped, and "That file isn't a photo" shows under "Add another photo". 2026-10-16 |
+| O10 | Five photos at today's 1600px and up to 900 KB each are 4.5 MB, and Next refuses a body over 1 MB. How do they fit? | question | spec p3 | user | Open | — |
+| O11 | Haiku 5.5 at low effort reads up to 5 photos at 1200px in one call within the 10 s timeout. It lists the things in photo order, lists a pack once when two photos show it, names a blank photo in `blank`, and puts "size 8" on the slippers only. It still reads photo-ask's CR2032 photo at 1200px | unproven | spec p3 | poc | Open | — |
+| O12 | A real phone photo shrinks to 180 KB or less at 1200px, and its print stays readable. The generated e2e photos are cleaner: 138 KB and 198 KB at 1600px. The owner's iPhone photo in photo-ask's O8 was 739 KB at 1600px and 0.85 | unproven | spec p3 | poc | Open | — |
+| O13 | Chrome on Android still offers the camera when the photo input takes several files (`multiple`) | unproven | spec p3 | poc | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -216,3 +405,6 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Channel3**: a hackathon sponsor whose API returns real product listings.
 - **Claude Haiku**: the small Claude model that reads Rose's ask and explains each listing.
 - **e2e**: end-to-end: one test that walks the whole slice as a person would.
+- **EXIF**: data that a camera writes inside a photo file, such as the time, the phone's model and the place it was taken.
+- **Image tokens**: how Claude counts a photo's size for cost and speed. A 1200×900 photo is about 1,419 tokens.
+- **Server action**: a Next.js function that runs on the server when a form is sent. Next limits what one request can carry to 1 MB by default.
