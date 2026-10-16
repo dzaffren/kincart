@@ -351,8 +351,8 @@ Recorded as D68, D69, D70, D71, D72.
 
 2026-10-16 · 4 raw findings, 2 survived, 2 fixed.
 
-- correctness · `app/(shop)/PhotoPicker.tsx:74` · a pick during another pick's shrink counts the photos still shrinking, and only Remove clears the first-5 line · `468bb14`
-- correctness · `app/(shop)/PhotoPicker.tsx:134` · focus goes to the line in Add's place when a pick fills the 5 · `7ae14a9`
+- correctness · `app/(shop)/PhotoPicker.tsx:74` · a pick during another pick's shrink counts the photos still shrinking, and only Remove clears the first-5 line · `dbf68d3`
+- correctness · `app/(shop)/PhotoPicker.tsx:134` · focus goes to the line in Add's place when a pick fills the 5 · `a506be2`
 
 ## Open items
 
