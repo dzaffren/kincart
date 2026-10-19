@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { addressOf, keyOf } from "./limits";
+import { addressOf, keyOf, minutesUntil } from "./limits";
 
 it("counts the first address Vercel forwards", () => {
   expect(addressOf("203.0.113.7")).toBe("203.0.113.7");
@@ -14,6 +14,14 @@ it("counts an IPv6 address by its first 64 bits, however it is written", () => {
   expect(addressOf("2001:DB8:85A3:12:ffff::1")).toBe(home);
   expect(addressOf("2001:db8:85a3:13::1")).not.toBe(home);
   expect(addressOf("2001:db8::1")).toBe(addressOf("2001:db8:0:0:1::"));
+});
+
+it("never says to wait more than 24 hours, whatever the page address says", () => {
+  const now = Date.UTC(2026, 9, 19, 12);
+  expect(minutesUntil(now + 3 * 60 * 60_000, now)).toBe(180);
+  expect(minutesUntil(Infinity, now)).toBe(24 * 60);
+  expect(minutesUntil(Number.MAX_SAFE_INTEGER, now)).toBe(24 * 60);
+  expect(minutesUntil(NaN, now)).toBeNaN();
 });
 
 it("keeps only an HMAC of the address, which changes with the key", () => {
