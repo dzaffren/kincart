@@ -204,18 +204,18 @@ The address crosses into the function only as a header that Vercel writes. It le
 | `db/migrations/0011_find_limits.up.sql` | New: `CREATE TABLE IF NOT EXISTS address_uses (kind text NOT NULL CHECK (kind IN ('find', 'household')), address text NOT NULL, used_at timestamptz[] NOT NULL, PRIMARY KEY (kind, address))` | Scenarios 2 and 3 |
 | `db/migrations/0011_find_limits.down.sql` | New: `DROP TABLE IF EXISTS address_uses` | Rollback |
 | `scripts/migrate.test.ts:33` | `downToHouseholds()` also runs `0010_photo_ask_several.down.sql`. The test expects `address_uses` after up, and no `address_uses` after one down. `clear()` also empties `address_uses` | The newest down file is now 0011 |
-| `lib/shop/limits.ts` | New. `FINDS_A_DAY = 20` and `HOUSEHOLDS_A_DAY = 5`. `addressOf(forwardedFor)`: the first value, an IPv4-mapped address as IPv4, and an IPv6 address as its first 64 bits (D75). `keyOf(address)`: HMAC-SHA256 under `ADDRESS_KEY`, hex | Scenarios 1 to 3. Pure functions, so `limits.test.ts` covers the address cases |
+| `lib/shop/limits.ts` | New. `FINDS_A_DAY = 20` and `HOUSEHOLDS_A_DAY = 5`. `addressOf(forwardedFor)`: the first value, an IPv4-mapped address as IPv4, and an IPv6 address as its first 64 bits (D75). `keyOf(address)`: HMAC-SHA256 under `ADDRESS_KEY`, hex. `minutesUntil(until)`: whole minutes left, rounded up and 24 hours at most, because the time comes from the page address | Scenarios 1 to 3. Pure functions, so `limits.test.ts` covers the address cases |
 | `lib/shop/requests.ts:202` | New `takeUse(kind, key, most): Promise<Date \| null>`. One `DELETE` drops rows whose newest time is 24 hours old. Then one upsert adds this row's time while fewer than `most` remain. `null` means allowed. When it is stopped, a second query returns the time the oldest use turns 24 hours old | Scenarios 2 and 3, D76 |
 | `lib/shop/find.ts:24` | `searchOn()` also needs `ADDRESS_KEY`. Without it, Rose picks from the fixed list, as with a missing Claude or Channel3 key | Find never runs without its limit (D74) |
 | `app/(shop)/actions.ts:80` | `find()`: after the empty and not-a-photo checks (line 89), `takeUse("find", ...)`. If stopped: `saveSearch(household, words, { outcome: "retry" })`, log `limit kind=find status=stopped wait=<minutes>`, and redirect to `/r/<token>?find=limit&until=<ms>` | Scenarios 2 and 4 |
 | `app/(shop)/actions.ts:31` | `start()`: before `startHousehold`, `takeUse("household", ...)`. If stopped: log `limit kind=household status=stopped wait=<minutes>` and redirect to `/?started=limit&until=<ms>`. With no `ADDRESS_KEY`: log `household status=failed reason=no ADDRESS_KEY` and redirect to `/?started=failed` | Scenario 3 |
-| `app/(shop)/actions.ts:217` | New `address()` reads `x-forwarded-for` from `headers()`, beside `origin()` | Both actions |
-| `app/(shop)/r/[token]/page.tsx:46` | Reads `find=limit` and `until` into a new `limitUntil` flag | Scenario 2 |
-| `app/(shop)/state.ts:86` | `problem: "limit"` and `waitMinutes` while `limitUntil` is in the future. Once it has passed, no notice | Scenario 2: Find works again at 9:41 pm |
+| `app/(shop)/actions.ts:217` | New `addressKey()` reads `x-forwarded-for` from `headers()`, beside `origin()`, and returns `keyOf(addressOf(...))` | Both actions |
+| `app/(shop)/r/[token]/page.tsx:46` | Reads `find=limit` and `until` into a new `limitWait`, the minutes left from `minutesUntil()` | Scenario 2 |
+| `app/(shop)/state.ts:86` | `problem: "limit"` and `waitMinutes` while `limitWait` is above 0. Once it has passed, no notice | Scenario 2: Find works again at 9:41 pm |
 | `app/(shop)/page.tsx:16` | `outcome: "limit"` and `waitMinutes` from `until` while it is in the future | Scenario 3 |
 | `.github/workflows/ci.yml:26` | `ADDRESS_KEY: ${{ github.run_id }}-${{ github.run_attempt }}`. It only keys CI's throwaway counts | CI runs Find |
 | `.env.example:22`, `README.md:71` | `ADDRESS_KEY=`, and one line on making one with `openssl rand -hex 32` | Setup |
-| `e2e/db.ts:15` | `reset()` also empties `address_uses`. New `seedUses(kind, address, times)` writes a row with `keyOf()` | Each spec starts with no counts |
+| `e2e/db.ts:15` | `reset()` also empties `address_uses`. New `usedFrom(address, kind, count, hours)` writes a row with `keyOf(addressOf(address))` | Each spec starts with no counts |
 | `e2e/find-limits.spec.ts` | New. Walks scenarios 1 to 3 (below) | The slice's e2e |
 | `app/(shop)/RoseView.tsx`, `HomeView.tsx`, `ui.tsx` | Done at pause 2 (c176a33). `/build` adds their tests | Interface |
 | `app/(shop)/preview/find-limits/page.tsx` | Done at pause 2 | Preview |
