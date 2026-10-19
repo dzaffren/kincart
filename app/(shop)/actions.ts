@@ -2,7 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { find as findOptions, findPhoto, searchOn, type Group, type Option } from "../../lib/shop/find";
+import { find as findOptions, findPhoto, searchOn, type Group, type Option, type Sent } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
 import { addressOf, FINDS_A_DAY, HOUSEHOLDS_A_DAY, keyOf, minutesUntil } from "../../lib/shop/limits";
 import { pay } from "../../lib/shop/pay";
@@ -14,6 +14,7 @@ import {
   claim,
   clearSearch,
   copyDemoVault,
+  countUse,
   decline,
   getLimit,
   getSearch,
@@ -46,6 +47,7 @@ export async function start(): Promise<void> {
   }
   if ("until" in started) {
     const until = started.until.getTime();
+    await countUse({ stoppedHouseholds: 1 });
     console.log(`limit kind=household status=stopped wait=${minutesUntil(until)}`);
     redirect(`/?started=limit&until=${until}`);
   }
@@ -101,17 +103,20 @@ export async function find(token: string, formData: FormData): Promise<void> {
   const stopped = await takeUse("find", await addressKey(), FINDS_A_DAY);
   if (stopped) {
     await saveSearch(who.household, words, { outcome: "retry" });
+    await countUse({ stoppedFinds: 1 });
     console.log(`limit kind=find status=stopped wait=${minutesUntil(stopped.getTime())}`);
     redirect(`/r/${token}?find=limit&until=${stopped.getTime()}`);
   }
   const limitCents = await getLimit(who.household);
+  const sent: Sent = { searches: 0 };
   if (jpegs.length) {
     // The photos go no further than Haiku: only the AI's words for them are kept (D64).
-    const found = await findPhoto(words, limitCents, jpegs);
+    const found = await findPhoto(words, limitCents, jpegs, sent);
     await saveSearch(who.household, found.words, found.result, found.photos, found.blank);
   } else {
-    await saveSearch(who.household, words, await findOptions(words, limitCents));
+    await saveSearch(who.household, words, await findOptions(words, limitCents, sent));
   }
+  await countUse({ finds: 1, searches: sent.searches });
   redirect(`/r/${token}`);
 }
 
