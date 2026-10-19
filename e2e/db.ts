@@ -21,6 +21,7 @@ export async function reset(paypal: string | null, search?: { words: string; opt
   await sql("DELETE FROM push_subscriptions");
   await sql("DELETE FROM households WHERE id <> 1");
   await sql("DELETE FROM address_uses");
+  await sql("DELETE FROM usage_days");
   if (paypal) await sql("INSERT INTO paypal_vault (payment_token) VALUES ($1)", [paypal]);
   if (search) {
     await sql("INSERT INTO rose_search (words, outcome, listings, groups) VALUES ($1, $2, $3, $4)", [
@@ -61,4 +62,14 @@ export async function usedFrom(address: string, kind: "find" | "household", coun
      ON CONFLICT (kind, address) DO UPDATE SET used_at = EXCLUDED.used_at`,
     [kind, keyOf(addressOf(address)), count, hours],
   );
+}
+
+// Today's UTC row of counts, as Finds and stops before this test would have left it.
+export async function usageToday(finds: number, searches: number, stoppedFinds: number, stoppedHouseholds: number) {
+  await sql("INSERT INTO usage_days VALUES ((now() AT TIME ZONE 'UTC')::date, $1, $2, $3, $4)", [
+    finds,
+    searches,
+    stoppedFinds,
+    stoppedHouseholds,
+  ]);
 }
