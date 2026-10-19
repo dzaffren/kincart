@@ -72,6 +72,8 @@ Slices 1 and 2 answer the main worry, abuse of the Claude and Channel3 keys. Sli
 
 ## Glossary
 
+- **e2e** — an end-to-end test: a script drives a real browser through the app, the way a person would.
+- **Pentest** — a penetration test: someone attacks the app on purpose to find holes. The reports are in `docs/security/`.
 - **Rate limit** — a cap on how many times one machine or one household can do something in a set time.
 - **Quota** — the number of calls a free tier allows each month. Channel3's is about 1,000 searches.
 - **Vercel Firewall** — Vercel's rules that can block or slow requests before they reach the app.
