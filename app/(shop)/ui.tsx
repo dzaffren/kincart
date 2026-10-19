@@ -19,6 +19,14 @@ export function wholeDollars(cents: number): string {
   return `$${Math.floor(cents / 100)}`;
 }
 
+// Rounded up, so a notice never says to come back before the limit lifts.
+export function waitFor(minutes: number): string {
+  const whole = Math.max(1, Math.ceil(minutes));
+  if (whole < 60) return whole === 1 ? "1 minute" : `${whole} minutes`;
+  const hours = Math.ceil(whole / 60);
+  return hours === 1 ? "1 hour" : `${hours} hours`;
+}
+
 const and = new Intl.ListFormat("en-US");
 
 export function listed(words: string[]): string {

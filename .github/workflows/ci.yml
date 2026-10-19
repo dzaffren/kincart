@@ -27,6 +27,8 @@ jobs:
       PAYPAL_E2E_VAULT_ID: ${{ secrets.PAYPAL_E2E_VAULT_ID }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       CHANNEL3_API_KEY: ${{ secrets.CHANNEL3_API_KEY }}
+      # Only keys the counts in CI's throwaway database, so a new one each run is enough.
+      ADDRESS_KEY: ${{ github.run_id }}-${{ github.run_attempt }}
       VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
       VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
       VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}

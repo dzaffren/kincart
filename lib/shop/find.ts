@@ -21,8 +21,9 @@ export type PhotoSearch = { words: string; result: Search; photos: number; blank
 
 const MOST_THINGS = 5;
 
+// Find never runs without its limit, so it needs ADDRESS_KEY too (D74).
 export function searchOn(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY && process.env.CHANNEL3_API_KEY);
+  return Boolean(process.env.ANTHROPIC_API_KEY && process.env.CHANNEL3_API_KEY && process.env.ADDRESS_KEY);
 }
 
 export async function find(words: string, limitCents: number): Promise<Search> {

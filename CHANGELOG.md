@@ -6,6 +6,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Each network address can run 20 Finds and start 5 new Roses and Sams in any 24 hours. Past that, nothing reaches Claude or Channel3, the page says how long to wait, and Rose's words stay in the box.
+
 ## [1.2.0] - 2026-10-16
 
 ### Added

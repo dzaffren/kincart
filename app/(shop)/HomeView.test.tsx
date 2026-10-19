@@ -44,3 +44,15 @@ it("shows the household's two pages in lazy frames, and a button for each", () =
   expect(html).not.toContain("Try KinCart");
   expect(html).not.toContain("Sample");
 });
+
+it("says when Try KinCart works again after an address's 5 for the day, and that this browser's own still work", () => {
+  const stopped = renderToStaticMarkup(<HomeView state={{ outcome: "limit", waitMinutes: 290 }} />);
+  expect(stopped).toContain("That&#x27;s a lot of new Roses and Sams from here today. Try again in 5 hours.");
+  expect(stopped).not.toContain("still work");
+
+  const yours = renderToStaticMarkup(
+    <HomeView state={{ links: { rose: "/r/rose-link", sam: "/h/sam-link" }, outcome: "limit", waitMinutes: 25 }} />,
+  );
+  expect(yours).toContain("Try again in 25 minutes. Your Rose and Sam still work.");
+  expect(yours).toMatch(/<iframe [^>]*src="\/r\/rose-link\?in=phone"/);
+});

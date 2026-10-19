@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { find as findOptions, findPhoto, searchOn, type Group, type Option } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
+import { addressOf, FINDS_A_DAY, HOUSEHOLDS_A_DAY, keyOf, minutesUntil } from "../../lib/shop/limits";
 import { pay } from "../../lib/shop/pay";
 import { reasonOf } from "../../lib/shop/paypal";
 import { hashOf, newLink, whoIs } from "../../lib/shop/people";
@@ -23,22 +24,30 @@ import {
   setLimit as saveLimit,
   setTotal as saveTotal,
   startHousehold,
+  takeUse,
 } from "../../lib/shop/requests";
 import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
 
-// Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44).
+// Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44). One address
+// starts 5 a day at most, and a stopped one keeps this browser's own household.
 export async function start(): Promise<void> {
   const jar = await cookies();
   const had = jar.has("household");
   const [rose, sam] = [newLink(), newLink()];
 
-  let household: number;
+  let started: { household: number } | { until: Date };
   try {
-    household = await startHousehold(hashOf(rose), hashOf(sam));
+    const until = await takeUse("household", await addressKey(), HOUSEHOLDS_A_DAY);
+    started = until ? { until } : { household: await startHousehold(hashOf(rose), hashOf(sam)) };
   } catch (error) {
     console.log(`household status=failed reason=${reasonOf(error)}`);
     redirect("/?started=failed");
+  }
+  if ("until" in started) {
+    const until = started.until.getTime();
+    console.log(`limit kind=household status=stopped wait=${minutesUntil(until)}`);
+    redirect(`/?started=limit&until=${until}`);
   }
   jar.set("household", `${rose}.${sam}`, {
     httpOnly: true,
@@ -47,7 +56,7 @@ export async function start(): Promise<void> {
     path: "/",
     maxAge: 90 * 24 * 60 * 60,
   });
-  console.log(`household id=${household} status=started`);
+  console.log(`household id=${started.household} status=started`);
   redirect(`/?started=${had ? "fresh" : "ready"}`);
 }
 
@@ -88,6 +97,13 @@ export async function find(token: string, formData: FormData): Promise<void> {
   // Haiku refuses an image whose bytes don't match its media type, so only real JPEGs go on.
   if (jpegs.some((jpeg) => jpeg.toString("hex", 0, 3) !== "ffd8ff")) redirect(`/r/${token}?find=notphoto`);
   if (!words && !jpegs.length) redirect(`/r/${token}?find=empty`);
+  // Past the address's 20 for the day, nothing reaches Claude or Channel3, and Rose's words stay in the box (D77).
+  const stopped = await takeUse("find", await addressKey(), FINDS_A_DAY);
+  if (stopped) {
+    await saveSearch(who.household, words, { outcome: "retry" });
+    console.log(`limit kind=find status=stopped wait=${minutesUntil(stopped.getTime())}`);
+    redirect(`/r/${token}?find=limit&until=${stopped.getTime()}`);
+  }
   const limitCents = await getLimit(who.household);
   if (jpegs.length) {
     // The photos go no further than Haiku: only the AI's words for them are kept (D64).
@@ -210,6 +226,11 @@ function basketPicks(groups: Group[], formData: FormData): { thing: string; opti
     if (option && !picks.some((pick) => pick.option.id === option.id)) picks.push({ thing, option });
   });
   return picks;
+}
+
+// The address Vercel says the request came from, as the key its uses are counted under.
+async function addressKey(): Promise<string> {
+  return keyOf(addressOf((await headers()).get("x-forwarded-for")));
 }
 
 async function origin(): Promise<string> {

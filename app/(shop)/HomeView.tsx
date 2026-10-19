@@ -1,14 +1,16 @@
 import { Button } from "./Button";
 import { RoseView } from "./RoseView";
 import { SamView } from "./SamView";
-import { HELPER, Notice, PhoneFrame, RELATIVE } from "./ui";
+import { HELPER, Notice, PhoneFrame, RELATIVE, waitFor } from "./ui";
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-// ready: the first start in this browser; fresh: a new one in place of an old one.
+// ready: the first start in this browser; fresh: a new one in place of an old one; limit: this
+// address started its 5 for the day, and waitMinutes says when the oldest drops out.
 export type HomeState = {
   links?: { rose: string; sam: string };
-  outcome?: "ready" | "fresh" | "failed";
+  outcome?: "ready" | "fresh" | "failed" | "limit";
+  waitMinutes?: number;
   busy?: boolean;
 };
 
@@ -22,7 +24,7 @@ const found = {
 };
 
 export function HomeView({ state, start }: { state: HomeState; start?: Action }) {
-  const { links, outcome, busy } = state;
+  const { links, outcome, waitMinutes, busy } = state;
   return (
     <>
       <div className="home">
@@ -35,6 +37,12 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
           {outcome === "fresh" && (
             <Notice tone="neutral">
               Your new {RELATIVE} and {HELPER} are ready. Tabs you already have open still show the old ones.
+            </Notice>
+          )}
+          {outcome === "limit" && (
+            <Notice tone="neutral">
+              That&apos;s a lot of new {RELATIVE}s and {HELPER}s from here today. Try again in{" "}
+              {waitFor(waitMinutes ?? 0)}.{links && ` Your ${RELATIVE} and ${HELPER} still work.`}
             </Notice>
           )}
           {outcome === "failed" && (

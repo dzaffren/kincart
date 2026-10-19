@@ -32,6 +32,7 @@ Used by older shoppers and the relative who helps them pay online.
 - A new Rose starts at Link PayPal, with a demo sandbox login on screen, and links on PayPal's own page; on a laptop PayPal opens in a new tab. Skip pays from the demo PayPal, as every new Rose did before.
 - Rose takes or picks a photo of the thing they need, or of a written list, and AI turns it into a search. The photo goes to the AI once and is not kept.
 - Rose sends up to 5 photos in one Find, one for each thing they need, and AI turns them into one basket.
+- One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again.
 
 ## Docs
 
@@ -69,6 +70,7 @@ You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker
    - `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`: a sandbox app from developer.paypal.com, under Apps & Credentials. Make it with a **US** sandbox business account and tick **Save payment methods** under its features, or saving Rose's PayPal fails with `NOT_AUTHORIZED`.
    - `ROSE_LINK_TOKEN` and `SAM_LINK_TOKEN`: two long random strings (the command is in `.env.example`). They are the only key to each person's page.
    - `ANTHROPIC_API_KEY` and `CHANNEL3_API_KEY`: an API key from the Claude Console and a free one from trychannel3.com. They turn on Rose's Find; with either unset, Rose picks from a fixed list of three items.
+   - `ADDRESS_KEY`: a random key, from `openssl rand -hex 32`. One network address gets 20 Finds and 5 new households a day, counted under an HMAC of the address with this key. With it unset, Rose picks from the fixed list and Try KinCart starts nothing.
    - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT`: they turn on notifications. Make the two keys with `pnpm exec web-push generate-vapid-keys`; the subject is the site's https URL or a `mailto:` address. With any unset, the Notifications section is hidden and nothing is sent.
 3. `pnpm db:up` creates the tables.
 4. `pnpm dev`, then open:
@@ -78,4 +80,4 @@ You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker
 
 Notifications: on Android, tap Turn on notifications on the page. On iPhone (iOS 16.4 or later) they only work from the Home Screen: open the link in Safari, tap Share, then Add to Home Screen, then open KinCart from the Home Screen and turn them on there. A phone needs https for this, so try it on the Vercel deployment, not `pnpm dev`. In PayPal itself these pings would be PayPal app notifications; web push stands in for them here.
 
-Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, `PAYPAL_E2E_VAULT_ID`, the Claude and Channel3 keys, the three VAPID variables, and Playwright's browsers from `pnpm exec playwright install chromium firefox`; stop `pnpm dev` first). The e2e makes real sandbox charges against a saved PayPal, real Channel3 searches and Claude calls, and real pushes through Mozilla's push service. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.
+Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, `PAYPAL_E2E_VAULT_ID`, the Claude and Channel3 keys, `ADDRESS_KEY`, the three VAPID variables, and Playwright's browsers from `pnpm exec playwright install chromium firefox`; stop `pnpm dev` first). The e2e makes real sandbox charges against a saved PayPal, real Channel3 searches and Claude calls, and real pushes through Mozilla's push service. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.

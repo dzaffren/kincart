@@ -25,6 +25,7 @@ import {
   startHousehold,
   stuck,
   subscriptionsFor,
+  takeUse,
 } from "./requests";
 
 const [glasses, pills, batteries] = ITEMS;
@@ -36,7 +37,7 @@ async function sql(text: string) {
   const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   try {
-    await client.query(text);
+    return (await client.query(text)).rows;
   } finally {
     await client.end();
   }
@@ -47,7 +48,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses");
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
@@ -406,4 +407,59 @@ it("lets only a household's own Sam claim or decline its ask, and finds only its
   await sql(`UPDATE purchase_requests SET answered_at = now() - interval '20 seconds' WHERE id = ${id}`);
   expect(await stuck(ben)).toBeNull();
   expect((await stuck(ana))?.id).toBe(id);
+});
+
+// count uses for one address, the oldest `hours` ago and the rest a minute apart after it.
+async function used(kind: string, address: string, count: number, hours: number) {
+  await sql(
+    `INSERT INTO address_uses (kind, address, used_at) VALUES ('${kind}', '${address}',
+       ARRAY(SELECT now() - interval '${hours} hours' + n * interval '1 minute' FROM generate_series(0, ${count - 1}) n))`,
+  );
+}
+
+async function stored(kind: string, address: string): Promise<number> {
+  const [row] = await sql(`SELECT cardinality(used_at) AS n FROM address_uses WHERE kind = '${kind}' AND address = '${address}'`);
+  return row?.n ?? 0;
+}
+
+it("lets an address take the day's last place, then says when its oldest use turns a day old", async () => {
+  await used("find", "key-a", 19, 21);
+
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
+  const until = await takeUse("find", "key-a", 20);
+
+  expect(until!.getTime() - Date.now()).toBeGreaterThan(3 * 60 * 60 * 1000 - 5000);
+  expect(until!.getTime() - Date.now()).toBeLessThan(3 * 60 * 60 * 1000 + 5000);
+  expect(await stored("find", "key-a")).toBe(20);
+});
+
+it("drops a use once it is 24 hours old, so its place is free again", async () => {
+  await used("find", "key-a", 20, 24.01);
+
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
+  expect(await stored("find", "key-a")).toBe(20);
+});
+
+it("lets exactly 20 of 30 Finds at once through", async () => {
+  const results = await Promise.all(Array.from({ length: 30 }, () => takeUse("find", "key-a", 20)));
+
+  expect(results.filter((until) => until === null)).toHaveLength(20);
+  expect(await stored("find", "key-a")).toBe(20);
+});
+
+it("counts Finds and households apart, and each address apart", async () => {
+  await used("household", "key-a", 5, 2);
+
+  expect(await takeUse("household", "key-a", 5)).toBeInstanceOf(Date);
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
+  expect(await takeUse("household", "key-b", 5)).toBeNull();
+});
+
+it("deletes an address once its newest use is a day old", async () => {
+  await used("find", "key-old", 3, 26);
+
+  await takeUse("find", "key-new", 20);
+
+  expect(await stored("find", "key-old")).toBe(0);
+  expect(await stored("find", "key-new")).toBe(1);
 });

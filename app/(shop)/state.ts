@@ -12,6 +12,8 @@ type RoseParams = {
   askAgain?: boolean;
   emptyFind?: boolean;
   notPhoto?: boolean;
+  // Minutes until a Find stopped for the day works again (D77).
+  limitWait?: number;
   over?: string[];
 };
 
@@ -83,13 +85,16 @@ export function roseState(
       : undefined;
   // What Sam left out goes back in Rose's box for the next ask.
   const leftOut = request?.status === "paid" && params.askAgain && request.leftOut;
+  const stopped = params.limitWait !== undefined && params.limitWait > 0;
   const problem = params.emptyFind
     ? "empty"
     : params.notPhoto
       ? "not a photo"
-      : current?.outcome === "retry"
-        ? undefined
-        : current?.outcome;
+      : stopped
+        ? "limit"
+        : current?.outcome === "retry"
+          ? undefined
+          : current?.outcome;
   return {
     kind: "ask",
     linked: params.linked || undefined,
@@ -99,6 +104,7 @@ export function roseState(
     photos: current?.photos || undefined,
     outcome,
     problem,
+    ...(stopped && { waitMinutes: params.limitWait }),
   };
 }
 
