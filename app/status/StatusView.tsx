@@ -6,7 +6,7 @@ import { SEARCHES_A_MONTH, SEARCHES_RED, type Counts, type UsageResult } from ".
 type Props = {
   database: DatabaseResult;
   paypal: PaypalResult;
-  usage?: UsageResult;
+  usage: UsageResult;
   build: string;
 };
 
@@ -38,22 +38,20 @@ export function StatusView({ database, paypal, usage, build }: Props) {
             <code>{build}</code>
           </dd>
         </dl>
-        {usage && (
-          <section className="stack">
-            <div className="heading">
-              <h2>Usage</h2>
-              <p className="small">Today and this month, in UTC.</p>
-            </div>
-            <dl>
-              {counts.map(([count, label]) => (
-                <Fragment key={count}>
-                  <dt>{label}</dt>
-                  <dd className={usage.state === "ok" ? undefined : "fail"}>{usageLines(usage, count)}</dd>
-                </Fragment>
-              ))}
-            </dl>
-          </section>
-        )}
+        <section className="stack">
+          <div className="heading">
+            <h2>Usage</h2>
+            <p className="small">Today and this month, in UTC.</p>
+          </div>
+          <dl>
+            {counts.map(([count, label]) => (
+              <Fragment key={count}>
+                <dt>{label}</dt>
+                <dd className={usage.state === "ok" ? undefined : "fail"}>{usageLines(usage, count)}</dd>
+              </Fragment>
+            ))}
+          </dl>
+        </section>
       </div>
     </main>
   );
