@@ -289,6 +289,12 @@ Single chunk. Every test file shares the local database, so the work runs serial
 
 Recorded as D73, D74, D75, D76, D77.
 
+## Review
+
+2026-10-19 · 3 raw findings, 1 survived, 1 fixed.
+
+- correctness · `app/(shop)/page.tsx:23` · `minutesUntil` caps the wait a page address shows at 24 hours · `fea750d`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
