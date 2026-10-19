@@ -519,3 +519,31 @@ Why: the ask screen already puts a `retry` search's words in the box (`state.ts:
 Rejected: a new `limit` outcome in `rose_search` (a migration to widen its check, and the time still has to live somewhere), minutes in the page address (the redraw would show the same number forever).
 Source: docs/specs/find-limits.md
 Status: active
+
+## D78 · 2026-10-19 · /status counts Finds, Channel3 searches, and stopped Finds and Try KinCarts, by the UTC day and month
+
+Why: Channel3's ~1,000 searches a month run out first, and one Find sends 0 to 10, so the page shows both. The month's searches show "of 1,000", in bold red from 800. The stops show each limit at work. Every call sent counts, because nobody knows which failures Channel3 bills.
+Rejected: Claude calls too (Anthropic's console shows the spend), stopped Finds only (a script that starts households would not show), the last 24 hours and 30 days (a calendar month reads straight against a monthly quota), answered calls only (too few if Channel3 bills failures), the number alone (you would do the sum yourself).
+Source: docs/specs/usage-on-status.md
+Status: active
+
+## D79 · 2026-10-19 · Anyone can see the counts on /status
+
+Why: `/status` has no sign-in, and the counts hold no addresses and no household data. A script writer learns how many searches are left, and the per-address limit still stops each address at 20 Finds.
+Rejected: the counts only with a secret key in the page address (a new env value, and a link to keep, for numbers that hold nothing private).
+Source: docs/specs/usage-on-status.md
+Status: active
+
+## D80 · 2026-10-19 · Usage lives in one row for each UTC day, added to by one upsert
+
+Why: `/status` needs this month's totals and the stops. `address_uses` keeps only 24 hours for each address, and a stopped Find adds nothing to it. One row a day adds 365 rows a year, and `INSERT ... ON CONFLICT DO UPDATE SET finds = usage_days.finds + EXCLUDED.finds` loses no count when two Finds end at once.
+Rejected: a row for each Find and each stop (a script's flood of stopped Finds becomes a flood of rows), sums from `address_uses` (24 hours only, and no stops), Vercel's logs (the page can't read them).
+Source: docs/specs/usage-on-status.md
+Status: active
+
+## D81 · 2026-10-19 · A Find counts once, after its searches, with a tally passed down like reasons, and a failed count only logs
+
+Why: `searchThing()` adds 2 to the tally before its two Channel3 calls, so every call sent counts (D78). One upsert then adds the Find and its searches. A count that can't be written logs `usage status=failed`, and Rose's Find goes on.
+Rejected: a change to `find()`'s result to carry the count (13 test assertions change for one number), a write for each search (up to 10 more Neon connections for one basket Find), the count inside `after()` as pushes do (D29) (the e2e would have to poll `/status`, and one upsert adds little to a Find that waits on Claude and Channel3).
+Source: docs/specs/usage-on-status.md
+Status: active
