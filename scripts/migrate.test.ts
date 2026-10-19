@@ -21,7 +21,7 @@ async function ask<T>(text: string, params: unknown[]): Promise<T> {
 
 async function clear() {
   await sql(
-    "TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions",
+    "TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM address_uses",
   );
 }
 
@@ -30,10 +30,15 @@ async function downFile(file: string) {
   await sql(await readFile(new URL(`../db/migrations/${file}`, import.meta.url), "utf8"));
 }
 
-// Steps back past 0010, 0009 and 0008 to the households migration.
+// Steps back past 0011, 0010, 0009 and 0008 to the households migration.
 async function downToHouseholds() {
   await migrate("down", url);
-  for (const file of ["0009_photo_ask.down.sql", "0008_clearer_pages.down.sql", "0007_households.down.sql"]) {
+  for (const file of [
+    "0010_photo_ask_several.down.sql",
+    "0009_photo_ask.down.sql",
+    "0008_clearer_pages.down.sql",
+    "0007_households.down.sql",
+  ]) {
     await downFile(file);
   }
 }
@@ -61,6 +66,7 @@ it("migrates up, back down, and up again", async () => {
     "push_subscriptions",
     "total_limit",
     "households",
+    "address_uses",
   ]) {
     expect(await tableExists(table)).toBe(true);
   }
@@ -76,6 +82,10 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "blank_photos")).toBe(true);
 
   await migrate("down", url);
+  expect(await tableExists("address_uses")).toBe(false);
+  expect(await columnExists("rose_search", "photos")).toBe(true);
+
+  await downFile("0010_photo_ask_several.down.sql");
   expect(await columnExists("rose_search", "photos")).toBe(false);
   expect(await columnExists("rose_search", "blank_photos")).toBe(false);
   expect(await columnExists("rose_search", "from_photo")).toBe(true);
@@ -83,6 +93,7 @@ it("migrates up, back down, and up again", async () => {
   await migrate("up", url);
   expect(await columnExists("rose_search", "photos")).toBe(true);
   expect(await columnExists("rose_search", "blank_photos")).toBe(true);
+  expect(await tableExists("address_uses")).toBe(true);
 });
 
 it("reruns with a photo search that saw nothing to buy, and goes back down to nothing found", async () => {
@@ -93,6 +104,7 @@ it("reruns with a photo search that saw nothing to buy, and goes back down to no
   await expect(migrate("up", url)).resolves.toBeDefined();
 
   await migrate("down", url);
+  await downFile("0010_photo_ask_several.down.sql");
   await downFile("0009_photo_ask.down.sql");
   expect(await sql("SELECT outcome FROM rose_search")).toEqual([{ outcome: "nothing found" }]);
   await expect(sql("UPDATE rose_search SET outcome = 'nothing in photo'")).rejects.toThrow(/rose_search_outcome_check/);
