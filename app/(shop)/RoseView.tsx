@@ -16,6 +16,7 @@ import {
   ReceiptCard,
   Summary,
   type Receipt,
+  waitFor,
   wholeDollars,
 } from "./ui";
 
@@ -39,7 +40,8 @@ export type RoseState =
       previews?: string[];
       photos?: number;
       outcome?: Outcome;
-      problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo";
+      problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo" | "limit";
+      waitMinutes?: number;
       busy?: boolean;
     }
   | {
@@ -181,6 +183,11 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         )}
         {state.problem === "too many" && (
           <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
+        )}
+        {state.problem === "limit" && (
+          <Notice tone="neutral">
+            That&apos;s a lot of Finds from here today. Try again in {waitFor(state.waitMinutes ?? 0)}.
+          </Notice>
         )}
         {state.problem === "over limit" && (
           <Notice tone="neutral">

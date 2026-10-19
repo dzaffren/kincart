@@ -97,6 +97,34 @@ Scenario: A Find that never reaches the AI does not count
 - A bigger Channel3 quota. That is your call with Channel3, not code.
 - A Vercel Firewall rule against floods, such as 5 Finds in 10 minutes for each IP. It is a dashboard setting, and Hobby allows one rule. You can add it at any time.
 
+## Interface
+
+Both notices are the system's `Notice` at the neutral tone, at the top of the screen, where today's notices sit. Tokens come from the repo's design system, `docs/design/design-system/` (D15, D50).
+
+```mermaid
+flowchart LR
+    A["Rose: What do you need?"] -- "taps Find past the limit" --> B["Same screen, with the notice<br/>and Rose's words in the box"]
+    B -- "taps Find after the wait" --> C["Which ones would you like?"]
+    H["Home page"] -- "taps Try KinCart past the limit" --> HN["Home page, with the notice"]
+    HN -- "browser has a household" --> P["Its Rose and Sam phones, as before"]
+```
+
+A stopped Find leaves Rose on the ask screen with their words, and a stopped Try KinCart leaves the visitor on the home page.
+
+| Screen | Notice | State |
+| ------ | ------ | ----- |
+| Rose's ask screen | "That's a lot of Finds from here today. Try again in 3 hours." | `RoseState` ask with `problem: "limit"` and `waitMinutes` |
+| Home page, no household | "That's a lot of new Roses and Sams from here today. Try again in 5 hours." | `HomeState` with `outcome: "limit"` and `waitMinutes` |
+| Home page, with a household | The same, then "Your Rose and Sam still work." | The same, with `links` |
+
+`waitFor()` in `app/(shop)/ui.tsx` writes the wait, rounded up so the notice never says to come back too early. Under an hour it says minutes ("25 minutes", "1 minute"). From an hour, it says whole hours ("1 hour", "3 hours").
+
+**Motion tier:** 0. The notices arrive with the page, as today's notices do.
+
+**Components used:** `Notice`, `PageHead`, `RoseView`, `HomeView`.
+
+**Preview:** `/preview/find-limits` for Rose's two notices, `/preview/find-limits?home=new` and `/preview/find-limits?home=yours` for the home page. Production returns 404.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
