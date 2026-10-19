@@ -1,6 +1,6 @@
 # Usage on status
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** find-limits
@@ -222,7 +222,7 @@ An allowed Find writes its count after the search, and a stopped Find writes onl
 | `app/status/page.tsx:16` | Reads `readUsage()` in the same `Promise.all`, passes it to `StatusView`, and adds `usage=ok`, `usage=not-reachable reason=<reason>` or `usage=not-configured` to the `status` log line | Scenario 1 |
 | `app/status/StatusView.tsx:9` | `usage` becomes required | The page always passes it |
 | `app/status/StatusView.tsx`, `status.css`, `app/(shop)/preview/usage-on-status/page.tsx` | Done at pause 2 (180b02c). `/build` adds their tests | Interface |
-| `e2e/db.ts:23` | `reset()` also empties `usage_days`. New `usageToday(counts)` writes today's row | Each spec starts with no counts |
+| `e2e/db.ts:23` | `reset()` also empties `usage_days`. New `usageToday(finds, searches, stoppedFinds, stoppedHouseholds)` writes today's row | Each spec starts with no counts |
 | `app/(shop)/actions.test.ts:67`, `lib/shop/requests.test.ts:51` | Their resets also empty `usage_days` | Counts don't leak between tests |
 | `e2e/usage-on-status.spec.ts` | New. Walks scenarios 2 to 4 (below) | The slice's e2e |
 
