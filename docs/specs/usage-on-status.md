@@ -1,6 +1,6 @@
 # Usage on status
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** find-limits
@@ -148,20 +148,151 @@ The design system keeps red for real failures. The month's searches use it from 
 
 **Preview:** `/preview/usage-on-status`, with scenarios 1, 4 and 5 and the database down. Production returns 404. `StatusView` takes `usage` as optional for now, so `/status` works until `/build` reads the counts in `app/status/page.tsx` and makes it required.
 
-## Open items
+## Technical plan
 
-| ID | What | Type | Raised at | Owner | Status | Answer |
-| -- | ---- | ---- | --------- | ----- | ------ | ------ |
-| O1 | Which counts `/status` shows | question | spec p1 | user | Resolved | Finds that reached the AI, Channel3 searches, Finds the limit stopped, and Try KinCarts the limit stopped. Stopped Finds only, and Claude calls too, were turned down. Anthropic's console shows the Claude spend. 2026-10-19 |
-| O2 | What "today" and "this month" mean | question | spec p1 | user | Resolved | The UTC day and the UTC calendar month. The page already gives its times in UTC. The last 24 hours and the last 30 days were turned down. 2026-10-19 |
-| O3 | Whether the searches show against Channel3's quota | question | spec p1 | user | Resolved | "540 of 1,000 this month", in bold red from 800. 1,000 is assumed (find-limits O6). The number alone was turned down. 2026-10-19 |
-| O4 | Who may see the counts | question | spec p1 | user | Resolved | Anyone, as with the rest of `/status`. The counts hold no addresses or household data. A script writer can see how many searches are left. A secret key in the page address was turned down. 2026-10-19 |
-| O5 | The page counts only production's searches, from the day this ships. CI's e2e and local runs use the same Channel3 key and don't show | flag | spec p1 | user | Accepted risk | Main freezes on Nov 5, so CI uses no searches during judging, and December's count is the whole month. Reading Channel3's own count was turned down. 2026-10-19 |
-| O6 | Whether a Channel3 search that fails, such as a timeout or an HTTP 500, counts | question | spec p1 | user | Resolved | Every call sent counts. Nobody knows which failures Channel3 bills, so the page may count a few too many, never too few. Answered calls only was turned down. 2026-10-19 |
+### Approach
 
-_Never delete this section or its rows. See references/ledger.md._
+A new table, `usage_days`, keeps one row for each UTC day, with four counters. `find()` and `start()` add to today's row with one upsert at the points where find-limits already decides. `/status` sums today's row and this month's rows in one query, beside its database and PayPal checks.
 
-## Decisions to record
+A Find's searches are counted where they are sent. `find()` and `findPhoto()` take a tally, and `searchThing()` adds 2 to it before its two Channel3 calls, as `reasons` is passed down today. After the search, `find()` writes the Find and the tally's searches in one upsert. A count that can't be written logs a line and never stops Rose's Find.
+
+Relies on: D11, D12, D24, D46, D73, D74, D78, D79, D80, D81
+
+```mermaid
+flowchart TB
+    subgraph vercel["Vercel function"]
+        F["find() actions.ts:89"]
+        S["start() actions.ts:34"]
+        T["find.ts searchThing()<br/>tally + 2"]
+        C["requests.ts countUse()"]
+        P["/status page.tsx"]
+        U["lib/status/usage.ts readUsage()"]
+    end
+    subgraph neon["Neon"]
+        D[("usage_days")]
+    end
+    F -- "words, tally" --> T
+    T -- "2 calls" --> CH["Channel3"]
+    F -- "1 Find + tally, or 1 stopped Find" --> C
+    S -- "1 stopped Try KinCart" --> C
+    C -- "upsert today's row" --> D
+    P --> U
+    U -- "sum today, sum this month" --> D
+```
+
+The shop actions add to today's row, and `/status` reads the sums. Nothing else touches `usage_days`.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's browser
+    participant F as find()
+    participant L as address_uses
+    participant A as Claude and Channel3
+    participant D as usage_days
+    R->>F: Find "a night light"
+    F->>L: takeUse find, most 20
+    alt a place was free
+        L-->>F: allowed
+        F->>A: readNeed, then 2 searches (tally 2)
+        A-->>F: listings
+        F->>D: upsert today: finds + 1, searches + 2
+        F-->>R: redirect /r/<token>
+    else 20 in the last 24 h
+        L-->>F: stopped until 9:40 pm
+        F->>D: upsert today: stopped_finds + 1
+        F-->>R: redirect /r/<token>?find=limit&until=<ms>
+    end
+```
+
+An allowed Find writes its count after the search, and a stopped Find writes only its stop. `/status` reads the row on its next load.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `db/migrations/0012_usage_on_status.up.sql` | New: `CREATE TABLE IF NOT EXISTS usage_days (day date PRIMARY KEY, finds integer NOT NULL DEFAULT 0, searches integer NOT NULL DEFAULT 0, stopped_finds integer NOT NULL DEFAULT 0, stopped_households integer NOT NULL DEFAULT 0)` | Scenarios 1, 4 and 5 |
+| `db/migrations/0012_usage_on_status.down.sql` | New: `DROP TABLE IF EXISTS usage_days` | Rollback |
+| `scripts/migrate.test.ts:22` | `clear()` also empties `usage_days`. `downToHouseholds()` runs `0011_find_limits.down.sql` first. The first test expects `usage_days` after up, no `usage_days` and still `address_uses` after one down, and runs `0011_find_limits.down.sql` before its 0010 step. The second test runs `0011_find_limits.down.sql` before 0010 | The newest down file is now 0012 (learning: name `scripts/migrate.test.ts` in a plan that adds a migration) |
+| `lib/shop/requests.ts:228` | New `countUse(use: Partial<Counts>)`. One `INSERT ... ON CONFLICT (day) DO UPDATE SET finds = usage_days.finds + EXCLUDED.finds, ...` for `(now() AT TIME ZONE 'UTC')::date`. On an error it logs `usage status=failed reason=<reason>` and returns | Scenarios 2 and 3. A count never stops a Find (D81) |
+| `lib/shop/find.ts:29` | `find()` and `findPhoto()` take `sent: Sent = { searches: 0 }`, and pass it through `searchThings()` to `searchThing()`. `searchThing()` adds 2 just before its `Promise.all` at line 101. The `find outcome=` log line adds `searches=<n>` | Scenario 2: every call sent counts (O6) |
+| `app/(shop)/actions.ts:101` | `find()`: a stopped Find calls `countUse({ stoppedFinds: 1 })` before its redirect. An allowed Find passes a tally to `findPhoto()` or `findOptions()`, then calls `countUse({ finds: 1, searches: sent.searches })` | Scenarios 2 and 3 |
+| `app/(shop)/actions.ts:47` | `start()`: a stopped Try KinCart calls `countUse({ stoppedHouseholds: 1 })` before its redirect | Scenario 3 |
+| `lib/status/usage.ts` | New `readUsage(url = process.env.DATABASE_URL)`, shaped like `checkDatabase()`: its own `pg` Client with 5 s timeouts, "not configured" without a URL, and "not reachable" with a reason on any error. One query sums today's row and the rows from the 1st of the UTC month | Scenarios 1 and 5 |
+| `lib/status/database.ts:30` | Exports `reasonOf()` for `usage.ts` | Reuse |
+| `app/status/page.tsx:16` | Reads `readUsage()` in the same `Promise.all`, passes it to `StatusView`, and adds `usage=ok`, `usage=not-reachable reason=<reason>` or `usage=not-configured` to the `status` log line | Scenario 1 |
+| `app/status/StatusView.tsx:9` | `usage` becomes required | The page always passes it |
+| `app/status/StatusView.tsx`, `status.css`, `app/(shop)/preview/usage-on-status/page.tsx` | Done at pause 2 (180b02c). `/build` adds their tests | Interface |
+| `e2e/db.ts:23` | `reset()` also empties `usage_days`. New `usageToday(counts)` writes today's row | Each spec starts with no counts |
+| `app/(shop)/actions.test.ts:67`, `lib/shop/requests.test.ts:51` | Their resets also empty `usage_days` | Counts don't leak between tests |
+| `e2e/usage-on-status.spec.ts` | New. Walks scenarios 2 to 4 (below) | The slice's e2e |
+
+Reusing: `query()` in `lib/shop/requests.ts`, `checkDatabase()`'s shape and `reasonOf()` from `lib/status/database.ts`, `reasonOf()` from `lib/shop/paypal.ts` for the shop side, `reasons` as the pattern for the tally, `usedFrom()` and `from()` from `e2e/find-limits.spec.ts`, and the pause 2 preview.
+
+### Data
+
+```mermaid
+erDiagram
+    USAGE_DAYS {
+        date day PK "the UTC date"
+        integer finds "Finds that reached the AI"
+        integer searches "Channel3 calls sent"
+        integer stopped_finds "Finds the limit stopped"
+        integer stopped_households "Try KinCarts the limit stopped"
+    }
+```
+
+`usage_days` holds no household's data and no addresses, so D46's split doesn't apply. It grows by one row a day, and nothing deletes it.
+
+**Migration:** expand only: one new table. Old code never reads it, so a rollback deploy keeps working. No backfill: the counts start at the deploy (O5).
+
+**Reverse:** `node scripts/migrate.mjs down` runs `0012_usage_on_status.down.sql` and drops `usage_days`. `scripts/migrate.test.ts` runs up, down and up again.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `usage_days` table | Scenarios 1, 4 and 5: this month's totals and the stops. `address_uses` keeps 24 hours for each address and no stops |
+| The `sent` tally in `find.ts` | Scenario 2: count each Channel3 call sent, with one write for each Find |
+| `readUsage()` in `lib/status/usage.ts` | Scenario 1: the counts, and "not reachable" when the database doesn't answer |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | About 100 Finds over judging. Each Find, stopped Find and stopped Try KinCart adds one upsert on its own connection, as every query in `requests.ts` does. Each `/status` load adds one query |
+| **Breaks first**     | Nothing in this slice at 10 times the load. All writes in a day update one row, and each holds its lock for one statement. A flood of stopped Finds runs out Neon's connections first, as it does today without this slice |
+| **Security surface** | Anyone can read the counts on `/status` (D79). `countUse()` runs inside `find()` and `start()`, and takes no input from the request. The table stores five numbers a day, with no addresses and no household data |
+| **Proof it works**   | In Vercel's logs, `find outcome=... searches=<n>` for each Find, and `status ... usage=ok` for each `/status` load. A failed count logs `usage status=failed reason=<reason>` |
+| **Rollout**          | No flag, and no new env value. Merge, CI migrates Neon after the tests (D11), and Vercel promotes. Before the migration runs, `countUse()` only logs, and `/status` says "not reachable" on the count lines. Rollback: revert the merge, and the old code ignores `usage_days`. Then `node scripts/migrate.mjs down` drops it |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 You see today's and this month's use | `lib/status/usage.test.ts`: rows for today and earlier this month give today's and the month's sums. No URL gives "not configured", and `127.0.0.1:1` gives "not reachable". `app/status/StatusView.test.tsx`: the four lines, "540 of 1,000", and "not reachable" in bold red on each line | `pnpm test` |
+| 2 A Find counts once, and each search counts | `lib/shop/find.test.ts`: the tally equals the Channel3 calls `fetch` saw for a one-thing Find (2), a two-thing basket (4), a search that times out (2), and "too many" (0). `app/(shop)/actions.test.ts`: a typed Find adds 1 Find and its searches, and an empty box and a PDF add nothing. `lib/shop/requests.test.ts`: 30 `countUse()` calls at once add 30, and a bad `DATABASE_URL` logs and doesn't throw | `pnpm test` |
+| 3 A stopped Find or Try KinCart counts only as stopped | `app/(shop)/actions.test.ts`: a Find past 20 adds 1 stopped Find and no Find, and a Try KinCart past 5 adds 1 stopped Try KinCart | `pnpm test` |
+| 4 The month's searches turn red from 800 | `app/status/StatusView.test.tsx`: 799 is plain, and 800 puts `fail` on the month line only. The e2e (below) | `pnpm test`, `pnpm test:e2e e2e/usage-on-status.spec.ts` |
+| 5 A new UTC day and month start from 0 | `lib/status/usage.test.ts`: a row for the last day of last month counts in neither sum, and a row for yesterday counts only in the month when yesterday is in this month | `pnpm test` |
+| Migration | `scripts/migrate.test.ts` | `pnpm test` |
+
+**E2E:** `e2e/usage-on-status.spec.ts` starts with 38 Finds and 798 searches today. Rose at 198.51.100.24 finds "a night light" for real (D24), and `/status` shows 39 Finds and "800 of 1,000 this month" in bold red. Then 20 Finds are seeded for 203.0.113.7, and a Find from there adds a stopped Find and leaves the Finds and searches as they were. Then 5 households are seeded, and a Try KinCart from there adds a stopped Try KinCart.
+
+### Chunks
+
+Single chunk. Every test file shares the local database, so the work runs serially (learning: build chunks one after another when their tests share the local database).
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| A Find dies after its searches go out and before its count, so `/status` counts too few | Each Channel3 call times out after 5 s (`search.ts:23`), so a Find ends long before Vercel stops the function. The `find outcome=` line still shows `searches=<n>` when it ends |
+| The count write fails during a Neon hiccup | `countUse()` logs `usage status=failed`, and Rose's Find goes on. The page counts too few for that moment |
+| Channel3's real quota isn't 1,000 | `SEARCHES_A_MONTH` and `SEARCHES_RED` in `lib/status/usage.ts`. Check Channel3's dashboard before Dec 1 (find-limits O5) |
+| CI and local runs use the same Channel3 key, and the page doesn't count them | Accepted at pause 1 (O5). Main freezes on Nov 5 |
+| The deploy goes live before CI migrates Neon | `countUse()` only logs, and `/status` says "not reachable" on the count lines until `usage_days` exists |
+
+### Decisions to record
 
 ```
 ## D78 · 2026-10-19 · /status counts Finds, Channel3 searches, and stopped Finds and Try KinCarts, by the UTC day and month
@@ -177,10 +308,41 @@ Why: `/status` has no sign-in, and the counts hold no addresses and no household
 Rejected: the counts only with a secret key in the page address (a new env value, and a link to keep, for numbers that hold nothing private).
 Source: docs/specs/usage-on-status.md
 Status: active
+
+## D80 · 2026-10-19 · Usage lives in one row for each UTC day, added to by one upsert
+
+Why: `/status` needs this month's totals and the stops. `address_uses` keeps only 24 hours for each address, and a stopped Find adds nothing to it. One row a day adds 365 rows a year, and `INSERT ... ON CONFLICT DO UPDATE SET finds = usage_days.finds + EXCLUDED.finds` loses no count when two Finds end at once.
+Rejected: a row for each Find and each stop (a script's flood of stopped Finds becomes a flood of rows), sums from `address_uses` (24 hours only, and no stops), Vercel's logs (the page can't read them).
+Source: docs/specs/usage-on-status.md
+Status: active
+
+## D81 · 2026-10-19 · A Find counts once, after its searches, with a tally passed down like reasons, and a failed count only logs
+
+Why: `searchThing()` adds 2 to the tally before its two Channel3 calls, so every call sent counts (D78). One upsert then adds the Find and its searches. A count that can't be written logs `usage status=failed`, and Rose's Find goes on.
+Rejected: a change to `find()`'s result to carry the count (13 test assertions change for one number), a write for each search (up to 10 more Neon connections for one basket Find), the count inside `after()` as pushes do (D29) (the e2e would have to poll `/status`, and one upsert adds little to a Find that waits on Claude and Channel3).
+Source: docs/specs/usage-on-status.md
+Status: active
 ```
+
+## Open items
+
+| ID | What | Type | Raised at | Owner | Status | Answer |
+| -- | ---- | ---- | --------- | ----- | ------ | ------ |
+| O1 | Which counts `/status` shows | question | spec p1 | user | Resolved | Finds that reached the AI, Channel3 searches, Finds the limit stopped, and Try KinCarts the limit stopped. Stopped Finds only, and Claude calls too, were turned down. Anthropic's console shows the Claude spend. 2026-10-19 |
+| O2 | What "today" and "this month" mean | question | spec p1 | user | Resolved | The UTC day and the UTC calendar month. The page already gives its times in UTC. The last 24 hours and the last 30 days were turned down. 2026-10-19 |
+| O3 | Whether the searches show against Channel3's quota | question | spec p1 | user | Resolved | "540 of 1,000 this month", in bold red from 800. 1,000 is assumed (find-limits O6). The number alone was turned down. 2026-10-19 |
+| O4 | Who may see the counts | question | spec p1 | user | Resolved | Anyone, as with the rest of `/status`. The counts hold no addresses or household data. A script writer can see how many searches are left. A secret key in the page address was turned down. 2026-10-19 |
+| O5 | The page counts only production's searches, from the day this ships. CI's e2e and local runs use the same Channel3 key and don't show | flag | spec p1 | user | Accepted risk | Main freezes on Nov 5, so CI uses no searches during judging, and December's count is the whole month. Reading Channel3's own count was turned down. 2026-10-19 |
+| O6 | Whether a Channel3 search that fails, such as a timeout or an HTTP 500, counts | question | spec p1 | user | Resolved | Every call sent counts. Nobody knows which failures Channel3 bills, so the page may count a few too many, never too few. Answered calls only was turned down. 2026-10-19 |
+
+_Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
 - **e2e** — an end-to-end test: a script drives a real browser through the app, the way a person would.
 - **Quota** — the number of calls a free tier allows each month. Channel3's is about 1,000 searches.
+- **Upsert** — one statement that inserts a row, or updates it if it is already there.
+- **Expand only** — a migration that only adds, so the old code still runs against the new schema.
+- **Backfill** — filling a new table from data already there, before the code reads it.
+- **Tally** — a running count passed into a function, which the function adds to.
 - **UTC** — the world's reference clock. Midnight UTC is 8 am in Kuala Lumpur and 4 pm the day before in San Francisco.
