@@ -1,6 +1,6 @@
 # Find limits
 
-**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** None
