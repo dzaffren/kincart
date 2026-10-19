@@ -354,3 +354,4 @@ Status: active
 - **Advisory lock** — a lock on a name, not a row, that Postgres holds until the transaction ends.
 - **Expand only** — a migration that only adds, so the old code still runs against the new schema.
 - **DDoS protection** — Vercel's own blocking of floods of requests, before they reach the app.
+- **Backfill** — filling a new column or table from the data already there, before the code switches to read it.
