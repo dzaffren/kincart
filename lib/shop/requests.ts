@@ -1,7 +1,9 @@
 import { Client } from "pg";
+import type { Counts } from "../status/usage";
 import type { Group, Option, Search } from "./find";
 import { things, type Item } from "./items";
 import type { Use } from "./limits";
+import { reasonOf } from "./paypal";
 import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
@@ -224,6 +226,22 @@ export async function takeUse(kind: Use, address: string, most: number): Promise
     [kind, address],
   );
   return until;
+}
+
+// Adds to today's UTC row for /status (D80). A count that can't be written only logs, so it never stops a
+// Find or a Try KinCart (D81).
+export async function countUse(use: Partial<Counts>): Promise<void> {
+  const { finds = 0, searches = 0, stoppedFinds = 0, stoppedHouseholds = 0 } = use;
+  await query(
+    `INSERT INTO usage_days AS u (day, finds, searches, stopped_finds, stopped_households)
+     VALUES ((now() AT TIME ZONE 'UTC')::date, $1, $2, $3, $4)
+     ON CONFLICT (day) DO UPDATE SET
+       finds = u.finds + EXCLUDED.finds,
+       searches = u.searches + EXCLUDED.searches,
+       stopped_finds = u.stopped_finds + EXCLUDED.stopped_finds,
+       stopped_households = u.stopped_households + EXCLUDED.stopped_households`,
+    [finds, searches, stoppedFinds, stoppedHouseholds],
+  ).catch((error) => console.log(`usage status=failed reason=${reasonOf(error)}`));
 }
 
 export async function getLimit(household: number): Promise<number> {
