@@ -167,3 +167,20 @@ it("points the photo button at the not-a-photo error under it", () => {
   expect(id).toBeTruthy();
   expect(html).toContain(`aria-describedby="${id}">Take or pick a photo</button>`);
 });
+
+it("tells Rose when Find works again after the day's limit, in hours or minutes, with Rose's words in the box", () => {
+  const stopped = (waitMinutes: number) =>
+    renderToStaticMarkup(
+      <RoseView
+        state={{ kind: "ask", limitCents: 2500, words: "a night light", problem: "limit", waitMinutes }}
+        items={[]}
+      />,
+    );
+
+  expect(stopped(180)).toContain("That&#x27;s a lot of Finds from here today. Try again in 3 hours.");
+  expect(stopped(180)).toContain(">a night light</textarea>");
+  expect(stopped(61)).toContain("Try again in 2 hours.");
+  expect(stopped(60)).toContain("Try again in 1 hour.");
+  expect(stopped(25)).toContain("Try again in 25 minutes.");
+  expect(stopped(1)).toContain("Try again in 1 minute.");
+});

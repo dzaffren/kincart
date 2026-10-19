@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { searchOn } from "../../../../lib/shop/find";
+import { minutesUntil } from "../../../../lib/shop/limits";
 import { ITEMS } from "../../../../lib/shop/items";
 import { settleStuck } from "../../../../lib/shop/pay";
 import { demoLogin } from "../../../../lib/shop/paypal";
@@ -53,6 +54,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
       askAgain: query.ask === "1",
       emptyFind: query.find === "empty",
       notPhoto: query.find === "notphoto",
+      limitWait: query.find === "limit" ? minutesUntil(Number(query.until)) : undefined,
       over: typeof query.over === "string" ? query.over.split(",") : undefined,
     },
     on ? { saved, limitCents, totalCents } : undefined,

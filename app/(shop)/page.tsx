@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { minutesUntil } from "../../lib/shop/limits";
 import { linksIn } from "../../lib/shop/people";
 import { start } from "./actions";
 import { HomeView } from "./HomeView";
@@ -17,14 +18,17 @@ const outcomes = ["ready", "fresh", "failed"] as const;
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const links = await linksIn((await cookies()).get("household")?.value);
-  const { started } = await searchParams;
+  const { started, until } = await searchParams;
+  // Past an address's 5 for the day, the notice counts down until the oldest is a day old.
+  const wait = started === "limit" ? minutesUntil(Number(until)) : 0;
 
   return (
     <main>
       <HomeView
         state={{
           links: links ? { rose: `/r/${links.rose}`, sam: `/h/${links.sam}` } : undefined,
-          outcome: outcomes.find((outcome) => outcome === started),
+          outcome: wait > 0 ? "limit" : outcomes.find((outcome) => outcome === started),
+          waitMinutes: wait > 0 ? wait : undefined,
         }}
         start={start}
       />

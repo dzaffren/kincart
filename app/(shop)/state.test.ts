@@ -387,3 +387,19 @@ it("says a browser without web push can't show them, including iOS 15 from the H
   expect(notifyState({ ...android, hasServiceWorker: false, hasPushManager: false })).toEqual({ kind: "not supported" });
   expect(notifyState({ ...android, hasPushManager: false })).toEqual({ kind: "not supported" });
 });
+
+it("tells Rose when a Find was stopped for the day, with Rose's words in the box, until the wait is over", () => {
+  expect(roseState(vault, null, { limitWait: 180 }, on(saved("retry")))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words,
+    problem: "limit",
+    waitMinutes: 180,
+  });
+  expect(roseState(vault, null, { limitWait: 0 }, on(saved("retry")))).toEqual({ kind: "ask", limitCents: 5000, words });
+  expect(roseState(vault, null, { limitWait: Number.NaN }, on(saved("retry")))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words,
+  });
+});
