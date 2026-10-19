@@ -144,7 +144,7 @@ flowchart TB
         F["find() actions.ts:80"]
         S["start() actions.ts:31"]
         L["lib/shop/limits.ts<br/>addressOf, keyOf"]
-        Q["requests.ts useAddress()"]
+        Q["requests.ts takeUse()"]
     end
     subgraph neon["Neon"]
         T[("address_uses")]
@@ -205,10 +205,10 @@ The address crosses into the function only as a header that Vercel writes. It le
 | `db/migrations/0011_find_limits.down.sql` | New: `DROP TABLE IF EXISTS address_uses` | Rollback |
 | `scripts/migrate.test.ts:33` | `downToHouseholds()` also runs `0010_photo_ask_several.down.sql`. The test expects `address_uses` after up, and no `address_uses` after one down. `clear()` also empties `address_uses` | The newest down file is now 0011 |
 | `lib/shop/limits.ts` | New. `FINDS_A_DAY = 20` and `HOUSEHOLDS_A_DAY = 5`. `addressOf(forwardedFor)`: the first value, an IPv4-mapped address as IPv4, and an IPv6 address as its first 64 bits (D75). `keyOf(address)`: HMAC-SHA256 under `ADDRESS_KEY`, hex | Scenarios 1 to 3. Pure functions, so `limits.test.ts` covers the address cases |
-| `lib/shop/requests.ts:202` | New `useAddress(kind, key, most): Promise<Date \| null>`. One `DELETE` drops rows whose newest time is 24 hours old. Then one upsert adds this row's time while fewer than `most` remain. `null` means allowed. When it is stopped, a second query returns the time the oldest use turns 24 hours old | Scenarios 2 and 3, D76 |
+| `lib/shop/requests.ts:202` | New `takeUse(kind, key, most): Promise<Date \| null>`. One `DELETE` drops rows whose newest time is 24 hours old. Then one upsert adds this row's time while fewer than `most` remain. `null` means allowed. When it is stopped, a second query returns the time the oldest use turns 24 hours old | Scenarios 2 and 3, D76 |
 | `lib/shop/find.ts:24` | `searchOn()` also needs `ADDRESS_KEY`. Without it, Rose picks from the fixed list, as with a missing Claude or Channel3 key | Find never runs without its limit (D74) |
-| `app/(shop)/actions.ts:80` | `find()`: after the empty and not-a-photo checks (line 89), `useAddress("find", ...)`. If stopped: `saveSearch(household, words, { outcome: "retry" })`, log `limit kind=find status=stopped wait=<minutes>`, and redirect to `/r/<token>?find=limit&until=<ms>` | Scenarios 2 and 4 |
-| `app/(shop)/actions.ts:31` | `start()`: before `startHousehold`, `useAddress("household", ...)`. If stopped: log `limit kind=household status=stopped wait=<minutes>` and redirect to `/?started=limit&until=<ms>`. With no `ADDRESS_KEY`: log `household status=failed reason=no ADDRESS_KEY` and redirect to `/?started=failed` | Scenario 3 |
+| `app/(shop)/actions.ts:80` | `find()`: after the empty and not-a-photo checks (line 89), `takeUse("find", ...)`. If stopped: `saveSearch(household, words, { outcome: "retry" })`, log `limit kind=find status=stopped wait=<minutes>`, and redirect to `/r/<token>?find=limit&until=<ms>` | Scenarios 2 and 4 |
+| `app/(shop)/actions.ts:31` | `start()`: before `startHousehold`, `takeUse("household", ...)`. If stopped: log `limit kind=household status=stopped wait=<minutes>` and redirect to `/?started=limit&until=<ms>`. With no `ADDRESS_KEY`: log `household status=failed reason=no ADDRESS_KEY` and redirect to `/?started=failed` | Scenario 3 |
 | `app/(shop)/actions.ts:217` | New `address()` reads `x-forwarded-for` from `headers()`, beside `origin()` | Both actions |
 | `app/(shop)/r/[token]/page.tsx:46` | Reads `find=limit` and `until` into a new `limitUntil` flag | Scenario 2 |
 | `app/(shop)/state.ts:86` | `problem: "limit"` and `waitMinutes` while `limitUntil` is in the future. Once it has passed, no notice | Scenario 2: Find works again at 9:41 pm |
@@ -303,7 +303,7 @@ Recorded as D73, D74, D75, D76, D77.
 | O8 | One `INSERT ... ON CONFLICT DO UPDATE ... WHERE` lets exactly 20 of 30 simultaneous Finds through | unproven | spec p3 | build | Resolved | Checked on the local Postgres 17 in a throwaway database: 3 of 3 runs let exactly 20 of 30 through and stored 20 times. `requests.test.ts` keeps checking it. 2026-10-19 |
 | O9 | Vercel's `x-forwarded-for` can't be set by the client | unproven | spec p3 | build | Resolved | Vercel's request-headers docs: "we currently overwrite the X-Forwarded-For header and do not forward external IPs. This restriction is in place to prevent IP spoofing." 2026-10-19 |
 | O10 | `ADDRESS_KEY` must be on Vercel before the merge. Without it, judges get the fixed list and Try KinCart fails | flag | spec p3 | user | Resolved | `/ship` asks first, then pipes `openssl rand -hex 32` into `vercel env add ADDRESS_KEY` for production and preview. The value is never printed. `/ship` stops before the merge if `vercel env ls` doesn't list it. Adding it by hand was turned down. 2026-10-19 |
-| O11 | The plan put the clean-up `DELETE` and the upsert in one statement. Two stale addresses that come back at the same moment could then lock each other's rows in turn and deadlock | flag | build | user | Decided alone | Chose: the `DELETE` runs as its own statement before the upsert, and the upsert alone still counts (D76). Other: one statement with a `DELETE` in a `WITH`. Undo: move the `DELETE` into a `WITH` on the upsert in `useAddress()`. 2026-10-19 |
+| O11 | The plan put the clean-up `DELETE` and the upsert in one statement. Two stale addresses that come back at the same moment could then lock each other's rows in turn and deadlock | flag | build | user | Decided alone | Chose: the `DELETE` runs as its own statement before the upsert, and the upsert alone still counts (D76). Other: one statement with a `DELETE` in a `WITH`. Undo: move the `DELETE` into a `WITH` on the upsert in `takeUse()`. 2026-10-19 |
 
 ## Glossary
 

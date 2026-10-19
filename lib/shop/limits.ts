@@ -24,6 +24,11 @@ export function addressOf(forwardedFor: string | null): string {
     .join(":")}::/64`;
 }
 
+// Whole minutes from now until a stopped address's oldest use turns 24 hours old, rounded up.
+export function minutesUntil(until: number, now = Date.now()): number {
+  return Math.ceil((until - now) / 60_000);
+}
+
 // Only an HMAC of the address reaches the table, so a leaked table holds no addresses (D74).
 export function keyOf(address: string, key = process.env.ADDRESS_KEY): string {
   if (!key) throw new Error("no ADDRESS_KEY");

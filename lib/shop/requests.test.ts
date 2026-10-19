@@ -25,7 +25,7 @@ import {
   startHousehold,
   stuck,
   subscriptionsFor,
-  useAddress,
+  takeUse,
 } from "./requests";
 
 const [glasses, pills, batteries] = ITEMS;
@@ -425,8 +425,8 @@ async function stored(kind: string, address: string): Promise<number> {
 it("lets an address take the day's last place, then says when its oldest use turns a day old", async () => {
   await used("find", "key-a", 19, 21);
 
-  expect(await useAddress("find", "key-a", 20)).toBeNull();
-  const until = await useAddress("find", "key-a", 20);
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
+  const until = await takeUse("find", "key-a", 20);
 
   expect(until!.getTime() - Date.now()).toBeGreaterThan(3 * 60 * 60 * 1000 - 5000);
   expect(until!.getTime() - Date.now()).toBeLessThan(3 * 60 * 60 * 1000 + 5000);
@@ -436,12 +436,12 @@ it("lets an address take the day's last place, then says when its oldest use tur
 it("drops a use once it is 24 hours old, so its place is free again", async () => {
   await used("find", "key-a", 20, 24.01);
 
-  expect(await useAddress("find", "key-a", 20)).toBeNull();
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
   expect(await stored("find", "key-a")).toBe(20);
 });
 
 it("lets exactly 20 of 30 Finds at once through", async () => {
-  const results = await Promise.all(Array.from({ length: 30 }, () => useAddress("find", "key-a", 20)));
+  const results = await Promise.all(Array.from({ length: 30 }, () => takeUse("find", "key-a", 20)));
 
   expect(results.filter((until) => until === null)).toHaveLength(20);
   expect(await stored("find", "key-a")).toBe(20);
@@ -450,15 +450,15 @@ it("lets exactly 20 of 30 Finds at once through", async () => {
 it("counts Finds and households apart, and each address apart", async () => {
   await used("household", "key-a", 5, 2);
 
-  expect(await useAddress("household", "key-a", 5)).toBeInstanceOf(Date);
-  expect(await useAddress("find", "key-a", 20)).toBeNull();
-  expect(await useAddress("household", "key-b", 5)).toBeNull();
+  expect(await takeUse("household", "key-a", 5)).toBeInstanceOf(Date);
+  expect(await takeUse("find", "key-a", 20)).toBeNull();
+  expect(await takeUse("household", "key-b", 5)).toBeNull();
 });
 
 it("deletes an address once its newest use is a day old", async () => {
   await used("find", "key-old", 3, 26);
 
-  await useAddress("find", "key-new", 20);
+  await takeUse("find", "key-new", 20);
 
   expect(await stored("find", "key-old")).toBe(0);
   expect(await stored("find", "key-new")).toBe(1);

@@ -2,6 +2,7 @@ import pg from "pg";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
+import { addressOf, keyOf } from "../../lib/shop/limits";
 import { hashOf, whoIs } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
 import {
@@ -27,8 +28,9 @@ vi.mock("next/server", async (importOriginal) => ({
   },
 }));
 
-// This browser's cookies, as start() sets and reads them.
+// This browser's cookies, as start() sets and reads them, and the address Vercel says it came from.
 const jar = vi.hoisted(() => new Map<string, { value: string; options?: object }>());
+const client = vi.hoisted(() => ({ address: "203.0.113.7" }));
 
 vi.mock("next/headers", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/headers")>()),
@@ -36,6 +38,7 @@ vi.mock("next/headers", async (importOriginal) => ({
     has: (name: string) => jar.has(name),
     set: (name: string, value: string, options?: object) => jar.set(name, { value, options }),
   }),
+  headers: async () => new Headers({ "x-forwarded-for": client.address }),
 }));
 
 vi.mock("../../lib/shop/push", async (importOriginal) => ({
@@ -59,19 +62,21 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
-  await client.connect();
-  await client.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1");
-  await client.end();
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  await db.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses");
+  await db.end();
   await saveVault(owner, "1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
   vi.stubEnv("SAM_LINK_TOKEN", sam);
   vi.stubEnv("VAPID_PUBLIC_KEY", "vapid-test-public-key");
   vi.stubEnv("VAPID_PRIVATE_KEY", "vapid-test-private-key");
   vi.stubEnv("VAPID_SUBJECT", "https://kincart.vercel.app");
+  vi.stubEnv("ADDRESS_KEY", "test-address-key");
   vi.stubGlobal("fetch", vi.fn());
   vi.mocked(notify).mockReset();
   jar.clear();
+  client.address = "203.0.113.7";
 });
 
 afterEach(() => {
@@ -261,6 +266,92 @@ it("refuses a file that isn't a JPEG, whatever it calls itself, and calls nothin
   );
   expect(await redirectOf(find(rose, form({ words: "", photo: photo("%PDF-1.7\n") })))).toBe(`/r/${rose}?find=notphoto`);
   expect(await getSearch(owner)).toBeNull();
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+// count uses from one address, the oldest `hours` ago and the rest a minute apart after it.
+async function usedFrom(address: string, kind: string, count: number, hours: number) {
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  await db.query(
+    `INSERT INTO address_uses (kind, address, used_at)
+     VALUES ($1, $2, ARRAY(SELECT now() - make_interval(secs => $4 * 3600) + n * interval '1 minute' FROM generate_series(0, $3 - 1) n))`,
+    [kind, keyOf(addressOf(address)), count, hours],
+  );
+  await db.end();
+}
+
+async function usesFrom(address: string, kind: string): Promise<number> {
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  const { rows } = await db.query("SELECT cardinality(used_at) AS n FROM address_uses WHERE kind = $1 AND address = $2", [
+    kind,
+    keyOf(addressOf(address)),
+  ]);
+  await db.end();
+  return rows[0]?.n ?? 0;
+}
+
+// Haiku reads one thing from Rose's words, and Channel3 has no listings for it.
+function stubWordServices() {
+  const things = JSON.stringify({ things: [{ words: "a night light", query: "plug-in night light" }] });
+  const fetch = vi.fn(async (url: string) =>
+    url.includes("anthropic")
+      ? Response.json({ content: [{ type: "text", text: things }], stop_reason: "end_turn" })
+      : Response.json({ products: [] }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+it("stops a Find past 20 from one address in a day, keeps Rose's words, and calls nothing", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+
+  const to = await redirectOf(find(rose, form({ words: "a night light" })));
+
+  const until = Number(new URL(to, "https://kincart.vercel.app").searchParams.get("until"));
+  expect(to).toBe(`/r/${rose}?find=limit&until=${until}`);
+  expect(until - Date.now()).toBeGreaterThan(3 * 60 * 60 * 1000 - 5000);
+  expect(until - Date.now()).toBeLessThan(3 * 60 * 60 * 1000 + 5000);
+  expect(await getSearch(owner)).toMatchObject({ words: "a night light", outcome: "retry" });
+  expect(fetch).not.toHaveBeenCalled();
+  expect(console.log).toHaveBeenCalledWith("limit kind=find status=stopped wait=180");
+  expect(await usesFrom("203.0.113.7", "find")).toBe(20);
+});
+
+it("lets another address find while one is stopped", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+  const services = stubWordServices();
+  client.address = "198.51.100.24";
+
+  expect(await redirectOf(find(rose, form({ words: "a night light" })))).toBe(`/r/${rose}`);
+  expect(services).toHaveBeenCalled();
+  expect(await usesFrom("198.51.100.24", "find")).toBe(1);
+});
+
+it("counts only the Finds that reach the AI", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 19, 21);
+
+  expect(await redirectOf(find(rose, form({ words: "   " })))).toBe(`/r/${rose}?find=empty`);
+  expect(await redirectOf(find(rose, form({ words: "", photo: photo("%PDF-1.7\n") })))).toBe(`/r/${rose}?find=notphoto`);
+  expect(await usesFrom("203.0.113.7", "find")).toBe(19);
+
+  stubWordServices();
+  expect(await redirectOf(find(rose, form({ words: "a night light" })))).toBe(`/r/${rose}`);
+  expect(await usesFrom("203.0.113.7", "find")).toBe(20);
+});
+
+it("calls nothing for a Find without ADDRESS_KEY", async () => {
+  searchOn();
+  vi.stubEnv("ADDRESS_KEY", "");
+
+  await expect(find(rose, form({ words: "a night light" }))).rejects.toThrow("no ADDRESS_KEY");
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -730,6 +821,43 @@ it("starts a new household in place of this browser's old one, and the old links
   expect((await whoIs(freshRose))?.household).not.toBe((await whoIs(oldRose))?.household);
   expect(await whoIs(oldSam)).toMatchObject({ person: "sam" });
 });
+
+it("stops a sixth household from one address in a day, and leaves this browser's own household alone", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  client.address = "198.51.100.24";
+  await redirectOf(start());
+  const own = jar.get("household")!.value;
+  client.address = "203.0.113.7";
+  await usedFrom("203.0.113.7", "household", 5, 19);
+  const [{ count }] = await households();
+
+  const to = await redirectOf(start());
+
+  const until = Number(new URL(to, "https://kincart.vercel.app").searchParams.get("until"));
+  expect(to).toBe(`/?started=limit&until=${until}`);
+  expect(until - Date.now()).toBeGreaterThan(5 * 60 * 60 * 1000 - 5000);
+  expect(until - Date.now()).toBeLessThan(5 * 60 * 60 * 1000 + 5000);
+  expect(await households()).toEqual([{ count }]);
+  expect(jar.get("household")!.value).toBe(own);
+  expect(console.log).toHaveBeenCalledWith("limit kind=household status=stopped wait=300");
+});
+
+it("starts no household without ADDRESS_KEY, and says why", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.stubEnv("ADDRESS_KEY", "");
+
+  expect(await redirectOf(start())).toBe("/?started=failed");
+  expect(jar.has("household")).toBe(false);
+  expect(console.log).toHaveBeenCalledWith("household status=failed reason=no ADDRESS_KEY");
+});
+
+async function households(): Promise<{ count: string }[]> {
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  const { rows } = await db.query("SELECT count(*) FROM households");
+  await db.end();
+  return rows;
+}
 
 it("saves nothing, and says so, when the database can't be reached", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});

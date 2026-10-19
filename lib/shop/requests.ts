@@ -207,7 +207,7 @@ export async function clearSearch(household: number): Promise<void> {
 // Takes one of the address's `most` places in the last 24 hours, or none when they're all taken. One upsert
 // locks the row and checks the count, so two at once can't both take the last place (D76). Returns null when
 // a place was free, or else when the oldest use turns 24 hours old. Addresses idle for a day go first.
-export async function useAddress(kind: Use, address: string, most: number): Promise<Date | null> {
+export async function takeUse(kind: Use, address: string, most: number): Promise<Date | null> {
   await query("DELETE FROM address_uses WHERE used_at[cardinality(used_at)] <= now() - interval '24 hours'");
   const taken = await query(
     `INSERT INTO address_uses AS u (kind, address, used_at) VALUES ($1, $2, ARRAY[now()])
