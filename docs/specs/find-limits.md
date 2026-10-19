@@ -287,42 +287,7 @@ Single chunk. Every test file shares the local database, so the work runs serial
 
 ### Decisions to record
 
-```
-## D73 · 2026-10-19 · Count Finds and new households in a Neon table, not a Vercel Firewall rule
-
-Why: the limit is 20 Finds and 5 new households for each address in 24 hours (find-limits O1). Vercel Hobby allows one rate-limit rule, with a fixed window of 10 minutes at most, so a 24-hour count can't be written. A stopped Find must show Rose KinCart's own notice, and the Firewall answers with a bare 429.
-Rejected: a Vercel Firewall rate-limit rule on the `find` Server Action Name (1 rule on Hobby, a 10-minute window at most, a bare 429 page), Vercel's Rate Limiting SDK (the same rule and the same 10-minute window).
-Source: docs/specs/find-limits.md
-Status: active
-
-## D74 · 2026-10-19 · Limit by network address, kept only as an HMAC under ADDRESS_KEY
-
-Why: a script starts a new household for every Find, so only the address it comes from links its Finds. The table must not hold visitors' addresses, so it keeps an HMAC-SHA256 under ADDRESS_KEY. Without the key, Find is off and Try KinCart fails, so nothing runs unlimited.
-Rejected: a limit for each household (a script starts a new one each time), the raw address kept for a day (anyone who reads Neon sees visitors' addresses), plain SHA-256 (every IPv4 address can be hashed in minutes), no addresses with one daily ceiling for everyone (one script blocks every judge for a day).
-Source: docs/specs/find-limits.md
-Status: active
-
-## D75 · 2026-10-19 · An IPv6 address counts by its first 64 bits
-
-Why: one home or office network gets a /64, so a script can change its IPv6 address on every request inside it. An IPv4-mapped IPv6 address counts as its IPv4 address.
-Rejected: the whole IPv6 address (a script gets a new one for every Find).
-Source: docs/specs/find-limits.md
-Status: active
-
-## D76 · 2026-10-19 · One row for each address and kind keeps the last 24 hours' times, changed by one upsert
-
-Why: one `INSERT ... ON CONFLICT DO UPDATE ... WHERE` locks the row and adds a time only while fewer than the limit remain. In 3 of 3 runs of 30 at once, exactly 20 went through. The window rolls, so each use drops out exactly 24 hours after it ran, and the notice can say when.
-Rejected: a row for each use, counted and then inserted (two Finds at once both see 19, and both run), an advisory lock in a transaction (needs one connection for several statements, and `query()` opens one for each), a calendar day (a script spends 20 before midnight and 20 after).
-Source: docs/specs/find-limits.md
-Status: active
-
-## D77 · 2026-10-19 · A stopped Find keeps Rose's words as a retry search, and the wait rides in the page address as a time
-
-Why: the ask screen already puts a `retry` search's words in the box (`state.ts:90`). `until` lets the 3 s redraw (D19) count the wait down, and drops the notice once it passes.
-Rejected: a new `limit` outcome in `rose_search` (a migration to widen its check, and the time still has to live somewhere), minutes in the page address (the redraw would show the same number forever).
-Source: docs/specs/find-limits.md
-Status: active
-```
+Recorded as D73, D74, D75, D76, D77.
 
 ## Open items
 
