@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import type { Group, Option, Search } from "./find";
 import { things, type Item } from "./items";
+import type { Use } from "./limits";
 import type { Person } from "./people";
 
 export type RequestStatus = "waiting" | "paying" | "paid" | "declined" | "failed";
@@ -201,6 +202,28 @@ export async function saveSearch(
 
 export async function clearSearch(household: number): Promise<void> {
   await query("DELETE FROM rose_search WHERE id = $1", [household]);
+}
+
+// Takes one of the address's `most` places in the last 24 hours, or none when they're all taken. One upsert
+// locks the row and checks the count, so two at once can't both take the last place (D76). Returns null when
+// a place was free, or else when the oldest use turns 24 hours old. Addresses idle for a day go first.
+export async function useAddress(kind: Use, address: string, most: number): Promise<Date | null> {
+  await query("DELETE FROM address_uses WHERE used_at[cardinality(used_at)] <= now() - interval '24 hours'");
+  const taken = await query(
+    `INSERT INTO address_uses AS u (kind, address, used_at) VALUES ($1, $2, ARRAY[now()])
+     ON CONFLICT (kind, address) DO UPDATE
+     SET used_at = ARRAY(SELECT t FROM unnest(u.used_at) t WHERE t > now() - interval '24 hours') || now()
+     WHERE cardinality(ARRAY(SELECT t FROM unnest(u.used_at) t WHERE t > now() - interval '24 hours')) < $3
+     RETURNING kind`,
+    [kind, address, most],
+  );
+  if (taken.length) return null;
+  const [{ until }] = await query<{ until: Date }>(
+    `SELECT min(t) + interval '24 hours' AS until FROM address_uses, unnest(used_at) t
+     WHERE kind = $1 AND address = $2 AND t > now() - interval '24 hours'`,
+    [kind, address],
+  );
+  return until;
 }
 
 export async function getLimit(household: number): Promise<number> {
