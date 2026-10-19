@@ -256,7 +256,7 @@ erDiagram
 | **Breaks first**     | Nothing at 10 times the load. Rows equal the addresses seen in 24 hours, each with at most 20 times. A flood from millions of addresses would grow the table, and Vercel's DDoS protection sits in front of it |
 | **Security surface** | Anyone can call `find()` with a Rose link, and `start()` with no link. It trusts `x-forwarded-for`, which Vercel overwrites (O9). It reads `ADDRESS_KEY`. It stores an HMAC of each address and up to 20 times for each kind, for 24 hours after the newest |
 | **Proof it works**   | In Vercel's logs, `limit kind=find status=stopped wait=<minutes>` when a Find is stopped, and the usual `find outcome=` line when it goes through |
-| **Rollout**          | No flag. First, `/ship` adds `ADDRESS_KEY` to Vercel production and preview, with your OK (O10). Then merge, CI migrates Neon after the tests (D11), and Vercel promotes. Rollback: revert the merge, and the old code ignores `address_uses`. Then `node scripts/migrate.mjs down` drops it. Before Dec 1: the Anthropic spend limit and Channel3's reset date (O5) |
+| **Rollout**          | No flag. First, `/ship` adds `ADDRESS_KEY` to Vercel production, with your OK (O10). Then merge, CI migrates Neon after the tests (D11), and Vercel promotes. Rollback: revert the merge, and the old code ignores `address_uses`. Then `node scripts/migrate.mjs down` drops it. Before Dec 1: the Anthropic spend limit and Channel3's reset date (O5) |
 
 ### Test plan
 
@@ -293,7 +293,7 @@ Recorded as D73, D74, D75, D76, D77.
 
 2026-10-19 · 3 raw findings, 1 survived, 1 fixed.
 
-- correctness · `app/(shop)/page.tsx:23` · `minutesUntil` caps the wait a page address shows at 24 hours · `fea750d`
+- correctness · `app/(shop)/page.tsx:23` · `minutesUntil` caps the wait a page address shows at 24 hours · `1fb2435`
 
 ## Open items
 
@@ -308,7 +308,7 @@ Recorded as D73, D74, D75, D76, D77.
 | O7 | What the counts table keeps for each address | question | spec p3 | user | Resolved | An HMAC-SHA256 under a new `ADDRESS_KEY`, so a leaked table holds no addresses. Without the key, Find is off and Try KinCart fails. The raw address for a day, and no addresses with a ceiling for everyone, were turned down (D74). 2026-10-19 |
 | O8 | One `INSERT ... ON CONFLICT DO UPDATE ... WHERE` lets exactly 20 of 30 simultaneous Finds through | unproven | spec p3 | build | Resolved | Checked on the local Postgres 17 in a throwaway database: 3 of 3 runs let exactly 20 of 30 through and stored 20 times. `requests.test.ts` keeps checking it. 2026-10-19 |
 | O9 | Vercel's `x-forwarded-for` can't be set by the client | unproven | spec p3 | build | Resolved | Vercel's request-headers docs: "we currently overwrite the X-Forwarded-For header and do not forward external IPs. This restriction is in place to prevent IP spoofing." 2026-10-19 |
-| O10 | `ADDRESS_KEY` must be on Vercel before the merge. Without it, judges get the fixed list and Try KinCart fails | flag | spec p3 | user | Resolved | `/ship` asks first, then pipes `openssl rand -hex 32` into `vercel env add ADDRESS_KEY` for production and preview. The value is never printed. `/ship` stops before the merge if `vercel env ls` doesn't list it. Adding it by hand was turned down. 2026-10-19 |
+| O10 | `ADDRESS_KEY` must be on Vercel before the merge. Without it, judges get the fixed list and Try KinCart fails | flag | spec p3 | user | Resolved | `/ship` asks first, then pipes `openssl rand -hex 32` into `vercel env add ADDRESS_KEY` for production. The value is never printed. `/ship` stops before the merge if `vercel env ls` doesn't list it. Adding it by hand was turned down. Preview was dropped at /ship: every other Vercel var is production only, so a key there would do nothing. 2026-10-19 |
 | O11 | The plan put the clean-up `DELETE` and the upsert in one statement. Two stale addresses that come back at the same moment could then lock each other's rows in turn and deadlock | flag | build | user | Decided alone | Chose: the `DELETE` runs as its own statement before the upsert, and the upsert alone still counts (D76). Other: one statement with a `DELETE` in a `WITH`. Undo: move the `DELETE` into a `WITH` on the upsert in `takeUse()`. 2026-10-19 |
 
 ## Glossary
