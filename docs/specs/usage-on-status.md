@@ -116,6 +116,38 @@ Scenario: A new UTC day and month start from 0
 - Channel3's own usage count, and searches from CI's e2e and local runs (O5). Not planned.
 - A sign-in or a secret key for `/status` (O4). Not planned.
 
+## Interface
+
+`/status` gets a second list under a "Usage" heading, below the Database, PayPal sandbox and Build lines. Tokens come from the repo's design system, `docs/design/design-system/` (D15, D50).
+
+```mermaid
+flowchart LR
+    P["/status"] -- "checks" --> C["Database, PayPal sandbox, Build"]
+    P -- "counts for today and this month" --> U["Usage: Finds, Channel3 searches,<br/>Stopped Finds, Stopped Try KinCarts"]
+    U -- "800 or more searches this month" --> R["that month line in bold red"]
+    U -- "database doesn't answer" --> N["each line: not reachable"]
+```
+
+The checks keep their list as today. The counts follow in a list of their own, and each count shows today on one line and this month on the next.
+
+| State | What each count line shows |
+| ----- | -------------------------- |
+| Counts read | "38 today", then "96 this month". The searches line says "540 of 1,000 this month" |
+| 800 or more searches this month | The searches line's month, such as "800 of 1,000 this month", in bold red. Today's line stays plain |
+| New UTC day and month | "0 today", then "0 this month" |
+| Database not reachable | "not reachable" in bold red, as the Database line says |
+| No `DATABASE_URL` | "not configured" in bold red, as the Database line says |
+
+The heading's note says "Today and this month, in UTC." Each list keeps its own label column, so the long "Stopped Try KinCarts" label doesn't push the Database line onto two lines. On a 390px phone, the red month line and the Database line take two lines each.
+
+The design system keeps red for real failures. The month's searches use it from 800 because O3 chose it.
+
+**Motion tier:** 0. The counts arrive with the page.
+
+**Components used:** the status page's `dl` list and its `.fail` style, `.screen`, `.stack`, `.heading`, `.small`, and the `.screen h2` heading.
+
+**Preview:** `/preview/usage-on-status`, with scenarios 1, 4 and 5 and the database down. Production returns 404. `StatusView` takes `usage` as optional for now, so `/status` works until `/build` reads the counts in `app/status/page.tsx` and makes it required.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |

@@ -1,4 +1,4 @@
-/* The page's tokens and base styles come from the shop's; this adds the violet head and the list of checks. */
+/* The page's tokens and base styles come from the shop's; this adds the violet head and the lists of checks and counts. */
 .status-head {
   background: var(--showcase-stage);
   color: var(--showcase-on-stage);
@@ -14,7 +14,8 @@
 }
 
 .status dl {
-  margin: 0 auto;
+  margin: 0;
+  display: grid;
   grid-template-columns: max-content 1fr;
   gap: 0;
 }
@@ -35,7 +36,11 @@
   overflow-wrap: anywhere;
 }
 
-.status dd.fail {
+.status dd span {
+  display: block;
+}
+
+.status .fail {
   font-weight: 700;
   color: var(--color-danger);
 }
