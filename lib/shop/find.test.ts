@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { find, findPhoto } from "./find";
+import { find, findAgain, findPhoto } from "./find";
 
 const words = "warm slippers that are easy to put on, size 8";
 
@@ -99,6 +99,7 @@ it("shows up to three listings Haiku picked, with Channel3's names, prices and l
       expect.objectContaining({ id: "prod_7Hq2kZ", name: kohls.title, cents: 2707 }),
       expect.objectContaining({ id: "prod_8Kp3rT", cents: 900 }),
     ],
+    query: "warm slippers easy to put on size 8",
   });
   expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=3 searches=2 ms=\d+ checked=3 unloaded=0$/));
 });
@@ -111,7 +112,10 @@ it("says nothing under the limit when the thing only exists above it", async () 
     choice: { picks: [], aboveLimit: true },
   });
 
-  expect(await find("a tablet for video calls", 3000)).toEqual({ outcome: "over limit" });
+  expect(await find("a tablet for video calls", 3000)).toEqual({
+    outcome: "over limit",
+    query: "tablet for video calls with front camera",
+  });
 });
 
 it("says it couldn't find anything when nothing fits at any price", async () => {
@@ -121,7 +125,10 @@ it("says it couldn't find anything when nothing fits at any price", async () => 
     all: [],
   });
 
-  expect(await find("a left-handed teapot for a cat", 5000)).toEqual({ outcome: "nothing found" });
+  expect(await find("a left-handed teapot for a cat", 5000)).toEqual({
+    outcome: "nothing found",
+    query: "left-handed teapot for a cat",
+  });
   expect(searches(fetch)).toBe(2);
 });
 
@@ -137,7 +144,7 @@ it("says too many for more than five things, and searches for nothing that isn't
   expect(searches(notAProduct)).toBe(0);
 
   const blank = stubServices({ need: { things: [{ words: "something nice", query: " " }] } });
-  expect(await find("something nice", 5000)).toEqual({ outcome: "nothing found" });
+  expect(await find("something nice", 5000)).toEqual({ outcome: "nothing found", query: " " });
   expect(searches(blank)).toBe(0);
 });
 
@@ -221,9 +228,10 @@ it("searches every thing at once and shows a group of listings for each, under R
           expect.objectContaining({ id: "prod_3Ba7aA", name: aa24.title, cents: 999, shop: "amazon.com" }),
           expect.objectContaining({ id: "prod_1Dc8aA", cents: 879, why: pick("prod_1Dc8aA").why }),
         ],
+        query: "AA batteries",
       },
-      { thing: "a night light", options: [expect.objectContaining({ id: "prod_6Nl2tL", cents: 1249 })] },
-      { thing: "a phone charger", options: [expect.objectContaining({ id: "prod_2Ak5cH", cents: 1599 })] },
+      { thing: "a night light", options: [expect.objectContaining({ id: "prod_6Nl2tL", cents: 1249 })], query: "night light" },
+      { thing: "a phone charger", options: [expect.objectContaining({ id: "prod_2Ak5cH", cents: 1599 })], query: "phone charger" },
     ],
   });
   const calls = fetch.mock.calls.map(([url, init]) => ({ url: String(url), body: init.body && JSON.parse(String(init.body)) }));
@@ -247,10 +255,14 @@ it("still shows the things it found when some can't be shown, and says why for e
   expect(await find("AA batteries, a tablet for video calls, a left-handed teapot for a cat and a phone charger", 3000)).toEqual({
     outcome: "basket",
     groups: [
-      { thing: "AA batteries", options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })] },
-      { thing: "a tablet for video calls", options: [], problem: "over limit" },
-      { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found" },
-      { thing: "a phone charger", options: [], problem: "nothing found" },
+      {
+        thing: "AA batteries",
+        options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })],
+        query: "AA batteries",
+      },
+      { thing: "a tablet for video calls", options: [], problem: "over limit", query: "tablet for video calls" },
+      { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found", query: "left-handed teapot for a cat" },
+      { thing: "a phone charger", options: [], problem: "nothing found", query: "phone charger" },
     ],
   });
   expect(console.log).toHaveBeenLastCalledWith(
@@ -289,6 +301,7 @@ it("never sends Haiku a listing whose photo it can't download, and judges one wi
       expect.objectContaining({ id: "prod_1Dc8aA", imageUrl: undefined }),
       expect.objectContaining({ id: "prod_3Ba7aA", imageUrl: "https://cdn.trychannel3.com/prod_3Ba7aA" }),
     ],
+    query: "AA batteries",
   });
   expect(JSON.stringify(result)).not.toContain('"photo"');
   const choose = fetch.mock.calls
@@ -315,7 +328,7 @@ it("says over limit, nothing found, or blanks one group, when every listing's ph
     all: [tablet],
     choice: { picks: [pick("prod_1Cs4eB")], aboveLimit: true },
   });
-  expect(await find("a tablet for video calls", 3000)).toEqual({ outcome: "over limit" });
+  expect(await find("a tablet for video calls", 3000)).toEqual({ outcome: "over limit", query: "tablet for video calls" });
 
   const fetch = stubServices({
     need: { things: [{ words: "AA batteries", query: "AA batteries" }] },
@@ -323,7 +336,7 @@ it("says over limit, nothing found, or blanks one group, when every listing's ph
     all: [],
     choice: { picks: [pick("prod_3Ba7aA")], aboveLimit: false },
   });
-  expect(await find("AA batteries", 5000)).toEqual({ outcome: "nothing found" });
+  expect(await find("AA batteries", 5000)).toEqual({ outcome: "nothing found", query: "AA batteries" });
   expect(fetch.mock.calls.filter(([url]) => String(url).includes("anthropic"))).toHaveLength(1);
   expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/ checked=0 unloaded=1$/));
 
@@ -331,8 +344,12 @@ it("says over limit, nothing found, or blanks one group, when every listing's ph
   expect(await find("a night light and AA batteries", 5000)).toEqual({
     outcome: "basket",
     groups: [
-      { thing: "a night light", options: [], problem: "nothing found" },
-      { thing: "AA batteries", options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })] },
+      { thing: "a night light", options: [], problem: "nothing found", query: "night light" },
+      {
+        thing: "AA batteries",
+        options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })],
+        query: "AA batteries",
+      },
     ],
   });
 });
@@ -390,7 +407,11 @@ it("finds the one thing in Rose's photo under the AI's words, and sends the phot
 
   expect(await findPhoto("", 2500, [jpeg])).toEqual({
     words: "CR2032 coin battery",
-    result: { outcome: "options", options: [expect.objectContaining({ id: "prod_2Cr3eN", cents: 649 })] },
+    result: {
+      outcome: "options",
+      options: [expect.objectContaining({ id: "prod_2Cr3eN", cents: 649 })],
+      query: "CR2032 3V lithium coin battery",
+    },
     photos: 1,
     blank: 0,
   });
@@ -483,4 +504,187 @@ it("says it couldn't find anything when Haiku fails on a photo, keeps Rose's wor
   expect(console.log).toHaveBeenLastCalledWith(
     expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ checked=0 unloaded=0 photos=1 blank=0 reason=TimeoutError$/),
   );
+});
+
+// Find another's own call answers with a query; it never reads Rose's words again (D99).
+const isOther = (body: { output_config: { format: { schema: { required: string[] } } } }) =>
+  body.output_config.format.schema.required[0] === "query";
+
+type Again = Thing & { last: string; refused?: string[]; otherFails?: boolean };
+
+// Each thing's other-words call answers with its query, and its searches and pick are answered as in stubBasket.
+function stubAgain(things: Again[]) {
+  const fetch = vi.fn(async (url: string, init: RequestInit) => {
+    if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
+    const body = JSON.parse(String(init.body));
+    if (url.includes("anthropic")) {
+      if (isOther(body)) {
+        const thing = things.find(({ words }) => body.messages[0].content.startsWith(`They want: ${JSON.stringify(words)}`))!;
+        if (thing.otherFails) return Response.json({ error: "overloaded" }, { status: 529 });
+        return Response.json({ content: [{ type: "text", text: JSON.stringify({ query: thing.query }) }], stop_reason: "end_turn" });
+      }
+      const data = things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))?.choice;
+      return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
+    }
+    const thing = things.find(({ query }) => query === body.query)!;
+    return Response.json({ products: (body.filters ? thing.under : thing.all) ?? [] });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+const anthropicBodies = (fetch: ReturnType<typeof stubAgain>) =>
+  fetch.mock.calls.filter(([url]) => String(url).includes("anthropic")).map(([, init]) => JSON.parse(String(init.body)));
+
+const oxo = product("prod_5Jo1xO", "OXO Good Grips Jar Opener with Base Pad", 9.99, "amazon.com");
+const jarPads = product("prod_7Jp4dS", "Rubber Jar Gripper Pads, Set of 6", 7.49, "target.com");
+const jar = {
+  words: "something to grip jar lids",
+  last: "jar lid grip",
+  query: "jar opener",
+  under: [oxo, jarPads],
+  all: [oxo],
+  choice: { picks: [pick("prod_5Jo1xO"), pick("prod_7Jp4dS")], aboveLimit: false },
+};
+
+it("searches Channel3 with Haiku's other words for the thing, and keeps them as the search's query", async () => {
+  const fetch = stubAgain([jar]);
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+
+  const result = await findAgain(jar.words, [{ words: jar.words, query: jar.last, refused: [] }], 5000, sent);
+
+  expect(result).toEqual({
+    outcome: "options",
+    options: [expect.objectContaining({ id: "prod_5Jo1xO", cents: 999 }), expect.objectContaining({ id: "prod_7Jp4dS" })],
+    query: "jar opener",
+  });
+  const [other, chose] = anthropicBodies(fetch);
+  expect(other.messages[0].content).toBe('They want: "something to grip jar lids"\nThe last query: "jar lid grip"');
+  expect(chose.messages[0].content[0].text).toMatch(/^They asked: "something to grip jar lids"/);
+  const queried = fetch.mock.calls
+    .filter(([url]) => String(url).includes("api.trychannel3.com"))
+    .map(([, init]) => JSON.parse(String(init.body)).query);
+  expect(queried).toEqual(["jar opener", "jar opener"]);
+  expect(sent.searches).toBe(2);
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=options listings=2 searches=2 ms=\d+ checked=2 unloaded=0 again=1$/),
+  );
+});
+
+it("never sends the pick call a listing Sam refused, under or above the limit", async () => {
+  const fetch = stubAgain([
+    {
+      words,
+      last: "warm slippers easy to put on size 8",
+      query: "slip-on house slippers size 8",
+      under: [kohls, muji, ikea],
+      all: [kohls, avenue, sheepskin],
+      choice: { picks: [pick("prod_7Hq2kZ"), pick("prod_8Kp3rT")], aboveLimit: false },
+    },
+  ]);
+
+  const result = await findAgain(
+    words,
+    [{ words, query: "warm slippers easy to put on size 8", refused: ["prod_4Fd6sW", "prod_2Lm9vQ"] }],
+    5000,
+  );
+
+  expect(result).toMatchObject({ outcome: "options", options: [{ id: "prod_7Hq2kZ" }, { id: "prod_8Kp3rT" }] });
+  const [, chose] = anthropicBodies(fetch);
+  const sentToPick = JSON.stringify(chose.messages[0].content);
+  expect(sentToPick).not.toContain("prod_4Fd6sW");
+  expect(sentToPick).not.toContain("Warm Fiber Slippers");
+  expect(sentToPick).not.toContain("Sheepskin Moccasin Slippers");
+  expect(sentToPick).toContain("Sara Slippers");
+});
+
+it("searches every thing again at once, and marks each group tried", async () => {
+  const fetch = stubAgain([
+    { ...batteries, last: "AA batteries", query: "AA alkaline batteries" },
+    { ...nightLight, last: "night light", query: "plug-in night light" },
+    { ...charger, last: "phone charger", query: "USB wall charger" },
+  ]);
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+
+  const result = await findAgain(
+    "AA batteries, a night light and a phone charger",
+    [
+      { words: "AA batteries", query: "AA batteries", refused: ["prod_9Xx1aA"] },
+      { words: "a night light", query: "night light", refused: ["prod_9Xx1aA"] },
+      { words: "a phone charger", query: "phone charger", refused: ["prod_9Xx1aA"] },
+    ],
+    5000,
+    sent,
+  );
+
+  expect(result).toEqual({
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [expect.anything(), expect.anything()], query: "AA alkaline batteries", tried: true },
+      { thing: "a night light", options: [expect.objectContaining({ id: "prod_6Nl2tL" })], query: "plug-in night light", tried: true },
+      { thing: "a phone charger", options: [expect.objectContaining({ id: "prod_2Ak5cH" })], query: "USB wall charger", tried: true },
+    ],
+  });
+  expect(anthropicBodies(fetch).filter(isOther)).toHaveLength(3);
+  expect(sent.searches).toBe(6);
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 searches=6 ms=\d+ checked=4 unloaded=0 again=1$/),
+  );
+});
+
+it("blanks only the thing whose other-words call failed, with its last query kept, and logs why", async () => {
+  stubAgain([
+    { ...batteries, last: "AA batteries", query: "AA alkaline batteries" },
+    { ...jar, otherFails: true },
+  ]);
+
+  const result = await findAgain(
+    "AA batteries, something to grip jar lids",
+    [
+      { words: "AA batteries", query: "AA batteries", refused: [] },
+      { words: jar.words, query: jar.last, refused: [] },
+    ],
+    5000,
+  );
+
+  expect(result).toEqual({
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [expect.anything(), expect.anything()], query: "AA alkaline batteries", tried: true },
+      { thing: jar.words, options: [], problem: "nothing found", query: "jar lid grip", tried: true },
+    ],
+  });
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/ again=1 reason=anthropic 529$/));
+});
+
+it("says nothing found with the last query kept when the one thing's call fails, or when nothing fits", async () => {
+  stubAgain([{ ...jar, otherFails: true }]);
+  expect(await findAgain(jar.words, [{ words: jar.words, query: jar.last, refused: [] }], 5000)).toEqual({
+    outcome: "nothing found",
+    query: "jar lid grip",
+  });
+
+  stubAgain([{ words: "a lamp for reading in bed", last: "reading lamp for bed", query: "bedside book light", under: [], all: [] }]);
+  expect(
+    await findAgain(
+      "a lamp for reading in bed",
+      [{ words: "a lamp for reading in bed", query: "reading lamp for bed", refused: [] }],
+      2000,
+    ),
+  ).toEqual({ outcome: "nothing found", query: "bedside book light" });
+
+  stubAgain([
+    { ...jar, under: [], all: [] },
+    { words: "a lamp for reading in bed", last: "reading lamp for bed", query: "bedside book light", under: [], all: [] },
+  ]);
+  expect(
+    await findAgain(
+      "something to grip jar lids, a lamp for reading in bed",
+      [
+        { words: jar.words, query: jar.last, refused: [] },
+        { words: "a lamp for reading in bed", query: "reading lamp for bed", refused: [] },
+      ],
+      2000,
+    ),
+  ).toEqual({ outcome: "nothing found" });
 });
