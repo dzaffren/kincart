@@ -158,12 +158,7 @@ Single chunk.
 
 ### Decisions to record
 
-## D96 · 2026-10-22 · The home page cites one US survey as its proof, and quotes nobody
-
-Why: the judge's review said nothing on the home page proves families need KinCart. Foong et al. (JMIR 2025) surveyed 657 US adults, a nationally representative sample. About 1 in 10 had signed in to someone's money or medical account with that person's login, which is the problem "No more logging in as them" names.
-Rejected: a quote from someone who tried KinCart (a hackathon build has no real users, so a quote proves the demo works, not that families need it), Latulipe et al., CHI 2022 (42 people in Canada, and only its abstract could be read), the FBI IC3 2025 report (scam losses, and KinCart has no scam checks, so it reads as a promise).
-Source: docs/specs/home-page-proof.md
-Status: active
+Recorded as D96.
 
 ## Open items
 
