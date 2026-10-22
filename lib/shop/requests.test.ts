@@ -225,6 +225,64 @@ it("keeps how many photos Rose's current search read and how many showed nothing
   expect(await getSearch(owner)).toMatchObject({ outcome: "retry", fromPhoto: false, photos: 0, blankPhotos: 0 });
 });
 
+it("keeps a search's query, and whether Find another ran it", async () => {
+  await saveSearch(owner, "warm slippers that are easy to put on, size 8", {
+    outcome: "options",
+    options: [strap],
+    query: "warm slip-on slippers size 8",
+  });
+  expect(await getSearch(owner)).toMatchObject({ query: "warm slip-on slippers size 8", tried: false });
+
+  await saveSearch(owner, "a lamp for reading in bed", { outcome: "over limit", query: "bedside reading lamp" }, 0, 0, true);
+  expect(await getSearch(owner)).toMatchObject({ outcome: "over limit", query: "bedside reading lamp", tried: true });
+
+  await saveSearch(owner, "AA batteries, something to grip jar lids", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [strap], query: "AA batteries" },
+      { thing: "something to grip jar lids", options: [], problem: "nothing found", query: "jar opener", tried: true },
+    ],
+  });
+  expect(await getSearch(owner)).toMatchObject({
+    query: null,
+    tried: false,
+    groups: [
+      { thing: "AA batteries", query: "AA batteries" },
+      { thing: "something to grip jar lids", query: "jar opener", tried: true },
+    ],
+  });
+
+  await saveSearch(owner, "a lamp for reading in bed", { outcome: "retry" });
+  expect(await getSearch(owner)).toMatchObject({ query: null, tried: false });
+
+  const empty = [
+    { thing: "AA batteries", options: [], problem: "nothing found" as const, query: "AA batteries" },
+    { thing: "something to grip jar lids", options: [], problem: "over limit" as const, query: "jar lid grip" },
+  ];
+  await saveSearch(owner, "AA batteries, something to grip jar lids", { outcome: "nothing found", groups: empty });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", groups: empty });
+});
+
+it("keeps each pick's thing, query and listing id with the ask, after Sam's OK too", async () => {
+  const queries = [{ id: strap.id, thing: "warm slippers that are easy to put on, size 8", query: "warm slip-on slippers size 8" }];
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why }, undefined, queries);
+  expect((await latest(owner))?.queries).toEqual(queries);
+
+  await sql("TRUNCATE purchase_requests");
+  const picks = [
+    { id: aa.id, thing: "AA batteries", query: "AA batteries" },
+    { id: light.id, thing: "a night light", query: "plug-in night light" },
+  ];
+  await ask(owner, basket, undefined, [aa, light], picks);
+  const { id } = (await latest(owner))!;
+  await claim(owner, id, [aa.id]);
+  expect(await latest(owner)).toMatchObject({ lines: [aa], leftOut: ["a night light"], queries: picks });
+
+  await sql("TRUNCATE purchase_requests");
+  await ask(owner, glasses);
+  expect((await latest(owner))?.queries).toBeNull();
+});
+
 const aa = {
   id: "prod_3Ba7aA",
   name: "Amazon Basics 24-Pack AA Alkaline Batteries",

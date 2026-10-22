@@ -2,7 +2,16 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { find as findOptions, findPhoto, searchOn, type Group, type Option, type Sent } from "../../lib/shop/find";
+import {
+  find as findOptions,
+  findAgain,
+  findPhoto,
+  groupOf,
+  searchOn,
+  type Group,
+  type Option,
+  type Sent,
+} from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
 import { addressOf, FINDS_A_DAY, HOUSEHOLDS_A_DAY, keyOf, minutesUntil } from "../../lib/shop/limits";
 import { pay } from "../../lib/shop/pay";
@@ -20,6 +29,7 @@ import {
   getSearch,
   getTotal,
   getVault,
+  latest,
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
@@ -29,6 +39,7 @@ import {
 } from "../../lib/shop/requests";
 import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
+import { againOf } from "./state";
 
 // Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44). One address
 // starts 5 a day at most, and a stopped one keeps this browser's own household.
@@ -120,6 +131,45 @@ export async function find(token: string, formData: FormData): Promise<void> {
   redirect(`/r/${token}`);
 }
 
+// Searches again what Rose's screen offers Find another for, worked out from Neon only (D23). It counts as a
+// Find, toward the address's 20 a day and on /status (D97), and a stopped one saves nothing (D101).
+export async function findAnother(token: string, formData: FormData): Promise<void> {
+  const who = await whoIs(token);
+  if (who?.person !== "rose" || !searchOn()) return;
+  const { household } = who;
+  const tapped = formData.get("another");
+  const [saved, request] = await Promise.all([getSearch(household), latest(household)]);
+  const again = againOf(saved, request, tapped === null ? undefined : Number(tapped));
+  if (!again) redirect(`/r/${token}`);
+
+  // A group's Find another sends the Ask Sam form, so Rose's picks in the other groups come back (D36).
+  const picked =
+    again.group !== undefined && saved?.outcome === "basket"
+      ? saved.groups.map((_, index) => (index === again.group ? "" : String(formData.get(`pick-${index}`) ?? "")))
+      : [];
+  const back = picked.length ? `picked=${picked.map(encodeURIComponent).join(",")}` : "";
+  const stopped = await takeUse("find", await addressKey(), FINDS_A_DAY);
+  if (stopped) {
+    await countUse({ stoppedFinds: 1 });
+    console.log(`limit kind=find status=stopped wait=${minutesUntil(stopped.getTime())}`);
+    redirect(`/r/${token}?find=limit&until=${stopped.getTime()}${back && `&${back}`}`);
+  }
+
+  const sent: Sent = { searches: 0, checked: 0, unloaded: 0 };
+  const found = await findAgain(again.words, again.things, await getLimit(household), sent);
+  if (again.group !== undefined && saved?.outcome === "basket") {
+    // Only the tapped group changes. The basket keeps its photo counts, and its own tried.
+    const groups = saved.groups.map((group, index) =>
+      index === again.group ? { ...groupOf(group.thing, found), tried: true } : group,
+    );
+    await saveSearch(household, saved.words, { outcome: "basket", groups }, saved.photos, saved.blankPhotos, saved.tried);
+  } else {
+    await saveSearch(household, again.words, found, 0, 0, true);
+  }
+  await countUse({ finds: 1, searches: sent.searches });
+  redirect(back ? `/r/${token}?${back}` : `/r/${token}`);
+}
+
 export async function tryAgain(token: string): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
@@ -131,12 +181,21 @@ export async function tryAgain(token: string): Promise<void> {
 export async function askSam(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
+  // A basket group's Find another sends this form, with Rose's picks, and asks Sam nothing.
+  if (formData.has("another")) return findAnother(token, formData);
   const { household } = who;
   if (searchOn()) {
     const saved = await getSearch(household);
     const option = saved?.options.find((listing) => listing.id === formData.get("listing"));
-    const picks = saved?.outcome === "basket" ? basketPicks(saved.groups, formData) : option ? [{ thing: "", option }] : [];
+    const picks =
+      saved?.outcome === "basket"
+        ? basketPicks(saved.groups, formData)
+        : option && saved
+          ? [{ thing: saved.words, query: saved.query ?? saved.words, option }]
+          : [];
     if (!picks.length) redirect(`/r/${token}?pick=missing`);
+    // Each pick's thing, query and listing, so Find another can search again without it (D100).
+    const queries = picks.map(({ thing, query, option: { id } }) => ({ id, thing, query }));
     // Sam's total limit counts everything asked for at once, one pick or several (D34).
     const cents = picks.reduce((sum, { option }) => sum + option.cents, 0);
     const total = await getTotal(household);
@@ -153,7 +212,7 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
       if (picks.length === 1) {
         const [{ option }] = picks;
         const { shop, url, why, watch, imageUrl } = option;
-        if (await ask(household, option, { shop, url, reason: why, watch, imageUrl }))
+        if (await ask(household, option, { shop, url, reason: why, watch, imageUrl }, undefined, queries))
           sendPing(household, "asked", { item: option });
       } else {
         const lines = picks.map(({ thing, option: { id, name, cents, shop, url, why, watch, imageUrl } }) => ({
@@ -168,7 +227,7 @@ export async function askSam(token: string, formData: FormData): Promise<void> {
           thing,
         }));
         const item = { id: "basket", name: things(lines.length), cents };
-        if (await ask(household, item, undefined, lines)) sendPing(household, "asked", { item, lines });
+        if (await ask(household, item, undefined, lines, queries)) sendPing(household, "asked", { item, lines });
       }
       await clearSearch(household);
     }
@@ -223,12 +282,13 @@ export async function subscribe(token: string, json: unknown): Promise<boolean> 
   return true;
 }
 
-// Each group's radio is pick-<index>, and a listing picked under two things counts once.
-function basketPicks(groups: Group[], formData: FormData): { thing: string; option: Option }[] {
-  const picks: { thing: string; option: Option }[] = [];
-  groups.forEach(({ thing, options }, index) => {
+// Each group's radio is pick-<index>, and a listing picked under two things counts once. A group from before
+// queries were kept searched for its thing.
+function basketPicks(groups: Group[], formData: FormData): { thing: string; query: string; option: Option }[] {
+  const picks: { thing: string; query: string; option: Option }[] = [];
+  groups.forEach(({ thing, query, options }, index) => {
     const option = options.find((listing) => listing.id === formData.get(`pick-${index}`));
-    if (option && !picks.some((pick) => pick.option.id === option.id)) picks.push({ thing, option });
+    if (option && !picks.some((pick) => pick.option.id === option.id)) picks.push({ thing, query: query ?? thing, option });
   });
   return picks;
 }

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { choose, readNeed, readPhoto } from "./ai";
+import { choose, otherWords, readNeed, readPhoto } from "./ai";
 import type { Found } from "./search";
 
 const words = "warm slippers that are easy to put on, size 8";
@@ -49,6 +49,26 @@ it("asks Haiku for each thing in Rose's own words, with a search query for each"
   expect(body.messages).toEqual([{ role: "user", content: "AA batteries and a night light" }]);
   expect(body.system).toContain("their own words");
   expect(body.output_config.format.schema.required).toEqual(["things"]);
+  expect(body.max_tokens).toBe(2000);
+});
+
+it("asks Haiku for a new query for the thing, in other words than the last one, with a prompt of its own", async () => {
+  const fetch = stubHaiku(() => reply({ query: "jar opener" }));
+
+  expect(await otherWords("something to grip jar lids", "jar lid grip")).toEqual({ query: "jar opener" });
+
+  const { body } = sent(fetch);
+  expect(body.messages).toEqual([
+    { role: "user", content: 'They want: "something to grip jar lids"\nThe last query: "jar lid grip"' },
+  ]);
+  expect(body.system).toContain("Never repeat the last query.");
+  expect(body.system).not.toContain("their own words");
+  expect(body.output_config.format.schema).toEqual({
+    type: "object",
+    additionalProperties: false,
+    required: ["query"],
+    properties: { query: { type: "string" } },
+  });
   expect(body.max_tokens).toBe(2000);
 });
 

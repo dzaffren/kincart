@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
 import type { Group } from "../../lib/shop/find";
-import { RoseView } from "./RoseView";
+import { RoseView, type RoseState } from "./RoseView";
 
 const listing = (id: string, name: string, cents: number) => ({
   id,
@@ -201,4 +201,140 @@ it("says on the receipt that the money went to KinCart's sandbox shop, not the s
   );
 
   expect(html).toContain("Paid to KinCart&#x27;s sandbox shop. In this demo, no order reaches the shops.");
+});
+
+const render = (state: RoseState) => renderToStaticMarkup(<RoseView state={state} items={[]} findAnother={async () => {}} />);
+const findAnother = (hint: string) => new RegExp(`<button[^>]*>Find another</button><p class="small">${hint}</p>`);
+const jar = "something to grip jar lids";
+const lamp = "a lamp for reading in bed";
+
+it("offers Find another under an empty Find's notice, then says Still and offers none once it ran", () => {
+  const empty = render({ kind: "ask", limitCents: 5000, words: jar, problem: "nothing found" });
+  expect(empty).toContain("Couldn&#x27;t find that. Try different words.");
+  expect(empty).toMatch(findAnother("KinCart tries other words for you."));
+
+  const over = render({ kind: "ask", limitCents: 2000, words: lamp, problem: "over limit" });
+  expect(over).toContain("Nothing under $20 for that. Try different words, or ask Sam to raise the limit.");
+  expect(over).toMatch(findAnother("KinCart tries other words for you."));
+
+  const still = render({ kind: "ask", limitCents: 5000, words: jar, problem: "nothing found", tried: true });
+  expect(still).toContain("Still couldn&#x27;t find that. Try different words.");
+  expect(still).not.toContain("Find another");
+
+  const stillOver = render({ kind: "ask", limitCents: 2000, words: lamp, problem: "over limit", tried: true });
+  expect(stillOver).toContain("Still nothing under $20 for that. Try different words, or ask Sam to raise the limit.");
+  expect(stillOver).not.toContain("Find another");
+  expect(stillOver).toContain(`>${lamp}</textarea>`);
+
+  expect(render({ kind: "ask", limitCents: 5000, words: jar, problem: "too many" })).not.toContain("Find another");
+  expect(render({ kind: "ask", limitCents: 5000 })).not.toContain("Find another");
+});
+
+const dearfoams = { id: "prod_2Df7cZ", name: "Dearfoams Women's Cozy Comfort Slippers", cents: 2499 };
+const line = (thing: string, { id, name, cents }: typeof aa24) => ({ id, name, cents, shop: "amazon.com", url: "https://www.amazon.com/", reason: "", thing });
+
+it("offers Find another under Sam's No, for one thing and for a basket, and not after a failed charge", () => {
+  const one = render({ kind: "ask", limitCents: 5000, outcome: { kind: "declined", item: dearfoams } });
+  expect(one).toContain("Sam said no to Dearfoams Women&#x27;s Cozy Comfort Slippers.");
+  expect(one).toMatch(findAnother("KinCart looks again with other words, without the one Sam said no to."));
+
+  const lines = [line("AA batteries", aa24), line("a phone charger", belkin)];
+  const basket = render({ kind: "ask", limitCents: 5000, outcome: { kind: "declined", item: dearfoams, lines } });
+  expect(basket).toContain("Sam said no to your 2 things. Nothing was taken.");
+  expect(basket).toMatch(findAnother("KinCart looks again for each thing, without the ones Sam said no to."));
+
+  expect(render({ kind: "ask", limitCents: 5000, outcome: { kind: "failed", item: dearfoams } })).not.toContain("Find another");
+});
+
+const trimmed = {
+  item: { id: "basket", name: "1 thing", cents: 999 },
+  paidAt: new Date("2026-10-22T10:16:00Z"),
+  transactionId: "7KT20419UA331082M",
+  lines: [line("AA batteries", aa24)],
+};
+
+it("offers Find another on the receipt for what Sam left out, above Ask for something else", () => {
+  const one = render({ kind: "paid", receipt: { ...trimmed, leftOut: ["a night light"] } });
+  expect(one).toContain("Sam left out a night light.");
+  expect(one).toMatch(
+    /<button[^>]*>Find another<\/button><p class="small">KinCart looks again with other words, without the one Sam left out.<\/p><\/form><a [^>]*>Ask for something else<\/a>/,
+  );
+
+  const two = render({ kind: "paid", receipt: { ...trimmed, leftOut: ["a night light", "a phone charger"] } });
+  expect(two).toMatch(findAnother("KinCart looks again with other words, without the ones Sam left out."));
+
+  expect(render({ kind: "paid", receipt: trimmed })).not.toContain("Find another");
+});
+
+it("offers Find another in a basket group that found nothing, sent with the Ask Sam form and named by its group", () => {
+  const html = render({
+    kind: "basket",
+    limitCents: 5000,
+    words: `AA batteries, ${jar}, ${lamp}`,
+    groups: [
+      { thing: "AA batteries", options: [aa24] },
+      { thing: jar, options: [], problem: "nothing found" },
+      { thing: lamp, options: [], problem: "over limit", tried: true },
+    ],
+  });
+
+  const [form] = html.match(/<form[^>]*>.*<\/form>/)!;
+  const [another] = form.match(/<button[^>]*>Find another<\/button>/)!;
+  expect(another).toContain('name="another"');
+  expect(another).toContain('value="1"');
+  expect(another).not.toContain("formAction");
+  const [askSam] = form.match(/<button[^>]*>Ask Sam<\/button>/)!;
+  expect(askSam).toContain('name="ask"');
+  expect(askSam).toContain('value="sam"');
+  expect(form).toContain("Couldn&#x27;t find this one.");
+  expect(form).toContain('<p class="small">KinCart tries other words for this one.</p>');
+  expect(form).toContain("Still nothing under $50 for this one.");
+  expect(form.match(/>Find another</g)).toHaveLength(1);
+});
+
+it("says Find another looked again with other words, on its options, its basket, or the one group it searched", () => {
+  const listings = [aa24, aa16, belkin];
+  expect(render({ kind: "options", limitCents: 5000, words: jar, listings, tried: true })).toContain(
+    "For “something to grip jar lids”. Looked again with other words.</p>",
+  );
+  expect(render({ kind: "options", limitCents: 5000, words: jar, listings })).not.toContain("Looked again");
+
+  const again = groups.map((group) => ({ ...group, tried: true }));
+  const basket = render({ kind: "basket", limitCents: 5000, words: "batteries", groups: again, tried: true });
+  expect(basket).toContain("For “batteries”. Looked again with other words. Pick one for each thing you want.");
+  expect(basket.match(/Looked again/g)).toHaveLength(1);
+
+  const one = render({
+    kind: "basket",
+    limitCents: 5000,
+    words: `AA batteries, ${jar}`,
+    groups: [groups[0], { thing: jar, options: [aa16], tried: true }],
+  });
+  expect(one).toMatch(/<h2[^>]*>something to grip jar lids<\/h2><p class="small">Looked again with other words.<\/p>/);
+  expect(one.match(/Looked again/g)).toHaveLength(1);
+});
+
+it("puts the day's limit notice on the basket and the receipt, and keeps an empty search's Find another under it", () => {
+  const notice = "That&#x27;s a lot of Finds from here today. Try again in 3 hours.";
+  expect(render({ kind: "basket", limitCents: 5000, words: "batteries", groups, waitMinutes: 170 })).toContain(notice);
+  expect(render({ kind: "basket", limitCents: 5000, words: "batteries", groups })).not.toContain("a lot of Finds");
+  expect(render({ kind: "paid", receipt: { ...trimmed, leftOut: ["a night light"] }, waitMinutes: 170 })).toMatch(
+    new RegExp(`${notice}.*Find another`),
+  );
+
+  const empty = render({ kind: "ask", limitCents: 5000, words: jar, problem: "nothing found", waitMinutes: 170 });
+  expect(empty).toContain("Couldn&#x27;t find that. Try different words.");
+  expect(empty).toContain(notice);
+  expect(empty).toMatch(findAnother("KinCart tries other words for you."));
+
+  const declined = render({
+    kind: "ask",
+    limitCents: 5000,
+    outcome: { kind: "declined", item: dearfoams },
+    problem: "limit",
+    waitMinutes: 170,
+  });
+  expect(declined).toContain(notice);
+  expect(declined).toMatch(findAnother("KinCart looks again with other words, without the one Sam said no to."));
+  expect(declined.match(/a lot of Finds/g)).toHaveLength(1);
 });

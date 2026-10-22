@@ -9,7 +9,7 @@ import { demoLogin } from "../../../../lib/shop/paypal";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
-import { askSam, find, skipLink, startLink, tryAgain } from "../../actions";
+import { askSam, find, findAnother, skipLink, startLink, tryAgain } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -56,6 +56,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
       notPhoto: query.find === "notphoto",
       limitWait: query.find === "limit" ? minutesUntil(Number(query.until)) : undefined,
       over: typeof query.over === "string" ? query.over.split(",") : undefined,
+      picked: typeof query.picked === "string" ? query.picked.split(",") : undefined,
     },
     on ? { saved, limitCents, totalCents } : undefined,
   );
@@ -74,6 +75,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
           ask={askSam.bind(null, token)}
           find={find.bind(null, token)}
           tryAgain={tryAgain.bind(null, token)}
+          findAnother={findAnother.bind(null, token)}
           notify={pushOn() ? <NotifyControl who="rose" token={token} publicKey={publicKey()} /> : undefined}
         />
         <Refresher />

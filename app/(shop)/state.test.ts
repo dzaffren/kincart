@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { ITEMS } from "../../lib/shop/items";
 import type { PurchaseRequest, RequestStatus, SavedSearch } from "../../lib/shop/requests";
-import { notifyState, roseState, samState, type NotifyEnv } from "./state";
+import { againOf, notifyState, roseState, samState, type NotifyEnv } from "./state";
 
 const [glasses, pills, batteries] = ITEMS;
 const askedAt = new Date("2026-10-20T10:15:00Z");
@@ -21,6 +21,7 @@ function request(status: RequestStatus, item = glasses): PurchaseRequest {
     failureReason: status === "failed" ? "PERMISSION_DENIED" : null,
     lines: null,
     leftOut: null,
+    queries: null,
   };
 }
 
@@ -90,6 +91,8 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   fromPhoto: false,
   photos: 0,
   blankPhotos: 0,
+  query: null,
+  tried: false,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
@@ -401,5 +404,176 @@ it("tells Rose when a Find was stopped for the day, with Rose's words in the box
     kind: "ask",
     limitCents: 5000,
     words,
+  });
+});
+
+const jarWords = "something to grip jar lids";
+const slipperPick = { id: strap.id, thing: words, query: "warm slip-on slippers size 8" };
+const aaPick = { id: aa.id, thing: "AA batteries", query: "AA batteries" };
+const lightPick = { id: light.id, thing: "a night light", query: "plug-in night light" };
+
+it("searches an empty Find's words again with its last query, once, and only while it's the current search", () => {
+  expect(againOf({ ...saved("nothing found"), words: jarWords, query: "jar lid grip" }, null)).toEqual({
+    words: jarWords,
+    things: [{ words: jarWords, query: "jar lid grip", refused: [] }],
+  });
+  expect(againOf({ ...saved("over limit"), query: null }, request("declined"))).toEqual({
+    words,
+    things: [{ words, query: words, refused: [] }],
+  });
+  expect(againOf({ ...saved("nothing found"), tried: true }, null)).toBeNull();
+  for (const outcome of ["options", "basket", "retry", "too many", "nothing in photo"] as const) {
+    expect(againOf(saved(outcome), null)).toBeNull();
+  }
+  expect(againOf(null, null)).toBeNull();
+});
+
+it("searches each thing of a basket that found nothing again, each with its own last query", () => {
+  const groups = [
+    { thing: "AA batteries", options: [], problem: "nothing found" as const, query: "AA batteries" },
+    { thing: jarWords, options: [], problem: "over limit" as const },
+  ];
+  expect(againOf({ ...saved("nothing found"), words: `AA batteries, ${jarWords}`, groups }, null)).toEqual({
+    words: `AA batteries, ${jarWords}`,
+    things: [
+      { words: "AA batteries", query: "AA batteries", refused: [] },
+      { words: jarWords, query: jarWords, refused: [] },
+    ],
+  });
+});
+
+it("searches the thing Sam said no to again, without its listing", () => {
+  const declined = { ...request("declined", strap), queries: [slipperPick] };
+  expect(againOf(null, declined)).toEqual({
+    words,
+    things: [{ words, query: "warm slip-on slippers size 8", refused: [strap.id] }],
+  });
+  expect(againOf({ ...saved("options"), searchedAt: new Date("2026-10-20T10:00:00Z") }, declined)).toMatchObject({ words });
+});
+
+it("searches every thing in a basket Sam said no to, each without any of its listings", () => {
+  const declined = { ...asked("declined"), queries: [aaPick, lightPick] };
+  expect(againOf(null, declined)).toEqual({
+    words: "AA batteries and a night light",
+    things: [
+      { words: "AA batteries", query: "AA batteries", refused: [aa.id, light.id] },
+      { words: "a night light", query: "plug-in night light", refused: [aa.id, light.id] },
+    ],
+  });
+});
+
+it("searches only what Sam left out of a paid basket, without the listing Sam left out", () => {
+  expect(againOf(null, { ...trimmed("paid"), queries: [aaPick, lightPick] })).toEqual({
+    words: "a night light",
+    things: [{ words: "a night light", query: "plug-in night light", refused: [light.id] }],
+  });
+  expect(againOf(null, { ...asked("paid"), queries: [aaPick, lightPick] })).toBeNull();
+  expect(againOf(null, { ...request("paid", strap), queries: [slipperPick] })).toBeNull();
+});
+
+it("offers nothing to a stale tab, while Sam decides, or after a failed charge", () => {
+  const declined = { ...request("declined", strap), queries: [slipperPick] };
+  expect(againOf({ ...saved("options"), tried: true }, declined)).toBeNull();
+  expect(againOf({ ...saved("nothing found"), tried: true }, declined)).toBeNull();
+  expect(againOf(saved("retry"), declined)).toBeNull();
+  expect(againOf(null, { ...request("waiting", strap), queries: [slipperPick] })).toBeNull();
+  expect(againOf(null, { ...request("paying", strap), queries: [slipperPick] })).toBeNull();
+  expect(againOf(null, { ...request("failed", strap), queries: [slipperPick] })).toBeNull();
+  expect(againOf(saved("nothing found"), request("waiting"))).toBeNull();
+});
+
+it("falls back to each line's thing, the item's name, or what Sam left out, for an ask from before queries were kept", () => {
+  expect(againOf(null, request("declined", strap))).toEqual({
+    words: strap.name,
+    things: [{ words: strap.name, query: strap.name, refused: [strap.id] }],
+  });
+  expect(againOf(null, asked("declined"))).toEqual({
+    words: "AA batteries and a night light",
+    things: [
+      { words: "AA batteries", query: "AA batteries", refused: [aa.id, light.id] },
+      { words: "a night light", query: "a night light", refused: [aa.id, light.id] },
+    ],
+  });
+  expect(againOf(null, trimmed("paid"))).toEqual({
+    words: "a night light",
+    things: [{ words: "a night light", query: "a night light", refused: [] }],
+  });
+});
+
+const jarSearch = (group: object = {}): SavedSearch => ({
+  ...saved("basket"),
+  words: "AA batteries, something to grip jar lids",
+  groups: [
+    { thing: "AA batteries", options: [strap], query: "AA batteries" },
+    { thing: jarWords, options: [], problem: "nothing found", query: "jar lid grip", ...group },
+  ],
+});
+
+it("searches one empty group of the current basket again, once", () => {
+  expect(againOf(jarSearch(), null, 1)).toEqual({
+    words: "AA batteries, something to grip jar lids",
+    things: [{ words: jarWords, query: "jar lid grip", refused: [] }],
+    group: 1,
+  });
+  expect(againOf(jarSearch({ query: undefined, problem: "over limit" }), null, 1)).toMatchObject({
+    things: [{ words: jarWords, query: jarWords, refused: [] }],
+  });
+  expect(againOf(jarSearch({ tried: true }), null, 1)).toBeNull();
+  expect(againOf(jarSearch(), null, 0)).toBeNull();
+  expect(againOf(jarSearch(), null, 2)).toBeNull();
+  expect(againOf(jarSearch(), null, -1)).toBeNull();
+  expect(againOf(saved("nothing found"), null, 0)).toBeNull();
+  expect(againOf(jarSearch(), { ...request("declined", strap), queries: [slipperPick] }, 1)).toMatchObject({ group: 1 });
+  expect(againOf(null, { ...request("declined", strap), queries: [slipperPick] }, 0)).toBeNull();
+});
+
+it("tells Rose's screens when Find another ran their search", () => {
+  expect(roseState(vault, null, {}, on({ ...saved("nothing found"), tried: true }))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words,
+    problem: "nothing found",
+    tried: true,
+  });
+  expect(roseState(vault, null, {}, on({ ...saved("options"), tried: true }))).toMatchObject({ kind: "options", tried: true });
+  expect(roseState(vault, null, {}, on({ ...jarSearch(), tried: true }))).toMatchObject({ kind: "basket", tried: true });
+  expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ tried: undefined });
+});
+
+it("keeps Rose's other picks after a group's Find another, when they're still in their group", () => {
+  const basket = on(jarSearch({ options: [{ ...strap, id: "prod_5Jo1xO" }], problem: undefined, tried: true }));
+
+  expect(roseState(vault, null, { picked: [strap.id, ""] }, basket)).toMatchObject({ kind: "basket", picked: [strap.id, undefined] });
+  expect(roseState(vault, null, { picked: ["prod_madeUp1", strap.id] }, basket)).toMatchObject({ picked: [undefined, undefined] });
+  expect(roseState(vault, null, { picked: [""] }, basket)).toMatchObject({ picked: [undefined, undefined] });
+  expect(roseState(vault, null, {}, basket)).toMatchObject({ picked: undefined });
+});
+
+it("puts the limit notice on the basket and the receipt, and keeps an empty search's Find another under it", () => {
+  expect(roseState(vault, null, { limitWait: 170, picked: [strap.id] }, on(jarSearch()))).toMatchObject({
+    kind: "basket",
+    picked: [strap.id, undefined],
+    waitMinutes: 170,
+  });
+  expect(roseState(vault, null, { limitWait: 0 }, on(jarSearch()))).not.toHaveProperty("waitMinutes");
+  expect(roseState(vault, trimmed("paid"), { limitWait: 170 }, on())).toEqual({
+    kind: "paid",
+    receipt: trimmedReceipt,
+    waitMinutes: 170,
+  });
+  expect(roseState(vault, trimmed("paid"), {}, on())).toEqual({ kind: "paid", receipt: trimmedReceipt });
+  expect(roseState(vault, null, { limitWait: 170 }, on(saved("nothing found")))).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words,
+    problem: "nothing found",
+    waitMinutes: 170,
+  });
+  expect(roseState(vault, request("declined", strap), { limitWait: 170 }, on())).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    outcome: { kind: "declined", item: strap },
+    problem: "limit",
+    waitMinutes: 170,
   });
 });

@@ -37,6 +37,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money.
 - A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words.
 - The home page cites a checked US survey under its claim: about 1 in 10 of 657 adults had signed in to someone's money or medical account with their login. Step 1 of How it works says Rose can send a photo.
+- When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused.
 
 ## Docs
 
