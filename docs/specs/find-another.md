@@ -354,42 +354,7 @@ Chunk A owns the shared types: `Group`, `Single` and `SavedSearch`.
 
 ### Decisions to record
 
-Drafted at pauses 1 and 3. `/build` appends them to `DECISIONS.md`.
-
-## D97 · 2026-10-22 · Rose gets one Find another for each empty Find, No or untick, and each one counts as a Find
-
-Why: one try with other words gives Rose new options without a loop of empty searches. It sends the same Claude and Channel3 calls as a Find, so it counts toward the address's 20 a day (D73) and on `/status` (D78).
-Rejected: taps until the daily limit, each with untried words (a loop of empty results, and KinCart must keep every tried query), a Find another that runs free (a script could tap it past the daily limit).
-Source: docs/specs/find-another.md
-Status: active
-
-## D98 · 2026-10-22 · Find another leaves out only what Sam just refused, and after a basket No it searches every thing
-
-Why: a No or an untick stores the refused listings with the ask. Rose's other options are cleared at Ask Sam. One tap for the whole basket keeps Rose's page to one new control.
-Rejected: leave out every listing Sam ever refused for the thing (a history to store), also leave out the options Rose saw and didn't pick (KinCart must keep them after Ask Sam), Rose ticks which things to search after a basket No (one more control on Rose's page).
-Source: docs/specs/find-another.md
-Status: active
-
-## D99 · 2026-10-22 · Find another writes other words in a Haiku call of its own for each thing, then runs Find's search and pick step without what Sam refused
-
-Why: the other-words call takes the place of reading Rose's words, so a Find another sends the same calls as a Find (D97) and stays within D91's times. The pick step is the one that D88 to D95 fixed. Each thing gets its own call, so one bad answer blanks only its own group (D31).
-Rejected: `readNeed()` again with a hint about the last query (it changes `NEED`, which its tests check, as D66 avoided), one call for every thing in a basket (one bad answer spoils every group, as D31 found), an agent loop that searches until it finds a fit (D22: no scenario needs it, and it adds 3 to 5 s).
-Source: docs/specs/find-another.md
-Status: active
-
-## D100 · 2026-10-22 · A search keeps its query and whether Find another ran it, and each ask keeps its picks' words and queries in a queries jsonb column
-
-Why: Find another must avoid the last query and leave out what Sam refused. `claim()` keeps only the paid lines, so an untick loses the left-out pick's id. `tried` must survive the 3 s redraw (D19) and a reopened link, as `from_photo` does (D67). D57 still holds for a one-thing ask's note and photo.
-Rejected: `thing` and `query` columns and a `left_out_lines` column, as D57 did for the note and photo (`claim()` must change, and a basket keeps its queries in two places), no stored query (Haiku can't tell which words to avoid), keep `rose_search` after Ask Sam (the unticked pick is still lost, and a stale tab could ask for the refused pick again), `?tried=1` in the page address (lost on a reopened link, as D67 found).
-Source: docs/specs/find-another.md
-Status: active
-
-## D101 · 2026-10-22 · A stopped Find another saves nothing, so its screen and its Find another stay, with the limit notice on top
-
-Why: Rose can tap it again once the wait passes. The wait rides in the page address, as for Find (D77). It still counts as a stopped Find (D97).
-Rejected: a retry search, as a stopped Find saves (D77) (the No notice and its Find another would vanish, and an empty search's words are already saved).
-Source: docs/specs/find-another.md
-Status: active
+Recorded as D97, D98, D99, D100, D101.
 
 ## Open items
 
