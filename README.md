@@ -35,6 +35,7 @@ Used by older shoppers and the relative who helps them pay online.
 - One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again.
 - `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped.
 - Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money.
+- A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words.
 
 ## Docs
 

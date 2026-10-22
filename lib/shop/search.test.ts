@@ -1,5 +1,7 @@
+import { randomBytes } from "node:crypto";
+import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { searchListings } from "./search";
+import { searchListings, withPhotos, type Found } from "./search";
 
 const slippers = {
   id: "prod_7Hq2kZ",
@@ -55,6 +57,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 it("searches Channel3 under the limit and keeps in-stock US-dollar listings that cost something", async () => {
@@ -96,4 +99,82 @@ it("throws when Channel3 refuses, so the caller can say it couldn't find anythin
   stubChannel3(() => Response.json({ error: "rate limited" }, { status: 429 }));
 
   await expect(searchListings("warm slippers")).rejects.toThrow("channel3 429");
+});
+
+const found = (id: string, imageUrl?: string): Found => ({
+  id,
+  name: "Duracell Coppertop AA Batteries, 8 Pack",
+  cents: 879,
+  shop: "target.com",
+  url: `https://www.target.com/p/${id}`,
+  imageUrl,
+  details: "Long-lasting AA alkaline batteries.",
+});
+
+const photoOf = (width: number, height: number) =>
+  sharp({ create: { width, height, channels: 3, background: "#e8e8e8" } }).webp().toBuffer();
+
+const photo = (body: BodyInit, type = "image/webp", status = 200) =>
+  new Response(body, { status, headers: { "content-type": type } });
+
+it("downloads each listing's photo from Channel3's photo host and shrinks it to 512 px, with no key sent", async () => {
+  const big = await photoOf(2048, 1536);
+  const fetch = stubChannel3(() => photo(new Uint8Array(big), "image/jpeg"));
+  const timeout = vi.spyOn(AbortSignal, "timeout");
+
+  const [kept] = await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")]);
+
+  expect(kept).toEqual({ ...found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3"), photo: { mediaType: "image/webp", data: expect.any(String) } });
+  expect(await sharp(Buffer.from(kept.photo!.data, "base64")).metadata()).toMatchObject({ format: "webp", width: 512, height: 384 });
+  const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  expect(url).toBe("https://cdn.trychannel3.com/a1b2c3");
+  expect(init.redirect).toBe("error");
+  expect(timeout).toHaveBeenCalledWith(3000);
+  expect(init.signal).toBe(timeout.mock.results[0].value);
+  expect(init.headers).toBeUndefined();
+});
+
+it("keeps a small photo at its own size", async () => {
+  const small = await photoOf(300, 200);
+  stubChannel3(() => photo(new Uint8Array(small)));
+
+  const [kept] = await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")]);
+
+  expect(await sharp(Buffer.from(kept.photo!.data, "base64")).metadata()).toMatchObject({ width: 300, height: 200 });
+});
+
+it("passes a listing with no photo on, with no download", async () => {
+  const fetch = stubChannel3(() => photo(""));
+
+  expect(await withPhotos([found("prod_1Dc8aA")])).toEqual([found("prod_1Dc8aA")]);
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo, broken or too big", async () => {
+  // Noise doesn't compress, so this is a real photo over 1 MB that only the size check can drop.
+  const noise = await sharp(randomBytes(700 * 700 * 3), { raw: { width: 700, height: 700, channels: 3 } }).png().toBuffer();
+  expect(noise.length).toBeGreaterThan(1024 * 1024);
+  const answers: Record<string, () => Response> = {
+    gone: () => photo("Not found", "text/plain", 404),
+    slow: () => {
+      throw new DOMException("The operation timed out.", "TimeoutError");
+    },
+    moved: () => {
+      throw new TypeError("fetch failed: redirect mode is set to error");
+    },
+    page: () => photo("<!doctype html><title>Sign in</title>", "text/html"),
+    broken: () => photo(new Uint8Array(Buffer.from("524946462400000057454250565038", "hex"))),
+    huge: () => photo(new Uint8Array(noise), "image/png"),
+  };
+  const fetch = vi.fn(async (url: string) => answers[url.split("/").pop()!]());
+  vi.stubGlobal("fetch", fetch);
+
+  const listings = [
+    ...Object.keys(answers).map((name) => found(`prod_${name}`, `https://cdn.trychannel3.com/${name}`)),
+    found("prod_other", "https://images.example.com/gone"),
+    found("prod_lookalike", "https://cdn.trychannel3.com.example.com/slow"),
+    found("prod_http", "http://cdn.trychannel3.com/gone"),
+  ];
+  expect(await withPhotos(listings)).toEqual([]);
+  expect(fetch.mock.calls.map(([url]) => url)).toEqual(Object.keys(answers).map((name) => `https://cdn.trychannel3.com/${name}`));
 });

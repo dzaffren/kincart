@@ -140,13 +140,29 @@ it("gives Haiku the listings under the limit by id, and only the names above it"
   });
 
   expect(sent(fetch).body.max_tokens).toBe(4000);
-  const message = sent(fetch).body.messages[0].content;
-  expect(message).toContain(words);
-  expect(message).toContain('"id":"prod_7Hq2kZ"');
+  const message = JSON.stringify(sent(fetch).body.messages[0].content);
+  expect(message).toContain(JSON.stringify(words).slice(1, -1));
+  expect(message).toContain("Listing prod_7Hq2kZ:");
   expect(message).toContain("Sizes: 6, 8, 10");
   expect(message).toContain("Sheepskin Moccasin Slippers");
   expect(message).not.toContain("prod_2Lm9vQ");
   expect(message).not.toContain("27.07");
+});
+
+it("sends each listing's photo right after its words, and none for a listing without one", async () => {
+  const fetch = stubHaiku(() => reply({ picks: [], aboveLimit: false }));
+  const photo = { mediaType: "image/webp", data: "UklGRiQAAABXRUJQVlA4" };
+  const muji = { ...kohls, id: "prod_4Fd6sW", name: "Warm Fiber Slippers", details: "Warm fiber slippers." };
+
+  await choose(words, [{ ...kohls, photo }, muji], [{ ...kohls, id: "prod_2Lm9vQ", name: "Sheepskin Moccasin Slippers", photo }]);
+
+  expect(sent(fetch).body.messages[0].content).toEqual([
+    { type: "text", text: `They asked: ${JSON.stringify(words)}\n\nUnder their price limit, pick from these:` },
+    { type: "text", text: `Listing prod_7Hq2kZ: ${JSON.stringify({ name: kohls.name, details: kohls.details })}` },
+    { type: "image", source: { type: "base64", media_type: "image/webp", data: photo.data } },
+    { type: "text", text: `Listing prod_4Fd6sW: ${JSON.stringify({ name: muji.name, details: muji.details })}` },
+    { type: "text", text: `Above their price limit, not to pick from:\n${JSON.stringify(["Sheepskin Moccasin Slippers"])}` },
+  ]);
 });
 
 it("throws when Haiku fails or its answer is cut off", async () => {

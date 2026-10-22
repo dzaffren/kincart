@@ -590,3 +590,59 @@ Why: the sandbox took 128- and 300-character names and kept the first 124 charac
 Rejected: cutting in `charge()` to 126 characters and "…" (code for a cut PayPal already makes in sandbox).
 Source: docs/specs/itemized-receipt.md
 Status: active
+
+## D88 · 2026-10-22 · A pick must be the product Rose asked for, in any brand or pack size
+
+Why: an older shopper may pick a battery case for "AA batteries" and not see the mistake until it arrives. Any brand or pack size of the real thing does the job.
+Rejected: drop only listings that are a different product (a battery case or a pack of AAA still reaches Rose as "AA batteries"), only the brand Rose names (fewer results, when any brand of AA works).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D89 · 2026-10-22 · A listing whose photo shows something other than its name never reaches Rose, and a listing with no photo is judged on its words
+
+Why: Channel3 lists a white basket, a trash can and a pin board from containerstore.com as "AA Batteries", with words about Energizer AA (O1). Rose and Sam judge by the photo (D54).
+Rejected: show a mismatch with a "Good to know" note (Rose may still pick it, and Sam sees a basket), drop every listing with no photo (fewer results, and they show today).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D90 · 2026-10-22 · A recorded set of real wrong listings proves the pick step, run 3 times against real Haiku
+
+Why: Channel3's results change, so a live e2e may never meet a wrong listing. The containerstore.com listings in O1 are real, and a test can run them again and again. The live e2e still calls Channel3 and Claude, as D24 says.
+Rejected: a live e2e check alone (it passes on a day with no wrong listing in the results).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D91 · 2026-10-22 · Checking picks adds no time to Find: one thing within 15 s, five within 20 s
+
+Why: these are find-and-explain's and the basket's limits (D31). A slower Find makes a worse first look for a judge.
+Rejected: 5 s more for each (one thing within 20 s, five within 25 s).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D92 · 2026-10-22 · The pick call sees each listing's photo, downloaded by KinCart, and listings above the limit stay names only
+
+Why: Channel3's words can say "AA batteries" over a photo of a basket, so only the photo shows the mismatch (O1). One call keeps D22's two fixed steps, and Haiku can pick another listing in place of a misfit. The API refuses Channel3's photo URLs because the CDN's robots.txt disallows crawlers, so KinCart sends the bytes.
+Rejected: a third call that checks the 3 picks' photos (one more call in a row against the 15 s limit, and Rose may see 1 option when others fit), photo URLs in the request (the API refuses them), photos for listings above the limit too (up to 10 more photos a call, for a wrong message, not a wrong pick).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D93 · 2026-10-22 · A photo KinCart can't download drops its listing, and a failed pick call finds nothing, as today
+
+Why: a listing whose photo can't be checked could be O1's basket, and Rose's and Sam's pages would likely show a broken photo too. A wrong pick must never get through (D88, D89).
+Rejected: judge such a listing on its words (a basket like O1's gets through when its photo fails), retry a failed pick call without photos (the basket could reach Rose again).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D94 · 2026-10-22 · The recorded set keeps its photos in the repo, and runs in `pnpm test` on every push
+
+Why: Channel3 can drop a listing or photo at any time, and the O1 listings are the proof. A wrong pick then fails CI like any other test, as the live e2e can (D24). A run costs an estimated 3 to 5 cents.
+Rejected: photos fetched live from Channel3's CDN (the test breaks when a photo goes), a run by hand before a ship only (a prompt change could ship a wrong pick between runs).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D95 · 2026-10-22 · KinCart downloads listing photos only from cdn.trychannel3.com, with redirects refused, in 3 s and up to 1 MB
+
+Why: the URL comes from shop data, so the server must not fetch any host that a listing names. All 60 photos in the O1 spike were on `cdn.trychannel3.com`, from 3 to 260 KB, and took 0.7 to 3.5 s fetched all at once. The time and size caps stop one slow or huge photo from failing the whole pick call.
+Rejected: any https host with redirects refused (the server fetches whatever host a listing names).
+Source: docs/specs/picks-that-match.md
+Status: active

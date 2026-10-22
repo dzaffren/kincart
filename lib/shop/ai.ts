@@ -51,7 +51,7 @@ const NEED_PHOTO_SCHEMA = {
   },
 };
 
-const CHOOSE = `You help an older person choose something to buy. From the listings under their price limit, pick up to three that fit what they asked, best first, or none if none is really the thing they asked for. For each pick write one short, plain sentence each: what it is, why it fits what they asked, and one thing to watch for, such as size, pack count, fit or delivery. Use only what the listing says. Never mention a price or the shop. Refer to listings only by their id. Then say whether any listing above their limit is the thing they asked for.`;
+const CHOOSE = `You help an older person choose something to buy. Each listing under their price limit comes with its photo, if it has one. A listing sells the main thing in its photo, whatever its words say. First leave out every listing that is not the product they asked for: a case, holder, organizer, charger, cable or other part for it, even when its photo shows the product inside it, since the product's own printed retail pack is the only packaging that counts as the product; another size or type than they said; and any listing whose photo shows something other than its name and words say, even when the words fit. Judge a listing with no photo by its name and words alone. Any brand or pack size of the product counts. From the listings left, pick up to three that fit what they asked, best first. Fewer than three is fine, and none if none is left. Never pick a listing that you would describe as only a part, or whose photo shows something else. For each pick write one short, plain sentence each: what it is, why it fits what they asked, and one thing to watch for, such as size, pack count, fit or delivery. Use only what the listing says. Never mention a price or the shop. Refer to listings only by their id. Then say whether any listing above their limit is the thing they asked for.`;
 
 const CHOOSE_SCHEMA = {
   type: "object",
@@ -88,14 +88,18 @@ export function readPhoto(words: string, jpegs: Buffer[]): Promise<PhotoNeed> {
   return haiku(NEED_PHOTO, content, NEED_PHOTO_SCHEMA, 2000);
 }
 
+// Each listing under the limit goes under its own "Listing <id>:" label, with its photo after it when
+// it has one (D92). Listings above the limit stay names only.
 export function choose(words: string, under: Found[], above: Found[]): Promise<Choice> {
-  const listings = under.map(({ id, name, details }) => ({ id, name, details }));
-  const message = [
-    `They asked: ${JSON.stringify(words)}`,
-    `Under their price limit, pick from these:\n${JSON.stringify(listings)}`,
-    `Above their price limit, not to pick from:\n${JSON.stringify(above.map((listing) => listing.name))}`,
-  ].join("\n\n");
-  return haiku(CHOOSE, message, CHOOSE_SCHEMA, 4000);
+  const content = [
+    { type: "text", text: `They asked: ${JSON.stringify(words)}\n\nUnder their price limit, pick from these:` },
+    ...under.flatMap(({ id, name, details, photo }) => [
+      { type: "text", text: `Listing ${id}: ${JSON.stringify({ name, details })}` },
+      ...(photo ? [{ type: "image", source: { type: "base64", media_type: photo.mediaType, data: photo.data } }] : []),
+    ]),
+    { type: "text", text: `Above their price limit, not to pick from:\n${JSON.stringify(above.map((listing) => listing.name))}` },
+  ];
+  return haiku(CHOOSE, content, CHOOSE_SCHEMA, 4000);
 }
 
 // Low effort still thinks now and then, and the thinking counts toward max_tokens: a pick that
