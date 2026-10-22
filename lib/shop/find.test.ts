@@ -30,9 +30,19 @@ const isNeed = (body: { output_config: { format: { schema: { required: string[] 
 
 type Answers = { need: unknown; under?: unknown[]; all?: unknown[]; choice?: unknown };
 
+// The first bytes of a WebP file: RIFF, a size, then WEBP.
+const webp = Buffer.from("524946462400000057454250565038", "hex");
+
+// Channel3's photo host answers with a small WebP, or a 404 for a photo that is gone.
+const photoAnswer = (url: string) =>
+  url.endsWith("/gone")
+    ? new Response("Not found", { status: 404 })
+    : new Response(new Uint8Array(webp), { headers: { "content-type": "image/webp" } });
+
 function stubServices(answers: Answers | (() => never)) {
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
     if (typeof answers === "function") return answers();
+    if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
       const data = isNeed(body) ? answers.need : answers.choice;
@@ -45,7 +55,7 @@ function stubServices(answers: Answers | (() => never)) {
 }
 
 const searches = (fetch: ReturnType<typeof stubServices>) =>
-  fetch.mock.calls.filter(([url]) => String(url).includes("trychannel3")).length;
+  fetch.mock.calls.filter(([url]) => String(url).includes("api.trychannel3.com")).length;
 
 beforeEach(() => {
   vi.stubEnv("ANTHROPIC_API_KEY", "sk-ant-test-key");
@@ -90,7 +100,7 @@ it("shows up to three listings Haiku picked, with Channel3's names, prices and l
       expect.objectContaining({ id: "prod_8Kp3rT", cents: 900 }),
     ],
   });
-  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=3 searches=2 ms=\d+$/));
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=3 searches=2 ms=\d+ checked=3 unloaded=0$/));
 });
 
 it("says nothing under the limit when the thing only exists above it", async () => {
@@ -120,7 +130,7 @@ it("says too many for more than five things, and searches for nothing that isn't
   const list = stubServices({ need: { things: six.map((thing) => ({ words: thing, query: thing })) } });
   expect(await find(six.join(", "), 5000)).toEqual({ outcome: "too many" });
   expect(searches(list)).toBe(0);
-  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=too-many listings=0 searches=0 ms=\d+$/));
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=too-many listings=0 searches=0 ms=\d+ checked=0 unloaded=0$/));
 
   const notAProduct = stubServices({ need: { things: [] } });
   expect(await find("what time is it in Ohio", 5000)).toEqual({ outcome: "nothing found" });
@@ -137,7 +147,7 @@ it("says it couldn't find anything when Haiku or Channel3 fails, and logs why", 
   });
   expect(await find(words, 5000)).toEqual({ outcome: "nothing found" });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ reason=TimeoutError$/),
+    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ checked=0 unloaded=0 reason=TimeoutError$/),
   );
 
   vi.stubGlobal(
@@ -168,6 +178,7 @@ type Thing = {
 // Each thing's searches and pick are answered by its own query and words. A photo Find also gets blank.
 function stubBasket(things: Thing[], blank?: number[]) {
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
+    if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
       const data =
@@ -215,13 +226,13 @@ it("searches every thing at once and shows a group of listings for each, under R
       { thing: "a phone charger", options: [expect.objectContaining({ id: "prod_2Ak5cH", cents: 1599 })] },
     ],
   });
-  const calls = fetch.mock.calls.map(([url, init]) => ({ url: String(url), body: JSON.parse(String(init.body)) }));
-  const lastSearch = calls.findLastIndex(({ url }) => url.includes("trychannel3"));
+  const calls = fetch.mock.calls.map(([url, init]) => ({ url: String(url), body: init.body && JSON.parse(String(init.body)) }));
+  const lastSearch = calls.findLastIndex(({ url }) => url.includes("api.trychannel3.com"));
   const firstPick = calls.findIndex(({ url, body }) => url.includes("anthropic") && !isNeed(body));
   expect(searches(fetch)).toBe(6);
   expect(lastSearch).toBeLessThan(firstPick);
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 searches=6 ms=\d+$/),
+    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 searches=6 ms=\d+ checked=4 unloaded=0$/),
   );
 });
 
@@ -243,7 +254,7 @@ it("still shows the things it found when some can't be shown, and says why for e
     ],
   });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=basket things=4 shown=1 listings=2 searches=8 ms=\d+ reason=channel3 429$/),
+    expect.stringMatching(/^find outcome=basket things=4 shown=1 listings=2 searches=8 ms=\d+ checked=3 unloaded=0 reason=channel3 429$/),
   );
 });
 
@@ -258,9 +269,77 @@ it("says it couldn't find anything when no thing in the list has listings", asyn
   });
 });
 
+const gone = (found: ReturnType<typeof product>) => ({ ...found, images: [{ url: "https://cdn.trychannel3.com/gone" }] });
+
+it("never sends Haiku a listing whose photo it can't download, and judges one with no photo on its words", async () => {
+  const basket = gone(product("prod_qYGxLFs", "AA Batteries", 6.74, "containerstore.com"));
+  const fetch = stubServices({
+    need: { things: [{ words: "AA batteries", query: "AA batteries" }] },
+    under: [basket, { ...aa8, images: [] }, aa24],
+    all: [aa24],
+    choice: { picks: [pick("prod_qYGxLFs"), pick("prod_1Dc8aA"), pick("prod_3Ba7aA")], aboveLimit: false },
+  });
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+
+  const result = await find("AA batteries", 5000, sent);
+
+  expect(result).toEqual({
+    outcome: "options",
+    options: [
+      expect.objectContaining({ id: "prod_1Dc8aA", imageUrl: undefined }),
+      expect.objectContaining({ id: "prod_3Ba7aA", imageUrl: "https://cdn.trychannel3.com/prod_3Ba7aA" }),
+    ],
+  });
+  expect(JSON.stringify(result)).not.toContain(webp.toString("base64"));
+  const choose = fetch.mock.calls
+    .filter(([url]) => String(url).includes("anthropic"))
+    .map(([, init]) => JSON.parse(String(init.body)).messages[0].content)[1];
+  expect(JSON.stringify(choose)).not.toContain("prod_qYGxLFs");
+  expect(choose.map((block: { type: string; text?: string }) => block.text?.split(":")[0] ?? block.type)).toEqual([
+    "They asked",
+    "Listing prod_1Dc8aA",
+    "Listing prod_3Ba7aA",
+    "image",
+    "Above their price limit, not to pick from",
+  ]);
+  expect(sent).toEqual({ searches: 2, checked: 1, unloaded: 1 });
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=options listings=2 searches=2 ms=\d+ checked=1 unloaded=1$/),
+  );
+});
+
+it("says over limit, nothing found, or blanks one group, when every listing's photo fails", async () => {
+  stubServices({
+    need: { things: [{ words: "a tablet for video calls", query: "tablet for video calls" }] },
+    under: [gone(tabletCase)],
+    all: [tablet],
+    choice: { picks: [pick("prod_1Cs4eB")], aboveLimit: true },
+  });
+  expect(await find("a tablet for video calls", 3000)).toEqual({ outcome: "over limit" });
+
+  const fetch = stubServices({
+    need: { things: [{ words: "AA batteries", query: "AA batteries" }] },
+    under: [gone(aa24)],
+    all: [],
+    choice: { picks: [pick("prod_3Ba7aA")], aboveLimit: false },
+  });
+  expect(await find("AA batteries", 5000)).toEqual({ outcome: "nothing found" });
+  expect(fetch.mock.calls.filter(([url]) => String(url).includes("anthropic"))).toHaveLength(1);
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/ checked=0 unloaded=1$/));
+
+  stubBasket([{ ...nightLight, under: [gone(plugLight)], all: [] }, batteries]);
+  expect(await find("a night light and AA batteries", 5000)).toEqual({
+    outcome: "basket",
+    groups: [
+      { thing: "a night light", options: [], problem: "nothing found" },
+      { thing: "AA batteries", options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })] },
+    ],
+  });
+});
+
 it("tallies every Channel3 call it sends, also ones that fail or time out", async () => {
   const basket = stubBasket([batteries, { words: "a phone charger", query: "phone charger", fails: true }]);
-  const sent = { searches: 0 };
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
   await find("AA batteries and a phone charger", 5000, sent);
   expect(sent.searches).toBe(4);
   expect(searches(basket)).toBe(4);
@@ -275,7 +354,7 @@ it("tallies every Channel3 call it sends, also ones that fail or time out", asyn
       });
     }),
   );
-  const timedOut = { searches: 0 };
+  const timedOut = { searches: 0, checked: 0, unloaded: 0 };
   expect(await find(words, 5000, timedOut)).toEqual({ outcome: "nothing found" });
   expect(timedOut.searches).toBe(2);
 });
@@ -293,7 +372,7 @@ it("tallies the Channel3 calls a photo Find sends", async () => {
     all: [coin, coinBig],
     choice: { picks: [pick("prod_2Cr3eN")], aboveLimit: false },
   });
-  const sent = { searches: 0 };
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
 
   await findPhoto("", 2500, [jpeg], sent);
 
@@ -322,7 +401,7 @@ it("finds the one thing in Rose's photo under the AI's words, and sends the phot
   expect(calls[0][1]).toMatchObject({ type: "image", source: { media_type: "image/jpeg", data: jpeg.toString("base64") } });
   expect(calls[1][0].text).toMatch(/^They asked: "CR2032 coin battery"/);
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=options listings=1 searches=2 ms=\d+ photos=1 blank=0$/),
+    expect.stringMatching(/^find outcome=options listings=1 searches=2 ms=\d+ checked=1 unloaded=0 photos=1 blank=0$/),
   );
 });
 
@@ -351,7 +430,7 @@ it("finds the things in two photos as one basket, in photo order, with a list's 
   });
   expect(found).toMatchObject({ photos: 2, blank: 0 });
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=basket things=4 shown=4 listings=5 searches=8 ms=\d+ photos=2 blank=0$/),
+    expect.stringMatching(/^find outcome=basket things=4 shown=4 listings=5 searches=8 ms=\d+ checked=5 unloaded=0 photos=2 blank=0$/),
   );
 });
 
@@ -386,7 +465,7 @@ it("says too many for photos of six things, and nothing in photo with Rose's wor
   });
   expect(searches(garden)).toBe(0);
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-in-photo listings=0 searches=0 ms=\d+ photos=2 blank=0$/),
+    expect.stringMatching(/^find outcome=nothing-in-photo listings=0 searches=0 ms=\d+ checked=0 unloaded=0 photos=2 blank=0$/),
   );
 });
 
@@ -402,6 +481,6 @@ it("says it couldn't find anything when Haiku fails on a photo, keeps Rose's wor
     blank: 0,
   });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ photos=1 blank=0 reason=TimeoutError$/),
+    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ checked=0 unloaded=0 photos=1 blank=0 reason=TimeoutError$/),
   );
 });

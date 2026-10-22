@@ -1,6 +1,6 @@
 import { choose, readNeed, readPhoto, type Need, type PhotoNeed } from "./ai";
 import { reasonOf } from "./paypal";
-import { searchListings, type Found, type Listing } from "./search";
+import { searchListings, withPhotos, type Found, type Listing } from "./search";
 
 export type Option = Listing & { what: string; why: string; watch: string };
 
@@ -19,8 +19,9 @@ type Searched = { words: string; result: Search; blank?: number };
 
 export type PhotoSearch = { words: string; result: Search; photos: number; blank: number };
 
-// The Channel3 calls a Find sent, whatever they answered, for /status (D81).
-export type Sent = { searches: number };
+// searches are the Channel3 calls a Find sent, whatever they answered, for /status (D81). checked are the
+// listings sent to Haiku with a photo, and unloaded the listings dropped for their photo. Those two are for the log.
+export type Sent = { searches: number; checked: number; unloaded: number };
 
 const MOST_THINGS = 5;
 
@@ -29,7 +30,7 @@ export function searchOn(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY && process.env.CHANNEL3_API_KEY && process.env.ADDRESS_KEY);
 }
 
-export async function find(words: string, limitCents: number, sent: Sent = { searches: 0 }): Promise<Search> {
+export async function find(words: string, limitCents: number, sent: Sent = { searches: 0, checked: 0, unloaded: 0 }): Promise<Search> {
   const { result } = await logged(words, 0, sent, async (reasons) => {
     const { things } = await readNeed(words);
     return { words, result: await searchThings(words, things, limitCents, reasons, sent) };
@@ -42,7 +43,7 @@ export async function findPhoto(
   words: string,
   limitCents: number,
   jpegs: Buffer[],
-  sent: Sent = { searches: 0 },
+  sent: Sent = { searches: 0, checked: 0, unloaded: 0 },
 ): Promise<PhotoSearch> {
   const searched = await logged(words, jpegs.length, sent, async (reasons) => {
     const need = await readPhoto(words, jpegs);
@@ -83,7 +84,7 @@ async function logged(
   const photo = photos ? ` photos=${photos} blank=${searched.blank ?? 0}` : "";
   const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
   console.log(
-    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} searches=${sent.searches} ms=${Date.now() - started}${photo}${reason}`,
+    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} searches=${sent.searches} ms=${Date.now() - started} checked=${sent.checked} unloaded=${sent.unloaded}${photo}${reason}`,
   );
   return searched;
 }
@@ -121,12 +122,15 @@ async function searchThing(words: string, query: string, limitCents: number, sen
   const [under, all] = await Promise.all([searchListings(query, limitCents), searchListings(query)]);
   const affordable = under.filter((listing) => listing.cents <= limitCents);
   const above = all.filter((listing) => listing.cents > limitCents);
-  if (!affordable.length && !above.length) return { outcome: "nothing found" };
+  const kept = await withPhotos(affordable);
+  sent.checked += kept.filter((listing) => listing.photo).length;
+  sent.unloaded += affordable.length - kept.length;
+  if (!kept.length && !above.length) return { outcome: "nothing found" };
 
-  const choice = await choose(words, affordable, above);
+  const choice = await choose(words, kept, above);
   const options: Option[] = [];
   for (const { id, what, why, watch } of choice.picks) {
-    const found = affordable.find((listing) => listing.id === id);
+    const found = kept.find((listing) => listing.id === id);
     if (found && !options.some((option) => option.id === id)) options.push({ ...listingOf(found), what, why, watch });
   }
   if (options.length) return { outcome: "options", options: options.slice(0, 3) };

@@ -145,8 +145,8 @@ it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo 
     page: () => photo("<!doctype html><title>Sign in</title>", "text/html"),
     huge: () => photo(new Uint8Array(1024 * 1024 + 1)),
   };
-  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
-  fetch.mockImplementation(async (url: unknown) => answers[String(url).split("/").pop()!]());
+  const fetch = vi.fn(async (url: string) => answers[url.split("/").pop()!]());
+  vi.stubGlobal("fetch", fetch);
 
   const listings = [
     ...Object.keys(answers).map((name) => found(`prod_${name}`, `https://cdn.trychannel3.com/${name}`)),

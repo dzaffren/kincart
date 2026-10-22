@@ -108,7 +108,7 @@ export async function find(token: string, formData: FormData): Promise<void> {
     redirect(`/r/${token}?find=limit&until=${stopped.getTime()}`);
   }
   const limitCents = await getLimit(who.household);
-  const sent: Sent = { searches: 0 };
+  const sent: Sent = { searches: 0, checked: 0, unloaded: 0 };
   if (jpegs.length) {
     // The photos go no further than Haiku: only the AI's words for them are kept (D64).
     const found = await findPhoto(words, limitCents, jpegs, sent);
