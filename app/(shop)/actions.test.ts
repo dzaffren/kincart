@@ -1,4 +1,5 @@
 import pg from "pg";
+import sharp from "sharp";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "../../lib/shop/items";
@@ -7,18 +8,33 @@ import { hashOf, whoIs } from "../../lib/shop/people";
 import { notify } from "../../lib/shop/push";
 import {
   ask,
+  claim,
+  decline,
   getLimit,
   getSearch,
   getTotal,
   getVault,
   latest,
+  record,
   saveSearch,
   saveVault,
   setTotal as saveTotal,
   startHousehold,
   subscriptionsFor,
 } from "../../lib/shop/requests";
-import { answer, askSam, find, setLimit, setTotal, skipLink, start, startLink, subscribe, tryAgain } from "./actions";
+import {
+  answer,
+  askSam,
+  find,
+  findAnother,
+  setLimit,
+  setTotal,
+  skipLink,
+  start,
+  startLink,
+  subscribe,
+  tryAgain,
+} from "./actions";
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -947,4 +963,269 @@ it("keeps the PayPal Rose linked in a new tab when she taps Skip in the old one,
   expect(await redirectOf(skipLink("ben-rose-link-7Qx2", form({})))).toBe("/r/ben-rose-link-7Qx2");
   expect(await getVault(ben)).toBe("8kf02113h7720954x");
   expect(console.log).toHaveBeenCalledWith(`paypal skip household=${ben} status=kept`);
+});
+
+const webp = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#e8e8e8" } }).webp().toBuffer();
+
+// A listing as Channel3 sends it.
+const product = ({ id, name, cents, shop, url, what, imageUrl }: typeof aa24) => ({
+  id,
+  title: name,
+  description: what,
+  images: [{ url: imageUrl }],
+  offers: [{ url, domain: shop, price: { price: cents / 100, currency: "USD" }, availability: "InStock" }],
+});
+
+// Channel3 answers every search with these listings. Haiku's other words for a thing are "<thing> in other
+// words", and its pick call picks every listing it's sent.
+function stubAgainServices(listings: (typeof aa24)[]) {
+  const fetch = vi.fn(async (url: string, init?: RequestInit) => {
+    if (url.includes("cdn.trychannel3.com")) {
+      return new Response(new Uint8Array(webp), { headers: { "content-type": "image/webp" } });
+    }
+    const body = JSON.parse(String(init?.body));
+    if (url.includes("api.trychannel3.com")) return Response.json({ products: listings.map(product) });
+    const content = body.messages[0].content;
+    const data =
+      body.output_config.format.schema.required[0] === "query"
+        ? { query: `${JSON.parse(content.split("\n")[0].slice("They want: ".length))} in other words` }
+        : {
+            picks: content
+              .flatMap((block: { text?: string }) => block.text?.match(/^Listing (\S+):/)?.[1] ?? [])
+              .map((id: string) => ({ id, what: "What it is.", why: "Why it fits.", watch: "Good to know." })),
+            aboveLimit: false,
+          };
+    return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+// What each other-words call asked Haiku.
+const askedForOtherWords = (fetch: ReturnType<typeof stubAgainServices>) =>
+  fetch.mock.calls
+    .map(([, init]) => init?.body && JSON.parse(String(init.body)))
+    .filter((body) => body?.output_config?.format.schema.required[0] === "query")
+    .map((body) => body.messages[0].content);
+
+const jarWords = "something to grip jar lids";
+const opener = option("prod_5Jo1xO", "OXO Good Grips Jar Opener with Base Pad", 999, "amazon.com");
+const pads = option("prod_7Jp4dS", "Rubber Jar Gripper Pads, Set of 6", 749, "target.com");
+const slippers = "warm slippers that are easy to put on, size 8";
+const isotoner = option("prod_1Is8tN", "Isotoner Women's Microterry Slip-On Slippers, Size 8", 1999, "macys.com");
+
+it("finds another after an empty Find with other words, keeps them as its query, and counts a Find", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, jarWords, { outcome: "nothing found", query: "jar lid grip" });
+  const services = stubAgainServices([opener, pads]);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: jarWords,
+    outcome: "options",
+    options: [{ id: opener.id }, { id: pads.id }],
+    query: `${jarWords} in other words`,
+    tried: true,
+  });
+  expect(askedForOtherWords(services)).toEqual([`They want: "${jarWords}"\nThe last query: "jar lid grip"`]);
+  expect(await usesFrom("203.0.113.7", "find")).toBe(1);
+  expect(await usedToday()).toEqual({ finds: 1, searches: 2, stopped_finds: 0, stopped_households: 0 });
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=2 searches=2 .* again=1$/));
+});
+
+it("calls nothing for a search Find another already ran, or one that found something", async () => {
+  searchOn();
+  await saveSearch(owner, jarWords, { outcome: "nothing found", query: "jar opener" }, 0, 0, true);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+  await saveSearch(owner, jarWords, { outcome: "options", options: [opener], query: "jar opener" });
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await usesFrom("203.0.113.7", "find")).toBe(0);
+  expect(await usedToday()).toBeUndefined();
+});
+
+it("keeps the thing, query and listing of one pick with the ask", async () => {
+  searchOn();
+  await saveSearch(owner, slippers, { outcome: "options", options: [strap], query: "warm slip-on slippers size 8" });
+  await redirectOf(askSam(rose, form({ listing: strap.id })));
+  expect((await latest(owner))?.queries).toEqual([{ id: strap.id, thing: slippers, query: "warm slip-on slippers size 8" }]);
+});
+
+it("keeps each basket pick's thing, query and listing with the ask, with the thing for a group from before queries", async () => {
+  searchOn();
+  await saveSearch(owner, "AA batteries, a night light and a phone charger", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24], query: "AA batteries" },
+      { thing: "a night light", options: [plugLight] },
+      { thing: "a phone charger", options: [anker], query: "phone charger" },
+    ],
+  });
+  await redirectOf(askSam(rose, form({ "pick-0": aa24.id, "pick-1": plugLight.id, "pick-2": "" })));
+  expect((await latest(owner))?.queries).toEqual([
+    { id: aa24.id, thing: "AA batteries", query: "AA batteries" },
+    { id: plugLight.id, thing: "a night light", query: "a night light" },
+  ]);
+});
+
+it("after Sam's No, searches the thing again with other words, without the listing Sam said no to", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, slippers, { outcome: "options", options: [strap], query: "warm slip-on slippers size 8" });
+  await redirectOf(askSam(rose, form({ listing: strap.id })));
+  await decline(owner, (await latest(owner))!.id);
+  const services = stubAgainServices([strap, isotoner]);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: slippers,
+    outcome: "options",
+    options: [{ id: isotoner.id }],
+    tried: true,
+  });
+  expect(askedForOtherWords(services)).toEqual([`They want: "${slippers}"\nThe last query: "warm slip-on slippers size 8"`]);
+});
+
+it("after Sam's No to a basket, searches every thing again, each without the basket's listings", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, a night light", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24], query: "AA batteries" },
+      { thing: "a night light", options: [plugLight], query: "plug-in night light" },
+    ],
+  });
+  await redirectOf(askSam(rose, form({ "pick-0": aa24.id, "pick-1": plugLight.id })));
+  await decline(owner, (await latest(owner))!.id);
+  const services = stubAgainServices([aa24, plugLight, anker]);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  const saved = await getSearch(owner);
+  expect(saved).toMatchObject({
+    words: "AA batteries and a night light",
+    outcome: "basket",
+    tried: true,
+    groups: [
+      { thing: "AA batteries", options: [{ id: anker.id }], tried: true },
+      { thing: "a night light", options: [{ id: anker.id }], tried: true },
+    ],
+  });
+  expect(askedForOtherWords(services)).toEqual([
+    'They want: "AA batteries"\nThe last query: "AA batteries"',
+    'They want: "a night light"\nThe last query: "plug-in night light"',
+  ]);
+  expect(await usedToday()).toMatchObject({ finds: 1, searches: 4 });
+});
+
+it("after Sam leaves a thing out, searches only that thing again, without the listing Sam left out", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, a night light", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24], query: "AA batteries" },
+      { thing: "a night light", options: [plugLight], query: "plug-in night light" },
+    ],
+  });
+  await redirectOf(askSam(rose, form({ "pick-0": aa24.id, "pick-1": plugLight.id })));
+  const { id } = (await latest(owner))!;
+  await claim(owner, id, [aa24.id]);
+  await record(id, { state: "paid", orderId: "5O190127TN364715T", captureId: "7BM91101S1572292D" });
+  const services = stubAgainServices([plugLight, anker]);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: "a night light",
+    outcome: "options",
+    options: [{ id: anker.id }],
+    tried: true,
+  });
+  expect(askedForOtherWords(services)).toEqual(['They want: "a night light"\nThe last query: "plug-in night light"']);
+});
+
+const aa8 = option("prod_1Dc8aA", "Duracell Coppertop AA Batteries, 8 Pack", 879, "target.com");
+const jarBasket = (group: object = {}) => ({
+  outcome: "basket" as const,
+  groups: [
+    { thing: "AA batteries", options: [aa24, aa8], query: "AA batteries" },
+    { thing: jarWords, options: [], problem: "nothing found" as const, query: "jar lid grip", ...group },
+  ],
+});
+
+it("searches one empty group of a basket again, keeps Rose's other picks and the photo counts, and never asks Sam", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, something to grip jar lids", jarBasket(), 2, 1);
+  const services = stubAgainServices([opener]);
+
+  const tapped = form({ "pick-0": aa8.id, another: "1" });
+  expect(await redirectOf(findAnother(rose, tapped))).toBe(`/r/${rose}?picked=${aa8.id},`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: "AA batteries, something to grip jar lids",
+    outcome: "basket",
+    photos: 2,
+    blankPhotos: 1,
+    tried: false,
+    groups: [
+      { thing: "AA batteries", options: [{ id: aa24.id }, { id: aa8.id }], query: "AA batteries" },
+      { thing: jarWords, options: [{ id: opener.id }], query: `${jarWords} in other words`, tried: true },
+    ],
+  });
+  expect(askedForOtherWords(services)).toEqual([`They want: "${jarWords}"\nThe last query: "jar lid grip"`]);
+  expect(await latest(owner)).toBeNull();
+  expect(notify).not.toHaveBeenCalled();
+
+  services.mockClear();
+  expect(await redirectOf(findAnother(rose, form({ another: "1" })))).toBe(`/r/${rose}`);
+  expect(await redirectOf(findAnother(rose, form({ another: "0" })))).toBe(`/r/${rose}`);
+  expect(await redirectOf(findAnother(rose, form({ another: "7" })))).toBe(`/r/${rose}`);
+  expect(services).not.toHaveBeenCalled();
+});
+
+it("stops a Find another past 20 Finds, saves nothing, counts a stopped Find, and keeps Rose's picks", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+  await saveSearch(owner, slippers, { outcome: "options", options: [strap], query: "warm slip-on slippers size 8" });
+  await redirectOf(askSam(rose, form({ listing: strap.id })));
+  await decline(owner, (await latest(owner))!.id);
+  vi.mocked(fetch).mockClear();
+
+  const to = await redirectOf(findAnother(rose, form({})));
+
+  const until = Number(new URL(to, "https://kincart.vercel.app").searchParams.get("until"));
+  expect(to).toBe(`/r/${rose}?find=limit&until=${until}`);
+  expect(until - Date.now()).toBeGreaterThan(3 * 60 * 60 * 1000 - 5000);
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toBeNull();
+  expect((await latest(owner))?.status).toBe("declined");
+  expect(await usedToday()).toEqual({ finds: 0, searches: 0, stopped_finds: 1, stopped_households: 0 });
+  expect(console.log).toHaveBeenCalledWith("limit kind=find status=stopped wait=180");
+
+  await saveSearch(owner, "AA batteries, something to grip jar lids", jarBasket());
+  const fromBasket = await redirectOf(findAnother(rose, form({ "pick-0": aa24.id, another: "1" })));
+  expect(fromBasket).toMatch(new RegExp(`^/r/${rose}\\?find=limit&until=\\d+&picked=${aa24.id},$`));
+  expect(await getSearch(owner)).toMatchObject(jarBasket());
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it("won't find another from Sam's link, or while search is off", async () => {
+  searchOn();
+  await saveSearch(owner, jarWords, { outcome: "nothing found", query: "jar lid grip" });
+
+  await expect(findAnother(sam, form({}))).resolves.toBeUndefined();
+  vi.stubEnv("ADDRESS_KEY", "");
+  await expect(findAnother(rose, form({}))).resolves.toBeUndefined();
+
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", tried: false });
 });
