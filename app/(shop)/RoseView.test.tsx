@@ -184,3 +184,21 @@ it("tells Rose when Find works again after the day's limit, in hours or minutes,
   expect(stopped(25)).toContain("Try again in 25 minutes.");
   expect(stopped(1)).toContain("Try again in 1 minute.");
 });
+
+it("says on the receipt that the money went to KinCart's sandbox shop, not the shops", () => {
+  const html = renderToStaticMarkup(
+    <RoseView
+      state={{
+        kind: "paid",
+        receipt: {
+          item: { id: "prod_6Fm3gL", name: "Fancii 3X Large Magnifying Glass with Light", cents: 1699 },
+          paidAt: new Date("2026-10-23T10:16:00Z"),
+          transactionId: "3GX51882JM604122T",
+        },
+      }}
+      items={[]}
+    />,
+  );
+
+  expect(html).toContain("Paid to KinCart&#x27;s sandbox shop. In this demo, no order reaches the shops.");
+});

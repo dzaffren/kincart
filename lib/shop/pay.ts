@@ -6,7 +6,7 @@ export type PayResult = "paid" | "refused" | "unknown";
 export async function pay(request: PurchaseRequest): Promise<PayResult> {
   const vaultId = await getVault(request.household);
   const result = vaultId
-    ? await charge(vaultId, request.item, `purchase-${request.id}-${request.askedAt.getTime()}`)
+    ? await charge(vaultId, request.item, `purchase-${request.id}-${request.askedAt.getTime()}`, request.lines ?? undefined)
     : ({ state: "refused", reason: "not linked" } as const);
 
   const line = `purchase id=${request.id} item=${request.item.id}`;
