@@ -1191,6 +1191,19 @@ it("searches one empty group of a basket again, keeps Rose's other picks and the
   expect(services).not.toHaveBeenCalled();
 });
 
+it("hands a group's Find another, sent with the Ask Sam form, to Find another, and asks Sam nothing", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, something to grip jar lids", jarBasket());
+  stubAgainServices([opener]);
+
+  expect(await redirectOf(askSam(rose, form({ "pick-0": aa24.id, another: "1" })))).toBe(`/r/${rose}?picked=${aa24.id},`);
+
+  expect(await getSearch(owner)).toMatchObject({ groups: [{ thing: "AA batteries" }, { options: [{ id: opener.id }], tried: true }] });
+  expect(await latest(owner)).toBeNull();
+  expect(notify).not.toHaveBeenCalled();
+});
+
 it("stops a Find another past 20 Finds, saves nothing, counts a stopped Find, and keeps Rose's picks", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});

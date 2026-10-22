@@ -181,6 +181,8 @@ export async function tryAgain(token: string): Promise<void> {
 export async function askSam(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "rose") return;
+  // A basket group's Find another sends this form, with Rose's picks, and asks Sam nothing.
+  if (formData.has("another")) return findAnother(token, formData);
   const { household } = who;
   if (searchOn()) {
     const saved = await getSearch(household);

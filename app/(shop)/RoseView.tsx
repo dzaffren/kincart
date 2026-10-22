@@ -190,7 +190,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         {state.problem === "too many" && (
           <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
         )}
-        {state.problem === "limit" && <LimitNotice waitMinutes={state.waitMinutes} />}
+        {state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
         {state.problem === "over limit" && (
           <Notice tone="neutral">
             {state.tried ? "Still nothing" : "Nothing"} under {limit} for that. Try different words, or ask {HELPER} to
@@ -305,7 +305,6 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
                 index={index}
                 limitCents={state.limitCents}
                 picked={state.picked?.[index]}
-                findAnother={findAnother}
                 basketTried={state.tried}
               />
             ))}
@@ -376,13 +375,13 @@ type GroupProps = {
   index: number;
   limitCents: number;
   picked?: string;
-  findAnother?: Action;
   // A basket that Find another searched says so once, above its groups.
   basketTried?: boolean;
 };
 
-// A group's Find another sends the whole Ask Sam form, so Rose's picks in the other groups go with it.
-function BasketGroup({ group, index, limitCents, picked, findAnother, basketTried }: GroupProps) {
+// A group's Find another sends the whole Ask Sam form, so Rose's picks in the other groups go with it, and
+// askSam() hands it to findAnother(). It has no formAction: React leaves such a button's name out of the form.
+function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupProps) {
   const headingId = useId();
   return (
     <section className="stack">
@@ -397,14 +396,7 @@ function BasketGroup({ group, index, limitCents, picked, findAnother, basketTrie
       )}
       {group.problem && !group.tried && (
         <div className="stack">
-          <Button
-            type="submit"
-            kind="secondary"
-            formAction={findAnother}
-            name="another"
-            value={String(index)}
-            busyLabel="Looking…"
-          >
+          <Button type="submit" kind="secondary" name="another" value={String(index)} busyLabel="Looking…">
             Find another
           </Button>
           <p className="small">KinCart tries other words for this one.</p>
