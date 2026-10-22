@@ -173,7 +173,7 @@ function stubBasket(things: Thing[], blank?: number[]) {
       const data =
         isNeed(body)
           ? { things: things.map(({ words, query, photos }) => ({ words, query, photos })), ...(blank && { blank }) }
-          : things.find((thing) => body.messages[0].content.startsWith(`They asked: ${JSON.stringify(thing.words)}`))
+          : things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))
               ?.choice;
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
@@ -320,7 +320,7 @@ it("finds the one thing in Rose's photo under the AI's words, and sends the phot
     .filter(([url]) => String(url).includes("anthropic"))
     .map(([, init]) => JSON.parse(String(init.body)).messages[0].content);
   expect(calls[0][1]).toMatchObject({ type: "image", source: { media_type: "image/jpeg", data: jpeg.toString("base64") } });
-  expect(calls[1]).toMatch(/^They asked: "CR2032 coin battery"/);
+  expect(calls[1][0].text).toMatch(/^They asked: "CR2032 coin battery"/);
   expect(console.log).toHaveBeenCalledWith(
     expect.stringMatching(/^find outcome=options listings=1 searches=2 ms=\d+ photos=1 blank=0$/),
   );
