@@ -30,10 +30,11 @@ async function downFile(file: string) {
   await sql(await readFile(new URL(`../db/migrations/${file}`, import.meta.url), "utf8"));
 }
 
-// Steps back past 0012, 0011, 0010, 0009 and 0008 to the households migration.
+// Steps back past 0013, 0012, 0011, 0010, 0009 and 0008 to the households migration.
 async function downToHouseholds() {
   await migrate("down", url);
   for (const file of [
+    "0012_usage_on_status.down.sql",
     "0011_find_limits.down.sql",
     "0010_photo_ask_several.down.sql",
     "0009_photo_ask.down.sql",
@@ -82,8 +83,17 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "from_photo")).toBe(true);
   expect(await columnExists("rose_search", "photos")).toBe(true);
   expect(await columnExists("rose_search", "blank_photos")).toBe(true);
+  expect(await columnExists("rose_search", "query")).toBe(true);
+  expect(await columnExists("rose_search", "tried")).toBe(true);
+  expect(await columnExists("purchase_requests", "queries")).toBe(true);
 
   await migrate("down", url);
+  expect(await columnExists("rose_search", "query")).toBe(false);
+  expect(await columnExists("rose_search", "tried")).toBe(false);
+  expect(await columnExists("purchase_requests", "queries")).toBe(false);
+  expect(await tableExists("usage_days")).toBe(true);
+
+  await downFile("0012_usage_on_status.down.sql");
   expect(await tableExists("usage_days")).toBe(false);
   expect(await tableExists("address_uses")).toBe(true);
 
@@ -101,6 +111,9 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "blank_photos")).toBe(true);
   expect(await tableExists("address_uses")).toBe(true);
   expect(await tableExists("usage_days")).toBe(true);
+  expect(await columnExists("rose_search", "query")).toBe(true);
+  expect(await columnExists("rose_search", "tried")).toBe(true);
+  expect(await columnExists("purchase_requests", "queries")).toBe(true);
 });
 
 it("reruns with a photo search that saw nothing to buy, and goes back down to nothing found", async () => {
@@ -111,6 +124,7 @@ it("reruns with a photo search that saw nothing to buy, and goes back down to no
   await expect(migrate("up", url)).resolves.toBeDefined();
 
   await migrate("down", url);
+  await downFile("0012_usage_on_status.down.sql");
   await downFile("0011_find_limits.down.sql");
   await downFile("0010_photo_ask_several.down.sql");
   await downFile("0009_photo_ask.down.sql");
