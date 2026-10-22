@@ -212,7 +212,7 @@ Reusing: `reset()` and `sql()` from `e2e/db.ts`, the seeded-search pattern from 
 | 2 A one-thing ask lists its one thing | `lib/shop/paypal.test.ts`: the glasses give one item at 18.99 and `item_total` 18.99. The e2e, test 2 | `pnpm test`, `pnpm test:e2e e2e/itemized-receipt.spec.ts` |
 | 3 A long listing name is cut to fit PayPal | The e2e, test 2: PayPal's item name is the first 124 characters and "...", and the receipt shows all 160 | `pnpm test:e2e e2e/itemized-receipt.spec.ts` |
 | 4 PayPal refuses the order | `lib/shop/paypal.test.ts`: a 422 `ITEM_TOTAL_MISMATCH` gives `{ state: "refused", reason: "ITEM_TOTAL_MISMATCH" }` after one orders call. The existing refused test in `pay.test.ts` covers the failed status | `pnpm test` |
-| O5 Rose's PayPal activity | By hand at `/build`: sign in to sandbox.paypal.com as the demo buyer, and open the first itemized payment | — |
+| O5 Rose's PayPal activity | By hand at `/build`: a throwaway script saved the demo buyer's PayPal, charged it 2 items, and opened the payment in its activity (O5) | — |
 
 **E2E:** `e2e/itemized-receipt.spec.ts`, from an already-saved PayPal (D20) and seeded searches with fixed names and prices:
 
