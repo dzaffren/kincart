@@ -295,6 +295,13 @@ B runs after A, because its test needs A's photo step. Chunk A owns `DECISIONS.m
 
 Recorded as D88, D89, D90, D91, D92, D93, D94, D95.
 
+## Review
+
+2026-10-22 · 3 raw findings, 2 survived, 2 fixed.
+
+- correctness · `lib/shop/search.test.ts:167` · the "huge" case sends a real noise PNG over 1 MB, so only the size check drops it · `89868ed`
+- coverage · `lib/shop/search.ts:54` · a test that each photo download gets `AbortSignal.timeout(3000)` · `8d2c838`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
