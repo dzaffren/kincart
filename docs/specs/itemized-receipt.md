@@ -1,6 +1,6 @@
 # Itemized receipt
 
-**Version:** v1 · **Status:** Refined · **Type:** Enhancement · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Enhancement · **Project type:** Web UI
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** None
@@ -244,8 +244,9 @@ Recorded as D86, D87.
 | O2 | What each PayPal line says: the listing's name, Rose's own word for it, or the name and its shop | question | spec p1 | user | Resolved | The listing's name, cut to fit PayPal's limit. The shop is left out, so nobody reads it as the shop got paid. 2026-10-22 |
 | O3 | What KinCart's receipt says about who got the money | question | spec p1 | user | Resolved | "Paid to KinCart's sandbox shop. In this demo, no order reaches the shops." It is true until `pay-the-shop` ships, and that slice swaps it for each shop's name (D82). 2026-10-22 |
 | O4 | Whether Sam also sees who gets the money before tapping OK, or only on the receipt | question | spec p1 | user | Resolved | The receipt only. Sam's OK screen stays as it is. 2026-10-22 |
-| O5 | PayPal's sandbox activity page shows the item lines for a saved-PayPal charge, and the name it shows as the payee is unknown | unproven | spec p1 | build | Accepted risk | `/build` makes the first itemized charge and checks the demo buyer's activity page by hand. If PayPal doesn't show the lines, scenario 1 drops that step. The e2e reads the items back from PayPal's API either way. 2026-10-22 |
+| O5 | PayPal's sandbox activity page shows the item lines for a saved-PayPal charge, and the name it shows as the payee is unknown | unproven | spec p1 | user | Resolved | Yes. The e2e's saved PayPal isn't the demo buyer's, so /build saved the demo buyer's PayPal in the sandbox in a throwaway script and charged it $22.46 with 2 items. Its activity opens to an Order summary with "Energizer MAX AA Batteries, 8 Pack $9.47", "LED Plug-in Night Light, Dusk to Dawn Sensor, 2 Pack $12.99" and Total $22.46, transaction `2S665827933666449`. The payee shows as "Test Store" (O7). 2026-10-22 |
 | O6 | Who cuts a listing name past PayPal's 127 characters. The sandbox cut 128- and 300-character names to 124 characters and "..." and still took the order | flag | spec p3 | user | Resolved | PayPal cuts it, and scenario 3 now says so. KinCart sends the whole name (D87). Live PayPal's behaviour is unchecked; KinCart runs only in sandbox. 2026-10-22 |
+| O7 | PayPal's activity names the payee "Test Store", the sandbox business account's name, while KinCart's receipt says "KinCart's sandbox shop" (O3) | flag | build | user | Decided alone | Chose: keep the approved receipt line. Other: say "Test Store" on the receipt, or rename the sandbox business account to KinCart on developer.paypal.com. Undo: change the line at `app/(shop)/ui.tsx:75` and its tests in `RoseView.test.tsx` and `e2e/itemized-receipt.spec.ts`. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

@@ -32,3 +32,4 @@
 - Match env names with digits before calling a key missing
 - Don't start a non-hook function's name with "use"
 - Send x-forwarded-for from the page to test a per-address limit
+- Save the demo buyer's PayPal to see a charge in its activity
