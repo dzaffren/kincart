@@ -107,9 +107,50 @@ Scenario: The recorded set proves it, and Find takes no longer
 - A way for Rose or Sam to report a wrong pick. No later slice.
 - Fixing Channel3's listing data. That is Channel3's to fix.
 
+## Interface
+
+This slice's interface is the pick step's contract with Haiku. Rose's and Sam's screens don't change: Rose sees fewer options, or today's messages.
+
+```mermaid
+flowchart LR
+    U["Channel3: listings under the limit"] -- "photo URL" --> DL[KinCart downloads each photo]
+    DL -- "dead, slow or unreadable" --> X[Dropped]
+    DL -- "photo bytes, base64" --> CH["choose(): Haiku"]
+    U -- "id, name, details" --> CH
+    A["Channel3: listings above the limit"] -- "names only" --> CH
+    CH -- "picks: id, what, why, watch; aboveLimit" --> F["find.ts: up to 3 options"]
+```
+
+KinCart downloads each listing's photo and sends it to Haiku with the listing's words, and Haiku picks only listings whose photo and words both fit.
+
+**Input to `choose(words, under, above)`:**
+
+- `words`: Rose's words for the thing, as today.
+- Under the limit: for each listing, a text block `Listing <id>:` with its name and details as JSON, as today. When the listing has a photo, a base64 image block follows the text block.
+- Above the limit: names only, as today (O11).
+
+KinCart downloads the photos itself. The API refuses Channel3's photo URLs with "This URL is disallowed by the website's robots.txt file.", because `cdn.trychannel3.com/robots.txt` disallows every crawler. Sent as base64, the basket photo from O1 cost 507 input tokens, and Haiku called it "White plastic storage bin with handles." in 1.1 s (checked 2026-10-22).
+
+**Prompt:** today's `CHOOSE`, with these sentences added. `/build` tunes the words against the recorded set.
+
+> Each listing under their limit comes with its photo, if it has one. Pick a listing only when it is the product they asked for. A case, holder, charger or part for it is not, and neither is another size or type than they said. Any brand or pack size of the product counts. Never pick a listing whose photo shows something other than its name and words say, even when the words fit. Judge a listing with no photo by its name and words alone.
+
+**Output:** unchanged, `{ picks: [{ id, what, why, watch }], aboveLimit }`. `find.ts` still keeps only picks whose id is under the limit, at most 3.
+
+**Failure modes:**
+
+| Case | What happens | What Rose sees |
+| ---- | ------------ | -------------- |
+| A listing has no photo | Haiku judges it on its name and words | it can show, with no photo, as today |
+| KinCart can't download a listing's photo: an error, too slow, or not WebP, JPEG, PNG or GIF | the listing is dropped before Haiku (O9) | fewer options, or today's messages |
+| A photo shows something other than the words say | Haiku doesn't pick it | fewer options, or today's messages |
+| Nothing under the limit fits, and the real thing is above it | `aboveLimit` is true | "Nothing under $50 for that. Try different words, or ask Sam to raise the limit." |
+| Nothing under the limit fits, and a misfit above it is named like the thing, such as the $64.99 pin board | `aboveLimit` can be true from the name alone (O11) | "Nothing under $50 for that…" where "Couldn't find that." is true |
+| The pick call fails or times out | the error is caught, as today (O10) | "Couldn't find that. Try different words.", or "Couldn't find this one." in a basket group |
+
 ## Decisions to record
 
-Drafted at pause 1. `/build` appends them to `DECISIONS.md`.
+Drafted at pauses 1 and 2. `/build` appends them to `DECISIONS.md`.
 
 ## D88 · 2026-10-22 · A pick must be the product Rose asked for, in any brand or pack size
 
@@ -139,6 +180,20 @@ Rejected: 5 s more for each (one thing within 20 s, five within 25 s).
 Source: docs/specs/picks-that-match.md
 Status: active
 
+## D92 · 2026-10-22 · The pick call sees each listing's photo, downloaded by KinCart, and listings above the limit stay names only
+
+Why: Channel3's words can say "AA batteries" over a photo of a basket, so only the photo shows the mismatch (O1). One call keeps D22's two fixed steps, and Haiku can pick another listing in place of a misfit. The API refuses Channel3's photo URLs because the CDN's robots.txt disallows crawlers, so KinCart sends the bytes.
+Rejected: a third call that checks the 3 picks' photos (one more call in a row against the 15 s limit, and Rose may see 1 option when others fit), photo URLs in the request (the API refuses them), photos for listings above the limit too (up to 10 more photos a call, for a wrong message, not a wrong pick).
+Source: docs/specs/picks-that-match.md
+Status: active
+
+## D93 · 2026-10-22 · A photo KinCart can't download drops its listing, and a failed pick call finds nothing, as today
+
+Why: a listing whose photo can't be checked could be O1's basket, and Rose's and Sam's pages would likely show a broken photo too. A wrong pick must never get through (D88, D89).
+Rejected: judge such a listing on its words (a basket like O1's gets through when its photo fails), retry a failed pick call without photos (the basket could reach Rose again).
+Source: docs/specs/picks-that-match.md
+Status: active
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -150,6 +205,10 @@ Status: active
 | O5 | A listing with no photo | question | spec p1 | user | Resolved | Show it, judged on its name and words alone, as today. 2026-10-22 |
 | O6 | What proves a wrong pick never reaches Rose, when the AI's answers change from run to run | question | spec p1 | user | Resolved | A recorded set of about 10 real wrong listings, each dropped in 3 of 3 runs against real Haiku, with the right listings beside them still shown. 2026-10-22 |
 | O7 | Can Find take longer to catch wrong picks? | question | spec p1 | user | Resolved | No. One thing within 15 s and five within 20 s, as today. 2026-10-22 |
+| O8 | How the pick step sees the photos: in the pick call, or in a check call after it | question | spec p2 | user | Resolved | In the pick call, with each listing's photo after its words. Still two fixed steps (D22). 2026-10-22 |
+| O9 | A listing whose photo KinCart can't download: dead link, too slow, or a format Claude can't read | question | spec p2 | user | Resolved | Drop it. 2026-10-22 |
+| O10 | The pick call fails or times out | question | spec p2 | user | Resolved | Nothing found, as today. No retry without photos. 2026-10-22 |
+| O11 | Listings above the limit go to Haiku as names only, so a misfit named like the thing can turn "Couldn't find that." into "Nothing under $50 for that…" | flag | spec p2 | user | Accepted risk | A wrong message, not a wrong pick, and only when nothing under the limit fits. `find-another` reworks the over-limit step. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -161,3 +220,5 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Recorded set** — real Channel3 listings saved once to a file, so a test can run the same ones again and again.
 - **/poc** — zuko's timeboxed spike. It answers one risky question with throwaway code.
 - **e2e** — end to end: a test that runs the whole path, the way a person would use it.
+- **base64** — a way to write a file's bytes as plain text, so a photo can go inside a JSON request.
+- **robots.txt** — a file where a website says which automated fetchers may read it. Channel3's photo server says none may.
