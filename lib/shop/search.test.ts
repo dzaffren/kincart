@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { searchListings, withPhotos, type Found } from "./search";
@@ -146,6 +147,9 @@ it("passes a listing with no photo on, with no download", async () => {
 });
 
 it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo, broken or too big", async () => {
+  // Noise doesn't compress, so this is a real photo over 1 MB that only the size check can drop.
+  const noise = await sharp(randomBytes(700 * 700 * 3), { raw: { width: 700, height: 700, channels: 3 } }).png().toBuffer();
+  expect(noise.length).toBeGreaterThan(1024 * 1024);
   const answers: Record<string, () => Response> = {
     gone: () => photo("Not found", "text/plain", 404),
     slow: () => {
@@ -156,7 +160,7 @@ it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo,
     },
     page: () => photo("<!doctype html><title>Sign in</title>", "text/html"),
     broken: () => photo(new Uint8Array(Buffer.from("524946462400000057454250565038", "hex"))),
-    huge: () => photo(new Uint8Array(1024 * 1024 + 1)),
+    huge: () => photo(new Uint8Array(noise), "image/png"),
   };
   const fetch = vi.fn(async (url: string) => answers[url.split("/").pop()!]());
   vi.stubGlobal("fetch", fetch);
