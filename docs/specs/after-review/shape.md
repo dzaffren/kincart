@@ -86,3 +86,5 @@ Slices 1 to 3 are for judges. Slices 4 and 5 are the AI's new legwork, and slice
 - **Agentic commerce** — AI that does shopping work for a person. In KinCart it searches and explains, and a person still approves.
 - **/poc** — zuko's timeboxed spike. It answers one risky question with throwaway code.
 - **Channel3** — the hackathon sponsor whose API returns real product listings.
+- **e2e** — end to end: an automated test that drives the app the way a person would, start to finish.
+- **CI** — the service that runs the tests on every push, here GitHub Actions.
