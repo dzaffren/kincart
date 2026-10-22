@@ -233,7 +233,7 @@ Status: active
 Why: `charge()` stays as it is, and our receipt already lists every line (scenario 2).
 Rejected: PayPal line items with an amount breakdown (Rose's PayPal activity would list each thing, but no scenario needs it, and the item amounts must add up to the total exactly or PayPal refuses the order).
 Source: docs/specs/basket.md
-Status: active
+Status: superseded by D86
 
 ## D34 · 2026-10-14 · Sam's total limit is off until set, and stops Rose at Ask Sam for any ask
 
@@ -574,4 +574,19 @@ Status: active
 Why: a secret link gives a judge both Rose and Sam in one tap. Accounts add a sign-up and show nothing new in sandbox.
 Rejected: accounts and family invites now (a sign-up for every judge, before they see anything).
 Source: docs/specs/after-review/shape.md
+Status: active
+
+## D86 · 2026-10-22 · Every charge lists its things as PayPal items, and the total is their sum
+
+Why: Rose's PayPal activity should show what Sam paid for (itemized-receipt scenario 1). The amount and `item_total` come from the same stored cents as the items, so PayPal's `ITEM_TOTAL_MISMATCH` refusal (seen in sandbox) can't happen. A basket is still one purchase unit and one charge for the ticked total, as D33 said.
+Rejected: one line named "2 things" (D33: Rose's activity can't show what was bought), a retry without items when PayPal refuses (a second charge path to test, for a mismatch the sum already rules out).
+Supersedes: D33
+Source: docs/specs/itemized-receipt.md
+Status: active
+
+## D87 · 2026-10-22 · Listing names go to PayPal whole, and PayPal cuts any past 127 characters
+
+Why: the sandbox took 128- and 300-character names and kept the first 124 characters and "..." (itemized-receipt O6, 2026-10-22). KinCart's receipt keeps the whole name.
+Rejected: cutting in `charge()` to 126 characters and "…" (code for a cut PayPal already makes in sandbox).
+Source: docs/specs/itemized-receipt.md
 Status: active
