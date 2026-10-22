@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { searchListings, withPhotos, type Found } from "./search";
 
@@ -108,32 +109,43 @@ const found = (id: string, imageUrl?: string): Found => ({
   details: "Long-lasting AA alkaline batteries.",
 });
 
-// The first bytes of a WebP file: RIFF, a size, then WEBP.
-const webp = Buffer.from("524946462400000057454250565038", "hex");
+const photoOf = (width: number, height: number) =>
+  sharp({ create: { width, height, channels: 3, background: "#e8e8e8" } }).webp().toBuffer();
 
 const photo = (body: BodyInit, type = "image/webp", status = 200) =>
   new Response(body, { status, headers: { "content-type": type } });
 
-it("downloads each listing's photo from Channel3's photo host and keeps it in base64, with no key sent", async () => {
-  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
+it("downloads each listing's photo from Channel3's photo host and shrinks it to 512 px, with no key sent", async () => {
+  const big = await photoOf(2048, 1536);
+  const fetch = stubChannel3(() => photo(new Uint8Array(big), "image/jpeg"));
 
-  expect(await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")])).toEqual([
-    { ...found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3"), photo: { mediaType: "image/webp", data: webp.toString("base64") } },
-  ]);
+  const [kept] = await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")]);
+
+  expect(kept).toEqual({ ...found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3"), photo: { mediaType: "image/webp", data: expect.any(String) } });
+  expect(await sharp(Buffer.from(kept.photo!.data, "base64")).metadata()).toMatchObject({ format: "webp", width: 512, height: 384 });
   const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
   expect(url).toBe("https://cdn.trychannel3.com/a1b2c3");
   expect(init.redirect).toBe("error");
   expect(init.headers).toBeUndefined();
 });
 
+it("keeps a small photo at its own size", async () => {
+  const small = await photoOf(300, 200);
+  stubChannel3(() => photo(new Uint8Array(small)));
+
+  const [kept] = await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")]);
+
+  expect(await sharp(Buffer.from(kept.photo!.data, "base64")).metadata()).toMatchObject({ width: 300, height: 200 });
+});
+
 it("passes a listing with no photo on, with no download", async () => {
-  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
+  const fetch = stubChannel3(() => photo(""));
 
   expect(await withPhotos([found("prod_1Dc8aA")])).toEqual([found("prod_1Dc8aA")]);
   expect(fetch).not.toHaveBeenCalled();
 });
 
-it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo or too big", async () => {
+it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo, broken or too big", async () => {
   const answers: Record<string, () => Response> = {
     gone: () => photo("Not found", "text/plain", 404),
     slow: () => {
@@ -143,6 +155,7 @@ it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo 
       throw new TypeError("fetch failed: redirect mode is set to error");
     },
     page: () => photo("<!doctype html><title>Sign in</title>", "text/html"),
+    broken: () => photo(new Uint8Array(Buffer.from("524946462400000057454250565038", "hex"))),
     huge: () => photo(new Uint8Array(1024 * 1024 + 1)),
   };
   const fetch = vi.fn(async (url: string) => answers[url.split("/").pop()!]());

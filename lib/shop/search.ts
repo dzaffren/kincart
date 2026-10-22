@@ -1,12 +1,16 @@
+import sharp from "sharp";
 import type { Item } from "./items";
 
 export type Listing = Item & { shop: string; url: string; imageUrl?: string };
 
-// photo is the listing's photo in base64, for the pick call only. It is never stored.
+// photo is the listing's photo as a small WebP in base64, for the pick call only. It is never stored.
 export type Found = Listing & { details: string; photo?: { mediaType: string; data: string } };
 
 const PHOTO_TYPES = ["image/webp", "image/jpeg", "image/png", "image/gif"];
 const MOST_PHOTO_BYTES = 1024 * 1024;
+// Channel3's photos run up to 2048 px. At full size, the pick call's thinking on 10 of them often ran
+// past its 10 s timeout. 512 px still shows what a listing is.
+const PHOTO_PX = 512;
 
 type Product = {
   id?: string;
@@ -51,7 +55,9 @@ async function download(imageUrl: string): Promise<Found["photo"]> {
   const mediaType = response.headers.get("content-type")?.split(";")[0].trim() ?? "";
   if (response.status !== 200 || !PHOTO_TYPES.includes(mediaType)) return undefined;
   const bytes = Buffer.from(await response.arrayBuffer());
-  return bytes.length > MOST_PHOTO_BYTES ? undefined : { mediaType, data: bytes.toString("base64") };
+  if (bytes.length > MOST_PHOTO_BYTES) return undefined;
+  const small = await sharp(bytes).resize(PHOTO_PX, PHOTO_PX, { fit: "inside", withoutEnlargement: true }).webp().toBuffer();
+  return { mediaType: "image/webp", data: small.toString("base64") };
 }
 
 function toFound(product: Product): Found[] {

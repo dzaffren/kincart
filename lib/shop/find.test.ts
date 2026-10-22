@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { find, findPhoto } from "./find";
 
@@ -30,8 +31,7 @@ const isNeed = (body: { output_config: { format: { schema: { required: string[] 
 
 type Answers = { need: unknown; under?: unknown[]; all?: unknown[]; choice?: unknown };
 
-// The first bytes of a WebP file: RIFF, a size, then WEBP.
-const webp = Buffer.from("524946462400000057454250565038", "hex");
+const webp = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#e8e8e8" } }).webp().toBuffer();
 
 // Channel3's photo host answers with a small WebP, or a 404 for a photo that is gone.
 const photoAnswer = (url: string) =>
@@ -290,7 +290,7 @@ it("never sends Haiku a listing whose photo it can't download, and judges one wi
       expect.objectContaining({ id: "prod_3Ba7aA", imageUrl: "https://cdn.trychannel3.com/prod_3Ba7aA" }),
     ],
   });
-  expect(JSON.stringify(result)).not.toContain(webp.toString("base64"));
+  expect(JSON.stringify(result)).not.toContain('"photo"');
   const choose = fetch.mock.calls
     .filter(([url]) => String(url).includes("anthropic"))
     .map(([, init]) => JSON.parse(String(init.body)).messages[0].content)[1];
