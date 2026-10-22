@@ -33,3 +33,5 @@
 - Don't start a non-hook function's name with "use"
 - Send x-forwarded-for from the page to test a per-address limit
 - Save the demo buyer's PayPal to see a charge in its activity
+- Shrink listing photos before a Haiku call with a timeout
+- Give a recorded set more wrong listings than right ones
