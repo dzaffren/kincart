@@ -1,6 +1,6 @@
 # Picks that match
 
-**Version:** v1 · **Status:** Built · **Type:** Bug · **Project type:** Data/LLM
+**Version:** v1 · **Status:** Shipped · **Type:** Bug · **Project type:** Data/LLM
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** None

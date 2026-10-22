@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-22 by /ship itemized-receipt
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-22 by /ship picks-that-match
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -21,7 +21,7 @@ Used by older shoppers and the relative who helps them pay online.
 - `app/status/` — the `/status` page and its view.
 - `lib/status/` — the database, PayPal and build checks, and the sums of today's and this month's usage.
 - `app/(shop)/` — the home page `/`, where Try KinCart starts your own Rose and Sam and a laptop shows both their pages side by side, Rose's page `/r/<link>`, which starts at Link PayPal with a demo sandbox login and Skip, Sam's page `/h/<link>`, the PayPal return route, the route a home page phone posts Link PayPal to in a new tab, each link's manifest, the notifications control, and the views they share.
-- `lib/shop/` — households and the link check, PayPal vault and charge calls, Channel3 search and Claude Haiku calls behind Rose's Find, request, search, price-limit, total-limit and phone storage, the daily Find and household limits for each network address, the usage counts for `/status`, `pay()`, and the pushes to saved phones.
+- `lib/shop/` — households and the link check, PayPal vault and charge calls, Channel3 search, the listing photo downloads, and Claude Haiku calls behind Rose's Find, with `picks/`, the recorded set of real listings that `picks.test.ts` runs against Haiku, request, search, price-limit, total-limit and phone storage, the daily Find and household limits for each network address, the usage counts for `/status`, `pay()`, and the pushes to saved phones.
 - `public/` — `sw.js`, the service worker that shows a push and opens the link on tap, and the KinCart icons.
 - `docs/design/design-system/` — the design tokens, and the showcase look, that the shop pages and `/status` load.
 - `db/migrations/` and `scripts/migrate.mjs` — plain SQL migrations and the runner.
@@ -47,6 +47,7 @@ Used by older shoppers and the relative who helps them pay online.
 | find-limits | Shipped | One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again. | docs/specs/find-limits.md |
 | usage-on-status | Shipped | `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped. | docs/specs/usage-on-status.md |
 | itemized-receipt | Shipped | Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money. | docs/specs/itemized-receipt.md |
+| picks-that-match | Shipped | A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words. | docs/specs/picks-that-match.md |
 
 ## More
 

@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the daily limits stopped. The month's searches read "N of 1,000", in red from 800.
 - Rose's PayPal activity lists each thing Sam paid for, with its price, where it used to show one line such as "2 things".
 - Rose's and Sam's receipts say the money went to KinCart's sandbox shop, and that no order reaches the shops in this demo.
+- Find shows Rose only listings that are the thing asked for. The AI checks each listing's photo as well as its words, so a storage bin sold as "AA Batteries", a lone cable for a charger or a case for a tablet no longer shows.
 
 ## [1.2.0] - 2026-10-16
 
