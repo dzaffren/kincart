@@ -57,6 +57,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 it("searches Channel3 under the limit and keeps in-stock US-dollar listings that cost something", async () => {
@@ -119,6 +120,7 @@ const photo = (body: BodyInit, type = "image/webp", status = 200) =>
 it("downloads each listing's photo from Channel3's photo host and shrinks it to 512 px, with no key sent", async () => {
   const big = await photoOf(2048, 1536);
   const fetch = stubChannel3(() => photo(new Uint8Array(big), "image/jpeg"));
+  const timeout = vi.spyOn(AbortSignal, "timeout");
 
   const [kept] = await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")]);
 
@@ -127,6 +129,8 @@ it("downloads each listing's photo from Channel3's photo host and shrinks it to 
   const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
   expect(url).toBe("https://cdn.trychannel3.com/a1b2c3");
   expect(init.redirect).toBe("error");
+  expect(timeout).toHaveBeenCalledWith(3000);
+  expect(init.signal).toBe(timeout.mock.results[0].value);
   expect(init.headers).toBeUndefined();
 });
 
