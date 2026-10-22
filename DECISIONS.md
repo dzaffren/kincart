@@ -547,3 +547,31 @@ Why: `searchThing()` adds 2 to the tally before its two Channel3 calls, so every
 Rejected: a change to `find()`'s result to carry the count (13 test assertions change for one number), a write for each search (up to 10 more Neon connections for one basket Find), the count inside `after()` as pushes do (D29) (the e2e would have to poll `/status`, and one upsert adds little to a Find that waits on Claude and Channel3).
 Source: docs/specs/usage-on-status.md
 Status: active
+
+## D82 · 2026-10-22 · Sam's OK pays the shop's own PayPal, and KinCart never holds Rose's money
+
+Why: today the charge lands in KinCart's sandbox account and no order reaches the shop, so a judge asks who the merchant is. Paying the shop keeps refunds, returns and fraud with the shop. Two PayPal claims are unproven (after-review O3, O4).
+Rejected: KinCart buys for Rose as a reseller (refunds, returns and fraud become KinCart's), no build and a pitch to PayPal only (the review's worst gap stays).
+Source: docs/specs/after-review/shape.md
+Status: active
+
+## D83 · 2026-10-22 · A person approves every buy, and the AI only does more legwork
+
+Why: KinCart's promise is that nothing is bought without Sam's OK. The AI repeats past asks and finds other options, and Sam still taps OK on each one.
+Rejected: a standing OK, where the AI buys repeat things under a cap without asking (the clearest agentic story, but it breaks that promise and the first shape's "Not doing: auto-approve").
+Source: docs/specs/after-review/shape.md
+Status: active
+
+## D84 · 2026-10-22 · Find another tries other words, then the nearest listings over Sam's limit, and runs only when Rose or Sam taps it
+
+Why: one control serves a No, an untick and an empty search. Other words alone leave a search empty when Sam's limit is low, so Sam can then allow one listing over it.
+Rejected: a scheduled search that pings Rose later (it needs a background job, and Vercel Hobby runs crons once a day), other words only (a low limit still finds nothing), a separate slice each for a swap after a No and for keep looking (two controls for one job).
+Source: docs/specs/after-review/shape.md
+Status: active
+
+## D85 · 2026-10-22 · Secret links stay, with no accounts or family invites for now
+
+Why: a secret link gives a judge both Rose and Sam in one tap. Accounts add a sign-up and show nothing new in sandbox.
+Rejected: accounts and family invites now (a sign-up for every judge, before they see anything).
+Source: docs/specs/after-review/shape.md
+Status: active
