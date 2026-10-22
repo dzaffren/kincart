@@ -80,6 +80,7 @@ test("a phone gets a button for each", async ({ page, context }) => {
   for (const caption of await page.getByText("Sample, not live").all()) await expect(caption).toBeHidden();
   await page.getByRole("button", { name: "Try KinCart" }).click();
   await expect(page.getByText("Your Rose and Sam are ready.")).toBeVisible();
+  await expect(study(page)).toBeVisible();
   await expect(page.getByRole("link", { name: "Be Rose" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Be Sam" })).toBeVisible();
   await page.mouse.wheel(0, 5000);

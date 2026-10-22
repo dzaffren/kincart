@@ -45,6 +45,8 @@ it("shows the household's two pages in lazy frames, and a button for each", () =
   expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Be Rose<\/a>/);
   expect(html).toMatch(/<a [^>]*href="\/h\/sam-link" target="_blank"[^>]*>Be Sam<\/a>/);
   expect(html).toContain("Start a new one");
+  expect(html).toMatch(/In a survey of 657 US adults, about 1 in 10 had signed in .*>Be Rose<\/a>/);
+  expect(html).toContain('<a class="link" href="https://doi.org/10.2196/69806">');
   expect(html).toContain("Your Rose and Sam are in the two phones. Link Rose&#x27;s PayPal or skip it.");
   expect(html).not.toContain("on the right");
   expect(html).not.toContain("Try KinCart");
