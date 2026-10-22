@@ -90,7 +90,7 @@ it("shows up to three listings Haiku picked, with Channel3's names, prices and l
       expect.objectContaining({ id: "prod_8Kp3rT", cents: 900 }),
     ],
   });
-  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=3 ms=\d+$/));
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=3 searches=2 ms=\d+$/));
 });
 
 it("says nothing under the limit when the thing only exists above it", async () => {
@@ -120,7 +120,7 @@ it("says too many for more than five things, and searches for nothing that isn't
   const list = stubServices({ need: { things: six.map((thing) => ({ words: thing, query: thing })) } });
   expect(await find(six.join(", "), 5000)).toEqual({ outcome: "too many" });
   expect(searches(list)).toBe(0);
-  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=too-many listings=0 ms=\d+$/));
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=too-many listings=0 searches=0 ms=\d+$/));
 
   const notAProduct = stubServices({ need: { things: [] } });
   expect(await find("what time is it in Ohio", 5000)).toEqual({ outcome: "nothing found" });
@@ -137,7 +137,7 @@ it("says it couldn't find anything when Haiku or Channel3 fails, and logs why", 
   });
   expect(await find(words, 5000)).toEqual({ outcome: "nothing found" });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-found listings=0 ms=\d+ reason=TimeoutError$/),
+    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ reason=TimeoutError$/),
   );
 
   vi.stubGlobal(
@@ -221,7 +221,7 @@ it("searches every thing at once and shows a group of listings for each, under R
   expect(searches(fetch)).toBe(6);
   expect(lastSearch).toBeLessThan(firstPick);
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 ms=\d+$/),
+    expect.stringMatching(/^find outcome=basket things=3 shown=3 listings=4 searches=6 ms=\d+$/),
   );
 });
 
@@ -243,7 +243,7 @@ it("still shows the things it found when some can't be shown, and says why for e
     ],
   });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=basket things=4 shown=1 listings=2 ms=\d+ reason=channel3 429$/),
+    expect.stringMatching(/^find outcome=basket things=4 shown=1 listings=2 searches=8 ms=\d+ reason=channel3 429$/),
   );
 });
 
@@ -258,11 +258,48 @@ it("says it couldn't find anything when no thing in the list has listings", asyn
   });
 });
 
+it("tallies every Channel3 call it sends, also ones that fail or time out", async () => {
+  const basket = stubBasket([batteries, { words: "a phone charger", query: "phone charger", fails: true }]);
+  const sent = { searches: 0 };
+  await find("AA batteries and a phone charger", 5000, sent);
+  expect(sent.searches).toBe(4);
+  expect(searches(basket)).toBe(4);
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (!url.includes("anthropic")) throw new DOMException("The operation timed out.", "TimeoutError");
+      return Response.json({
+        content: [{ type: "text", text: '{"things":[{"words":"slippers","query":"slippers"}]}' }],
+        stop_reason: "end_turn",
+      });
+    }),
+  );
+  const timedOut = { searches: 0 };
+  expect(await find(words, 5000, timedOut)).toEqual({ outcome: "nothing found" });
+  expect(timedOut.searches).toBe(2);
+});
+
 // The first bytes of a JPEG, as the browser's shrink makes it.
 const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
 
 const coin = product("prod_2Cr3eN", "Energizer CR2032 Lithium Coin Battery, 4 Pack", 6.49, "target.com");
 const coinBig = product("prod_9Cr1eN", "Panasonic CR2032 3V Lithium Coin Cell, 10 Pack", 29.99, "amazon.com");
+
+it("tallies the Channel3 calls a photo Find sends", async () => {
+  const fetch = stubServices({
+    need: { things: [{ words: "CR2032 coin battery", query: "CR2032 3V lithium coin battery", photos: [1] }], blank: [] },
+    under: [coin],
+    all: [coin, coinBig],
+    choice: { picks: [pick("prod_2Cr3eN")], aboveLimit: false },
+  });
+  const sent = { searches: 0 };
+
+  await findPhoto("", 2500, [jpeg], sent);
+
+  expect(sent.searches).toBe(2);
+  expect(searches(fetch)).toBe(2);
+});
 
 it("finds the one thing in Rose's photo under the AI's words, and sends the photo to the first call only", async () => {
   const fetch = stubServices({
@@ -285,7 +322,7 @@ it("finds the one thing in Rose's photo under the AI's words, and sends the phot
   expect(calls[0][1]).toMatchObject({ type: "image", source: { media_type: "image/jpeg", data: jpeg.toString("base64") } });
   expect(calls[1]).toMatch(/^They asked: "CR2032 coin battery"/);
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=options listings=1 ms=\d+ photos=1 blank=0$/),
+    expect.stringMatching(/^find outcome=options listings=1 searches=2 ms=\d+ photos=1 blank=0$/),
   );
 });
 
@@ -314,7 +351,7 @@ it("finds the things in two photos as one basket, in photo order, with a list's 
   });
   expect(found).toMatchObject({ photos: 2, blank: 0 });
   expect(console.log).toHaveBeenCalledWith(
-    expect.stringMatching(/^find outcome=basket things=4 shown=4 listings=5 ms=\d+ photos=2 blank=0$/),
+    expect.stringMatching(/^find outcome=basket things=4 shown=4 listings=5 searches=8 ms=\d+ photos=2 blank=0$/),
   );
 });
 
@@ -349,7 +386,7 @@ it("says too many for photos of six things, and nothing in photo with Rose's wor
   });
   expect(searches(garden)).toBe(0);
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-in-photo listings=0 ms=\d+ photos=2 blank=0$/),
+    expect.stringMatching(/^find outcome=nothing-in-photo listings=0 searches=0 ms=\d+ photos=2 blank=0$/),
   );
 });
 
@@ -365,6 +402,6 @@ it("says it couldn't find anything when Haiku fails on a photo, keeps Rose's wor
     blank: 0,
   });
   expect(console.log).toHaveBeenLastCalledWith(
-    expect.stringMatching(/^find outcome=nothing-found listings=0 ms=\d+ photos=1 blank=0 reason=TimeoutError$/),
+    expect.stringMatching(/^find outcome=nothing-found listings=0 searches=0 ms=\d+ photos=1 blank=0 reason=TimeoutError$/),
   );
 });

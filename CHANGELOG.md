@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Each network address can run 20 Finds and start 5 new Roses and Sams in any 24 hours. Past that, nothing reaches Claude or Channel3, the page says how long to wait, and Rose's words stay in the box.
+- `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the daily limits stopped. The month's searches read "N of 1,000", in red from 800.
 
 ## [1.2.0] - 2026-10-16
 

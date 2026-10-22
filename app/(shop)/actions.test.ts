@@ -64,7 +64,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await db.connect();
-  await db.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses");
+  await db.query("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses; DELETE FROM usage_days");
   await db.end();
   await saveVault(owner, "1j970427g9944212v");
   vi.stubEnv("ROSE_LINK_TOKEN", rose);
@@ -345,6 +345,33 @@ it("counts only the Finds that reach the AI", async () => {
   stubWordServices();
   expect(await redirectOf(find(rose, form({ words: "a night light" })))).toBe(`/r/${rose}`);
   expect(await usesFrom("203.0.113.7", "find")).toBe(20);
+});
+
+// Today's row of counts, as /status reads it.
+async function usedToday() {
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  const { rows } = await db.query(
+    "SELECT finds, searches, stopped_finds, stopped_households FROM usage_days WHERE day = (now() AT TIME ZONE 'UTC')::date",
+  );
+  await db.end();
+  return rows[0];
+}
+
+it("adds a Find and every search it sent to today's count, and nothing for a Find that never reaches the AI", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+
+  expect(await redirectOf(find(rose, form({ words: "   " })))).toBe(`/r/${rose}?find=empty`);
+  expect(await redirectOf(find(rose, form({ words: "", photo: photo("%PDF-1.7\n") })))).toBe(`/r/${rose}?find=notphoto`);
+  expect(await usedToday()).toBeUndefined();
+
+  stubWordServices();
+  expect(await redirectOf(find(rose, form({ words: "a night light" })))).toBe(`/r/${rose}`);
+  stubPhotoServices();
+  expect(await redirectOf(find(rose, form({ words: "", photo: photo(jpeg) })))).toBe(`/r/${rose}`);
+
+  expect(await usedToday()).toEqual({ finds: 2, searches: 4, stopped_finds: 0, stopped_households: 0 });
 });
 
 it("calls nothing for a Find without ADDRESS_KEY", async () => {
@@ -849,6 +876,18 @@ it("starts no household without ADDRESS_KEY, and says why", async () => {
   expect(await redirectOf(start())).toBe("/?started=failed");
   expect(jar.has("household")).toBe(false);
   expect(console.log).toHaveBeenCalledWith("household status=failed reason=no ADDRESS_KEY");
+});
+
+it("counts a stopped Find and a stopped Try KinCart only as stopped", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+  await usedFrom("203.0.113.7", "household", 5, 19);
+
+  expect(await redirectOf(find(rose, form({ words: "a night light" })))).toMatch(/\?find=limit&until=\d+$/);
+  expect(await redirectOf(start())).toMatch(/^\/\?started=limit&until=\d+$/);
+
+  expect(await usedToday()).toEqual({ finds: 0, searches: 0, stopped_finds: 1, stopped_households: 1 });
 });
 
 async function households(): Promise<{ count: string }[]> {

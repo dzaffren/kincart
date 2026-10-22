@@ -1,5 +1,5 @@
 import pg from "pg";
-import { beforeAll, beforeEach, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
 import {
@@ -7,6 +7,7 @@ import {
   copyDemoVault,
   claim,
   clearSearch,
+  countUse,
   decline,
   findHousehold,
   forgetSubscription,
@@ -48,7 +49,12 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses");
+  await sql("TRUNCATE purchase_requests; DELETE FROM paypal_vault; DELETE FROM rose_search; DELETE FROM price_limit; DELETE FROM total_limit; DELETE FROM push_subscriptions; DELETE FROM households WHERE id <> 1; DELETE FROM address_uses; DELETE FROM usage_days");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 it("keeps one saved PayPal, replaced when Rose links again", async () => {
@@ -462,4 +468,26 @@ it("deletes an address once its newest use is a day old", async () => {
 
   expect(await stored("find", "key-old")).toBe(0);
   expect(await stored("find", "key-new")).toBe(1);
+});
+
+async function today() {
+  return sql(
+    "SELECT finds, searches, stopped_finds, stopped_households FROM usage_days WHERE day = (now() AT TIME ZONE 'UTC')::date",
+  );
+}
+
+it("adds each use to today's UTC row, and 30 at once all count", async () => {
+  await countUse({ finds: 1, searches: 4 });
+  await Promise.all(Array.from({ length: 30 }, () => countUse({ searches: 2, stoppedFinds: 1 })));
+  await countUse({ stoppedHouseholds: 1 });
+
+  expect(await today()).toEqual([{ finds: 1, searches: 64, stopped_finds: 30, stopped_households: 1 }]);
+});
+
+it("logs a count it can't write, and doesn't throw", async () => {
+  vi.stubEnv("DATABASE_URL", "postgres://u:p@127.0.0.1:1/x");
+  const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+  await expect(countUse({ finds: 1, searches: 2 })).resolves.toBeUndefined();
+  expect(log).toHaveBeenCalledWith(expect.stringMatching(/^usage status=failed reason=.*ECONNREFUSED/));
 });

@@ -19,6 +19,9 @@ type Searched = { words: string; result: Search; blank?: number };
 
 export type PhotoSearch = { words: string; result: Search; photos: number; blank: number };
 
+// The Channel3 calls a Find sent, whatever they answered, for /status (D81).
+export type Sent = { searches: number };
+
 const MOST_THINGS = 5;
 
 // Find never runs without its limit, so it needs ADDRESS_KEY too (D74).
@@ -26,17 +29,22 @@ export function searchOn(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY && process.env.CHANNEL3_API_KEY && process.env.ADDRESS_KEY);
 }
 
-export async function find(words: string, limitCents: number): Promise<Search> {
-  const { result } = await logged(words, 0, async (reasons) => {
+export async function find(words: string, limitCents: number, sent: Sent = { searches: 0 }): Promise<Search> {
+  const { result } = await logged(words, 0, sent, async (reasons) => {
     const { things } = await readNeed(words);
-    return { words, result: await searchThings(words, things, limitCents, reasons) };
+    return { words, result: await searchThings(words, things, limitCents, reasons, sent) };
   });
   return result;
 }
 
 // The photos go to the first call only (D66). The things' words, joined, name the search for Rose.
-export async function findPhoto(words: string, limitCents: number, jpegs: Buffer[]): Promise<PhotoSearch> {
-  const searched = await logged(words, jpegs.length, async (reasons) => {
+export async function findPhoto(
+  words: string,
+  limitCents: number,
+  jpegs: Buffer[],
+  sent: Sent = { searches: 0 },
+): Promise<PhotoSearch> {
+  const searched = await logged(words, jpegs.length, sent, async (reasons) => {
     const need = await readPhoto(words, jpegs);
     if (!need.things.length) return { words, result: { outcome: "nothing in photo" } };
     // In the order Rose added the photos. sort() is stable, so a list keeps its own order (D71).
@@ -44,7 +52,7 @@ export async function findPhoto(words: string, limitCents: number, jpegs: Buffer
     const named = things.map((thing) => thing.words).join(", ");
     return {
       words: named,
-      result: await searchThings(named, things, limitCents, reasons),
+      result: await searchThings(named, things, limitCents, reasons, sent),
       blank: blankOf(need, jpegs.length),
     };
   });
@@ -59,7 +67,12 @@ function blankOf({ things, blank }: PhotoNeed, photos: number): number {
 }
 
 // A search that fails says nothing found under Rose's own words, and the log line says why.
-async function logged(words: string, photos: number, run: (reasons: string[]) => Promise<Searched>): Promise<Searched> {
+async function logged(
+  words: string,
+  photos: number,
+  sent: Sent,
+  run: (reasons: string[]) => Promise<Searched>,
+): Promise<Searched> {
   const started = Date.now();
   const reasons: string[] = [];
   const searched = await run(reasons).catch((error): Searched => {
@@ -70,20 +83,26 @@ async function logged(words: string, photos: number, run: (reasons: string[]) =>
   const photo = photos ? ` photos=${photos} blank=${searched.blank ?? 0}` : "";
   const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
   console.log(
-    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} ms=${Date.now() - started}${photo}${reason}`,
+    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} searches=${sent.searches} ms=${Date.now() - started}${photo}${reason}`,
   );
   return searched;
 }
 
-async function searchThings(words: string, things: Need["things"], limitCents: number, reasons: string[]): Promise<Search> {
+async function searchThings(
+  words: string,
+  things: Need["things"],
+  limitCents: number,
+  reasons: string[],
+  sent: Sent,
+): Promise<Search> {
   if (things.length > MOST_THINGS) return { outcome: "too many" };
   if (!things.length) return { outcome: "nothing found" };
-  if (things.length === 1) return searchThing(words, things[0].query, limitCents);
+  if (things.length === 1) return searchThing(words, things[0].query, limitCents, sent);
 
   // Every thing searches at once, and one that fails blanks only its own group (D31).
   const groups = await Promise.all(
     things.map(async ({ words: thing, query }): Promise<Group> => {
-      const result = await searchThing(thing, query, limitCents).catch((error): Single => {
+      const result = await searchThing(thing, query, limitCents, sent).catch((error): Single => {
         reasons.push(reasonOf(error));
         return { outcome: "nothing found" };
       });
@@ -95,9 +114,10 @@ async function searchThings(words: string, things: Need["things"], limitCents: n
   return groups.some((group) => group.options.length) ? { outcome: "basket", groups } : { outcome: "nothing found" };
 }
 
-async function searchThing(words: string, query: string, limitCents: number): Promise<Single> {
+async function searchThing(words: string, query: string, limitCents: number, sent: Sent): Promise<Single> {
   if (!query.trim()) return { outcome: "nothing found" };
 
+  sent.searches += 2;
   const [under, all] = await Promise.all([searchListings(query, limitCents), searchListings(query)]);
   const affordable = under.filter((listing) => listing.cents <= limitCents);
   const above = all.filter((listing) => listing.cents > limitCents);

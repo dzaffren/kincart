@@ -27,7 +27,7 @@ export async function checkDatabase(url = process.env.DATABASE_URL): Promise<Dat
   }
 }
 
-function reasonOf(error: unknown): string {
+export function reasonOf(error: unknown): string {
   if (error instanceof Error) return (error as Error & { code?: string }).code ?? error.message;
   return String(error);
 }
