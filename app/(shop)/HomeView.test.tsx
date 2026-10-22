@@ -9,13 +9,22 @@ it("sells KinCart and shows two still sample phones before a household starts", 
 
   expect(html).toContain("<span>Mom asks.</span> <span>You say OK.</span> <span>PayPal pays.</span>");
   expect(html).toContain("No more logging in as them or reading out card numbers.");
+  expect(html).toContain(
+    "reading out card numbers.</p><p>In a survey of 657 US adults, about 1 in 10 had signed in to someone else&#x27;s money or medical account with that person&#x27;s login.",
+  );
+  expect(html).toContain(
+    '<a class="link" href="https://doi.org/10.2196/69806">Foong et al., Journal of Medical Internet Research, 2025.</a>',
+  );
   expect(html).toContain("<strong>Sandbox money only.</strong> Nothing real is bought.");
   expect(html).toMatch(/>what&#x27;s real, what stands in, and what comes next\.<\/a><\/p>/);
   expect(html).toContain("Try KinCart");
   expect(html).toContain("First, link Rose&#x27;s sandbox PayPal on PayPal&#x27;s own page, or skip to a demo one.");
   expect(html).not.toContain("already linked");
   expect(html).toContain("<h2>How it works</h2>");
-  expect(html).toContain("<strong>Your parent says what they need.</strong>");
+  expect(html).toContain(
+    "<strong>Your parent says what they need.</strong> In their own words, or a photo of the thing or of a written list: batteries, a night light, a phone charger.",
+  );
+  expect(html).not.toContain("spoken");
   expect(html).toContain("<strong>AI finds real options.</strong>");
   expect(html).toContain("<strong>You say OK from your phone.</strong>");
   expect(html).toContain("<h2>You stay in charge</h2>");
@@ -39,6 +48,8 @@ it("shows the household's two pages in lazy frames, and a button for each", () =
   expect(html).toMatch(/<a [^>]*href="\/r\/rose-link" target="_blank"[^>]*>Be Rose<\/a>/);
   expect(html).toMatch(/<a [^>]*href="\/h\/sam-link" target="_blank"[^>]*>Be Sam<\/a>/);
   expect(html).toContain("Start a new one");
+  expect(html).toMatch(/In a survey of 657 US adults, about 1 in 10 had signed in .*>Be Rose<\/a>/);
+  expect(html).toContain('<a class="link" href="https://doi.org/10.2196/69806">');
   expect(html).toContain("Your Rose and Sam are in the two phones. Link Rose&#x27;s PayPal or skip it.");
   expect(html).not.toContain("on the right");
   expect(html).not.toContain("Try KinCart");

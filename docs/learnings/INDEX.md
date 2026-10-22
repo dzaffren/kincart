@@ -35,3 +35,4 @@
 - Save the demo buyer's PayPal to see a charge in its activity
 - Shrink listing photos before a Haiku call with a timeout
 - Give a recorded set more wrong listings than right ones
+- Don't run Prettier on this repo's files

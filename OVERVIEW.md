@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-22 by /ship picks-that-match
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-22 by /ship home-page-proof
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -48,6 +48,7 @@ Used by older shoppers and the relative who helps them pay online.
 | usage-on-status | Shipped | `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped. | docs/specs/usage-on-status.md |
 | itemized-receipt | Shipped | Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money. | docs/specs/itemized-receipt.md |
 | picks-that-match | Shipped | A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words. | docs/specs/picks-that-match.md |
+| home-page-proof | Shipped | The home page cites a checked US survey under its claim: about 1 in 10 of 657 adults had signed in to someone's money or medical account with their login. Step 1 of How it works says Rose can send a photo. | docs/specs/home-page-proof.md |
 
 ## More
 
