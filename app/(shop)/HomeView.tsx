@@ -139,8 +139,8 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
           <h2>How it works</h2>
           <ol className="home-steps">
             <li>
-              <strong>Your parent says what they need.</strong> In their own words, typed or spoken: batteries, a
-              night light, a phone charger.
+              <strong>Your parent says what they need.</strong> In their own words, or a photo of the thing or of a
+              written list: batteries, a night light, a phone charger.
             </li>
             <li>
               <strong>AI finds real options.</strong> Up to three listings for each thing, under your limit, each

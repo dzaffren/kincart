@@ -21,7 +21,10 @@ it("sells KinCart and shows two still sample phones before a household starts", 
   expect(html).toContain("First, link Rose&#x27;s sandbox PayPal on PayPal&#x27;s own page, or skip to a demo one.");
   expect(html).not.toContain("already linked");
   expect(html).toContain("<h2>How it works</h2>");
-  expect(html).toContain("<strong>Your parent says what they need.</strong>");
+  expect(html).toContain(
+    "<strong>Your parent says what they need.</strong> In their own words, or a photo of the thing or of a written list: batteries, a night light, a phone charger.",
+  );
+  expect(html).not.toContain("spoken");
   expect(html).toContain("<strong>AI finds real options.</strong>");
   expect(html).toContain("<strong>You say OK from your phone.</strong>");
   expect(html).toContain("<h2>You stay in charge</h2>");
