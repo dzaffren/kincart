@@ -41,6 +41,7 @@ export type RoseState =
       photos?: number;
       outcome?: Outcome;
       problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo" | "limit";
+      tried?: boolean;
       waitMinutes?: number;
       busy?: boolean;
     }
@@ -56,6 +57,7 @@ export type RoseState =
       picked?: string;
       error?: boolean;
       overCents?: number;
+      tried?: boolean;
       busy?: boolean;
     }
   | {
@@ -70,6 +72,7 @@ export type RoseState =
       picked?: string[];
       error?: boolean;
       overCents?: number;
+      tried?: boolean;
       busy?: boolean;
     }
   | { kind: "waiting"; item: Item; askedAt: Date; shop?: string; lines?: Line[] }
@@ -87,10 +90,11 @@ type Props = {
   ask?: Action;
   find?: Action;
   tryAgain?: Action;
+  findAnother?: Action;
   notify?: ReactNode;
 };
 
-export function RoseView({ state, items, link, skip, login, framedLink, ask, find, tryAgain, notify }: Props) {
+export function RoseView({ state, items, link, skip, login, framedLink, ask, find, tryAgain, findAnother, notify }: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -172,7 +176,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         {state.linked && <Notice tone="neutral">Your PayPal is linked. You won&apos;t need to do this again.</Notice>}
         <OutcomeNotice outcome={state.outcome} />
         {state.problem === "nothing found" && (
-          <Notice tone="neutral">Couldn&apos;t find that. Try different words.</Notice>
+          <Notice tone="neutral">{state.tried ? "Still couldn't" : "Couldn't"} find that. Try different words.</Notice>
         )}
         {state.problem === "nothing in photo" && (
           <Notice tone="neutral">
@@ -191,9 +195,11 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         )}
         {state.problem === "over limit" && (
           <Notice tone="neutral">
-            Nothing under {limit} for that. Try different words, or ask {HELPER} to raise the limit.
+            {state.tried ? "Still nothing" : "Nothing"} under {limit} for that. Try different words, or ask {HELPER} to
+            raise the limit.
           </Notice>
         )}
+        <AnotherForm action={findAnother} hint={anotherHint(state)} />
         <div className="heading">
           <h1 id={headingId}>What do you need?</h1>
           <p className="small" id={hintId}>
@@ -246,6 +252,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           <p className="small">
             For &ldquo;{state.words}&rdquo;
             {state.fromPhoto && fromPhotos(state.photos)}
+            {state.tried && ". Looked again with other words"}
             {state.listings.length < 3 &&
               `. Only ${state.listings.length} found at ${wholeDollars(state.limitCents)} or less`}
             .
@@ -286,7 +293,8 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         <div className="heading">
           <h1>Which ones would you like?</h1>
           <p className="small">
-            For &ldquo;{state.words}&rdquo;{state.fromPhoto && fromPhotos(state.photos)}. Pick one for each thing you want.
+            For &ldquo;{state.words}&rdquo;{state.fromPhoto && fromPhotos(state.photos)}
+            {state.tried && ". Looked again with other words"}. Pick one for each thing you want.
           </p>
         </div>
         <form className="stack" action={ask}>
@@ -295,14 +303,17 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
               <BasketGroup
                 key={index}
                 group={group}
-                name={`pick-${index}`}
+                index={index}
                 limitCents={state.limitCents}
                 picked={state.picked?.[index]}
+                findAnother={findAnother}
+                basketTried={state.tried}
               />
             ))}
           </div>
           <TotalLine totalCents={state.totalCents} />
-          <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
+          {/* Named, so a group's Find another, sent with this form, doesn't show this one as busy. */}
+          <Button type="submit" name="ask" value="sam" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
             Ask {HELPER}
           </Button>
         </form>
@@ -326,6 +337,14 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           <Notice tone="neutral">
             {HELPER} left out {listed(state.receipt.leftOut)}.
           </Notice>
+        )}
+        {state.receipt.leftOut && (
+          <AnotherForm
+            action={findAnother}
+            hint={`KinCart looks again with other words, without ${
+              state.receipt.leftOut.length > 1 ? "the ones" : "the one"
+            } ${HELPER} left out.`}
+          />
         )}
         <a className="button button-secondary" href="?ask=1">
           Ask for something else
@@ -352,27 +371,83 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
   );
 }
 
-type GroupProps = { group: Group; name: string; limitCents: number; picked?: string };
+type GroupProps = {
+  group: Group;
+  index: number;
+  limitCents: number;
+  picked?: string;
+  findAnother?: Action;
+  // A basket that Find another searched says so once, above its groups.
+  basketTried?: boolean;
+};
 
-function BasketGroup({ group, name, limitCents, picked }: GroupProps) {
+// A group's Find another sends the whole Ask Sam form, so Rose's picks in the other groups go with it.
+function BasketGroup({ group, index, limitCents, picked, findAnother, basketTried }: GroupProps) {
   const headingId = useId();
   return (
     <section className="stack">
       <h2 id={headingId}>{group.thing}</h2>
-      {group.problem === "nothing found" && <Notice tone="neutral">Couldn&apos;t find this one.</Notice>}
+      {group.problem === "nothing found" && (
+        <Notice tone="neutral">{group.tried ? "Still couldn't" : "Couldn't"} find this one.</Notice>
+      )}
       {group.problem === "over limit" && (
-        <Notice tone="neutral">Nothing under {wholeDollars(limitCents)} for this one.</Notice>
+        <Notice tone="neutral">
+          {group.tried ? "Still nothing" : "Nothing"} under {wholeDollars(limitCents)} for this one.
+        </Notice>
+      )}
+      {group.problem && !group.tried && (
+        <div className="stack">
+          <Button
+            type="submit"
+            kind="secondary"
+            formAction={findAnother}
+            name="another"
+            value={String(index)}
+            busyLabel="Looking…"
+          >
+            Find another
+          </Button>
+          <p className="small">KinCart tries other words for this one.</p>
+        </div>
+      )}
+      {group.tried && !basketTried && group.options.length > 0 && (
+        <p className="small">Looked again with other words.</p>
       )}
       {group.options.length > 0 && (
         <ListingPicker
           listings={group.options}
           labelledBy={headingId}
-          name={name}
+          name={`pick-${index}`}
           picked={picked}
           none="None of these"
         />
       )}
     </section>
+  );
+}
+
+// One Find another for each empty Find, No or untick (D97): a search it ran itself offers none.
+function anotherHint(state: Extract<RoseState, { kind: "ask" }>): string | undefined {
+  if (state.outcome?.kind === "declined") {
+    return state.outcome.lines
+      ? `KinCart looks again for each thing, without the ones ${HELPER} said no to.`
+      : `KinCart looks again with other words, without the one ${HELPER} said no to.`;
+  }
+  if ((state.problem === "nothing found" || state.problem === "over limit") && !state.tried) {
+    return "KinCart tries other words for you.";
+  }
+  return undefined;
+}
+
+function AnotherForm({ action, hint }: { action?: Action; hint?: string }) {
+  if (!hint) return null;
+  return (
+    <form className="stack" action={action}>
+      <Button type="submit" kind="secondary" busyLabel="Looking…">
+        Find another
+      </Button>
+      <p className="small">{hint}</p>
+    </form>
   );
 }
 

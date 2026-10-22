@@ -147,6 +147,46 @@ Scenario Outline: Find another counts as a Find
 - Telling the AI why Sam said No. No later slice.
 - Repeating a past ask: `ask-again` (slice 5).
 
+## Interface
+
+Rose's page gets one new control, Find another, on four screens. Sam's page doesn't change. Every piece comes from the design system: no new component, class or token.
+
+```mermaid
+flowchart LR
+    E["Ask: Couldn't find that."] -- "Find another" --> L["Looking…"]
+    N["Ask: Sam said no to …"] -- "Find another" --> L
+    P["Paid: Sam left out …"] -- "Find another" --> L
+    B["Basket: Couldn't find this one."] -- "Find another, with Rose's other picks" --> L
+    L -- "found a fit" --> O["Which one would you like? Looked again with other words."]
+    L -- "found nothing" --> S["Still couldn't find that. No Find another."]
+    L -- "past 20 Finds" --> X["That's a lot of Finds… Find another stays."]
+```
+
+Rose taps Find another on one of four screens. The search ends in new options, a "Still…" message with no second Find another, or the daily-limit message.
+
+**Where it shows.** Find another is a secondary button under the notice that it answers, with a small hint under it.
+
+| Screen | The notice above it | The hint under it |
+| ------ | ------------------- | ----------------- |
+| Ask, after an empty Find | "Couldn't find that. Try different words." or "Nothing under $20 for that. Try different words, or ask Sam to raise the limit." | "KinCart tries other words for you." |
+| Ask, after Sam's No to one thing | "Sam said no to Dearfoams Women's Cozy Comfort Slippers." | "KinCart looks again with other words, without the one Sam said no to." |
+| Ask, after Sam's No to a basket | "Sam said no to your 3 things. Nothing was taken." | "KinCart looks again for each thing, without the ones Sam said no to." |
+| Paid, with a thing left out | "Sam left out a night light." | "KinCart looks again with other words, without the one Sam left out." It says "the ones" for several. "Ask for something else" stays under it. |
+| Basket, a group that found nothing | "Couldn't find this one." or "Nothing under $50 for this one." | "KinCart tries other words for this one." |
+
+**After the tap:**
+
+- **Pressed.** The button says "Looking…" with the existing spinner. In a basket, the group's Find another sends the Ask Sam form, so Rose's picks in the other groups go with it. Ask Sam has its own name and value there, so only the pressed button spins.
+- **Found.** The usual options or basket screen. Its line reads `For "something to grip jar lids". Looked again with other words.` When Find another searched one group of a basket, the line sits under that group's heading instead. Rose's other picks stay picked, and the searched group has no pick.
+- **Found nothing.** "Still couldn't find that. Try different words." or "Still nothing under $20 for that. Try different words, or ask Sam to raise the limit." In a group, "Still couldn't find this one." or "Still nothing under $50 for this one." No Find another shows, and Rose's words stay in the box.
+- **Stopped by the daily limit.** Today's "That's a lot of Finds from here today. Try again in 3 hours." The No notice and Find another stay, so Rose can tap it after the wait.
+
+**Motion tier:** 1, as before. Nothing new moves: the notices rise and fade like every notice, and "Looking…" turns the existing spinner. Under reduced motion, nothing moves.
+
+**Components used:** `Notice`, `Button` (secondary, and with `formAction` in a basket group), `ListingPicker`, `ReceiptCard`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
+
+**Preview:** `/preview/find-another` on `pnpm dev`, from `app/(shop)/preview/find-another/page.tsx`. It shows Rose's real page in 14 frames, one or more for each scenario.
+
 ## Decisions to record
 
 Drafted at pause 1. They move under the Technical plan at pause 3, and `/build` appends them to DECISIONS.md.
@@ -175,6 +215,9 @@ Status: active
 | O4 | Does a Find another count as a Find? | question | spec p1 | user | Resolved | Yes: toward the address's 20 a day, and on `/status` (D97). 2026-10-22 |
 | O5 | What Find another leaves out after a No or an untick | question | spec p1 | user | Resolved | The listing or listings in that No or untick. A listing that Sam refused in an earlier ask can come back (D98). 2026-10-22 |
 | O6 | What one tap does after Sam's No to a basket | question | spec p1 | user | Resolved | It searches every thing again, each without its refused listing. Rose picks again and asks Sam once (D98). 2026-10-22 |
+| O7 | Which motion tier | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-22 |
+| O8 | The button's name after an empty Find, when nothing was found first | question | spec p2 | user | Resolved | "Find another" everywhere: one name for one control (D84). 2026-10-22 |
+| O9 | What the new options say about the search | question | spec p2 | user | Resolved | A plain line, "Looked again with other words.", not the AI's search words. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

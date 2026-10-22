@@ -6,8 +6,8 @@ export type Option = Listing & { what: string; why: string; watch: string };
 
 type Problem = "nothing found" | "over limit";
 
-// thing is what Rose called it, such as "a night light".
-export type Group = { thing: string; options: Option[]; problem?: Problem };
+// thing is what Rose called it, such as "a night light". tried marks a group that Find another searched.
+export type Group = { thing: string; options: Option[]; problem?: Problem; tried?: boolean };
 
 type Single = { outcome: "options"; options: Option[] } | { outcome: Problem };
 
