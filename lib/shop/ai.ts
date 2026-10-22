@@ -71,8 +71,23 @@ const CHOOSE_SCHEMA = {
   },
 };
 
+// Find another's own prompt, so NEED stays as its tests check it (D99).
+const OTHER = `You help an older person shop. Their last shop search for a product didn't give them one they could use: it found nothing that fits, or their helper said no to what it found. Write one new short shop search query for the same product in other words, such as another common name for it, or plainer and broader words. Never repeat the last query. Keep the sizes, colours, codes and other must-haves they gave.`;
+
+const OTHER_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["query"],
+  properties: { query: { type: "string" } },
+};
+
 export function readNeed(words: string): Promise<Need> {
   return haiku(NEED, words, NEED_SCHEMA, 2000);
+}
+
+// thing is what Rose called it, and lastQuery the shop search that gave Rose nothing to use.
+export function otherWords(thing: string, lastQuery: string): Promise<{ query: string }> {
+  return haiku(OTHER, `They want: ${JSON.stringify(thing)}\nThe last query: ${JSON.stringify(lastQuery)}`, OTHER_SCHEMA, 2000);
 }
 
 // jpegs are Rose's photos as the browser shrank them. The find action checked that each starts like a JPEG.
