@@ -69,7 +69,8 @@ export type RoseState =
       photos?: number;
       blankPhotos?: number;
       groups: Group[];
-      picked?: string[];
+      // undefined for a group with no pick, and "" for None of these.
+      picked?: (string | undefined)[];
       error?: boolean;
       overCents?: number;
       tried?: boolean;

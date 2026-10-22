@@ -1,4 +1,4 @@
-import type { Option } from "../../lib/shop/find";
+import type { Again, Group, Option } from "../../lib/shop/find";
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
 import type { RoseState } from "./RoseView";
@@ -15,9 +15,14 @@ type RoseParams = {
   // Minutes until a Find stopped for the day works again (D77).
   limitWait?: number;
   over?: string[];
+  // Rose's picks in a basket's other groups, back from a group's Find another.
+  picked?: string[];
 };
 
 type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null };
+
+// What Find another searches. group is the index of a basket's group that it searches alone.
+export type AgainOf = { words: string; things: Again[]; group?: number };
 
 export function roseState(
   vault: string | null,
@@ -38,9 +43,11 @@ export function roseState(
     };
   }
 
-  const current = search.saved && (!request || search.saved.searchedAt > request.askedAt) ? search.saved : null;
+  const current = currentOf(search.saved, request);
   const { limitCents } = search;
   const totalCents = search.totalCents ?? undefined;
+  const tried = current?.tried || undefined;
+  const stopped = params.limitWait !== undefined && params.limitWait > 0;
   if (current?.outcome === "options") {
     const over = overOf([current.options.find(({ id }) => id === params.over?.[0])], totalCents);
     return {
@@ -55,6 +62,7 @@ export function roseState(
       error: params.pickMissing ?? false,
       picked: over?.ids[0],
       overCents: over?.cents,
+      tried,
     };
   }
   if (current?.outcome === "basket") {
@@ -72,12 +80,14 @@ export function roseState(
       blankPhotos: current.blankPhotos || undefined,
       groups: current.groups,
       error: params.pickMissing ?? false,
-      picked: over?.ids,
+      picked: over?.ids ?? pickedOf(current.groups, params.picked),
       overCents: over?.cents,
+      tried,
+      ...(stopped && { waitMinutes: params.limitWait }),
     };
   }
   if (request?.status === "paid" && !current && !params.askAgain && !params.emptyFind) {
-    return { kind: "paid", receipt: receiptOf(request) };
+    return { kind: "paid", receipt: receiptOf(request), ...(stopped && { waitMinutes: params.limitWait }) };
   }
   const outcome =
     !current && (request?.status === "declined" || request?.status === "failed")
@@ -85,12 +95,12 @@ export function roseState(
       : undefined;
   // What Sam left out goes back in Rose's box for the next ask.
   const leftOut = request?.status === "paid" && params.askAgain && request.leftOut;
-  const stopped = params.limitWait !== undefined && params.limitWait > 0;
+  // A stopped Find another saves nothing, so its empty search and its Find another stay (D101).
   const problem = params.emptyFind
     ? "empty"
     : params.notPhoto
       ? "not a photo"
-      : stopped
+      : stopped && !emptyOf(current)
         ? "limit"
         : current?.outcome === "retry"
           ? undefined
@@ -104,8 +114,62 @@ export function roseState(
     photos: current?.photos || undefined,
     outcome,
     problem,
+    tried,
     ...(stopped && { waitMinutes: params.limitWait }),
   };
+}
+
+// Rose's page shows the saved search while it's newer than the latest ask.
+function currentOf(saved: SavedSearch | null, request: PurchaseRequest | null): SavedSearch | null {
+  return saved && (!request || saved.searchedAt > request.askedAt) ? saved : null;
+}
+
+// A search that found nothing, which Find another hasn't run yet.
+function emptyOf(current: SavedSearch | null): boolean {
+  return (current?.outcome === "nothing found" || current?.outcome === "over limit") && !current.tried;
+}
+
+// What Find another searches, from Neon only (D23), by the rule that picks the screen Rose sees. Null when
+// that screen offers none: one for each empty Find, No or untick (D97), without what Sam refused (D98).
+export function againOf(saved: SavedSearch | null, request: PurchaseRequest | null, group?: number): AgainOf | null {
+  if (request?.status === "waiting" || request?.status === "paying") return null;
+  const current = currentOf(saved, request);
+  if (group !== undefined) {
+    const empty = current?.outcome === "basket" ? current.groups[group] : undefined;
+    if (!current || !empty?.problem || empty.tried) return null;
+    return { words: current.words, things: [{ words: empty.thing, query: empty.query ?? empty.thing, refused: [] }], group };
+  }
+  if (current) {
+    if (!emptyOf(current)) return null;
+    return { words: current.words, things: [{ words: current.words, query: current.query ?? current.words, refused: [] }] };
+  }
+  const picks = request ? refusedOf(request) : [];
+  if (!picks.length) return null;
+  const refused = picks.flatMap(({ id }) => (id ? [id] : []));
+  return {
+    words: listed(picks.map(({ thing }) => thing)),
+    things: picks.map(({ thing, query }) => ({ words: thing, query, refused })),
+  };
+}
+
+// The picks Sam said no to, or left out. An ask from before queries were kept falls back to its lines'
+// things, its item's name, or the things Sam left out, whose listings it no longer knows.
+function refusedOf(request: PurchaseRequest): { id?: string; thing: string; query: string }[] {
+  if (request.status === "declined") {
+    if (request.queries) return request.queries;
+    if (request.lines) return request.lines.map(({ id, thing }) => ({ id, thing, query: thing }));
+    return [{ id: request.item.id, thing: request.item.name, query: request.item.name }];
+  }
+  if (request.status === "paid" && request.leftOut) {
+    if (request.queries) return request.queries.filter(({ id }) => !request.lines?.some((line) => line.id === id));
+    return request.leftOut.map((thing) => ({ thing, query: thing }));
+  }
+  return [];
+}
+
+// Rose's picks back from a group's Find another, each while it's still in its own group (D36).
+function pickedOf(groups: Group[], picked: string[] | undefined) {
+  return picked && groups.map(({ options }, index) => options.find(({ id }) => id === picked[index])?.id);
 }
 
 // The picks Ask Sam sent back for going over Sam's total limit, one place per group, while their
