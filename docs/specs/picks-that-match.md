@@ -299,8 +299,8 @@ Recorded as D88, D89, D90, D91, D92, D93, D94, D95.
 
 2026-10-22 · 3 raw findings, 2 survived, 2 fixed.
 
-- correctness · `lib/shop/search.test.ts:167` · the "huge" case sends a real noise PNG over 1 MB, so only the size check drops it · `89868ed`
-- coverage · `lib/shop/search.ts:54` · a test that each photo download gets `AbortSignal.timeout(3000)` · `8d2c838`
+- correctness · `lib/shop/search.test.ts:167` · the "huge" case sends a real noise PNG over 1 MB, so only the size check drops it · `44a51c2`
+- coverage · `lib/shop/search.ts:54` · a test that each photo download gets `AbortSignal.timeout(3000)` · `f83ea27`
 
 ## Open items
 
@@ -321,7 +321,7 @@ Recorded as D88, D89, D90, D91, D92, D93, D94, D95.
 | O13 | Where the recorded set's photos live | question | spec p3 | user | Resolved | Committed to the repo, about 2 MB (D94). 2026-10-22 |
 | O14 | When the recorded-set test runs | question | spec p3 | user | Resolved | In `pnpm test`, on every push (D94). An estimated 3 to 5 cents a run, and about a minute with the asks run one after another. 2026-10-22 |
 | O15 | Which hosts the server may download listing photos from | question | spec p3 | user | Resolved | `cdn.trychannel3.com` only, with redirects refused (D95). 2026-10-22 |
-| O16 | The plan sent each photo to Haiku as Channel3 sent it. Channel3's photos run up to 2048 px, and with 10 of them the pick call often ran past its 10 s timeout (O12) | flag | build | user | Decided alone | Chose: shrink each photo to a WebP of at most 512 px with `sharp` before the pick call, and add `sharp` as a direct dependency at 0.35.5, the version Next already installs. 384 px saved under 1 s more. Other: send full-size photos and let a Find take up to 15 s, with basket groups lost to timeouts; turn thinking off for the pick call (one thing 6.8 to 11.6 s, but misfits got through in 4 of 7 asks); or raise the pick call's timeout past 10 s. Undo: `git revert 4d9719d`, then fix `find.test.ts`'s photo stub. 2026-10-22 |
+| O16 | The plan sent each photo to Haiku as Channel3 sent it. Channel3's photos run up to 2048 px, and with 10 of them the pick call often ran past its 10 s timeout (O12) | flag | build | user | Decided alone | Chose: shrink each photo to a WebP of at most 512 px with `sharp` before the pick call, and add `sharp` as a direct dependency at 0.35.5, the version Next already installs. 384 px saved under 1 s more. Other: send full-size photos and let a Find take up to 15 s, with basket groups lost to timeouts; turn thinking off for the pick call (one thing 6.8 to 11.6 s, but misfits got through in 4 of 7 asks); or raise the pick call's timeout past 10 s. Undo: `git revert 0850f7f`, then fix `find.test.ts`'s photo stub. 2026-10-22 |
 | O17 | The plan said the recorded set had about 10 asks, built from Channel3's answers for each ask | flag | build | user | Decided alone | Chose: 7 asks with 27 real wrong listings, each beside 2 right ones, composed from 20 real searches and 2 product lookups. Wrong listings outnumber right ones, so Haiku can't fill three picks without a misfit. Other: 10 asks with Channel3's own 10-listing answers (5 to 7 MB of photos, and right listings outnumber wrong ones, so Haiku skips misfits without the photo, as O1 found). Undo: add asks to `lib/shop/picks/asks.json` and their photos. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
