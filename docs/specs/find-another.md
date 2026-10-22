@@ -1,6 +1,6 @@
 # Find another
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** picks-that-match
@@ -82,9 +82,9 @@ Scenario Outline: Rose's Find found nothing, and Find another finds it
   And Rose can pick one and tap Ask Sam, as today
 
   Examples:
-    | limit | words                      | message                                                                          |
-    | $50   | something to grip jar lids | Couldn't find that. Try different words.                                         |
-    | $20   | a lamp for reading in bed  | Nothing under $20 for that. Try different words, or ask Sam to raise the limit. |
+    | limit | words                                          | message                                                                          |
+    | $20   | a long grabber to pick things up off the floor | Couldn't find that. Try different words.                                         |
+    | $10   | a sock aid with long handles and foam grips    | Nothing under $10 for that. Try different words, or ask Sam to raise the limit. |
 
 Scenario Outline: Find another leaves out what Sam just refused
   Given Sam's limit is $50
@@ -110,11 +110,11 @@ Scenario: Find another for one empty thing in a basket
 
 Scenario: Find another finds nothing either
   Given Sam's limit is $20
-  And Rose's Find for "a lamp for reading in bed" found nothing under $20
+  And Rose's Find for "a walking stick that stands up by itself" found nothing under $20
   When Rose taps Find another, and it finds nothing under $20 too
   Then Rose sees "Still nothing under $20 for that. Try different words, or ask Sam to raise the limit."
   And Find another doesn't show again for that search
-  And "a lamp for reading in bed" stays in Rose's box
+  And "a walking stick that stands up by itself" stays in Rose's box
 
 Scenario Outline: Find another counts as a Find
   Given this network address ran <finds> Finds in the last 24 hours
@@ -176,14 +176,14 @@ Rose taps Find another on one of four screens. The search ends in new options, a
 
 **After the tap:**
 
-- **Pressed.** The button says "Looking…" with the existing spinner. In a basket, the group's Find another sends the Ask Sam form, so Rose's picks in the other groups go with it. Ask Sam has its own name and value there, so only the pressed button spins.
+- **Pressed.** The button says "Looking…" with the existing spinner. In a basket, the group's Find another sends the Ask Sam form, so Rose's picks in the other groups go with it, and `askSam()` hands it to `findAnother()` (O12). Ask Sam has its own name and value there, so only the pressed button spins.
 - **Found.** The usual options or basket screen. Its line reads `For "something to grip jar lids". Looked again with other words.` When Find another searched one group of a basket, the line sits under that group's heading instead. Rose's other picks stay picked, and the searched group has no pick.
 - **Found nothing.** "Still couldn't find that. Try different words." or "Still nothing under $20 for that. Try different words, or ask Sam to raise the limit." In a group, "Still couldn't find this one." or "Still nothing under $50 for this one." No Find another shows, and Rose's words stay in the box.
 - **Stopped by the daily limit.** Today's "That's a lot of Finds from here today. Try again in 3 hours." The No notice and Find another stay, so Rose can tap it after the wait. On the basket and receipt screens, the same notice sits at the top, and Rose's picks stay. Pause 3 added these two, because only the ask screen had the notice.
 
 **Motion tier:** 1, as before. Nothing new moves: the notices rise and fade like every notice, and "Looking…" turns the existing spinner. Under reduced motion, nothing moves.
 
-**Components used:** `Notice`, `Button` (secondary, and with `formAction` in a basket group), `ListingPicker`, `ReceiptCard`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
+**Components used:** `Notice`, `Button` (secondary, and named `another` in a basket group), `ListingPicker`, `ReceiptCard`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
 
 **Preview:** `/preview/find-another` on `pnpm dev`, from `app/(shop)/preview/find-another/page.tsx`. It shows Rose's real page in 16 frames, one or more for each scenario.
 
@@ -350,7 +350,7 @@ Chunk A owns the shared types: `Group`, `Single` and `SavedSearch`.
 | Haiku repeats the last query | `OTHER` says never to. O10's measure logs each new query beside the last one |
 | Channel3 gives the refused listing another id in the new search, so it comes back | The e2e checks that the refused name is gone. If it fails, `refused` also matches names |
 | The e2e's Find another finds nothing for slippers, so the test fails | Slippers at $50 have passed find-and-explain's e2e on every CI run. A failure here is the signal O10 asks for |
-| A basket group's Find another sends the Ask Sam form, so a wrong action could ask Sam | The group button's `formAction` is `findAnother`, and `askSam()` never runs. The action test checks that no request is made |
+| A basket group's Find another sends the Ask Sam form, so a wrong action could ask Sam | `askSam()` hands any form with `another` to `findAnother()` before it reads a pick (O12). The action test checks that no request is made |
 
 ### Decisions to record
 
@@ -369,8 +369,11 @@ Recorded as D97, D98, D99, D100, D101.
 | O7 | Which motion tier | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-22 |
 | O8 | The button's name after an empty Find, when nothing was found first | question | spec p2 | user | Resolved | "Find another" everywhere: one name for one control (D84). 2026-10-22 |
 | O9 | What the new options say about the search | question | spec p2 | user | Resolved | A plain line, "Looked again with other words.", not the AI's search words. 2026-10-22 |
-| O10 | After an empty Find, Haiku's other words find a fit under Sam's limit on real asks. Channel3 might answer reworded searches with about the same listings. The scenarios' examples are made up, and they may find things the first time | unproven | spec p3 | build | Accepted risk | No /poc. `/build` finds about 5 asks that come back empty today. It runs each through `findAgain()` 3 times with real Haiku and Channel3, and writes here how many find a fit, the time, and each new query beside the last. It swaps the scenarios' examples for real ones. If none finds a fit, the spec goes back to Draft with the numbers. The No and untick triggers still differ, because they drop the refused listing. 2026-10-22 |
+| O10 | After an empty Find, Haiku's other words find a fit under Sam's limit on real asks. Channel3 might answer reworded searches with about the same listings. The scenarios' examples are made up, and they may find things the first time | unproven | spec p3 | build | Accepted risk | No /poc. `/build` finds about 5 asks that come back empty today. It runs each through `findAgain()` 3 times with real Haiku and Channel3, and writes here how many find a fit, the time, and each new query beside the last. It swaps the scenarios' examples for real ones. If none finds a fit, the spec goes back to Draft with the numbers. The No and untick triggers still differ, because they drop the refused listing. 2026-10-22. **Measured by /build, 2026-10-22:** 4 real empty asks, 3 runs each. A pill box that beeps at $20 (nothing found): 0 of 3. A folding shower chair at $30 (over limit): 0 of 3. A walking stick that stands up by itself at $20 (over limit): 0 of 3. A sock aid with long handles and foam grips at $10 (over limit): 2 of 3, both a "Shoehorn Dressing Stick Aid" at $9.99, which isn't a sock aid. New queries beside the last: "medication reminder box with alarm" for "pill box with alarm beeper reminder"; "fold-up bath seat with backrest" for "folding shower chair"; "freestanding cane with tripod base" for "self standing walking stick"; "long handled sock pulling tool with foam grip" for "sock aid long handles foam grips". Haiku never repeated the last query. One thing took 6.6 to 11.0 s. Four more first Finds timed out with 10 at once, and showed "Couldn't find that."; Find another found 3 options for each, 12 of 12, in 9.9 to 15.4 s. The examples in scenarios 1 and 4 are now these real asks. One ask found a fit by the pick step, so the spec stays Built. Other words rarely help a real empty ask, and never fixed an over-limit one. |
 | O11 | D57 kept a one-thing ask's extras in columns, not jsonb. How does each ask keep its picks' words and queries? | question | spec p3 | user | Resolved | One `queries` jsonb column on `purchase_requests`, for one-thing asks and baskets. `claim()` doesn't change, and D57 still holds for the note and photo (D100). 2026-10-22 |
+| O12 | The interface said a basket group's Find another is a `Button` with `formAction={findAnother}`. React leaves such a button's name and value out of the form data (`react-dom-client`: `submitter = null`), so the group index never reached the action, and no button showed "Looking…" | flag | build | user | Decided alone | Chose: a plain submit named `another` in the Ask Sam form, and `askSam()` hands a form with `another` to `findAnother()` before it reads a pick. Other: keep `formAction`, bind the group into a second action, and make `Button` match `useFormStatus().action`. Undo: revert 11e4c10, then add the bound action and the `Button` change. 2026-10-22 |
+| O13 | D101 says a stopped Find another keeps its screen and its Find another. Pause 2 drew this only for the No screen. On the empty-Find screen, the limit notice took the place of "Couldn't find that." and Find another | flag | build | user | Decided alone | Chose: the ask screen shows the limit notice whenever there's a wait, and a stopped Find another keeps the empty search's notice and Find another under it. Other: the limit notice alone, with Find another back when the wait ends. Undo: show `LimitNotice` only for `problem === "limit"` in `RoseView`, and drop `emptyOf` from `roseState`'s problem (11e4c10, 6476c28). 2026-10-22 |
+| O14 | An empty search with no saved query: a basket whose every group found nothing, a Find whose AI call failed, or one from before this slice. The plan didn't say what Find another searches for it | flag | build | user | Decided alone | Chose: its words as one thing, with the words as the last query. For a basket of several things, Haiku then writes one query for all of them. Other: keep each group's query on an all-empty basket, and search each thing again. Undo: return the groups with the "nothing found" outcome in `searchThings()`, and search each group in `againOf()`. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

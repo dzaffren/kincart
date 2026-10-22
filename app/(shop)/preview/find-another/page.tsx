@@ -144,8 +144,8 @@ export default function FindAnotherPreview() {
       <header className="preview-header">
         <h1>Find another: every screen</h1>
         <p>
-          Each frame is Rose&apos;s real page with fixed data. The listings are written examples until real search
-          results replace them at /build. Grey squares stand in for listing photos. Sam&apos;s page doesn&apos;t change.
+          Each frame is Rose&apos;s real page with fixed data. The listings are written examples, and the spec&apos;s
+          O10 row has real ones. Grey squares stand in for listing photos. Sam&apos;s page doesn&apos;t change.
         </p>
       </header>
 
