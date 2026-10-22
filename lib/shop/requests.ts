@@ -216,7 +216,7 @@ export async function saveSearch(
       words,
       result.outcome,
       JSON.stringify(result.outcome === "options" ? result.options : []),
-      JSON.stringify(result.outcome === "basket" ? result.groups : []),
+      JSON.stringify("groups" in result ? result.groups : []),
       photos > 0,
       photos,
       blank,

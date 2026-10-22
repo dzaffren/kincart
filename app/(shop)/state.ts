@@ -141,7 +141,11 @@ export function againOf(saved: SavedSearch | null, request: PurchaseRequest | nu
   }
   if (current) {
     if (!emptyOf(current)) return null;
-    return { words: current.words, things: [{ words: current.words, query: current.query ?? current.words, refused: [] }] };
+    // A basket whose every group found nothing searches each thing again, in a call of its own (D99).
+    const things = current.groups.length
+      ? current.groups.map(({ thing, query }) => ({ words: thing, query: query ?? thing, refused: [] }))
+      : [{ words: current.words, query: current.query ?? current.words, refused: [] }];
+    return { words: current.words, things };
   }
   const picks = request ? refusedOf(request) : [];
   if (!picks.length) return null;

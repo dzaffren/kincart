@@ -1191,6 +1191,32 @@ it("searches one empty group of a basket again, keeps Rose's other picks and the
   expect(services).not.toHaveBeenCalled();
 });
 
+it("after a Find whose every thing found nothing, asks for other words for each thing on its own", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, something to grip jar lids", {
+    outcome: "nothing found",
+    groups: [
+      { thing: "AA batteries", options: [], problem: "nothing found", query: "AA batteries" },
+      { thing: jarWords, options: [], problem: "nothing found", query: "jar lid grip" },
+    ],
+  });
+  const services = stubAgainServices([aa8, opener]);
+
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+
+  expect(askedForOtherWords(services)).toEqual([
+    'They want: "AA batteries"\nThe last query: "AA batteries"',
+    `They want: "${jarWords}"\nThe last query: "jar lid grip"`,
+  ]);
+  expect(await getSearch(owner)).toMatchObject({
+    words: "AA batteries, something to grip jar lids",
+    outcome: "basket",
+    tried: true,
+    groups: [{ thing: "AA batteries", tried: true }, { thing: jarWords, tried: true }],
+  });
+});
+
 it("hands a group's Find another, sent with the Ask Sam form, to Find another, and asks Sam nothing", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});

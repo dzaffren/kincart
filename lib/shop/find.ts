@@ -12,7 +12,12 @@ export type Group = { thing: string; options: Option[]; problem?: Problem; query
 
 type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string };
 
-export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" | "nothing in photo" };
+// A basket whose every group found nothing keeps its groups, so Find another can search each thing again (D99).
+export type Search =
+  | Single
+  | { outcome: "basket"; groups: Group[] }
+  | { outcome: "nothing found"; groups: Group[] }
+  | { outcome: "too many" | "nothing in photo" };
 
 // words are what the search was for: Rose's own, or the AI's words for Rose's photos. blank counts
 // the photos that showed nothing to buy.
@@ -160,7 +165,7 @@ async function searchThings(
       return groupOf(thing, { ...result, query });
     }),
   );
-  return groups.some((group) => group.options.length) ? { outcome: "basket", groups } : { outcome: "nothing found" };
+  return groups.some((group) => group.options.length) ? { outcome: "basket", groups } : { outcome: "nothing found", groups };
 }
 
 // refused are listings Sam said no to, which Find another leaves out (D98).

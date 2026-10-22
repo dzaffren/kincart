@@ -278,6 +278,10 @@ it("says it couldn't find anything when no thing in the list has listings", asyn
 
   expect(await find("a left-handed teapot for a cat and a tablet for video calls", 3000)).toEqual({
     outcome: "nothing found",
+    groups: [
+      { thing: "a left-handed teapot for a cat", options: [], problem: "nothing found", query: "left-handed teapot for a cat" },
+      { thing: "a tablet for video calls", options: [], problem: "over limit", query: "tablet for video calls" },
+    ],
   });
 });
 

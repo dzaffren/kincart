@@ -254,6 +254,13 @@ it("keeps a search's query, and whether Find another ran it", async () => {
 
   await saveSearch(owner, "a lamp for reading in bed", { outcome: "retry" });
   expect(await getSearch(owner)).toMatchObject({ query: null, tried: false });
+
+  const empty = [
+    { thing: "AA batteries", options: [], problem: "nothing found" as const, query: "AA batteries" },
+    { thing: "something to grip jar lids", options: [], problem: "over limit" as const, query: "jar lid grip" },
+  ];
+  await saveSearch(owner, "AA batteries, something to grip jar lids", { outcome: "nothing found", groups: empty });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", groups: empty });
 });
 
 it("keeps each pick's thing, query and listing id with the ask, after Sam's OK too", async () => {

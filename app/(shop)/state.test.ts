@@ -428,6 +428,20 @@ it("searches an empty Find's words again with its last query, once, and only whi
   expect(againOf(null, null)).toBeNull();
 });
 
+it("searches each thing of a basket that found nothing again, each with its own last query", () => {
+  const groups = [
+    { thing: "AA batteries", options: [], problem: "nothing found" as const, query: "AA batteries" },
+    { thing: jarWords, options: [], problem: "over limit" as const },
+  ];
+  expect(againOf({ ...saved("nothing found"), words: `AA batteries, ${jarWords}`, groups }, null)).toEqual({
+    words: `AA batteries, ${jarWords}`,
+    things: [
+      { words: "AA batteries", query: "AA batteries", refused: [] },
+      { words: jarWords, query: jarWords, refused: [] },
+    ],
+  });
+});
+
 it("searches the thing Sam said no to again, without its listing", () => {
   const declined = { ...request("declined", strap), queries: [slipperPick] };
   expect(againOf(null, declined)).toEqual({
