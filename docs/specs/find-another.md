@@ -1,6 +1,6 @@
 # Find another
 
-**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Shipped · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** picks-that-match

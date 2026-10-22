@@ -15,6 +15,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Find shows Rose only listings that are the thing asked for. The AI checks each listing's photo as well as its words, so a storage bin sold as "AA Batteries", a lone cable for a charger or a case for a tablet no longer shows.
 - The home page backs "No more logging in as them" with a 2025 survey of 657 US adults, linked at its source: about 1 in 10 had signed in to someone else's money or medical account with that person's login.
 - The home page's How it works says your parent can send a photo of the thing or of a written list.
+- After a Find that comes back empty, a No from Sam, or a thing Sam left out, Rose taps Find another, and KinCart searches again with other words, without the listings Sam said no to. Each Find another counts as one of the day's 20 Finds.
 
 ## [1.2.0] - 2026-10-16
 
