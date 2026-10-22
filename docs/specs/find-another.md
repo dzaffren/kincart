@@ -356,6 +356,12 @@ Chunk A owns the shared types: `Group`, `Single` and `SavedSearch`.
 
 Recorded as D97, D98, D99, D100, D101.
 
+## Review
+
+2026-10-22 · 1 raw finding, 1 survived, 1 fixed.
+
+- decisions · `app/(shop)/state.ts:144` · a basket whose every thing found nothing searches each thing in its own call, as D99 says · `517aa1a`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -373,7 +379,8 @@ Recorded as D97, D98, D99, D100, D101.
 | O11 | D57 kept a one-thing ask's extras in columns, not jsonb. How does each ask keep its picks' words and queries? | question | spec p3 | user | Resolved | One `queries` jsonb column on `purchase_requests`, for one-thing asks and baskets. `claim()` doesn't change, and D57 still holds for the note and photo (D100). 2026-10-22 |
 | O12 | The interface said a basket group's Find another is a `Button` with `formAction={findAnother}`. React leaves such a button's name and value out of the form data (`react-dom-client`: `submitter = null`), so the group index never reached the action, and no button showed "Looking…" | flag | build | user | Decided alone | Chose: a plain submit named `another` in the Ask Sam form, and `askSam()` hands a form with `another` to `findAnother()` before it reads a pick. Other: keep `formAction`, bind the group into a second action, and make `Button` match `useFormStatus().action`. Undo: revert 11e4c10, then add the bound action and the `Button` change. 2026-10-22 |
 | O13 | D101 says a stopped Find another keeps its screen and its Find another. Pause 2 drew this only for the No screen. On the empty-Find screen, the limit notice took the place of "Couldn't find that." and Find another | flag | build | user | Decided alone | Chose: the ask screen shows the limit notice whenever there's a wait, and a stopped Find another keeps the empty search's notice and Find another under it. Other: the limit notice alone, with Find another back when the wait ends. Undo: show `LimitNotice` only for `problem === "limit"` in `RoseView`, and drop `emptyOf` from `roseState`'s problem (11e4c10, 6476c28). 2026-10-22 |
-| O14 | An empty search with no saved query: a basket whose every group found nothing, a Find whose AI call failed, or one from before this slice. The plan didn't say what Find another searches for it | flag | build | user | Decided alone | Chose: its words as one thing, with the words as the last query. For a basket of several things, Haiku then writes one query for all of them. Other: keep each group's query on an all-empty basket, and search each thing again. Undo: return the groups with the "nothing found" outcome in `searchThings()`, and search each group in `againOf()`. 2026-10-22 |
+| O14 | An empty search with no saved query: a basket whose every group found nothing, a Find whose AI call failed, or one from before this slice. The plan didn't say what Find another searches for it | flag | build | user | Decided alone | Chose: its words as one thing, with the words as the last query. For a basket of several things, Haiku then writes one query for all of them. Other: keep each group's query on an all-empty basket, and search each thing again. Undo: return the groups with the "nothing found" outcome in `searchThings()`, and search each group in `againOf()`. 2026-10-22. Reversed at review for a basket: see O15. |
+| O15 | Review found that O14's choice contradicts D99 (Find another writes other words in a Haiku call of its own for each thing). A basket whose every group found nothing was searched as one thing, with one other-words call | flag | review | user | Decided alone | Chose: such a search keeps its groups, each with its query, and Find another searches each thing in a call of its own. A Find whose AI call failed, or a search from before this slice, still searches its words as one thing. Other: keep O14, and supersede D99 through `/spec`. Undo: revert 517aa1a. 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
