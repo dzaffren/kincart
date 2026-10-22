@@ -32,6 +32,8 @@ flowchart LR
     S2["2 picks-that-match"] -- "the fixed pick step" --> S4["4 find-another"]
     S2 -- "the fixed pick step" --> S5["5 ask-again"]
     S3["3 home-page-proof"]
+    S4 -- "the Find another step" --> S7["7 allow-over-limit"]
+    S7 -- "the Find another step" --> S8["8 sam-finds-another"]
 ```
 
 Slices 1 to 3 are for judges. Slices 4 and 5 are the AI's new legwork, and slice 6 is the product step.
@@ -44,6 +46,8 @@ Slices 1 to 3 are for judges. Slices 4 and 5 are the AI's new legwork, and slice
 | 4 | `find-another` | On a thing with no fit, a No or an untick, Rose or Sam taps Find another. The AI tries other words, then shows the nearest listings over the limit, and Sam can allow one. | The AI's biggest new legwork. It comes after `picks-that-match` so it reuses the fixed pick step. |
 | 5 | `ask-again` | Rose taps a past ask to repeat it. The AI finds today's listings for the same things and says what changed. | Older shoppers rebuy the same things. It stands alone, so it can move up if `find-another` runs long. |
 | 6 | `pay-the-shop` | Sam's OK pays each shop's own PayPal account, and the receipt names the shop. KinCart never holds Rose's money. In sandbox, stand-in business accounts play the shops. | The product step, last as the user asked. It rests on two unproven PayPal claims (O3, O4), so a /poc starts it. |
+| 7 | `allow-over-limit` | When Find another's other words still find nothing under Sam's limit, Rose sees the nearest listings over it, and Sam can allow one. | Split from `find-another` at its pause 1 (find-another O1). |
+| 8 | `sam-finds-another` | Sam taps Find another on Sam's own page. | Split from `find-another` at its pause 1 (find-another O2). It decides who picks (O20). |
 
 ## Not doing
 
@@ -77,6 +81,8 @@ Slices 1 to 3 are for judges. Slices 4 and 5 are the AI's new legwork, and slice
 | O17 | When Sam taps Find another, who picks the new listing: Sam, or Rose after Sam's tap | question | shape | user | Handed to find-another | — |
 | O18 | What "what changed" means in `ask-again`: price, shop, a listing gone, or all three | question | shape | user | Handed to ask-again | — |
 | O19 | This shape's branch stacks on `feat/usage-on-status`, because PR #19 adds D78 to D81 to DECISIONS.md | flag | shape | user | Accepted risk | Merge PR #19 first, then this branch. 2026-10-22 |
+| O20 | When Sam taps Find another, who picks the new listing: Sam, or Rose after Sam's tap (from find-another O2, which carried O17) | question | spec | user | Handed to sam-finds-another | — |
+| O21 | What Sam allowing a listing over the limit means: Rose picks it and Sam's OK pays it, or Sam allows it first | question | spec | user | Handed to allow-over-limit | — |
 
 ## Glossary
 
