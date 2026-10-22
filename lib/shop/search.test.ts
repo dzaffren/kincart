@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { searchListings } from "./search";
+import { searchListings, withPhotos, type Found } from "./search";
 
 const slippers = {
   id: "prod_7Hq2kZ",
@@ -96,4 +96,64 @@ it("throws when Channel3 refuses, so the caller can say it couldn't find anythin
   stubChannel3(() => Response.json({ error: "rate limited" }, { status: 429 }));
 
   await expect(searchListings("warm slippers")).rejects.toThrow("channel3 429");
+});
+
+const found = (id: string, imageUrl?: string): Found => ({
+  id,
+  name: "Duracell Coppertop AA Batteries, 8 Pack",
+  cents: 879,
+  shop: "target.com",
+  url: `https://www.target.com/p/${id}`,
+  imageUrl,
+  details: "Long-lasting AA alkaline batteries.",
+});
+
+// The first bytes of a WebP file: RIFF, a size, then WEBP.
+const webp = Buffer.from("524946462400000057454250565038", "hex");
+
+const photo = (body: BodyInit, type = "image/webp", status = 200) =>
+  new Response(body, { status, headers: { "content-type": type } });
+
+it("downloads each listing's photo from Channel3's photo host and keeps it in base64, with no key sent", async () => {
+  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
+
+  expect(await withPhotos([found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3")])).toEqual([
+    { ...found("prod_1Dc8aA", "https://cdn.trychannel3.com/a1b2c3"), photo: { mediaType: "image/webp", data: webp.toString("base64") } },
+  ]);
+  const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+  expect(url).toBe("https://cdn.trychannel3.com/a1b2c3");
+  expect(init.redirect).toBe("error");
+  expect(init.headers).toBeUndefined();
+});
+
+it("passes a listing with no photo on, with no download", async () => {
+  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
+
+  expect(await withPhotos([found("prod_1Dc8aA")])).toEqual([found("prod_1Dc8aA")]);
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it("drops a listing whose photo is missing, slow, moved, elsewhere, not a photo or too big", async () => {
+  const answers: Record<string, () => Response> = {
+    gone: () => photo("Not found", "text/plain", 404),
+    slow: () => {
+      throw new DOMException("The operation timed out.", "TimeoutError");
+    },
+    moved: () => {
+      throw new TypeError("fetch failed: redirect mode is set to error");
+    },
+    page: () => photo("<!doctype html><title>Sign in</title>", "text/html"),
+    huge: () => photo(new Uint8Array(1024 * 1024 + 1)),
+  };
+  const fetch = stubChannel3(() => photo(new Uint8Array(webp)));
+  fetch.mockImplementation(async (url: unknown) => answers[String(url).split("/").pop()!]());
+
+  const listings = [
+    ...Object.keys(answers).map((name) => found(`prod_${name}`, `https://cdn.trychannel3.com/${name}`)),
+    found("prod_other", "https://images.example.com/gone"),
+    found("prod_lookalike", "https://cdn.trychannel3.com.example.com/slow"),
+    found("prod_http", "http://cdn.trychannel3.com/gone"),
+  ];
+  expect(await withPhotos(listings)).toEqual([]);
+  expect(fetch.mock.calls.map(([url]) => url)).toEqual(Object.keys(answers).map((name) => `https://cdn.trychannel3.com/${name}`));
 });

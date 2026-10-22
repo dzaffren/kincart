@@ -2,7 +2,11 @@ import type { Item } from "./items";
 
 export type Listing = Item & { shop: string; url: string; imageUrl?: string };
 
-export type Found = Listing & { details: string };
+// photo is the listing's photo in base64, for the pick call only. It is never stored.
+export type Found = Listing & { details: string; photo?: { mediaType: string; data: string } };
+
+const PHOTO_TYPES = ["image/webp", "image/jpeg", "image/png", "image/gif"];
+const MOST_PHOTO_BYTES = 1024 * 1024;
 
 type Product = {
   id?: string;
@@ -25,6 +29,29 @@ export async function searchListings(query: string, maxCents?: number): Promise<
   if (!response.ok) throw new Error(`channel3 ${response.status}`);
   const body: { products?: Product[] } = await response.json();
   return (body.products ?? []).flatMap(toFound);
+}
+
+// Only the photo shows a listing that isn't what its words say, so one whose photo can't be read is dropped
+// (D89, D93). The photo's URL comes from shop data, so only Channel3's own photo host is fetched (D95).
+export async function withPhotos(listings: Found[]): Promise<Found[]> {
+  const kept = await Promise.all(
+    listings.map(async (listing) => {
+      if (!listing.imageUrl) return [listing];
+      const photo = await download(listing.imageUrl).catch(() => undefined);
+      return photo ? [{ ...listing, photo }] : [];
+    }),
+  );
+  return kept.flat();
+}
+
+async function download(imageUrl: string): Promise<Found["photo"]> {
+  const url = new URL(imageUrl);
+  if (url.protocol !== "https:" || url.host !== "cdn.trychannel3.com") return undefined;
+  const response = await fetch(url.href, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(3000) });
+  const mediaType = response.headers.get("content-type")?.split(";")[0].trim() ?? "";
+  if (response.status !== 200 || !PHOTO_TYPES.includes(mediaType)) return undefined;
+  const bytes = Buffer.from(await response.arrayBuffer());
+  return bytes.length > MOST_PHOTO_BYTES ? undefined : { mediaType, data: bytes.toString("base64") };
 }
 
 function toFound(product: Product): Found[] {
