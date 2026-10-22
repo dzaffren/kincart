@@ -73,10 +73,11 @@ export type RoseState =
       error?: boolean;
       overCents?: number;
       tried?: boolean;
+      waitMinutes?: number;
       busy?: boolean;
     }
   | { kind: "waiting"; item: Item; askedAt: Date; shop?: string; lines?: Line[] }
-  | { kind: "paid"; receipt: Receipt };
+  | { kind: "paid"; receipt: Receipt; waitMinutes?: number };
 
 type Action = (formData: FormData) => void | Promise<void>;
 
@@ -188,11 +189,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
         {state.problem === "too many" && (
           <Notice tone="neutral">Up to 5 things at a time. Which 5 do you need most?</Notice>
         )}
-        {state.problem === "limit" && (
-          <Notice tone="neutral">
-            That&apos;s a lot of Finds from here today. Try again in {waitFor(state.waitMinutes ?? 0)}.
-          </Notice>
-        )}
+        {state.problem === "limit" && <LimitNotice waitMinutes={state.waitMinutes} />}
         {state.problem === "over limit" && (
           <Notice tone="neutral">
             {state.tried ? "Still nothing" : "Nothing"} under {limit} for that. Try different words, or ask {HELPER} to
@@ -284,6 +281,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
     return (
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick at least one first.</Notice>}
+        {state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
         <OverNotice
           totalCents={state.totalCents}
           overCents={state.overCents}
@@ -331,6 +329,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
   if (state.kind === "paid") {
     return (
       <div className="screen">
+        {state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
         <h1>{HELPER} said OK. It&apos;s paid.</h1>
         <ReceiptCard receipt={state.receipt} />
         {state.receipt.leftOut && (
@@ -437,6 +436,15 @@ function anotherHint(state: Extract<RoseState, { kind: "ask" }>): string | undef
     return "KinCart tries other words for you.";
   }
   return undefined;
+}
+
+// A Find or a Find another past the address's 20 for the day (D77, D101).
+function LimitNotice({ waitMinutes }: { waitMinutes?: number }) {
+  return (
+    <Notice tone="neutral">
+      That&apos;s a lot of Finds from here today. Try again in {waitFor(waitMinutes ?? 0)}.
+    </Notice>
+  );
 }
 
 function AnotherForm({ action, hint }: { action?: Action; hint?: string }) {

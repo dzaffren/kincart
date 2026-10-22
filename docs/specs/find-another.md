@@ -1,6 +1,6 @@
 # Find another
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** picks-that-match
@@ -179,17 +179,182 @@ Rose taps Find another on one of four screens. The search ends in new options, a
 - **Pressed.** The button says "Looking…" with the existing spinner. In a basket, the group's Find another sends the Ask Sam form, so Rose's picks in the other groups go with it. Ask Sam has its own name and value there, so only the pressed button spins.
 - **Found.** The usual options or basket screen. Its line reads `For "something to grip jar lids". Looked again with other words.` When Find another searched one group of a basket, the line sits under that group's heading instead. Rose's other picks stay picked, and the searched group has no pick.
 - **Found nothing.** "Still couldn't find that. Try different words." or "Still nothing under $20 for that. Try different words, or ask Sam to raise the limit." In a group, "Still couldn't find this one." or "Still nothing under $50 for this one." No Find another shows, and Rose's words stay in the box.
-- **Stopped by the daily limit.** Today's "That's a lot of Finds from here today. Try again in 3 hours." The No notice and Find another stay, so Rose can tap it after the wait.
+- **Stopped by the daily limit.** Today's "That's a lot of Finds from here today. Try again in 3 hours." The No notice and Find another stay, so Rose can tap it after the wait. On the basket and receipt screens, the same notice sits at the top, and Rose's picks stay. Pause 3 added these two, because only the ask screen had the notice.
 
 **Motion tier:** 1, as before. Nothing new moves: the notices rise and fade like every notice, and "Looking…" turns the existing spinner. Under reduced motion, nothing moves.
 
 **Components used:** `Notice`, `Button` (secondary, and with `formAction` in a basket group), `ListingPicker`, `ReceiptCard`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
 
-**Preview:** `/preview/find-another` on `pnpm dev`, from `app/(shop)/preview/find-another/page.tsx`. It shows Rose's real page in 14 frames, one or more for each scenario.
+**Preview:** `/preview/find-another` on `pnpm dev`, from `app/(shop)/preview/find-another/page.tsx`. It shows Rose's real page in 16 frames, one or more for each scenario.
 
-## Decisions to record
+## Technical plan
 
-Drafted at pause 1. They move under the Technical plan at pause 3, and `/build` appends them to DECISIONS.md.
+### Approach
+
+A new server action, `findAnother`, works out what to search again from Neon only, never from the form (D23). After an empty Find, it uses the saved search's words and the query that found nothing. After a No or an untick, it uses the request's new `queries` column: each pick's thing, its query, and its listing id to leave out. For each thing, a new Haiku call writes other words than the last query. Then Find's own two searches and pick step run on them, with Sam's refused ids dropped before Haiku sees the listings. The result is saved as Rose's search, marked `tried`, so the page offers no second Find another. It counts as a Find, before and after it runs (D97).
+
+Relies on: D10, D11, D12, D19, D22, D23, D24, D31, D36, D46, D57, D67, D73, D77, D78, D81, D84, D88, D91, D92, D97, D98, D99, D100, D101
+
+```mermaid
+flowchart TB
+    subgraph browser["Rose's browser"]
+        RV["RoseView: Find another"]
+    end
+    subgraph vercel["Vercel"]
+        ACT["findAnother (actions.ts)"] -- "saved search, latest ask, group index" --> AG["againOf (state.ts)"]
+        AG -- "each thing: words, last query, refused ids" --> ACT
+        ACT -- "things, Sam's limit" --> FA["findAgain (find.ts)"]
+        FA -- "thing, last query" --> OW["otherWords (ai.ts)"]
+        FA -- "new query, refused ids" --> ST["searchThing (find.ts)"]
+    end
+    RV -- "POST: group index, Rose's picks" --> ACT
+    PR[("purchase_requests.queries")] -- "thing, query, id per pick" --> AG
+    ACT -- "result, new query, tried" --> RS[("rose_search")]
+    OW -- "one small call per thing" --> H["Claude Haiku 5.5"]
+    ST -- "two searches per thing" --> C3["Channel3"]
+    ST -- "pick step, as Find" --> H
+```
+
+`againOf` decides what to search, `otherWords` writes the new query, and Find's `searchThing` does the rest, without what Sam refused.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's browser
+    participant A as findAnother
+    participant N as Neon
+    participant F as findAgain
+    participant H as Haiku 5.5
+    participant C as Channel3
+    R->>A: POST Find another, after Sam's No
+    A->>N: getSearch, latest
+    N-->>A: no newer search; declined ask, queries [{id, thing, query}]
+    A->>A: againOf: one thing, last query, refused [id]
+    A->>N: takeUse find, 20 a day
+    A->>F: findAgain(things, limit)
+    F->>H: otherWords: "They want: …", "The last query: …"
+    H-->>F: a new query
+    F->>C: two searches with the new query, at once
+    C-->>F: listings
+    F->>F: drop the refused id, download photos
+    F->>H: choose, as Find
+    H-->>F: picks
+    F-->>A: options, new query
+    A->>N: saveSearch(words, result, tried), usage +1 Find and its searches
+    A-->>R: redirect /r/<token>
+```
+
+A Find another sends the same three calls as a Find. The other-words call takes the place of reading Rose's words, so it stays within D91's times.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `lib/shop/ai.ts:74` | A new `OTHER` prompt (below), an `OTHER_SCHEMA` of `{ query }`, and `otherWords(thing, lastQuery)`, which sends `They want: "…"` and `The last query: "…"` through `haiku()` with 2000 max tokens, as `readNeed()` has | 1 to 4 |
+| `lib/shop/find.ts:12` | `Single`'s outcomes and `Group` carry `query`, set in `searchThings()` (`:92`) from the thing's query. A new `findAgain(words, things, limitCents, sent)` runs `otherWords()` and then `searchThing()` for each thing at once. One thing gives a `Single`, and several give a basket whose groups all have `tried`. A failed call blanks only its own thing, with its last query kept (D31). `searchThing()` (`:118`) takes `refused` ids and drops them from both searches before `withPhotos()`. `logged()` (`:71`) adds ` again=1` | 1 to 4 |
+| `lib/shop/requests.ts:59` | `SavedSearch` gains `query` and `tried`. `getSearch()` (`:147`) reads them. `saveSearch()` (`:178`) writes the result's `query` and takes `tried = false` after `blank`. `PurchaseRequest` gains `queries`, `Row` and `toRequest()` (`:385`) read them, and `ask()` (`:125`) takes `queries` after `lines` | 1 to 4 |
+| `app/(shop)/state.ts:22` | A new `againOf(saved, request, group?)` uses `roseState`'s rule for the current search. It returns what Find another searches, or null: a current empty search not yet `tried`, one empty group not yet `tried`, a declined ask's every pick, or a paid ask's picks that are missing from its lines. An ask from before this slice has no `queries`, so it falls back to each line's thing, or the item's name. `roseState` passes `tried` to ask, options and basket. It passes `waitMinutes` to basket and paid when stopped. It passes `?picked=` ids to a basket when they belong to their group, and an empty one becomes no pick | 1 to 5 |
+| `app/(shop)/actions.ts:123` | A new `findAnother(token, formData)`: Rose's link only, and `searchOn()`. It calls `againOf()`, then `takeUse("find")`. A stopped one counts a stopped Find, saves nothing, and redirects with `?find=limit&until=` (D101). Otherwise it runs `findAgain()`, saves the search with `tried`, and adds one Find and its searches (D81). A group's search replaces only that group in the saved basket, keeps the search's photos and blank count, and redirects with Rose's other picks as `?picked=` (D36). `askSam()` (`:131`) writes `queries`: the saved search's words and query for one pick, and each group's for a basket. `basketPicks()` (`:227`) returns the query too | 1 to 5 |
+| `app/(shop)/r/[token]/page.tsx:58` | Reads `?picked=`, and passes `findAnother` to `RoseView` | 2, 3 |
+| `app/(shop)/RoseView.tsx`, `app/(shop)/preview/find-another/page.tsx` | Built at pauses 2 and 3. `/build` breaks each new line once, as the lesson says | 1 to 5 |
+| `lib/shop/find.ts:10` | `Group` gained `tried` at pause 2 | 3, 4 |
+| `db/migrations/0013_find_another.up.sql`, `.down.sql` | Add `rose_search.query text`, `rose_search.tried boolean NOT NULL DEFAULT false` and `purchase_requests.queries jsonb`, with `IF NOT EXISTS`, so a rerun of `db:up` passes | 1 to 4 |
+| `scripts/migrate.test.ts:27` | The first test checks the three columns up, down and up. `downToHouseholds()` also runs `0012_usage_on_status.down.sql` by hand | migration |
+| `e2e/find-another.spec.ts` | The slice's e2e | 2 |
+
+Reusing: `searchThing()`, `withPhotos()` and `choose()` unchanged apart from `refused`, `haiku()`, `logged()` and the `Sent` tally, `takeUse()`, `countUse()` and `minutesUntil()` as `find` uses them, `roseState`'s current-search rule, `reset()` from `e2e/db.ts`, and the pause 2 view.
+
+`OTHER`, a draft that `/build` measures (O10):
+
+> You help an older person shop. Their last shop search for a product didn't give them one they could use: it found nothing that fits, or their helper said no to what it found. Write one new short shop search query for the same product in other words, such as another common name for it, or plainer and broader words. Never repeat the last query. Keep the sizes, colours, codes and other must-haves they gave.
+
+### Data
+
+```mermaid
+erDiagram
+    HOUSEHOLDS ||--o| ROSE_SEARCH : "has one current"
+    HOUSEHOLDS ||--o{ PURCHASE_REQUESTS : "asks"
+    ROSE_SEARCH {
+        bigint id PK "household id"
+        text words
+        jsonb groups "each group gains query and tried"
+        text query "new: a one-thing search's query"
+        boolean tried "new, default false: Find another ran it"
+    }
+    PURCHASE_REQUESTS {
+        bigint id PK
+        bigint household_id FK
+        jsonb lines "unchanged: claim keeps the paid lines"
+        jsonb left_out "unchanged: the things Sam left out"
+        jsonb queries "new: id, thing, query for every pick"
+    }
+```
+
+**Migration:** expand only. `0013_find_another.up.sql` adds three columns with `IF NOT EXISTS`, so the rerun of every up file passes. There is no backfill. An old search has no query, so Find another uses its words as the last query. An old ask has no `queries`, so `againOf()` falls back to its lines' things, or the item's name. Old code ignores the columns. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
+
+**Reverse:** promote the previous deploy on Vercel. Then, if wanted, `pnpm db:down` runs `0013_find_another.down.sql`, which drops the three columns. `scripts/migrate.test.ts` tests this path.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `otherWords()` and `OTHER` | Scenarios 1 and 2: "with other words than the first search used". `NEED` stays as its tests check it (D99) |
+| `rose_search.query` and each group's `query` | Scenarios 1 and 3: the new call must know which words to avoid |
+| `rose_search.tried` and each group's `tried` | Scenario 4: no second Find another, and the "Still…" words, through the 3 s redraw (D19) and a reopened link (D100) |
+| `purchase_requests.queries` | Scenario 2: after a No or an untick, the words, the query and the id to leave out. `claim()` keeps only the paid lines (D100) |
+| `refused` in `searchThing()` | Scenario 2: none of the new options is the refused listing |
+| `againOf()` | Scenarios 1 to 3: one function decides the trigger by `roseState`'s rule, from Neon only (D23) |
+| `?picked=` | Scenario 3: Rose's other picks stay after the redirect, as D36 does for over-limit picks |
+| The limit notice on basket and receipt | Scenario 5 from those screens (D101) |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Judges and the video: a few Find anothers a day. Each sends what a Find sends: for each thing, one small Haiku call, two Channel3 searches and one pick call. At most one for each empty Find, No or untick, inside the address's 20 Finds a day (D73, D97) |
+| **Breaks first**     | Channel3's 1,000 free searches a month, as for Find. The e2e adds 4 searches each CI run: one Find and one Find another. `/status` shows them (D78). The fix is the same as for Find (`docs/ROADMAP.md`) |
+| **Security surface** | Rose's link only. The form gives only a group index, which `againOf()` checks against the saved groups, and pick ids, which only choose from the saved groups (D36). Words, queries and refused ids come from Neon (D23). Haiku's query goes to Channel3 only as a search, and Rose's words can steer it as they steer Find today. Sam still approves every charge (D83). Secrets: `ANTHROPIC_API_KEY`, `CHANNEL3_API_KEY` and `ADDRESS_KEY`, as Find. Stored: the AI's query words, and no new personal data |
+| **Proof it works**   | `find outcome=options listings=3 searches=2 ms=9420 checked=8 unloaded=0 again=1` in Vercel's logs, and one more Find on `/status`. The numbers are whatever the run gave |
+| **Rollout**          | No flag. CI migrates Neon, then Vercel promotes (D10, D11). Rollback: the two steps under Reverse |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 2 | `e2e/find-another.spec.ts`, real Haiku and Channel3 (D24) | `pnpm test:e2e e2e/find-another.spec.ts` |
+| 1 to 4 | `lib/shop/ai.test.ts`: `otherWords()` sends `OTHER`, "They want:" and "The last query:", with `OTHER_SCHEMA` | `pnpm test lib/shop/ai.test.ts` |
+| 1, 2, 4 | `lib/shop/find.test.ts`: `findAgain()` searches Channel3 with Haiku's new query and returns it; a refused id never reaches the pick call, under or above the limit; three things search at once, each `tried`; a failed other-words call blanks only its thing; nothing found keeps the last query; the log line has `again=1`, and the tally counts its searches. The existing results gain `query` | `pnpm test lib/shop/find.test.ts` |
+| 1 to 5 | `app/(shop)/actions.test.ts`: after an empty Find, it saves `tried` and the new query; after a No, it searches every pick of the ask without its id; after an untick, only the left-out picks; a group's tap replaces only that group, and redirects with `?picked=`; a tap on a `tried` search calls nothing; past 20 Finds, it calls nothing, counts a stopped Find, saves nothing, and redirects with `?find=limit`; a run adds one Find and its searches; Sam's link can't call it; `askSam()` writes `queries` for one pick and for a basket | `pnpm test "app/(shop)/actions.test.ts"` |
+| 1 to 5 | `app/(shop)/state.test.ts`: `againOf()` for each trigger, for a stale tab and for an ask from before this slice; `tried`, `?picked=` and `waitMinutes` reach the right screens | `pnpm test "app/(shop)/state.test.ts"` |
+| 1 to 5 | `app/(shop)/RoseView.test.tsx`: Find another and its hint on each screen; none on a `tried` search; the "Still…" words; "Looked again with other words."; the limit notice on basket and receipt; Ask Sam's name in the basket form | `pnpm test "app/(shop)/RoseView.test.tsx"` |
+| storage | `lib/shop/requests.test.ts`: `query`, `tried` and `queries` round trip; `scripts/migrate.test.ts`: 0013 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
+| 1 | O10's measure: real empty asks through `findAgain()` with real Haiku and Channel3 | none kept |
+
+**E2E:** `e2e/find-another.spec.ts`, one test: "Sam says no to Rose's slippers, and Find another finds others without them". It resets with the saved PayPal. Rose finds "warm slippers that are easy to put on, size 8", keeps the first option's name, and asks Sam. Sam taps No. Rose's page shows "Sam said no to <name>." and Find another. Rose taps it. Within 30 s, "Which one would you like?" shows with "Looked again with other words.", and 1 to 3 options at $50 or less. None has `<name>` as its exact name, as the lesson says. Rose picks one and asks Sam, and Sam's page shows "Rose would like this". Stop `pnpm dev` first, as the lesson says.
+
+### Chunks
+
+The two chunks share the local database in their tests, so they run one after the other, as the lesson says.
+
+| Chunk | Scenarios | Files owned |
+| ----- | --------- | ----------- |
+| A | 1, 2, 4 (the search) | `db/migrations/0013_find_another.*`, `scripts/migrate.test.ts`, `lib/shop/ai.ts`, `lib/shop/ai.test.ts`, `lib/shop/find.ts`, `lib/shop/find.test.ts`, `lib/shop/requests.ts`, `lib/shop/requests.test.ts` |
+| B | 1 to 5 (the action and pages) | `app/(shop)/actions.ts`, `app/(shop)/actions.test.ts`, `app/(shop)/state.ts`, `app/(shop)/state.test.ts`, `app/(shop)/RoseView.tsx`, `app/(shop)/RoseView.test.tsx`, `app/(shop)/r/[token]/page.tsx`, `app/(shop)/preview/find-another/page.tsx`, `e2e/find-another.spec.ts` |
+
+Chunk A owns the shared types: `Group`, `Single` and `SavedSearch`.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| After an empty Find, other words rarely find a fit, because Channel3 answers reworded searches with about the same listings | Accepted (O10). `/build` measures it, and the No path still always differs |
+| Haiku repeats the last query | `OTHER` says never to. O10's measure logs each new query beside the last one |
+| Channel3 gives the refused listing another id in the new search, so it comes back | The e2e checks that the refused name is gone. If it fails, `refused` also matches names |
+| The e2e's Find another finds nothing for slippers, so the test fails | Slippers at $50 have passed find-and-explain's e2e on every CI run. A failure here is the signal O10 asks for |
+| A basket group's Find another sends the Ask Sam form, so a wrong action could ask Sam | The group button's `formAction` is `findAnother`, and `askSam()` never runs. The action test checks that no request is made |
+
+### Decisions to record
+
+Drafted at pauses 1 and 3. `/build` appends them to `DECISIONS.md`.
 
 ## D97 · 2026-10-22 · Rose gets one Find another for each empty Find, No or untick, and each one counts as a Find
 
@@ -202,6 +367,27 @@ Status: active
 
 Why: a No or an untick stores the refused listings with the ask. Rose's other options are cleared at Ask Sam. One tap for the whole basket keeps Rose's page to one new control.
 Rejected: leave out every listing Sam ever refused for the thing (a history to store), also leave out the options Rose saw and didn't pick (KinCart must keep them after Ask Sam), Rose ticks which things to search after a basket No (one more control on Rose's page).
+Source: docs/specs/find-another.md
+Status: active
+
+## D99 · 2026-10-22 · Find another writes other words in a Haiku call of its own for each thing, then runs Find's search and pick step without what Sam refused
+
+Why: the other-words call takes the place of reading Rose's words, so a Find another sends the same calls as a Find (D97) and stays within D91's times. The pick step is the one that D88 to D95 fixed. Each thing gets its own call, so one bad answer blanks only its own group (D31).
+Rejected: `readNeed()` again with a hint about the last query (it changes `NEED`, which its tests check, as D66 avoided), one call for every thing in a basket (one bad answer spoils every group, as D31 found), an agent loop that searches until it finds a fit (D22: no scenario needs it, and it adds 3 to 5 s).
+Source: docs/specs/find-another.md
+Status: active
+
+## D100 · 2026-10-22 · A search keeps its query and whether Find another ran it, and each ask keeps its picks' words and queries in a queries jsonb column
+
+Why: Find another must avoid the last query and leave out what Sam refused. `claim()` keeps only the paid lines, so an untick loses the left-out pick's id. `tried` must survive the 3 s redraw (D19) and a reopened link, as `from_photo` does (D67). D57 still holds for a one-thing ask's note and photo.
+Rejected: `thing` and `query` columns and a `left_out_lines` column, as D57 did for the note and photo (`claim()` must change, and a basket keeps its queries in two places), no stored query (Haiku can't tell which words to avoid), keep `rose_search` after Ask Sam (the unticked pick is still lost, and a stale tab could ask for the refused pick again), `?tried=1` in the page address (lost on a reopened link, as D67 found).
+Source: docs/specs/find-another.md
+Status: active
+
+## D101 · 2026-10-22 · A stopped Find another saves nothing, so its screen and its Find another stay, with the limit notice on top
+
+Why: Rose can tap it again once the wait passes. The wait rides in the page address, as for Find (D77). It still counts as a stopped Find (D97).
+Rejected: a retry search, as a stopped Find saves (D77) (the No notice and its Find another would vanish, and an empty search's words are already saved).
 Source: docs/specs/find-another.md
 Status: active
 
@@ -218,13 +404,20 @@ Status: active
 | O7 | Which motion tier | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-22 |
 | O8 | The button's name after an empty Find, when nothing was found first | question | spec p2 | user | Resolved | "Find another" everywhere: one name for one control (D84). 2026-10-22 |
 | O9 | What the new options say about the search | question | spec p2 | user | Resolved | A plain line, "Looked again with other words.", not the AI's search words. 2026-10-22 |
+| O10 | After an empty Find, Haiku's other words find a fit under Sam's limit on real asks. Channel3 might answer reworded searches with about the same listings. The scenarios' examples are made up, and they may find things the first time | unproven | spec p3 | build | Accepted risk | No /poc. `/build` finds about 5 asks that come back empty today. It runs each through `findAgain()` 3 times with real Haiku and Channel3, and writes here how many find a fit, the time, and each new query beside the last. It swaps the scenarios' examples for real ones. If none finds a fit, the spec goes back to Draft with the numbers. The No and untick triggers still differ, because they drop the refused listing. 2026-10-22 |
+| O11 | D57 kept a one-thing ask's extras in columns, not jsonb. How does each ask keep its picks' words and queries? | question | spec p3 | user | Resolved | One `queries` jsonb column on `purchase_requests`, for one-thing asks and baskets. `claim()` doesn't change, and D57 still holds for the note and photo (D100). 2026-10-22 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
+- **Backfill** — filling a new column from the data already there, before the code reads it. This slice has none.
 - **Channel3** — the hackathon sponsor whose API returns real product listings.
 - **Haiku** — Claude Haiku, the small Claude model that reads Rose's words and picks listings.
 - **Pick step** — the Haiku call that drops listings that aren't the thing, and picks up to 3.
 - **Untick** — Sam clears a thing's box in a basket, so Sam's OK doesn't pay for it.
 - **e2e** — end to end: an automated test that drives the app as a person would, start to finish.
+- **jsonb** — a Postgres column type that holds a JSON value, such as a list of objects.
+- **Neon** — the hosted Postgres database that KinCart uses.
+- **Server action** — a Next.js function that runs on the server when a form is sent.
+- **/poc** — zuko's timeboxed spike. It answers one risky question with throwaway code.

@@ -209,6 +209,9 @@ export default function FindAnotherPreview() {
           <Frame label="Paid, the night light left out (scenario 2)">
             <RoseView state={{ kind: "paid", receipt: trimmed }} items={[]} />
           </Frame>
+          <Frame label="Stopped on the receipt (scenario 5)">
+            <RoseView state={{ kind: "paid", receipt: trimmed, waitMinutes: 170 }} items={[]} />
+          </Frame>
           <Frame label="Stopped by the daily limit (scenario 5)">
             <RoseView
               state={{
@@ -236,6 +239,19 @@ export default function FindAnotherPreview() {
           <Frame label="Find another found three, AA still picked (scenario 3)">
             <RoseView
               state={{ kind: "basket", limitCents: 5000, words: mixedWords, groups: jarFound, picked: ["aa-8"] }}
+              items={[]}
+            />
+          </Frame>
+          <Frame label="Stopped in the basket, AA still picked (scenario 5)">
+            <RoseView
+              state={{
+                kind: "basket",
+                limitCents: 5000,
+                words: mixedWords,
+                groups: jarEmpty,
+                picked: ["aa-8"],
+                waitMinutes: 170,
+              }}
               items={[]}
             />
           </Frame>
