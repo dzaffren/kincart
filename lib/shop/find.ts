@@ -6,10 +6,11 @@ export type Option = Listing & { what: string; why: string; watch: string };
 
 type Problem = "nothing found" | "over limit";
 
-// thing is what Rose called it, such as "a night light". tried marks a group that Find another searched.
-export type Group = { thing: string; options: Option[]; problem?: Problem; tried?: boolean };
+// thing is what Rose called it, such as "a night light". query is the shop search it last ran, which
+// Find another avoids, and tried marks a group that Find another searched.
+export type Group = { thing: string; options: Option[]; problem?: Problem; query?: string; tried?: boolean };
 
-type Single = { outcome: "options"; options: Option[] } | { outcome: Problem };
+type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string };
 
 export type Search = Single | { outcome: "basket"; groups: Group[] } | { outcome: "too many" | "nothing in photo" };
 

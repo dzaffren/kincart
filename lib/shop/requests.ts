@@ -14,6 +14,10 @@ export type Source = { shop: string; url: string; reason: string; watch?: string
 // thing is what Rose called it, such as "a night light"; name is the listing's own.
 export type Line = Item & Source & { thing: string };
 
+// Each pick's thing, the query that found it and its listing id, so Find another can search the thing
+// again without it after a No or an untick (D100).
+export type PickQuery = { id: string; thing: string; query: string };
+
 export type PurchaseRequest = {
   id: number;
   household: number;
@@ -27,6 +31,7 @@ export type PurchaseRequest = {
   failureReason: string | null;
   lines: Line[] | null;
   leftOut: string[] | null;
+  queries: PickQuery[] | null;
 };
 
 export type Outcome =
@@ -52,6 +57,7 @@ type Row = {
   image_url: string | null;
   lines: Line[] | null;
   left_out: string[] | null;
+  queries: PickQuery[] | null;
 };
 
 export type Subscription = { endpoint: string; p256dh: string; auth: string };
@@ -64,6 +70,9 @@ export type SavedSearch = {
   fromPhoto: boolean;
   photos: number;
   blankPhotos: number;
+  // query is a one-thing search's shop query; a basket keeps one in each group. tried: Find another ran it.
+  query: string | null;
+  tried: boolean;
   searchedAt: Date;
 };
 
@@ -122,10 +131,16 @@ export async function latest(household: number): Promise<PurchaseRequest | null>
 }
 
 // A second ask while one is open hits purchase_requests_one_open_per_household and is dropped.
-export async function ask(household: number, item: Item, source?: Source, lines?: Line[]): Promise<boolean> {
+export async function ask(
+  household: number,
+  item: Item,
+  source?: Source,
+  lines?: Line[],
+  queries?: PickQuery[],
+): Promise<boolean> {
   const rows = await query(
-    `INSERT INTO purchase_requests (household_id, item_id, item_name, amount_cents, shop, listing_url, reason, lines, watch, image_url)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `INSERT INTO purchase_requests (household_id, item_id, item_name, amount_cents, shop, listing_url, reason, lines, watch, image_url, queries)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      ON CONFLICT DO NOTHING
      RETURNING id`,
     [
@@ -139,6 +154,7 @@ export async function ask(household: number, item: Item, source?: Source, lines?
       lines ? JSON.stringify(lines) : null,
       source?.watch ?? null,
       source?.imageUrl ?? null,
+      queries ? JSON.stringify(queries) : null,
     ],
   );
   return rows.length === 1;
@@ -153,9 +169,11 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
     from_photo: boolean;
     photos: number;
     blank_photos: number;
+    query: string | null;
+    tried: boolean;
     searched_at: Date;
   }>(
-    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, searched_at FROM rose_search WHERE id = $1",
+    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, searched_at FROM rose_search WHERE id = $1",
     [household],
   );
   const row = rows[0];
@@ -168,6 +186,8 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
         fromPhoto: row.from_photo,
         photos: row.photos,
         blankPhotos: row.blank_photos,
+        query: row.query,
+        tried: row.tried,
         searchedAt: row.searched_at,
       }
     : null;
@@ -175,20 +195,22 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
 
 // photos: how many photos Find read, when words are the AI's words for them (D67). blank: how
 // many of them showed nothing to buy (D72). from_photo stays, so the code from before still reads it.
+// tried: Find another ran this search, so it offers no second one (D97).
 export async function saveSearch(
   household: number,
   words: string,
   result: Search | { outcome: "retry" },
   photos = 0,
   blank = 0,
+  tried = false,
 ): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
          from_photo = EXCLUDED.from_photo, photos = EXCLUDED.photos, blank_photos = EXCLUDED.blank_photos,
-         searched_at = now()`,
+         query = EXCLUDED.query, tried = EXCLUDED.tried, searched_at = now()`,
     [
       household,
       words,
@@ -198,6 +220,8 @@ export async function saveSearch(
       photos > 0,
       photos,
       blank,
+      ("query" in result && result.query) || null,
+      tried,
     ],
   );
 }
@@ -405,5 +429,6 @@ function toRequest(row: Row): PurchaseRequest {
     failureReason: row.failure_reason,
     lines: row.lines,
     leftOut: row.left_out,
+    queries: row.queries,
   };
 }

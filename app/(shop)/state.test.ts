@@ -21,6 +21,7 @@ function request(status: RequestStatus, item = glasses): PurchaseRequest {
     failureReason: status === "failed" ? "PERMISSION_DENIED" : null,
     lines: null,
     leftOut: null,
+    queries: null,
   };
 }
 
@@ -90,6 +91,8 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   fromPhoto: false,
   photos: 0,
   blankPhotos: 0,
+  query: null,
+  tried: false,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
