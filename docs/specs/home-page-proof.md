@@ -160,6 +160,10 @@ Single chunk.
 
 Recorded as D96.
 
+## Review
+
+2026-10-22 · 0 raw findings, 0 survived. Clean.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
