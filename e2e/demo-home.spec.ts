@@ -4,6 +4,7 @@ import { listing, reset, searchFor } from "./db";
 const savedPaypal = process.env.PAYPAL_E2E_VAULT_ID ?? "";
 
 const heading = (phone: Page | FrameLocator) => phone.getByRole("heading", { level: 1 });
+const study = (page: Page) => page.getByRole("link", { name: "Foong et al., Journal of Medical Internet Research, 2025." });
 
 test.beforeAll(() => {
   expect(savedPaypal, "set PAYPAL_E2E_VAULT_ID").toBeTruthy();
@@ -16,6 +17,8 @@ test.describe("on a laptop", () => {
     await reset(savedPaypal);
     await page.goto("/");
     await expect(page.getByText("Mom asks.")).toBeVisible();
+    await expect(page.getByText("In a survey of 657 US adults, about 1 in 10 had signed in")).toBeVisible();
+    await expect(study(page)).toHaveAttribute("href", "https://doi.org/10.2196/69806");
     for (const caption of await page.getByText("Sample, not live").all()) await expect(caption).toBeVisible();
     await expect(page.getByText("Sample, not live")).toHaveCount(2);
     await page.getByRole("button", { name: "Try KinCart" }).click();

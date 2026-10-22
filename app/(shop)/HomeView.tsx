@@ -66,6 +66,13 @@ export function HomeView({ state, start }: { state: HomeState; start?: Action })
               reading out card numbers.
             </p>
             <p>
+              In a survey of 657 US adults, about 1 in 10 had signed in to someone else&apos;s money or medical account
+              with that person&apos;s login.{" "}
+              <a className="link" href="https://doi.org/10.2196/69806">
+                Foong et al., Journal of Medical Internet Research, 2025.
+              </a>
+            </p>
+            <p>
               <strong>Sandbox money only.</strong> Nothing real is bought. This is a hackathon build:{" "}
               <a className="link" href="https://github.com/dzaffren/kincart/blob/main/docs/ROADMAP.md">
                 what&apos;s real, what stands in, and what comes next.

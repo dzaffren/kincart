@@ -9,6 +9,12 @@ it("sells KinCart and shows two still sample phones before a household starts", 
 
   expect(html).toContain("<span>Mom asks.</span> <span>You say OK.</span> <span>PayPal pays.</span>");
   expect(html).toContain("No more logging in as them or reading out card numbers.");
+  expect(html).toContain(
+    "reading out card numbers.</p><p>In a survey of 657 US adults, about 1 in 10 had signed in to someone else&#x27;s money or medical account with that person&#x27;s login.",
+  );
+  expect(html).toContain(
+    '<a class="link" href="https://doi.org/10.2196/69806">Foong et al., Journal of Medical Internet Research, 2025.</a>',
+  );
   expect(html).toContain("<strong>Sandbox money only.</strong> Nothing real is bought.");
   expect(html).toMatch(/>what&#x27;s real, what stands in, and what comes next\.<\/a><\/p>/);
   expect(html).toContain("Try KinCart");
