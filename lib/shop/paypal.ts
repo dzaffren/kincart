@@ -45,7 +45,10 @@ export async function createPaymentToken(setupTokenId: string): Promise<string> 
   return body.id;
 }
 
-export async function charge(vaultId: string, item: Item, requestKey: string): Promise<ChargeResult> {
+// lines are a basket's ticked things, or the item itself. The amount is their sum, so PayPal's
+// item total always matches it (D86). PayPal cuts a name past 127 characters itself (D87).
+export async function charge(vaultId: string, item: Item, requestKey: string, lines: Item[] = [item]): Promise<ChargeResult> {
+  const cents = lines.reduce((sum, line) => sum + line.cents, 0);
   let token: string;
   try {
     token = await accessToken();
@@ -66,7 +69,11 @@ export async function charge(vaultId: string, item: Item, requestKey: string): P
       body: JSON.stringify({
         intent: "CAPTURE",
         purchase_units: [
-          { description: item.name, amount: { currency_code: "USD", value: (item.cents / 100).toFixed(2) } },
+          {
+            description: item.name,
+            items: lines.map((line) => ({ name: line.name, quantity: "1", unit_amount: usd(line.cents) })),
+            amount: { ...usd(cents), breakdown: { item_total: usd(cents) } },
+          },
         ],
         payment_source: { paypal: { vault_id: vaultId } },
       }),
@@ -122,6 +129,10 @@ async function accessToken(): Promise<string> {
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return (await response.json()).access_token;
+}
+
+function usd(cents: number) {
+  return { currency_code: "USD", value: (cents / 100).toFixed(2) };
 }
 
 function issueOf(body: { name?: string; details?: { issue?: string }[] }): string | undefined {

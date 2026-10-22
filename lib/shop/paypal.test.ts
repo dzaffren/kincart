@@ -99,8 +99,57 @@ it("charges the saved PayPal once per request id and reports the capture", async
   expect((init.headers as Record<string, string>)["PayPal-Request-Id"]).toBe("purchase-12-1792491300000");
   const body = JSON.parse(String(init.body));
   expect(body.intent).toBe("CAPTURE");
-  expect(body.purchase_units[0].amount).toEqual({ currency_code: "USD", value: "18.99" });
+  expect(body.purchase_units).toEqual([
+    {
+      description: "Reading glasses, +2.00",
+      items: [{ name: "Reading glasses, +2.00", quantity: "1", unit_amount: { currency_code: "USD", value: "18.99" } }],
+      amount: {
+        currency_code: "USD",
+        value: "18.99",
+        breakdown: { item_total: { currency_code: "USD", value: "18.99" } },
+      },
+    },
+  ]);
   expect(body.payment_source).toEqual({ paypal: { vault_id: "1j970427g9944212v" } });
+});
+
+it("lists each of a basket's lines as a PayPal item, and charges their sum", async () => {
+  const fetch = stubPaypal(() =>
+    json({ id: "5UX02069M9686893E", purchase_units: [{ payments: { captures: [{ id: "7KT20419UA331082M", status: "COMPLETED" }] } }] }, 201),
+  );
+  const basket = { id: "basket", name: "2 things", cents: 2246 };
+  const lines = [
+    { id: "prod_8Ee4aA", name: "Energizer MAX AA Batteries, 8 Pack", cents: 947 },
+    { id: "prod_2Ln9nL", name: "LED Plug-in Night Light, Dusk to Dawn Sensor, 2 Pack", cents: 1299 },
+  ];
+
+  expect(await charge("1j970427g9944212v", basket, "purchase-18-1792491300000", lines)).toMatchObject({ state: "paid" });
+
+  const [unit] = JSON.parse(String(apiCall(fetch)[1].body)).purchase_units;
+  expect(unit.description).toBe("2 things");
+  expect(unit.items).toEqual([
+    { name: "Energizer MAX AA Batteries, 8 Pack", quantity: "1", unit_amount: { currency_code: "USD", value: "9.47" } },
+    {
+      name: "LED Plug-in Night Light, Dusk to Dawn Sensor, 2 Pack",
+      quantity: "1",
+      unit_amount: { currency_code: "USD", value: "12.99" },
+    },
+  ]);
+  expect(unit.amount).toEqual({
+    currency_code: "USD",
+    value: "22.46",
+    breakdown: { item_total: { currency_code: "USD", value: "22.46" } },
+  });
+});
+
+it("reports refused when PayPal won't take the items, and sends no second order", async () => {
+  const fetch = stubPaypal(() => json({ name: "UNPROCESSABLE_ENTITY", details: [{ issue: "ITEM_TOTAL_MISMATCH" }] }, 422));
+
+  expect(await charge("1j970427g9944212v", glasses, "purchase-19-1792491300000")).toEqual({
+    state: "refused",
+    reason: "ITEM_TOTAL_MISMATCH",
+  });
+  expect(fetch.mock.calls.filter(([url]) => String(url).endsWith("/v2/checkout/orders"))).toHaveLength(1);
 });
 
 it("reports refused when PayPal says no, with PayPal's reason", async () => {

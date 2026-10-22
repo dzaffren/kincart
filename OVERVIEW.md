@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-19 by /ship usage-on-status
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-22 by /ship itemized-receipt
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -46,6 +46,7 @@ Used by older shoppers and the relative who helps them pay online.
 | photo-ask-several | Shipped | Rose sends up to 5 photos in one Find, one for each thing they need, and AI turns them into one basket. | docs/specs/photo-ask-several.md |
 | find-limits | Shipped | One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again. | docs/specs/find-limits.md |
 | usage-on-status | Shipped | `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped. | docs/specs/usage-on-status.md |
+| itemized-receipt | Shipped | Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money. | docs/specs/itemized-receipt.md |
 
 ## More
 

@@ -71,6 +71,8 @@ export function ReceiptCard({ receipt }: { receipt: Receipt }) {
       <p className="receipt-status">Paid</p>
       <p className="amount">{money(receipt.item.cents)}</p>
       {receipt.lines ? <LineItems lines={receipt.lines} /> : <p>{receipt.item.name}</p>}
+      {/* Every charge so far went to the app's sandbox business account; pay-the-shop changes this. */}
+      <p className="receipt-detail">Paid to KinCart&apos;s sandbox shop. In this demo, no order reaches the shops.</p>
       <p className="receipt-detail">
         <LocalTime at={receipt.paidAt} format="day" />
       </p>
