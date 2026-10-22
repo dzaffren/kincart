@@ -34,6 +34,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Rose sends up to 5 photos in one Find, one for each thing they need, and AI turns them into one basket.
 - One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again.
 - `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped.
+- Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money.
 
 ## Docs
 

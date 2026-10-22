@@ -1,6 +1,6 @@
 # Itemized receipt
 
-**Version:** v1 · **Status:** Built · **Type:** Enhancement · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Enhancement · **Project type:** Web UI
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** None
