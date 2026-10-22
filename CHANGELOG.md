@@ -13,6 +13,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Rose's PayPal activity lists each thing Sam paid for, with its price, where it used to show one line such as "2 things".
 - Rose's and Sam's receipts say the money went to KinCart's sandbox shop, and that no order reaches the shops in this demo.
 - Find shows Rose only listings that are the thing asked for. The AI checks each listing's photo as well as its words, so a storage bin sold as "AA Batteries", a lone cable for a charger or a case for a tablet no longer shows.
+- The home page backs "No more logging in as them" with a 2025 survey of 657 US adults, linked at its source: about 1 in 10 had signed in to someone else's money or medical account with that person's login.
+- The home page's How it works says your parent can send a photo of the thing or of a written list.
 
 ## [1.2.0] - 2026-10-16
 
