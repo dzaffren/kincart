@@ -371,6 +371,27 @@ it("says nothing fits under Sam's limit over the options above it, marks each, a
   expect(html).not.toContain("a lot of Finds");
 });
 
+it("says a basket group found nothing under Sam's limit, marks its options over it, and keeps its Find another", () => {
+  const bathSeat = { ...listing("prod_7Fb4sH", "Folding Bath Seat Bench Shower Chair", 4499), shop: "bestbuy.com" };
+  const html = render({
+    kind: "basket",
+    limitCents: 3000,
+    words: "AA batteries, a folding shower chair",
+    groups: [
+      { thing: "AA batteries", options: [aa24, aa16] },
+      { thing: "a folding shower chair", options: [bathSeat], problem: "over limit" },
+    ],
+  });
+
+  expect(html).toMatch(
+    /<h2[^>]*>a folding shower chair<\/h2><p class="notice"[^>]*>Nothing under \$30 for this one\. These cost a little more, and Sam sees the price before saying OK\.<\/p><div class="stack"><button[^>]*>Find another<\/button>/,
+  );
+  expect(html).toContain("<strong>$14.99 over Sam&#x27;s $30 limit.</strong>");
+  expect(html.match(/ over Sam&#x27;s/g)).toHaveLength(1);
+  expect(html.match(/None of these/g)).toHaveLength(2);
+  expect(html.match(/These cost a little more/g)).toHaveLength(1);
+});
+
 const energizer = { ...listing("prod_4En8aA", "Energizer MAX AA Batteries, 8 Pack", 899), shop: "walmart.com" };
 const anker = listing("prod_2Ak5cH", "Anker 312 USB C Charger, 20W", 1599);
 const bought = [

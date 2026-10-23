@@ -155,12 +155,13 @@ export async function findRebuy(
 }
 
 // A one-thing search as one group of a basket, so a basket's groups and Find another's search of one
-// group come out alike.
+// group come out alike. A group over the limit keeps the listings over it that fit (D111).
 export function groupOf(thing: string, result: Search): Group {
   const query = "query" in result ? result.query : undefined;
   const last = "last" in result ? result.last : undefined;
   if (result.outcome === "options") return { thing, options: result.options, query, last };
-  return { thing, options: [], problem: result.outcome === "over limit" ? "over limit" : "nothing found", query, last };
+  if (result.outcome === "over limit") return { thing, options: result.options ?? [], problem: "over limit", query, last };
+  return { thing, options: [], problem: "nothing found", query, last };
 }
 
 // A photo that a thing is in is never blank, and a number past Rose's photos never counts (D69).

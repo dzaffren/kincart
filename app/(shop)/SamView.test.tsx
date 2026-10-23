@@ -73,3 +73,31 @@ it("tells Sam how far over Sam's limit one thing is, above the ask, and says not
   const under = renderToStaticMarkup(<SamView state={{ kind: "request", item: cane, askedAt, found, limitCents: 2500 }} />);
   expect(under).not.toContain("over your");
 });
+
+it("marks only the basket lines over Sam's limit, each with how far over it is", () => {
+  const chair = {
+    id: "prod_7Fb4sH",
+    name: "Folding Bath Seat Bench Shower Chair",
+    cents: 4499,
+    shop: "bestbuy.com",
+    url: "https://www.bestbuy.com/p/prod_7Fb4sH",
+    reason: "It folds flat against the wall when nobody is using it.",
+    thing: "a folding shower chair",
+  };
+  const html = renderToStaticMarkup(
+    <SamView
+      state={{
+        kind: "request",
+        item: { id: "basket", name: "2 things", cents: 5378 },
+        askedAt,
+        lines: [batteries, chair],
+        limitCents: 3000,
+      }}
+    />,
+  );
+
+  expect(html.match(/ over your/g)).toHaveLength(1);
+  expect(html).toMatch(/Folding Bath Seat Bench Shower Chair.*<span><strong>\$14\.99 over your \$30 limit\.<\/strong><\/span>/);
+  expect(html).not.toMatch(/Duracell Coppertop AA Batteries, 8 Pack.*over your.*Folding Bath Seat/);
+  expect(html).not.toContain("This is");
+});

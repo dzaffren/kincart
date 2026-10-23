@@ -925,3 +925,45 @@ it("sends the second pick call only the 5 cheapest listings up to double the lim
   const sentToPick = second.messages[0].content.flatMap((block: { text?: string }) => block.text?.match(/^Listing (\w+)/)?.[1] ?? []);
   expect(sentToPick).toEqual(["prod_1Qc1cN", "prod_3Qc3cN", "prod_6Qc6cN", "prod_0Qc0cN", "prod_5Qc5cN"]);
 });
+
+it("shows one thing of a basket over Sam's limit with its own notice, and the other things as today", async () => {
+  const grabBar = product("prod_5Gb2sC", "Suction Cup Shower Grab Bar, 12 inch", 14.99, "target.com");
+  const bathSeat = product("prod_7Fb4sH", "Folding Bath Seat Bench Shower Chair", 44.99, "bestbuy.com");
+  const bench = product("prod_3Tb9sB", "Heavy Duty Shower Bench with Back", 90.99, "walmart.com");
+  const chair = {
+    words: "a folding shower chair",
+    query: "folding shower chair",
+    under: [grabBar],
+    all: [grabBar, bench, bathSeat],
+    choice: { picks: [], aboveLimit: true },
+    over: { picks: [pick("prod_7Fb4sH")], aboveLimit: false },
+  };
+  stubBasket([batteries, chair]);
+
+  expect(await find("AA batteries, a folding shower chair", 3000)).toEqual({
+    outcome: "basket",
+    groups: [
+      {
+        thing: "AA batteries",
+        options: [expect.objectContaining({ id: "prod_3Ba7aA" }), expect.objectContaining({ id: "prod_1Dc8aA" })],
+        query: "AA batteries",
+      },
+      {
+        thing: "a folding shower chair",
+        options: [expect.objectContaining({ id: "prod_7Fb4sH", name: bathSeat.title, cents: 4499, shop: "bestbuy.com" })],
+        problem: "over limit",
+        query: "folding shower chair",
+      },
+    ],
+  });
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=basket things=2 shown=2 listings=3 searches=4 ms=\d+ checked=4 unloaded=0$/),
+  );
+
+  // A basket whose only shown thing is over the limit is still a basket.
+  stubBasket([{ ...nightLight, under: [], all: [] }, { ...chair, all: [bathSeat] }]);
+  expect(await find("a night light, a folding shower chair", 3000)).toMatchObject({
+    outcome: "basket",
+    groups: [{ problem: "nothing found", options: [] }, { problem: "over limit", options: [{ id: "prod_7Fb4sH" }] }],
+  });
+});
