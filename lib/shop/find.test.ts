@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { find, findAgain, findPhoto } from "./find";
+import { find, findAgain, findPhoto, findRebuy } from "./find";
 
 const words = "warm slippers that are easy to put on, size 8";
 
@@ -691,4 +691,149 @@ it("says nothing found with the last query kept when the one thing's call fails,
       2000,
     ),
   ).toEqual({ outcome: "nothing found" });
+});
+
+type Rebought = Thing & { last: { id: string; name: string; cents: number; shop: string }; named?: unknown[] };
+
+// Each thing's query searches and pick are answered as in stubBasket, and its search by last time's listing
+// name with named.
+function stubRebuy(things: Rebought[]) {
+  const fetch = vi.fn(async (url: string, init: RequestInit) => {
+    if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
+    const body = JSON.parse(String(init.body));
+    if (url.includes("anthropic")) {
+      const data = things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))?.choice;
+      return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
+    }
+    const named = things.find(({ last }) => last.name === body.query);
+    if (named) return Response.json({ products: named.named ?? [] });
+    const thing = things.find(({ query }) => query === body.query)!;
+    if (thing.fails) return Response.json({ error: "rate limited" }, { status: 429 });
+    return Response.json({ products: (body.filters ? thing.under : thing.all) ?? [] });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
+const energizer = (price: number, domain = "walmart.com") =>
+  product("prod_4En8aA", "Energizer MAX AA Batteries, 8 Pack", price, domain);
+const paidEnergizer = { id: "prod_4En8aA", name: "Energizer MAX AA Batteries, 8 Pack", cents: 899, shop: "walmart.com" };
+const rebuyBatteries = {
+  ...batteries,
+  last: paidEnergizer,
+  named: [energizer(9.49)],
+  choice: { picks: [pick("prod_3Ba7aA"), pick("prod_4En8aA"), pick("prod_1Dc8aA")], aboveLimit: false },
+};
+const rebuyOf = ({ words, query, last }: Rebought) => ({ words, query, last });
+
+it("searches last time's query, and last time's listing by its name at the same time, and shows that listing first", async () => {
+  const fetch = stubRebuy([rebuyBatteries]);
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+
+  const result = await findRebuy("AA batteries", [rebuyOf(rebuyBatteries)], 2000, sent);
+
+  expect(result).toEqual({
+    outcome: "options",
+    options: [
+      expect.objectContaining({ id: "prod_4En8aA", cents: 949, shop: "walmart.com" }),
+      expect.objectContaining({ id: "prod_3Ba7aA" }),
+      expect.objectContaining({ id: "prod_1Dc8aA" }),
+    ],
+    query: "AA batteries",
+    last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com" },
+  });
+  const queried = fetch.mock.calls
+    .filter(([url]) => String(url).includes("api.trychannel3.com"))
+    .map(([, init]) => JSON.parse(String(init.body)));
+  expect(queried.map(({ query }) => query)).toEqual(["AA batteries", "AA batteries", "Energizer MAX AA Batteries, 8 Pack"]);
+  expect(queried[2].filters).toBeUndefined();
+  const [chose] = anthropicBodies(fetch);
+  expect(JSON.stringify(chose.messages[0].content)).toContain("Listing prod_4En8aA (they bought this one last time):");
+  expect(sent.searches).toBe(3);
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=options listings=3 searches=3 ms=\d+ checked=3 unloaded=0 rebuy=1 same=1\/1$/),
+  );
+});
+
+it("keeps last time's listing's price today when it's over Sam's limit now, and never offers it as a pick", async () => {
+  const fetch = stubRebuy([{ ...rebuyBatteries, under: [aa8], all: [aa24], choice: { picks: [pick("prod_1Dc8aA")], aboveLimit: false } }]);
+
+  const result = await findRebuy("AA batteries", [rebuyOf(rebuyBatteries)], 900);
+
+  expect(result).toEqual({
+    outcome: "options",
+    options: [expect.objectContaining({ id: "prod_1Dc8aA" })],
+    query: "AA batteries",
+    last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com", nowCents: 949 },
+  });
+  const [chose] = anthropicBodies(fetch);
+  expect(JSON.stringify(chose.messages[0].content)).not.toContain("prod_4En8aA");
+  expect(chose.system).not.toContain("last time");
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/ rebuy=1 same=0\/1$/));
+});
+
+it("says nothing of last time's listing's price when no search has it, or the pick step leaves it out", async () => {
+  stubRebuy([{ ...rebuyBatteries, named: [] }]);
+  expect(await findRebuy("AA batteries", [rebuyOf(rebuyBatteries)], 2000)).toMatchObject({
+    outcome: "options",
+    last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com" },
+  });
+
+  stubRebuy([{ ...rebuyBatteries, choice: { picks: [pick("prod_3Ba7aA")], aboveLimit: false } }]);
+  const dropped = await findRebuy("AA batteries", [rebuyOf(rebuyBatteries)], 2000);
+  expect(dropped).toEqual({
+    outcome: "options",
+    options: [expect.objectContaining({ id: "prod_3Ba7aA" })],
+    query: "AA batteries",
+    last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com" },
+  });
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/ rebuy=1 same=0\/1$/));
+});
+
+it("searches each paid thing at once, each group with its last listing, and blanks only a thing whose search fails", async () => {
+  const paidAnker = { id: "prod_2Ak5cH", name: "Anker USB-C Wall Charger with 6 ft Cable", cents: 1599, shop: "amazon.com" };
+  const rebuyCharger = { ...charger, last: paidAnker, named: [anker] };
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+  stubRebuy([rebuyBatteries, rebuyCharger]);
+
+  const result = await findRebuy("AA batteries and a phone charger", [rebuyOf(rebuyBatteries), rebuyOf(rebuyCharger)], 2000, sent);
+
+  expect(result).toEqual({
+    outcome: "basket",
+    groups: [
+      {
+        thing: "AA batteries",
+        options: [expect.objectContaining({ id: "prod_4En8aA" }), expect.anything(), expect.anything()],
+        query: "AA batteries",
+        last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com" },
+      },
+      {
+        thing: "a phone charger",
+        options: [expect.objectContaining({ id: "prod_2Ak5cH" })],
+        query: "phone charger",
+        last: { id: "prod_2Ak5cH", cents: 1599, shop: "amazon.com" },
+      },
+    ],
+  });
+  expect(sent.searches).toBe(6);
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=basket things=2 shown=2 listings=4 searches=6 .* rebuy=1 same=2\/2$/));
+
+  stubRebuy([rebuyBatteries, { ...rebuyCharger, fails: true }]);
+  expect(await findRebuy("AA batteries and a phone charger", [rebuyOf(rebuyBatteries), rebuyOf(rebuyCharger)], 2000)).toEqual({
+    outcome: "basket",
+    groups: [
+      expect.objectContaining({ thing: "AA batteries", last: { id: "prod_4En8aA", cents: 899, shop: "walmart.com" } }),
+      { thing: "a phone charger", options: [], problem: "nothing found", query: "phone charger" },
+    ],
+  });
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/ rebuy=1 same=1\/2 reason=channel3 429$/));
+
+  stubRebuy([
+    { ...rebuyBatteries, under: [], all: [], named: [] },
+    { ...rebuyCharger, under: [], all: [], named: [] },
+  ]);
+  expect(await findRebuy("AA batteries and a phone charger", [rebuyOf(rebuyBatteries), rebuyOf(rebuyCharger)], 2000)).toMatchObject({
+    outcome: "nothing found",
+    groups: [{ thing: "AA batteries", problem: "nothing found" }, { thing: "a phone charger", problem: "nothing found" }],
+  });
 });

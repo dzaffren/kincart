@@ -16,6 +16,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The home page backs "No more logging in as them" with a 2025 survey of 657 US adults, linked at its source: about 1 in 10 had signed in to someone else's money or medical account with that person's login.
 - The home page's How it works says your parent can send a photo of the thing or of a written list.
 - After a Find that comes back empty, a No from Sam, or a thing Sam left out, Rose taps Find another, and KinCart searches again with other words, without the listings Sam said no to. Each Find another counts as one of the day's 20 Finds.
+- Rose's page lists the 3 newest things Sam paid for under Bought before. Ask again looks for the same things at today's prices, puts the one Rose bought last time first and picked, and says if its price or shop changed. Each Ask again counts as one of the day's 20 Finds.
 
 ## [1.2.0] - 2026-10-16
 

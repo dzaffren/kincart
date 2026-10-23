@@ -39,3 +39,5 @@
 - Don't name a formAction button to send a value
 - Run real Finds two at a time when measuring them
 - Give an e2e with two real Finds its own test timeout
+- Run next build again when it stops on a security notice
+- Spike on the recorded set when the production env can't be pulled

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
-import { find } from "./find";
+import { find, findRebuy } from "./find";
 
 // Real Channel3 products and photos, saved once (D90, D94). wrong and right map each listing's id to
 // what its photo shows. Channel3 answers every search with under or all, as the real search would.
@@ -60,3 +60,31 @@ for (const ask of asks) {
     });
   });
 }
+
+// Ask again labels last time's listing for the pick call (D104), and a wrong one stays out all the same (D89).
+const [batteries] = asks;
+const rebuy = (id: string, cents: number, shop: string) => [
+  { words: batteries.words, query: batteries.words, last: { id, name: batteries.under.find((listing) => listing.id === id)!.title, cents, shop } },
+];
+
+it(`never shows ${batteries.wrong.qYGxLFs}, sold as "AA Batteries", when Rose bought it last time, in 3 of 3 runs`, { timeout: 60_000 }, async () => {
+  stubChannel3(batteries);
+
+  const runs = await Promise.all([1, 2, 3].map(() => findRebuy(batteries.words, rebuy("qYGxLFs", 674, "containerstore.com"), 5000)));
+
+  runs.forEach((run, index) => {
+    const shown = run.outcome === "options" ? run.options.map((option) => option.id) : [];
+    expect(shown, `run ${index + 1} showed ${shown.join(", ") || run.outcome}`).not.toContain("qYGxLFs");
+  });
+});
+
+it(`shows the ${batteries.right.VISeFk2} that Rose bought last time first, in 3 of 3 runs`, { timeout: 60_000 }, async () => {
+  stubChannel3(batteries);
+
+  const runs = await Promise.all([1, 2, 3].map(() => findRebuy(batteries.words, rebuy("VISeFk2", 743, "walmart.com"), 5000)));
+
+  runs.forEach((run, index) => {
+    const shown = run.outcome === "options" ? run.options.map((option) => option.id) : [];
+    expect(shown[0], `run ${index + 1} showed ${shown.join(", ") || run.outcome}`).toBe("VISeFk2");
+  });
+});

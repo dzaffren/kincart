@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import type { Group, Option } from "../../lib/shop/find";
+import type { Group, Last, Option } from "../../lib/shop/find";
 import { things, type Item } from "../../lib/shop/items";
 import type { DemoLogin } from "../../lib/shop/paypal";
 import type { Line } from "../../lib/shop/requests";
@@ -9,6 +9,7 @@ import { PhotoPicker } from "./PhotoPicker";
 import {
   HELPER,
   ItemPicker,
+  LineItems,
   listed,
   ListingPicker,
   money,
@@ -21,6 +22,9 @@ import {
 } from "./ui";
 
 type Outcome = { kind: "declined" | "failed"; item: Item; lines?: Line[] };
+
+// An ask that Sam paid for, which Rose can ask again. lines are a basket's paid lines.
+export type Bought = { id: number; item: Item; lines?: Line[]; paidAt: Date };
 
 export type RoseState =
   | { kind: "not linked"; cancelled?: boolean; busy?: boolean }
@@ -43,6 +47,7 @@ export type RoseState =
       problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo" | "limit";
       tried?: boolean;
       waitMinutes?: number;
+      bought?: Bought[];
       busy?: boolean;
     }
   | {
@@ -58,6 +63,7 @@ export type RoseState =
       error?: boolean;
       overCents?: number;
       tried?: boolean;
+      last?: Last;
       busy?: boolean;
     }
   | {
@@ -93,10 +99,24 @@ type Props = {
   find?: Action;
   tryAgain?: Action;
   findAnother?: Action;
+  rebuy?: Action;
   notify?: ReactNode;
 };
 
-export function RoseView({ state, items, link, skip, login, framedLink, ask, find, tryAgain, findAnother, notify }: Props) {
+export function RoseView({
+  state,
+  items,
+  link,
+  skip,
+  login,
+  framedLink,
+  ask,
+  find,
+  tryAgain,
+  findAnother,
+  rebuy,
+  notify,
+}: Props) {
   const headingId = useId();
   const hintId = useId();
   const errorId = useId();
@@ -233,6 +253,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           {state.totalCents !== undefined && ` and ${wholeDollars(state.totalCents)} in all`}. Nothing is paid until{" "}
           {HELPER} says OK.
         </p>
+        <BoughtBefore bought={state.bought} action={rebuy} />
         {notify}
       </div>
     );
@@ -243,6 +264,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
     return (
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick one first.</Notice>}
+        <LastNotice last={state.last} listings={state.listings} limitCents={state.limitCents} />
         <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
         <BlankNotice blankPhotos={state.blankPhotos} />
         <div className="heading">
@@ -251,6 +273,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
             For &ldquo;{state.words}&rdquo;
             {state.fromPhoto && fromPhotos(state.photos)}
             {state.tried && ". Looked again with other words"}
+            {state.last && ". Today's prices for what you bought before"}
             {state.listings.length < 3 &&
               `. Only ${state.listings.length} found at ${wholeDollars(state.limitCents)} or less`}
             .
@@ -261,6 +284,7 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
             listings={state.listings}
             labelledBy={headingId}
             picked={state.picked}
+            bought={boughtOf(state.last, state.listings)}
           />
           <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
@@ -293,7 +317,9 @@ export function RoseView({ state, items, link, skip, login, framedLink, ask, fin
           <h1>Which ones would you like?</h1>
           <p className="small">
             For &ldquo;{state.words}&rdquo;{state.fromPhoto && fromPhotos(state.photos)}
-            {state.tried && ". Looked again with other words"}. Pick one for each thing you want.
+            {state.tried && ". Looked again with other words"}
+            {state.groups.some(({ last }) => last) && ". Today's prices for what you bought before"}. Pick one for each
+            thing you want.
           </p>
         </div>
         <form className="stack" action={ask}>
@@ -405,6 +431,7 @@ function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupPro
       {group.tried && !basketTried && group.options.length > 0 && (
         <p className="small">Looked again with other words.</p>
       )}
+      {group.options.length > 0 && <LastNotice last={group.last} listings={group.options} limitCents={limitCents} />}
       {group.options.length > 0 && (
         <ListingPicker
           listings={group.options}
@@ -412,6 +439,7 @@ function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupPro
           name={`pick-${index}`}
           picked={picked}
           none="None of these"
+          bought={boughtOf(group.last, group.options)}
         />
       )}
     </section>
@@ -429,6 +457,65 @@ function anotherHint(state: Extract<RoseState, { kind: "ask" }>): string | undef
     return "KinCart tries other words for you.";
   }
   return undefined;
+}
+
+// Sam's newest paid asks, each with its own form, so only the pressed Ask again shows "Looking…".
+function BoughtBefore({ bought, action }: { bought?: Bought[]; action?: Action }) {
+  const headingId = useId();
+  if (!bought?.length) return null;
+  return (
+    <section className="stack" aria-labelledby={headingId}>
+      <div className="heading">
+        <h2 id={headingId}>Bought before</h2>
+        <p className="small">Ask again looks for the same things at today&apos;s prices.</p>
+      </div>
+      <div className="groups">
+        {bought.map(({ id, item, lines, paidAt }) => (
+          <form className="stack" action={action} key={id}>
+            <input type="hidden" name="request" value={id} />
+            <div className="summary">
+              {lines && <p className="summary-title">{things(lines.length)}</p>}
+              <LineItems lines={lines ?? [item]} />
+              <p className="small">
+                Paid <LocalTime at={paidAt} format="day" />
+              </p>
+            </div>
+            <Button type="submit" kind="secondary" busyLabel="Looking…">
+              Ask again
+            </Button>
+          </form>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// The listing Rose bought last time, when today's options have it, and what changed about it since.
+function boughtOf(last: Last | undefined, listings: Option[]) {
+  const now = last && listings.find(({ id }) => id === last.id);
+  return last && now ? { id: now.id, note: changeOf(last, now) } : undefined;
+}
+
+function changeOf(last: Last, now: Option): string {
+  const price = now.cents !== last.cents;
+  const shop = now.shop !== last.shop;
+  if (price && shop) return `Now ${money(now.cents)} from ${now.shop}. It was ${money(last.cents)} from ${last.shop}.`;
+  if (price) return `Now ${money(now.cents)}. It was ${money(last.cents)}.`;
+  if (shop) return `Now from ${now.shop}. It was from ${last.shop}.`;
+  return "Same price as last time.";
+}
+
+// Said when today's options don't have the listing Rose bought last time. The limit is read on each redraw,
+// so after Sam raises it past the price, the notice gives the price alone.
+function LastNotice({ last, listings, limitCents }: { last?: Last; listings: Option[]; limitCents: number }) {
+  if (!last || listings.some(({ id }) => id === last.id)) return null;
+  if (!last.nowCents) return <Notice tone="neutral">Couldn&apos;t find the one you bought last time today.</Notice>;
+  return (
+    <Notice tone="neutral">
+      The one you bought last time is {money(last.nowCents)} now
+      {last.nowCents > limitCents ? `, over ${HELPER}'s ${wholeDollars(limitCents)} limit` : ""}.
+    </Notice>
+  );
 }
 
 // A Find or a Find another past the address's 20 for the day (D77, D101).

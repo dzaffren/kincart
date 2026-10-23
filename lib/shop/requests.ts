@@ -1,6 +1,6 @@
 import { Client } from "pg";
 import type { Counts } from "../status/usage";
-import type { Group, Option, Search } from "./find";
+import type { Group, Last, Option, Search } from "./find";
 import { things, type Item } from "./items";
 import type { Use } from "./limits";
 import { reasonOf } from "./paypal";
@@ -73,6 +73,8 @@ export type SavedSearch = {
   // query is a one-thing search's shop query; a basket keeps one in each group. tried: Find another ran it.
   query: string | null;
   tried: boolean;
+  // A one-thing rebuy's listing from last time; a basket keeps one in each group (D107).
+  last: Last | null;
   searchedAt: Date;
 };
 
@@ -130,6 +132,33 @@ export async function latest(household: number): Promise<PurchaseRequest | null>
   return rows[0] ? toRequest(rows[0]) : null;
 }
 
+// The 3 newest asks Sam paid for that came from a search, newest first. Asks that paid for the same
+// listings count once, as the newest of them (D102). claim() left only the paid lines in a basket.
+export async function boughtBefore(household: number): Promise<PurchaseRequest[]> {
+  const rows = await query<Row>(
+    `SELECT * FROM (
+       SELECT DISTINCT ON (paid) * FROM (
+         SELECT *, COALESCE((SELECT string_agg(l->>'id', ',' ORDER BY l->>'id') FROM jsonb_array_elements(lines) l), item_id) AS paid
+         FROM purchase_requests
+         WHERE household_id = $1 AND status = 'paid' AND (shop IS NOT NULL OR lines IS NOT NULL)
+       ) asks
+       ORDER BY paid, id DESC
+     ) newest
+     ORDER BY id DESC LIMIT 3`,
+    [household],
+  );
+  return rows.map(toRequest);
+}
+
+export async function paidAsk(household: number, id: number): Promise<PurchaseRequest | null> {
+  if (!Number.isSafeInteger(id)) return null;
+  const rows = await query<Row>(
+    "SELECT * FROM purchase_requests WHERE id = $1 AND household_id = $2 AND status = 'paid'",
+    [id, household],
+  );
+  return rows[0] ? toRequest(rows[0]) : null;
+}
+
 // A second ask while one is open hits purchase_requests_one_open_per_household and is dropped.
 export async function ask(
   household: number,
@@ -171,9 +200,10 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
     blank_photos: number;
     query: string | null;
     tried: boolean;
+    last: Last | null;
     searched_at: Date;
   }>(
-    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, searched_at FROM rose_search WHERE id = $1",
+    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last, searched_at FROM rose_search WHERE id = $1",
     [household],
   );
   const row = rows[0];
@@ -188,6 +218,7 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
         blankPhotos: row.blank_photos,
         query: row.query,
         tried: row.tried,
+        last: row.last,
         searchedAt: row.searched_at,
       }
     : null;
@@ -205,12 +236,12 @@ export async function saveSearch(
   tried = false,
 ): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
          from_photo = EXCLUDED.from_photo, photos = EXCLUDED.photos, blank_photos = EXCLUDED.blank_photos,
-         query = EXCLUDED.query, tried = EXCLUDED.tried, searched_at = now()`,
+         query = EXCLUDED.query, tried = EXCLUDED.tried, last = EXCLUDED.last, searched_at = now()`,
     [
       household,
       words,
@@ -222,6 +253,7 @@ export async function saveSearch(
       blank,
       ("query" in result && result.query) || null,
       tried,
+      "last" in result && result.last ? JSON.stringify(result.last) : null,
     ],
   );
 }

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { ITEMS } from "../../lib/shop/items";
 import type { PurchaseRequest, RequestStatus, SavedSearch } from "../../lib/shop/requests";
-import { againOf, notifyState, roseState, samState, type NotifyEnv } from "./state";
+import { againOf, notifyState, rebuyOf, roseState, samState, type NotifyEnv } from "./state";
 
 const [glasses, pills, batteries] = ITEMS;
 const askedAt = new Date("2026-10-20T10:15:00Z");
@@ -93,6 +93,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   blankPhotos: 0,
   query: null,
   tried: false,
+  last: null,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
@@ -576,4 +577,80 @@ it("puts the limit notice on the basket and the receipt, and keeps an empty sear
     problem: "limit",
     waitMinutes: 170,
   });
+});
+
+const paidStrap = (queries: PurchaseRequest["queries"] = null): PurchaseRequest => ({
+  ...request("paid", strap),
+  found: { shop: strap.shop, url: strap.url, reason: strap.why },
+  queries,
+});
+const lastStrap = { id: strap.id, name: strap.name, cents: 3250, shop: "amazon.com" };
+const lastAa = { id: aa.id, name: aa.name, cents: 999, shop: "amazon.com" };
+const lastLight = { id: light.id, name: light.name, cents: 1249, shop: "target.com" };
+
+it("searches a paid ask's thing again with its last query and the listing Sam paid for", () => {
+  expect(rebuyOf(paidStrap([slipperPick]))).toEqual({
+    words,
+    things: [{ words, query: "warm slip-on slippers size 8", last: lastStrap }],
+  });
+  expect(rebuyOf(paidStrap())).toEqual({
+    words: strap.name,
+    things: [{ words: strap.name, query: strap.name, last: lastStrap }],
+  });
+});
+
+it("searches only the things Sam paid for in a basket, each with its own last query", () => {
+  expect(rebuyOf({ ...asked("paid"), queries: [aaPick, lightPick] })).toEqual({
+    words: "AA batteries and a night light",
+    things: [
+      { words: "AA batteries", query: "AA batteries", last: lastAa },
+      { words: "a night light", query: "plug-in night light", last: lastLight },
+    ],
+  });
+  expect(rebuyOf({ ...trimmed("paid"), queries: [aaPick, lightPick] })).toEqual({
+    words: "AA batteries",
+    things: [{ words: "AA batteries", query: "AA batteries", last: lastAa }],
+  });
+  expect(rebuyOf(asked("paid"))).toMatchObject({ things: [{ query: "AA batteries" }, { query: "a night light" }] });
+});
+
+it("searches nothing again for an ask Sam didn't pay for, or one from the fixed list", () => {
+  expect(rebuyOf({ ...paidStrap([slipperPick]), status: "declined" })).toBeNull();
+  expect(rebuyOf({ ...asked("failed"), queries: [aaPick, lightPick] })).toBeNull();
+  expect(rebuyOf(request("paid", glasses))).toBeNull();
+});
+
+it("lists what Sam paid for on Rose's ask screen, and nowhere else", () => {
+  const bought = [trimmed("paid"), { ...paidStrap(), id: 9, answeredAt: null }];
+  const search = { ...on(), bought };
+
+  expect(roseState(vault, trimmed("paid"), { askAgain: true }, search)).toEqual({
+    kind: "ask",
+    limitCents: 5000,
+    words: "a night light",
+    bought: [
+      { id: 12, item: trimmedReceipt.item, lines: [aa], paidAt: answeredAt },
+      { id: 9, item: strap, lines: undefined, paidAt: askedAt },
+    ],
+  });
+  expect(roseState(vault, trimmed("paid"), {}, search)).toEqual({ kind: "paid", receipt: trimmedReceipt });
+  expect(roseState(vault, null, {}, { ...on(saved("options")), bought })).not.toHaveProperty("bought");
+  expect(roseState(vault, null, {}, { ...on(), bought: [] })).toEqual({ kind: "ask", limitCents: 5000 });
+});
+
+it("picks last time's listing for Rose when today's options have it, in one search or in each group", () => {
+  const last = { id: strap.id, cents: 2999, shop: "walmart.com" };
+  expect(roseState(vault, null, {}, on({ ...saved("options"), last }))).toMatchObject({ kind: "options", last, picked: strap.id });
+  expect(roseState(vault, null, {}, on({ ...saved("options"), last: { ...last, id: "prod_madeUp1" } }))).toMatchObject({
+    picked: undefined,
+  });
+
+  const groups = [
+    { thing: "AA batteries", options: [strap], query: "AA batteries", last },
+    { thing: "a night light", options: [{ ...strap, id: light.id }], query: "night light", last: { ...last, id: "prod_madeUp1" } },
+  ];
+  const basket = on({ ...saved("basket"), groups });
+  expect(roseState(vault, null, {}, basket)).toMatchObject({ kind: "basket", picked: [strap.id, undefined] });
+  expect(roseState(vault, null, { picked: ["", light.id] }, basket)).toMatchObject({ picked: [undefined, light.id] });
+  expect(roseState(vault, null, {}, on(jarSearch()))).toMatchObject({ picked: undefined });
 });

@@ -4,6 +4,7 @@ import { migrate } from "../../scripts/migrate.mjs";
 import { ITEMS } from "./items";
 import {
   ask,
+  boughtBefore,
   copyDemoVault,
   claim,
   clearSearch,
@@ -17,6 +18,7 @@ import {
   getVault,
   keep,
   latest,
+  paidAsk,
   record,
   saveSearch,
   saveSubscription,
@@ -302,6 +304,78 @@ const light = {
   thing: "a night light",
 };
 const basket = { id: "basket", name: "2 things", cents: 2248 };
+
+it("keeps a rebuy's last listing with its search, and in each group of a basket", async () => {
+  const last = { id: strap.id, cents: 2999, shop: "walmart.com" };
+  await saveSearch(owner, "warm slippers", { outcome: "options", options: [strap], query: "warm slippers", last });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "options", last });
+
+  await saveSearch(owner, "warm slippers", { outcome: "over limit", query: "warm slippers", last: { ...last, nowCents: 6499 } });
+  expect((await getSearch(owner))?.last).toEqual({ ...last, nowCents: 6499 });
+
+  const groups = [
+    { thing: "AA batteries", options: [strap], query: "AA batteries", last },
+    { thing: "a night light", options: [strap], query: "night light", last: { id: light.id, cents: light.cents, shop: light.shop } },
+  ];
+  await saveSearch(owner, "AA batteries and a night light", { outcome: "basket", groups });
+  expect(await getSearch(owner)).toMatchObject({ last: null, groups });
+
+  await saveSearch(owner, "warm slippers", { outcome: "retry" });
+  expect((await getSearch(owner))?.last).toBeNull();
+});
+
+// Sam's answer, without a charge: the asks below only need their status.
+async function answered(status: "paid" | "declined") {
+  await sql(`UPDATE purchase_requests SET status = '${status}', answered_at = now() WHERE status = 'waiting'`);
+}
+
+const source = (line: typeof aa) => ({ shop: line.shop, url: line.url, reason: line.reason });
+
+it("lists the 3 newest paid asks with a listing, newest first, and the same listings once", async () => {
+  const other = await startHousehold("rose-hash-2", "sam-hash-2");
+  await ask(owner, aa, source(aa));
+  await answered("paid");
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  await answered("paid");
+  await ask(owner, glasses);
+  await answered("paid");
+  await ask(owner, basket, undefined, [aa, light]);
+  await answered("paid");
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  await answered("declined");
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  await answered("paid");
+  await ask(owner, basket, undefined, [light, aa]);
+  await answered("paid");
+  await ask(owner, light, source(light));
+  await answered("paid");
+  await ask(other, aa, source(aa));
+  await answered("paid");
+
+  const bought = await boughtBefore(owner);
+  expect(bought.map(({ item, lines }) => (lines ? lines.map(({ id }) => id) : item.id))).toEqual([
+    light.id,
+    [light.id, aa.id],
+    strap.id,
+  ]);
+  expect(bought.every(({ status, answeredAt }) => status === "paid" && answeredAt)).toBe(true);
+  expect(await boughtBefore(other)).toHaveLength(1);
+});
+
+it("gives a household's own paid ask by its id, and nothing for another's or an unpaid one", async () => {
+  const other = await startHousehold("rose-hash-2", "sam-hash-2");
+  await ask(owner, aa, source(aa));
+  await answered("paid");
+  const paid = (await latest(owner))!;
+  await ask(owner, light, source(light));
+  await answered("declined");
+  const declined = (await latest(owner))!;
+
+  expect(await paidAsk(owner, paid.id)).toMatchObject({ id: paid.id, item: { id: aa.id }, status: "paid" });
+  expect(await paidAsk(other, paid.id)).toBeNull();
+  expect(await paidAsk(owner, declined.id)).toBeNull();
+  expect(await paidAsk(owner, Number.NaN)).toBeNull();
+});
 
 it("records a basket as one request with its lines", async () => {
   expect(await ask(owner, basket, undefined, [aa, light])).toBe(true);

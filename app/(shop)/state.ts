@@ -1,7 +1,7 @@
-import type { Again, Group, Option } from "../../lib/shop/find";
+import type { Again, Group, Last, Option, Rebuy } from "../../lib/shop/find";
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
-import type { RoseState } from "./RoseView";
+import type { Bought, RoseState } from "./RoseView";
 import type { SamState } from "./SamView";
 import { listed, type Receipt } from "./ui";
 
@@ -19,7 +19,8 @@ type RoseParams = {
   picked?: string[];
 };
 
-type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null };
+// bought are Sam's newest paid asks, for Bought before on the ask screen (D102).
+type SearchOn = { saved: SavedSearch | null; limitCents: number; totalCents: number | null; bought?: PurchaseRequest[] };
 
 // What Find another searches. group is the index of a basket's group that it searches alone.
 export type AgainOf = { words: string; things: Again[]; group?: number };
@@ -60,9 +61,10 @@ export function roseState(
       blankPhotos: current.blankPhotos || undefined,
       listings: current.options,
       error: params.pickMissing ?? false,
-      picked: over?.ids[0],
+      picked: over?.ids[0] ?? lastPick(current.last, current.options),
       overCents: over?.cents,
       tried,
+      last: current.last ?? undefined,
     };
   }
   if (current?.outcome === "basket") {
@@ -80,7 +82,7 @@ export function roseState(
       blankPhotos: current.blankPhotos || undefined,
       groups: current.groups,
       error: params.pickMissing ?? false,
-      picked: over?.ids ?? pickedOf(current.groups, params.picked),
+      picked: over?.ids ?? pickedOf(current.groups, params.picked) ?? lastPicks(current.groups),
       overCents: over?.cents,
       tried,
       ...(stopped && { waitMinutes: params.limitWait }),
@@ -116,6 +118,7 @@ export function roseState(
     problem,
     tried,
     ...(stopped && { waitMinutes: params.limitWait }),
+    bought: search.bought?.length ? search.bought.map(boughtOf) : undefined,
   };
 }
 
@@ -169,6 +172,39 @@ function refusedOf(request: PurchaseRequest): { id?: string; thing: string; quer
     return request.leftOut.map((thing) => ({ thing, query: thing }));
   }
   return [];
+}
+
+// What Ask again searches for a paid ask, from Neon only (D23): only what Sam paid for (D102), each with its
+// last query and the listing Sam paid for (D105). An ask from before queries were kept searches its lines'
+// things, or its item's name. An ask from the fixed list has no listing to look for.
+export function rebuyOf(request: PurchaseRequest): { words: string; things: Rebuy[] } | null {
+  if (request.status !== "paid") return null;
+  const picked = (id: string) => request.queries?.find((pick) => pick.id === id);
+  if (request.lines) {
+    const things = request.lines.map(({ id, name, cents, shop, thing }) => ({
+      words: thing,
+      query: picked(id)?.query ?? thing,
+      last: { id, name, cents, shop },
+    }));
+    return { words: listed(things.map(({ words }) => words)), things };
+  }
+  if (!request.found) return null;
+  const { id, name, cents } = request.item;
+  const words = picked(id)?.thing ?? name;
+  return { words, things: [{ words, query: picked(id)?.query ?? name, last: { id, name, cents, shop: request.found.shop } }] };
+}
+
+function boughtOf({ id, item, lines, answeredAt, askedAt }: PurchaseRequest): Bought {
+  return { id, item, lines: lines ?? undefined, paidAt: answeredAt ?? askedAt };
+}
+
+// Last time's listing is picked for Rose when today's options have it (D104).
+function lastPick(last: Last | null | undefined, options: Option[]): string | undefined {
+  return options.find(({ id }) => id === last?.id)?.id;
+}
+
+function lastPicks(groups: Group[]) {
+  return groups.some(({ last }) => last) ? groups.map(({ last, options }) => lastPick(last, options)) : undefined;
 }
 
 // Rose's picks back from a group's Find another, each while it's still in its own group (D36).

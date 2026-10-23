@@ -185,6 +185,27 @@ it("sends each listing's photo right after its words, and none for a listing wit
   ]);
 });
 
+it("labels the listing Rose bought last time, and asks Haiku to pick it first only when it passes every check", async () => {
+  const muji = { ...kohls, id: "prod_4Fd6sW", name: "Warm Fiber Slippers", details: "Warm fiber slippers." };
+  const fetch = stubHaiku(() => reply({ picks: [], aboveLimit: false }));
+
+  await choose(words, [kohls, muji], [], "prod_4Fd6sW");
+
+  const { system, messages } = sent(fetch).body;
+  expect(system).toMatch(/Then say whether any listing above their limit is the thing they asked for\. A listing that says they bought it last time gets no pass on the checks above: leave it out like any other when its photo or words fail them, and pick it first only when it passes every one\.$/);
+  expect(messages[0].content.map(({ text }: { text?: string }) => text)).toEqual([
+    `They asked: ${JSON.stringify(words)}\n\nUnder their price limit, pick from these:`,
+    `Listing prod_7Hq2kZ: ${JSON.stringify({ name: kohls.name, details: kohls.details })}`,
+    `Listing prod_4Fd6sW (they bought this one last time): ${JSON.stringify({ name: muji.name, details: muji.details })}`,
+    `Above their price limit, not to pick from:\n[]`,
+  ]);
+
+  fetch.mockClear();
+  await choose(words, [kohls, muji], []);
+  expect(sent(fetch).body.system).not.toContain("last time");
+  expect(JSON.stringify(sent(fetch).body.messages)).not.toContain("last time");
+});
+
 it("throws when Haiku fails or its answer is cut off", async () => {
   stubHaiku(() => Response.json({ type: "error", error: { type: "overloaded_error" } }, { status: 529 }));
   await expect(readNeed(words)).rejects.toThrow("anthropic 529");
