@@ -150,7 +150,7 @@ Rose taps Ask again under "Bought before". The search ends in options with last 
 | Result | What Rose sees |
 | ------ | -------------- |
 | Last time's listing is under Sam's limit | "Which one would you like?", with `For "AA batteries". Today's prices for what you bought before.` Last time's listing is first and already picked (O10). Under its price: **You bought this last time.** and the change: "Same price as last time.", "Now $9.49. It was $8.99.", "Now from target.com. It was from walmart.com.", or "Now $9.49 from target.com. It was $8.99 from walmart.com." |
-| It's over Sam's limit now | A notice on top: "The one you bought last time is $9.49 now, over Sam's $8 limit." Nothing is picked |
+| It's over Sam's limit now | A notice on top: "The one you bought last time is $9.49 now, over Sam's $8 limit." Nothing is picked. When Sam raises the limit past the price before the next search, it reads "The one you bought last time is $9.49 now." (O15) |
 | It isn't in today's search | A notice on top: "Couldn't find the one you bought last time today." Nothing is picked |
 | Nothing found | The ask screen after an empty Find: "Couldn't find that. Try different words.", Find another, and "AA batteries" in the box. Bought before stays |
 | Stopped by the daily limit | The ask screen with "That's a lot of Finds from here today. Try again in 3 hours." on top. Bought before and its Ask again stay |
@@ -326,6 +326,12 @@ Chunk A owns the shared types: `Last`, `Group`, `Single`, `Rebuy` and `SavedSear
 
 Recorded as D102, D103, D104, D105, D106, D107.
 
+## Review
+
+2026-10-23 · 1 raw finding, 1 survived, 1 fixed.
+
+- correctness · `app/(shop)/RoseView.tsx:509` · the over-limit notice gives the price alone once Sam's limit covers it · `b2cecb0`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -344,6 +350,7 @@ Recorded as D102, D103, D104, D105, D106, D107.
 | O12 | Channel3 keeps a listing's id from day to day, and last time's query still returns the listing Sam paid for, in its 10 results under or over the limit | unproven | spec p3 | poc | Resolved | Ids yes, the query alone no. /poc, 2026-10-23: it ran the recorded set's 7 asks from Oct 22 (`lib/shop/picks/asks.json`) again, with 42 searches. No listing came back under a new id, and 0 of 65 changed price or shop. Rose's words as the query found 8 of 14 right listings by id. One unfiltered search by each listing's name found 13 of 13, at rank 1 to 7, in 0.8 to 1.8 s. So Ask again adds that search (D105). Limits: the gap was one day, the query was Rose's words, not Haiku's stored query, and live Neon wasn't read, because pulling the production env was blocked |
 | O13 | D89 says a listing whose photo shows something else never reaches Rose. Does last time's listing still go through the pick step's photo check? | question | spec p3 | user | Resolved | Yes. It goes to the pick call with its photo, labelled as last time's, and stays first unless it fails the check. D89 stands. A dropped one reads "Couldn't find the one you bought last time today." This narrows O5: first and marked when the pick step keeps it. 2026-10-23 |
 | O14 | What Ask again searches Channel3 for | question | spec p3 | user | Resolved | Last time's query, so the other options are other packs of the thing, as a Find gives. 2026-10-23 |
+| O15 | The over-limit notice said "The one you bought last time is $9.49 now, over Sam's $8 limit." It reads Sam's limit on each redraw, so after Sam raised the limit to $20 it said $9.49 was over a $20 limit | flag | review | user | Decided alone | Chose: when today's limit covers the price, the notice reads "The one you bought last time is $9.49 now." Other: keep the limit the Ask again ran under in `last`, and name that limit. Undo: revert b2cecb0, then add the limit to `Last` in `findRebuy()`. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
