@@ -50,7 +50,7 @@ A frame from another site stays blank, a frame from KinCart's own home page show
 
 ```gherkin
 Scenario: Another site can't show Sam's page
-  Given Sam's page is /h/<token> on KinCart, with Rose's 2-pack of AA batteries at $6.99 waiting for OK
+  Given Sam's page is /h/<token> on KinCart, with Rose's reading glasses at $18.99 waiting for OK
   When a page on another origin puts /h/<token> in an iframe
   Then the browser refuses to show it, and the frame has no OK button
 
@@ -169,6 +169,10 @@ Single chunk: `next.config.ts` and `e2e/security-headers.spec.ts`.
 ### Decisions to record
 
 Recorded as D117, D118.
+
+## Review
+
+2026-10-23 · 0 raw findings, 0 survived. Clean.
 
 ## Open items
 
