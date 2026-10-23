@@ -1,9 +1,10 @@
 # Sam finds another
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** find-another, allow-over-limit
+**Page:** none. Skipped: you read the `.md` directly.
 
 Sam taps Find another on Sam's own page, after a No or a thing Sam left out, and KinCart looks again for Rose. It ships now because it is the last slice of the after-review shape, and Rose's Find another already does the search.
 
@@ -163,9 +164,142 @@ Sam taps Find another under a No or a left-out notice. Sam's page then says how 
 
 **Preview:** `/preview/sam-finds-another` on `pnpm dev`, from `app/(shop)/preview/sam-finds-another/page.tsx`. It shows Sam's and Rose's real pages in 11 frames, one or more for each scenario.
 
-## Decisions to record
+## Technical plan
 
-Drafted at pause 1. `/build` appends them to DECISIONS.md.
+### Approach
+
+`findAnother` takes Sam's link as well as Rose's. For Sam, it runs only when Rose has no newer search, so Sam's tap answers a No or an untick and never Rose's own empty Find. It saves the result as Rose's search with a new `by_sam` flag, and sends Rose a push either way. Sam's page reads Rose's saved search too, and `samState` works out whether to offer Find another or say how the search ended, with the same `againOf` rule Rose's page uses (D115).
+
+Relies on: D19, D23, D27, D29, D46, D73, D74, D78, D81, D83, D98, D99, D100, D101, D110, D113, D114, D115, D116
+
+```mermaid
+flowchart TB
+    subgraph browser["Sam's browser"]
+        SV["SamView: Find another"]
+    end
+    subgraph vercel["Vercel"]
+        ACT["findAnother (actions.ts)"] -- "saved search, latest ask" --> AG["againOf (state.ts)"]
+        ACT -- "things, Sam's limit" --> FA["findAgain (find.ts), unchanged"]
+        ACT -- "options again / nothing again" --> PG["sendPing (pings.ts)"]
+        HP["/h/<token> page"] -- "latest ask, saved search" --> SS["samState (state.ts)"]
+    end
+    SV -- "POST from Sam's link" --> ACT
+    ACT -- "result, tried, by_sam" --> RS[("rose_search")]
+    RS -- "newer search, by_sam" --> SS
+    PG -- "after(): web push" --> RP((Rose's phone))
+```
+
+`againOf` decides what Sam's tap searches, `findAgain` searches as for Rose, and `samState` reads the saved search back to show Sam how it ended.
+
+```mermaid
+sequenceDiagram
+    participant S as Sam's browser
+    participant A as findAnother
+    participant N as Neon
+    participant F as findAgain
+    participant P as push service
+    S->>A: POST Find another, from /h/<token>
+    A->>N: getSearch, latest
+    N-->>A: no newer search; declined ask with its queries
+    A->>A: againOf: the slippers, last query, refused [dearfoams]
+    A->>N: takeUse find, Sam's address, 20 a day
+    A->>F: findAgain(words, things, limit)
+    F-->>A: 3 options
+    A->>N: saveSearch(…, tried, by_sam), usage +1 Find
+    A-->>S: redirect /h/<token>
+    A-)P: after(): "Sam asked KinCart to look again"
+    S->>N: page load: latest, getSearch
+    N-->>S: newer search, tried, 3 options
+    S->>S: samState: again = "options"
+```
+
+Sam's tap sends the same calls as Rose's Find another, plus one push. Sam's page then reads the saved search to say that Rose has new options.
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `db/migrations/0015_sam_finds_another.up.sql`, `.down.sql` | Add `rose_search.by_sam boolean NOT NULL DEFAULT false` with `IF NOT EXISTS`. The down file drops it | 1, 4 |
+| `scripts/migrate.test.ts:33` | The first test checks `by_sam` up, down and up. `downToHouseholds()` also runs `0015_sam_finds_another.down.sql`, as the lesson says | migration |
+| `lib/shop/requests.ts:65` | `SavedSearch` gains `bySam`. `getSearch()` (`:192`) reads `by_sam`. `saveSearch()` (`:230`) takes `bySam = false` after `tried` and writes it | 1, 4 |
+| `app/(shop)/state.ts:126` | Export `currentOf`. `roseState` passes `bySam` to ask, options and basket. `samState(request, limitCents, saved?, waitMinutes?)` sets `again` on a declined ask and on a paid ask with things left out: `offer` when there is no newer search and `againOf()` returns one, `options` or `nothing` when the newer search is `tried`, and nothing otherwise. It passes `waitMinutes` to `nothing` and `paid` | 1 to 5 |
+| `app/(shop)/actions.ts:138` | `findAnother` takes Sam's link too. For Sam, it ignores `another`, and returns to `/h/<token>` when `currentOf()` gives a newer search. A stopped one counts a stopped Find, saves nothing, and redirects to `/h/<token>?find=limit&until=` (D101). Otherwise it saves with `bySam`, adds one Find, and calls `sendPing(household, found ? "options again" : "nothing again", request)` | 1, 4, 5 |
+| `app/(shop)/pings.ts:9` | `PingKind` gains `options again` and `nothing again`, both to Rose, with the titles and bodies from the Interface table | 1, 4 |
+| `app/(shop)/h/[token]/page.tsx:35` | Reads `getSearch()` when Find is on, and `?find=limit&until=` as Rose's page does with `minutesUntil()`. It passes both to `samState`, and `findAnother.bind(null, token)` to `SamView` | 1 to 5 |
+| `app/(shop)/SamView.tsx`, `app/(shop)/RoseView.tsx`, `app/(shop)/ui.tsx`, `app/(shop)/preview/sam-finds-another/page.tsx` | Built at pause 2. `/build` breaks each new line once, as the lesson says | 1 to 5 |
+| `e2e/sam-finds-another.spec.ts` | The slice's e2e | 1, 2 |
+
+Reusing: `againOf()`, `currentOf()`, `findAgain()`, `takeUse()`, `countUse()`, `minutesUntil()`, `addressKey()`, `sendPing()` with `after()`, `AnotherForm`, `LimitNotice`, `reset()` from `e2e/db.ts`, and the pause 2 views.
+
+### Data
+
+```mermaid
+erDiagram
+    HOUSEHOLDS ||--o| ROSE_SEARCH : "has one current"
+    HOUSEHOLDS ||--o{ PURCHASE_REQUESTS : "asks"
+    ROSE_SEARCH {
+        bigint id PK "household id"
+        text words
+        boolean tried "Find another ran it"
+        boolean by_sam "new, default false: Sam's tap ran it"
+    }
+    PURCHASE_REQUESTS {
+        bigint id PK
+        jsonb queries "unchanged: what Find another leaves out"
+    }
+```
+
+**Migration:** expand only. `0015_sam_finds_another.up.sql` adds one column with a default, so old rows read `false`, and old code ignores it. There is no backfill. CI runs `db:up` on Neon after tests pass on main (D11), and Vercel promotes after that (D10). There is no contract step.
+
+**Reverse:** promote the previous deploy on Vercel. Then, if wanted, `pnpm db:down` runs `0015_sam_finds_another.down.sql`, which drops the column. `scripts/migrate.test.ts` tests this path.
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `rose_search.by_sam` | O5 and D116: Rose's page names Sam, through the 3 s redraw (D19) and a reopened link |
+| `again` on `samState` | Scenarios 2 to 4: Sam's page offers Find another once, and says how it ended |
+| Two `PingKind`s | Scenarios 1 and 4: Rose hears how Sam's search ended (D114) |
+| `getSearch()` on Sam's page | Scenarios 2 to 4: Sam's page must see Rose's newer search |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | Judges and the video: a few a day. One Find another for each No, shared, so Sam's tap adds no searches that Rose's tap didn't already have. Sam's page adds one `getSearch()` read on each 3 s redraw |
+| **Breaks first**     | Channel3's 1,000 free searches a month, as for Find. The new e2e adds 4 searches to each CI run. `/status` shows them (D78) |
+| **Security surface** | Sam's link only adds a caller of `findAnother`. Sam's form sends nothing that it reads: words, queries and refused ids come from Neon (D23). Sam can't search for Rose's own empty Find, or for another household (D46). Sam's tap counts under Sam's address, kept only as an HMAC (D74). Secrets: as Find. Stored: one boolean |
+| **Proof it works**   | `find outcome=options listings=3 searches=2 ms=9420 checked=8 unloaded=0 again=1` in Vercel's logs, then one push to Rose, and one more Find on `/status`. The numbers are whatever the run gave |
+| **Rollout**          | No flag. CI migrates Neon, then Vercel promotes (D10, D11). Rollback: the two steps under Reverse |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1, 2 | `e2e/sam-finds-another.spec.ts`, real Haiku and Channel3 (D24) | `pnpm test:e2e e2e/sam-finds-another.spec.ts` |
+| 1, 4, 5 | `app/(shop)/actions.test.ts`: Sam's tap after a No searches without the refused id and saves `tried` and `bySam`; after an untick, only the left-out picks; with a newer search from Rose, it calls nothing; a group index from Sam's form is ignored; past 20 Finds, it calls nothing, counts a stopped Find, and redirects to `/h/<token>?find=limit`; it sends `options again` or `nothing again`; Rose's own tap sends no push and saves `bySam` false | `pnpm test "app/(shop)/actions.test.ts"` |
+| 1 to 5 | `app/(shop)/state.test.ts`: `samState`'s `again` for a No, a basket No, an untick, a newer search found or empty, a newer untried search from Rose, a paid ask with nothing left out, and `waitMinutes`; `roseState` passes `bySam` | `pnpm test "app/(shop)/state.test.ts"` |
+| 1, 4 | `app/(shop)/pings.test.ts`: the two new pushes' titles and bodies, both to Rose | `pnpm test "app/(shop)/pings.test.ts"` |
+| 1 to 5 | `app/(shop)/SamView.test.tsx`: Find another and each hint; the found and nothing notices with no Find another; the limit notice with Find another kept. `app/(shop)/RoseView.test.tsx`: the Sam lines on options, basket and the "Still…" notice | `pnpm test "app/(shop)/SamView.test.tsx" "app/(shop)/RoseView.test.tsx"` |
+| storage | `lib/shop/requests.test.ts`: `bySam` round trips; `scripts/migrate.test.ts`: 0015 up, down, up | `pnpm test lib/shop/requests.test.ts scripts/migrate.test.ts` |
+
+**E2E:** `e2e/sam-finds-another.spec.ts`, one test: "Sam says no to Rose's slippers, and Sam's Find another gets Rose others". It resets with the saved PayPal, and has its own 90 s timeout, as the lesson says for two Finds. Rose finds "warm slippers that are easy to put on, size 8", keeps the first option's name, and asks Sam. Sam taps No, then Find another on Sam's page. Within 30 s, Sam's page shows "KinCart found new options for Rose. Rose picks one and asks you." with no Find another. Rose's page shows "Which one would you like?" with "Sam asked KinCart to look again with other words." and no option named `<name>` exactly. Rose picks one and asks Sam, and Sam's page shows "Rose would like this". Stop `pnpm dev` first, as the lesson says.
+
+### Chunks
+
+Single chunk. The change is small, and the views were built at pause 2.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Rose and Sam tap Find another within the same 10 to 15 s. Both pass `againOf`, both search, and both count a Find. The last save wins | Accepted (O6): one extra Find and 2 Channel3 searches, and both results are valid |
+| Sam's tap finds nothing, as find-another's measure found for most empty asks | The No path differs: it drops the refused listing, so the e2e's slippers come back with options, as in find-another's e2e |
+| The push fails or Rose turned pushes off | Rose's page shows the result on the next 3 s redraw (D19), and it names Sam (D116) |
+
+### Decisions to record
+
+Drafted at pauses 1 and 2. `/build` appends them to DECISIONS.md.
 
 ## D113 · 2026-10-23 · Sam's Find another shows only after a No or an untick, and Rose picks from what it finds
 
@@ -191,7 +325,7 @@ Status: active
 
 ## D116 · 2026-10-23 · Rose's page says when Sam asked KinCart to look again
 
-Why: Sam's tap changes Rose's page while Rose didn't tap anything. An older shopper needs to see why new options appeared, and Rose's push may be off.
+Why: Sam's tap changes Rose's page while Rose didn't tap anything. An older shopper needs to see why new options appeared, and Rose's push may be off. A `by_sam` flag on `rose_search` keeps it through the 3 s redraw (D19), as `tried` does.
 Rejected: the same "Looked again with other words." line as Rose's own tap (no data change, but Rose learns it was Sam only from the push).
 Source: docs/specs/sam-finds-another.md
 Status: active
@@ -205,6 +339,7 @@ Status: active
 | O3 | What Rose hears when Sam's search finishes: a push either way, a push only for new options, or none | question | spec p1 | user | Resolved | A push either way: new options are ready, or KinCart found nothing (D114). 2026-10-23 |
 | O4 | Is the one Find another for each No shared by Rose and Sam, or does each get one | question | spec p1 | user | Resolved | Shared. Whoever taps first uses it (D115, which supersedes D97). 2026-10-23 |
 | O5 | What Rose's page says about options from Sam's tap | question | spec p2 | user | Resolved | It names Sam: "Sam asked KinCart to look again with other words." KinCart keeps who tapped with the search (D116). 2026-10-23 |
+| O6 | Rose and Sam tap Find another within the same 10 to 15 s: both search, both count a Find, and the last save wins | flag | spec p3 | user | Accepted risk | Rare, since both must tap within seconds. The cost is one extra Find and 2 Channel3 searches, and both results are valid. No guard. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
