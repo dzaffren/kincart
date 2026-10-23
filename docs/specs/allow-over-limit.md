@@ -1,6 +1,6 @@
 # Allow over limit
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** find-another
@@ -125,6 +125,7 @@ Rose sees the dearer options with a notice and a mark on each, and Sam sees how 
 | Rose, a basket group | Under the group's heading: "Nothing under $30 for this one. These cost a little more, and Sam sees the price before saying OK." The group keeps its Find another and None of these |
 | Rose, each listing over the limit | Under its price, in bold: "$3.89 over Sam's $20 limit." |
 | Rose, one thing, under the options | Find another, with "KinCart tries other words for you.", until it has run once. Try other words stays, as on every options screen |
+| Rose, one thing, after a stopped Find another | The day's limit notice on top, as on the basket screen (D101, O12) |
 | Sam, one thing, on top | "This is $3.89 over your $20 limit." |
 | Sam, a basket line | Under its price, in bold: "$14.99 over your $30 limit." |
 
@@ -290,6 +291,7 @@ Recorded as D109, D110, D111, D112.
 | O9 | In Ask again, last time's listing can be over the limit now and among the options over it. D104 puts it first, and D111 says cheapest first | question | spec p3 | user | Resolved | Last time's listing comes first and picked, as D104 says. The rest follow cheapest first. 2026-10-23 |
 | O10 | How many listings the second pick call sees. The walking stick sent 8 photos and took 14.9 s | question | spec p3 | user | Resolved | The 5 cheapest up to double the limit, and last time's listing when it is within double. 2026-10-23 |
 | O11 | `CHANNEL3_API_KEY` in `.env.local` is out of Channel3's free credits: every search answers `402`. Vercel's production key and GitHub's CI key may be the same one | flag | spec p3 | user | Resolved | Use `CHANNEL3_API_KEY_II`. `/build` runs its tests with `CHANNEL3_API_KEY="$CHANNEL3_API_KEY_II"` in the shell, which wins over `.env.local`, so no code changes. Swapping the key on Vercel and in GitHub's secrets is the user's call. 2026-10-23 |
+| O12 | The plan's options screen had no day's limit notice. A stopped Find another on Rose's over-limit options screen would show the same screen and say nothing, where D101 puts the limit notice on top | flag | build | user | Decided alone | Chose: the options screen takes `waitMinutes` and shows the day's limit notice on top, as the basket screen does. Other: no notice there, so Rose's tap seems to do nothing. Undo: remove the `waitMinutes` lines from `roseState()` and from the options screen in `RoseView.tsx`, added in c7450a4. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

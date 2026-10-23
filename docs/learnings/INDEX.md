@@ -41,3 +41,4 @@
 - Give an e2e with two real Finds its own test timeout
 - Run next build again when it stops on a security notice
 - Spike on the recorded set when the production env can't be pulled
+- Pass --silent=false to see a passing test's console output
