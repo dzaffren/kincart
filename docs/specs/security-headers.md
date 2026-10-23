@@ -1,6 +1,6 @@
 # Security headers
 
-**Version:** v1 · **Status:** Refined · **Type:** Technical · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Technical · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** None
@@ -124,7 +124,7 @@ sequenceDiagram
 | `next.config.ts:3` | Add `headers()` that returns one rule for `/:path*` with `Content-Security-Policy: frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN` and `Referrer-Policy: same-origin` | Scenarios 1 to 4 |
 | `e2e/security-headers.spec.ts` (new) | One test that walks scenarios 1, 3 and 4, and checks the home page's phones for scenario 2 | All scenarios |
 
-Reusing: `reset()` and `sql()` from `e2e/db.ts`, the `ROSE_LINK_TOKEN` and `SAM_LINK_TOKEN` env, and the `roseAsksFor` steps from `e2e/approve-and-pay.spec.ts:24`, copied into the new spec as each spec file does. The other origin is `http://127.0.0.1:3000`, which serves the same app but is a different origin from `http://localhost:3000`. Playwright's `page.route` serves the attacker page at that origin. A photo request is an `<img>` that the test adds to Sam's page, with its `src` on `127.0.0.1`, so no real Find is needed.
+Reusing: `reset()` and `sql()` from `e2e/db.ts`, the `ROSE_LINK_TOKEN` and `SAM_LINK_TOKEN` env, and the `roseAsksFor` steps from `e2e/approve-and-pay.spec.ts:24`, copied into the new spec as each spec file does. The other site is a `node:http` server on another `localhost` port, started by the test. A photo request is an `<img>` that the test adds to Sam's page, with its `src` on that server, so no real Find is needed.
 
 ### Earn-it
 
@@ -179,6 +179,8 @@ Recorded as D117, D118.
 | O3 | After this ships, any site that frames kincart.vercel.app shows a blank frame. If Devpost or a judging tool shows the live site in a frame, the judges see nothing there. Whether one does is not checked | flag | spec p3 | user | Accepted risk | Judges open the site directly from the Devpost link, and nothing frames it. 2026-10-23 |
 | O4 | DECISIONS.md on main ends at D112, so the drafted entries would become D113 and D114. The unmerged `feat/sam-finds-another` already holds D113 to D116 | flag | build | user | Decided alone | Chose: keep D117 and D118, so the two branches don't share a number. Other: renumber to D113 and D114 now. Undo: renumber here if sam-finds-another is dropped. 2026-10-23 |
 
+| O5 | The plan said the other origin is `http://127.0.0.1:3000`, served with Playwright's `page.route`. Chrome's local network checks block a fulfilled page from framing `localhost` | flag | build | user | Decided alone | Chose: a `node:http` server on another `localhost` port, started in the spec. Other: launch Chrome with local network checks off. Undo: swap the server for `page.route` and add the launch flag. 2026-10-23 |
+| O6 | 8 e2e tests that run a real Find fail: `ask-again`, `basket`, `find-and-explain`, `find-another`, `find-limits`, `photo-ask`, `photo-ask-several`, `usage-on-status`. The find log says `reason=channel3 402` | flag | build | user | Decided alone | Chose: leave them. Channel3 refuses the server's search call, before any response header is set. The other 16 tests pass. Other: wait for Channel3 credit, then run them again. Undo: none needed. 2026-10-23 |
 _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary

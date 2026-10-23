@@ -42,3 +42,4 @@
 - Run next build again when it stops on a security notice
 - Spike on the recorded set when the production env can't be pulled
 - Pass --silent=false to see a passing test's console output
+- Play another site in an e2e with a real local server
