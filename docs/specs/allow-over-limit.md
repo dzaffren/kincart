@@ -276,6 +276,13 @@ Single chunk. It changes about 60 lines of app code beyond pause 2's, and its un
 
 Recorded as D109, D110, D111, D112.
 
+## Review
+
+2026-10-23 · 3 raw findings, 2 survived, 2 fixed.
+
+- correctness · `app/(shop)/RoseView.tsx:266` · the over-limit notice and Find another need a search over the limit, not only prices over Sam's limit now · `e49f0bf`
+- correctness · `lib/shop/find.ts:308` · Ask again's `same=` log count reads an over-limit search's options · `dad06fc`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
