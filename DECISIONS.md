@@ -768,3 +768,17 @@ Rejected: one call with photos for listings above the limit too (up to 10 more p
 Supersedes: D92
 Source: docs/specs/allow-over-limit.md
 Status: active
+
+## D117 · 2026-10-23 · KinCart sends frame-ancestors 'self', X-Frame-Options SAMEORIGIN and Referrer-Policy same-origin, and no other CSP
+
+Why: a hidden frame over Sam's page could trick Sam into an OK, and the home page frames only KinCart's own pages (D53). A full CSP must allow photos from any shop host and Next's inline scripts. Three pentests found no XSS hole, and a missed source could break the demo before the Nov 5 freeze.
+Rejected: a full CSP with a nonce for each request (needs `proxy.ts`, and a missed source blanks a page), no referrer rule (the browser default sends shops the KinCart origin, and the default can differ by browser), `Referrer-Policy: no-referrer` (it gives shops nothing more than `same-origin` does).
+Source: docs/specs/security-headers.md
+Status: active
+
+## D118 · 2026-10-23 · The security headers come from headers() in next.config.ts
+
+Why: the values are the same for every request, so no code needs to run for each one. `next start` sends them too, so the local e2e proves them.
+Rejected: `proxy.ts` (code on every request, needed only for a nonce, which D117 drops), `vercel.json` headers (`next start` doesn't read them, so the e2e couldn't prove them).
+Source: docs/specs/security-headers.md
+Status: active
