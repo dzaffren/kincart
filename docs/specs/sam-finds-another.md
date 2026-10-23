@@ -299,36 +299,7 @@ Single chunk. The change is small, and the views were built at pause 2.
 
 ### Decisions to record
 
-Drafted at pauses 1 and 2. `/build` appends them to DECISIONS.md.
-
-## D113 · 2026-10-23 · Sam's Find another shows only after a No or an untick, and Rose picks from what it finds
-
-Why: Rose is the one who shops, and Sam's OK still checks every buy (D83). The new options land on Rose's page as Rose's search, so Sam's page gets one button and Rose's page doesn't change.
-Rejected: Sam picks and Sam's OK pays it (Rose never chooses the swap, and Sam's page needs a picker), Sam picks and Rose agrees (two new steps and a new state), a third button "No, find another" on the request screen (one more choice next to OK and No).
-Source: docs/specs/sam-finds-another.md
-Status: active
-
-## D114 · 2026-10-23 · Rose gets a push when Sam's Find another finishes, with new options or with nothing found
-
-Why: Sam's tap starts a search that Rose didn't ask for, so Rose must hear how it ended. A push for nothing found tells Rose to try different words instead of waiting.
-Rejected: a push only for new options (Rose waits after an empty result), no push (Rose already heard "Sam said no", and may not open the page again).
-Source: docs/specs/sam-finds-another.md
-Status: active
-
-## D115 · 2026-10-23 · Rose or Sam gets one Find another for each empty Find, No or untick, shared, and each one counts as a Find
-
-Why: one try with other words gives Rose new options without a loop of empty searches. Rose's and Sam's pages read the same `againOf` rule, so whoever taps first uses it. It sends the same Claude and Channel3 calls as a Find, so it counts toward the tapper's address's 20 a day (D73) and on `/status` (D78).
-Rejected: one each for Rose and Sam (two searches for one No, and KinCart must keep who tapped), taps until the daily limit, each with untried words (a loop of empty results, and KinCart must keep every tried query), a Find another that runs free (a script could tap it past the daily limit).
-Supersedes: D97
-Source: docs/specs/sam-finds-another.md
-Status: active
-
-## D116 · 2026-10-23 · Rose's page says when Sam asked KinCart to look again
-
-Why: Sam's tap changes Rose's page while Rose didn't tap anything. An older shopper needs to see why new options appeared, and Rose's push may be off. A `by_sam` flag on `rose_search` keeps it through the 3 s redraw (D19), as `tried` does.
-Rejected: the same "Looked again with other words." line as Rose's own tap (no data change, but Rose learns it was Sam only from the push).
-Source: docs/specs/sam-finds-another.md
-Status: active
+Recorded as D113, D114, D115, D116.
 
 ## Open items
 
