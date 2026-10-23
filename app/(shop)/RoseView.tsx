@@ -261,12 +261,20 @@ export function RoseView({
 
   // The page comes back scrolled to the top after Ask Sam, so its notices go at the top.
   if (state.kind === "options") {
+    // Listings over Sam's limit show only when nothing fits under it (D110), so every one is over.
+    const overLimit = state.listings.every(({ cents }) => cents > state.limitCents);
     return (
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick one first.</Notice>}
         <LastNotice last={state.last} listings={state.listings} limitCents={state.limitCents} />
         <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
         <BlankNotice blankPhotos={state.blankPhotos} />
+        {overLimit && (
+          <Notice tone="neutral">
+            {state.tried ? "Still nothing" : "Nothing"} under {wholeDollars(state.limitCents)} for that. These cost a
+            little more, and {HELPER} sees the price before saying OK.
+          </Notice>
+        )}
         <div className="heading">
           <h1 id={headingId}>Which one would you like?</h1>
           <p className="small">
@@ -275,6 +283,7 @@ export function RoseView({
             {state.tried && ". Looked again with other words"}
             {state.last && ". Today's prices for what you bought before"}
             {state.listings.length < 3 &&
+              !overLimit &&
               `. Only ${state.listings.length} found at ${wholeDollars(state.limitCents)} or less`}
             .
           </p>
@@ -285,12 +294,16 @@ export function RoseView({
             labelledBy={headingId}
             picked={state.picked}
             bought={boughtOf(state.last, state.listings)}
+            limitCents={state.limitCents}
           />
           <TotalLine totalCents={state.totalCents} />
           <Button type="submit" busy={state.busy} busyLabel={`Asking ${HELPER}…`}>
             Ask {HELPER}
           </Button>
         </form>
+        {!state.busy && (
+          <AnotherForm action={findAnother} hint={overLimit && !state.tried ? "KinCart tries other words for you." : undefined} />
+        )}
         {!state.busy && (
           <form action={tryAgain}>
             <Button type="submit" kind="secondary">
@@ -418,6 +431,7 @@ function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupPro
       {group.problem === "over limit" && (
         <Notice tone="neutral">
           {group.tried ? "Still nothing" : "Nothing"} under {wholeDollars(limitCents)} for this one.
+          {group.options.length > 0 && ` These cost a little more, and ${HELPER} sees the price before saying OK.`}
         </Notice>
       )}
       {group.problem && !group.tried && (
@@ -440,6 +454,7 @@ function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupPro
           picked={picked}
           none="None of these"
           bought={boughtOf(group.last, group.options)}
+          limitCents={limitCents}
         />
       )}
     </section>

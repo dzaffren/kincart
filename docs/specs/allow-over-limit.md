@@ -63,10 +63,10 @@ Scenario: Sam's OK pays a listing over the limit
   Then Rose's saved PayPal pays $23.89, and both receipts show it as today
 
 Scenario: One thing in a basket is over the limit
-  Given Sam's limit is $50
-  And Rose's Find for "AA batteries, a folding shower chair" shows 3 AA battery options
-  And nothing fits under $50 for the shower chair
-  Then the shower chair group shows "Folding Bath Seat Bench Shower Chair" at $64.99 from bestbuy.com, marked over Sam's $50 limit
+  Given Sam's limit is $30
+  And Rose's Find for "AA batteries, a folding shower chair" shows AA battery options
+  And nothing fits under $30 for the shower chair
+  Then the shower chair group shows "Folding Bath Seat Bench Shower Chair" at $44.99 from bestbuy.com, marked $14.99 over Sam's $30 limit
   And the AA batteries group shows its options as today
   And Rose can pick one in each group and tap Ask Sam once
   And Sam's page marks only the shower chair's line as over the limit
@@ -85,7 +85,7 @@ Scenario: Sam's total limit still stops the ask
   Then the ask doesn't reach Sam, and Rose sees the total limit notice, as today (D34)
 ```
 
-The canes and the $44.99 shower chair are real Channel3 listings from 2026-10-23. Scenario 3's $64.99 price is made up to sit over a $50 limit. `/build` swaps the examples for listings it finds then.
+The canes and the $44.99 shower chair are real Channel3 listings from 2026-10-23. `/build` swaps the examples for listings it finds then.
 
 ## Scope
 
@@ -104,6 +104,40 @@ The canes and the $44.99 shower chair are real Channel3 listings from 2026-10-23
 - A different push for an ask over the limit. The push says what it says today. No later slice.
 - Sam's own Find another, and who picks after it. `sam-finds-another` picks these up.
 
+## Interface
+
+Rose's and Sam's pages each get one line on a listing over the limit, and one notice. Every piece comes from the design system: no new component, class or token.
+
+```mermaid
+flowchart LR
+    F["Rose: Find"] -- "nothing under $20, fits up to $40" --> O["Rose: notice, 3 canes marked over $20,<br/>Ask Sam, Find another"]
+    F -- "nothing up to $40" --> N["Rose: Nothing under $20 for that, as today"]
+    O -- "Find another, still over" --> T["Rose: Still nothing under $20, the canes again,<br/>no Find another"]
+    O -- "picks the $23.89 cane, Ask Sam" --> S["Sam: This is $3.89 over your $20 limit"]
+    O -- "over Sam's total limit" --> X["Rose: total limit notice, as today"]
+```
+
+Rose sees the dearer options with a notice and a mark on each, and Sam sees how far over the limit the ask is before tapping OK.
+
+| Where | What it says |
+| ----- | ------------ |
+| Rose, one thing, on top | "Nothing under $20 for that. These cost a little more, and Sam sees the price before saying OK." After Find another: "Still nothing under $20 for that." and the same second sentence |
+| Rose, a basket group | Under the group's heading: "Nothing under $30 for this one. These cost a little more, and Sam sees the price before saying OK." The group keeps its Find another and None of these |
+| Rose, each listing over the limit | Under its price, in bold: "$3.89 over Sam's $20 limit." |
+| Rose, one thing, under the options | Find another, with "KinCart tries other words for you.", until it has run once. Try other words stays, as on every options screen |
+| Sam, one thing, on top | "This is $3.89 over your $20 limit." |
+| Sam, a basket line | Under its price, in bold: "$14.99 over your $30 limit." |
+
+The marks compare the price with Sam's limit on each redraw. When Sam raises the limit past a price, that listing's mark goes, as Ask again's notice does (D103). The heading's "Only 2 found at $20 or less" line is left out when every option is over the limit.
+
+**Motion tier:** 1, as before (O5). Nothing new moves: the notices rise and fade like every notice, and Ask Sam turns the existing spinner. Under reduced motion, nothing moves.
+
+**Components used:** `Notice` (`neutral`), `ListingPicker` (with a new `limitCents` prop that adds one line), `BasketAnswer` (with a new `limitCents` prop that adds one line), `Summary`, `Button` (secondary), `AnotherForm`, `.heading`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
+
+**Built at pause 2:** `ListingPicker` and `BasketAnswer` take `limitCents`. Rose's options screen and basket groups pass it, show the notice, and offer Find another on an over-limit options screen. Sam's request state takes `limitCents` and shows the notice.
+
+**Preview:** `/preview/allow-over-limit` on `pnpm dev`, from `app/(shop)/preview/allow-over-limit/page.tsx`. It shows Rose's and Sam's real pages in 12 frames, one or more for each scenario.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -112,6 +146,8 @@ The canes and the $44.99 shower chair are real Channel3 listings from 2026-10-23
 | O2 | When Rose sees listings over the limit: straight after any search that finds nothing under it, or only after Find another also finds nothing, as D84 says | question | spec p1 | user | Resolved | Straight after any search that finds nothing under the limit, and Find another stays on the screen. Other words fixed 0 of 9 over-limit runs (find-another O10). D84 changes (D110). 2026-10-23 |
 | O3 | Which listings over the limit Rose sees, how many, and in what order | question | spec p1 | user | Resolved | Up to 3 that the pick step says are the thing, cheapest first. 2026-10-23 |
 | O4 | How far over Sam's limit a listing can be. For "a folding shower chair" at a $30 limit, the fits run $44.99, $90.99 and more | question | spec p1 | user | Resolved | Up to double Sam's limit. For a $30 limit, nothing above $60. 2026-10-23 |
+| O5 | Which motion tier the slice uses. The new notices rise and fade like every notice, and nothing else moves | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-23 |
+| O6 | Rose's one-thing screen over the limit shows Find another and Try other words, both under Ask Sam | question | spec p2 | user | Resolved | Keep both. Try other words stays, as on every options screen. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
