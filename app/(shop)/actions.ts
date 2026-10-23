@@ -6,6 +6,7 @@ import {
   find as findOptions,
   findAgain,
   findPhoto,
+  findRebuy,
   groupOf,
   searchOn,
   type Group,
@@ -30,6 +31,7 @@ import {
   getTotal,
   getVault,
   latest,
+  paidAsk,
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
@@ -39,7 +41,7 @@ import {
 } from "../../lib/shop/requests";
 import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
-import { againOf } from "./state";
+import { againOf, rebuyOf } from "./state";
 
 // Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44). One address
 // starts 5 a day at most, and a stopped one keeps this browser's own household.
@@ -168,6 +170,30 @@ export async function findAnother(token: string, formData: FormData): Promise<vo
   }
   await countUse({ finds: 1, searches: sent.searches });
   redirect(back ? `/r/${token}?${back}` : `/r/${token}`);
+}
+
+// Searches again what Sam paid for in one of Rose's asks, found in Neon by its id for Rose's household only
+// (D23, D102). It counts as a Find (D106), and a stopped one saves nothing and stays on the ask screen.
+export async function rebuy(token: string, formData: FormData): Promise<void> {
+  const who = await whoIs(token);
+  if (who?.person !== "rose" || !searchOn()) return;
+  const { household } = who;
+  const [paid, request] = await Promise.all([paidAsk(household, Number(formData.get("request"))), latest(household)]);
+  const open = request?.status === "waiting" || request?.status === "paying";
+  const again = paid && !open ? rebuyOf(paid) : null;
+  if (!again) redirect(`/r/${token}`);
+
+  const stopped = await takeUse("find", await addressKey(), FINDS_A_DAY);
+  if (stopped) {
+    await countUse({ stoppedFinds: 1 });
+    console.log(`limit kind=find status=stopped wait=${minutesUntil(stopped.getTime())}`);
+    redirect(`/r/${token}?ask=1&find=limit&until=${stopped.getTime()}`);
+  }
+
+  const sent: Sent = { searches: 0, checked: 0, unloaded: 0 };
+  await saveSearch(household, again.words, await findRebuy(again.words, again.things, await getLimit(household), sent));
+  await countUse({ finds: 1, searches: sent.searches });
+  redirect(`/r/${token}`);
 }
 
 export async function tryAgain(token: string): Promise<void> {

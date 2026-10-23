@@ -27,6 +27,7 @@ import {
   askSam,
   find,
   findAnother,
+  rebuy,
   setLimit,
   setTotal,
   skipLink,
@@ -991,7 +992,7 @@ function stubAgainServices(listings: (typeof aa24)[]) {
         ? { query: `${JSON.parse(content.split("\n")[0].slice("They want: ".length))} in other words` }
         : {
             picks: content
-              .flatMap((block: { text?: string }) => block.text?.match(/^Listing (\S+):/)?.[1] ?? [])
+              .flatMap((block: { text?: string }) => block.text?.match(/^Listing (\S+?)[: ]/)?.[1] ?? [])
               .map((id: string) => ({ id, what: "What it is.", why: "Why it fits.", watch: "Good to know." })),
             aboveLimit: false,
           };
@@ -1267,4 +1268,129 @@ it("won't find another from Sam's link, or while search is off", async () => {
 
   expect(fetch).not.toHaveBeenCalled();
   expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", tried: false });
+});
+
+// Sam's OK, without a charge: claim() keeps the ticked lines, and the charge is recorded as paid.
+async function paidFor(ticked: string[] = []): Promise<number> {
+  const { id } = (await latest(owner))!;
+  await claim(owner, id, ticked);
+  await record(id, { state: "paid", orderId: "5O190127TN364715T", captureId: "7BM91101S1572292D" });
+  return id;
+}
+
+// What each Channel3 search asked for, with a filter or without.
+const searchedFor = (fetch: ReturnType<typeof stubAgainServices>) =>
+  fetch.mock.calls
+    .filter(([url]) => String(url).includes("api.trychannel3.com"))
+    .map(([, init]) => JSON.parse(String(init?.body)))
+    .map(({ query, filters }) => (filters ? `${query} under $${filters.price.max_price}` : query));
+
+it("asks again for what Sam paid for, with last time's query and its listing's name, keeps that listing, and counts a Find", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, slippers, { outcome: "options", options: [strap], query: "warm slip-on slippers size 8" });
+  await redirectOf(askSam(rose, form({ listing: strap.id })));
+  const id = await paidFor();
+  const services = stubAgainServices([isotoner, strap]);
+
+  expect(await redirectOf(rebuy(rose, form({ request: String(id) })))).toBe(`/r/${rose}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: slippers,
+    outcome: "options",
+    options: [{ id: strap.id }, { id: isotoner.id }],
+    query: "warm slip-on slippers size 8",
+    tried: false,
+    last: { id: strap.id, cents: 3250, shop: "amazon.com" },
+  });
+  expect(searchedFor(services)).toEqual([
+    "warm slip-on slippers size 8 under $50",
+    "warm slip-on slippers size 8",
+    strap.name,
+  ]);
+  expect(await usesFrom("203.0.113.7", "find")).toBe(1);
+  expect(await usedToday()).toEqual({ finds: 1, searches: 3, stopped_finds: 0, stopped_households: 0 });
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=options listings=2 searches=3 .* rebuy=1 same=1\/1$/));
+});
+
+it("asks again only for what Sam paid for in a basket, and leaves out what Sam left out", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveSearch(owner, "AA batteries, a night light", {
+    outcome: "basket",
+    groups: [
+      { thing: "AA batteries", options: [aa24], query: "AA alkaline batteries" },
+      { thing: "a night light", options: [plugLight], query: "plug-in night light" },
+    ],
+  });
+  await redirectOf(askSam(rose, form({ "pick-0": aa24.id, "pick-1": plugLight.id })));
+  const id = await paidFor([aa24.id]);
+  const services = stubAgainServices([aa24, anker]);
+
+  expect(await redirectOf(rebuy(rose, form({ request: String(id) })))).toBe(`/r/${rose}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: "AA batteries",
+    outcome: "options",
+    options: [{ id: aa24.id }, { id: anker.id }],
+    last: { id: aa24.id, cents: aa24.cents, shop: aa24.shop },
+  });
+  expect(searchedFor(services)).toEqual(["AA alkaline batteries under $50", "AA alkaline batteries", aa24.name]);
+});
+
+it("searches nothing for another household's ask, one Sam didn't pay for, or while an ask is open", async () => {
+  searchOn();
+  const ben = await startHousehold(hashOf("ben-rose-link-7Qx2"), hashOf("ben-sam-link-9Lm4"));
+  await ask(ben, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  const { id: bens } = (await latest(ben))!;
+  await claim(ben, bens);
+  await record(bens, { state: "paid", orderId: "5O190127TN364715T", captureId: "7BM91101S1572292D" });
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  const { id: refused } = (await latest(owner))!;
+  await decline(owner, refused);
+
+  expect(await redirectOf(rebuy(rose, form({ request: String(bens) })))).toBe(`/r/${rose}`);
+  expect(await redirectOf(rebuy(rose, form({ request: String(refused) })))).toBe(`/r/${rose}`);
+  expect(await redirectOf(rebuy(rose, form({ request: "a night light" })))).toBe(`/r/${rose}`);
+  expect(await redirectOf(rebuy(rose, form({})))).toBe(`/r/${rose}`);
+
+  await ask(owner, aa24, { shop: aa24.shop, url: aa24.url, reason: aa24.why });
+  const paid = await paidFor();
+  await ask(owner, strap, { shop: strap.shop, url: strap.url, reason: strap.why });
+  expect(await redirectOf(rebuy(rose, form({ request: String(paid) })))).toBe(`/r/${rose}`);
+
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toBeNull();
+  expect(await usesFrom("203.0.113.7", "find")).toBe(0);
+});
+
+it("stops an Ask again past 20 Finds, saves nothing, counts a stopped Find, and keeps Rose on the ask screen", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+  await ask(owner, aa24, { shop: aa24.shop, url: aa24.url, reason: aa24.why });
+  const id = await paidFor();
+
+  const to = await redirectOf(rebuy(rose, form({ request: String(id) })));
+
+  const until = Number(new URL(to, "https://kincart.vercel.app").searchParams.get("until"));
+  expect(to).toBe(`/r/${rose}?ask=1&find=limit&until=${until}`);
+  expect(until - Date.now()).toBeGreaterThan(3 * 60 * 60 * 1000 - 5000);
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toBeNull();
+  expect(await usedToday()).toEqual({ finds: 0, searches: 0, stopped_finds: 1, stopped_households: 0 });
+  expect(console.log).toHaveBeenCalledWith("limit kind=find status=stopped wait=180");
+});
+
+it("won't ask again from Sam's link, or while search is off", async () => {
+  searchOn();
+  await ask(owner, aa24, { shop: aa24.shop, url: aa24.url, reason: aa24.why });
+  const id = await paidFor();
+
+  await expect(rebuy(sam, form({ request: String(id) }))).resolves.toBeUndefined();
+  vi.stubEnv("ADDRESS_KEY", "");
+  await expect(rebuy(rose, form({ request: String(id) }))).resolves.toBeUndefined();
+
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toBeNull();
 });
