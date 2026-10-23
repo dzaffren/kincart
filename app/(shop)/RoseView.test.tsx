@@ -338,3 +338,86 @@ it("puts the day's limit notice on the basket and the receipt, and keeps an empt
   expect(declined).toMatch(findAnother("KinCart looks again with other words, without the one Sam said no to."));
   expect(declined.match(/a lot of Finds/g)).toHaveLength(1);
 });
+
+const energizer = { ...listing("prod_4En8aA", "Energizer MAX AA Batteries, 8 Pack", 899), shop: "walmart.com" };
+const anker = listing("prod_2Ak5cH", "Anker 312 USB C Charger, 20W", 1599);
+const bought = [
+  { id: 41, item: energizer, paidAt: new Date("2026-10-22T10:16:00Z") },
+  {
+    id: 38,
+    item: { id: "basket", name: "2 things", cents: 2498 },
+    lines: [line("AA batteries", energizer), line("a phone charger", anker)],
+    paidAt: new Date("2026-10-21T16:02:00Z"),
+  },
+];
+const withRebuy = (state: RoseState) =>
+  renderToStaticMarkup(<RoseView state={state} items={[]} findAnother={async () => {}} rebuy={async () => {}} />);
+
+it("lists Bought before under Find, each paid ask in a card of its own with its own Ask again, and none before a paid ask", () => {
+  const html = withRebuy({ kind: "ask", limitCents: 2000, bought });
+
+  expect(html).toMatch(/Nothing is paid until Sam says OK\.<\/p><section class="stack"[^>]*><div class="heading"><h2[^>]*>Bought before<\/h2>/);
+  expect(html).toContain("Ask again looks for the same things at today&#x27;s prices.");
+  const forms = [...html.matchAll(/<form class="stack"[^>]*><input type="hidden" name="request" value="(\d+)"\/>(.*?)<\/form>/g)];
+  expect(forms.map(([, id]) => id)).toEqual(["41", "38"]);
+  expect(forms[0][2]).toMatch(/<li><span>Energizer MAX AA Batteries, 8 Pack<\/span><span class="line-price">\$8\.99<\/span><\/li>/);
+  expect(forms[0][2]).not.toContain("summary-title");
+  expect(forms[1][2]).toContain('<p class="summary-title">2 things</p>');
+  expect(forms[1][2]).toContain("Anker 312 USB C Charger, 20W");
+  expect(forms.every(([, , card]) => /Paid <time[^>]*><\/time>.*<button[^>]*>Ask again<\/button>/.test(card))).toBe(true);
+
+  expect(withRebuy({ kind: "ask", limitCents: 2000 })).not.toContain("Bought before");
+});
+
+it("marks last time's listing, and says the price, the shop or both changed, or that neither did", () => {
+  const options = (cents: number, shop: string) =>
+    withRebuy({
+      kind: "options",
+      limitCents: 2000,
+      words: "AA batteries",
+      listings: [{ ...energizer, cents, shop }, aa24, aa16],
+      picked: energizer.id,
+      last: { id: energizer.id, cents: 899, shop: "walmart.com" },
+    });
+  const mark = (change: string) => `<span><strong>You bought this last time.</strong> ${change}</span>`;
+
+  expect(options(899, "walmart.com")).toContain(mark("Same price as last time."));
+  expect(options(949, "walmart.com")).toContain(mark("Now $9.49. It was $8.99."));
+  expect(options(899, "target.com")).toContain(mark("Now from target.com. It was from walmart.com."));
+  expect(options(949, "target.com")).toContain(mark("Now $9.49 from target.com. It was $8.99 from walmart.com."));
+  expect(options(899, "walmart.com")).toContain("For “AA batteries”. Today&#x27;s prices for what you bought before.</p>");
+  expect(options(899, "walmart.com").match(/You bought this last time/g)).toHaveLength(1);
+  expect(withRebuy({ kind: "options", limitCents: 2000, words: "AA batteries", listings: [aa24] })).not.toMatch(
+    /last time|what you bought before/,
+  );
+});
+
+it("says when last time's listing is over Sam's limit now, or wasn't found today, and not for a group that found nothing", () => {
+  const options = (nowCents?: number) =>
+    withRebuy({
+      kind: "options",
+      limitCents: 800,
+      words: "AA batteries",
+      listings: [aa24],
+      last: { id: energizer.id, cents: 899, shop: "walmart.com", nowCents },
+    });
+  expect(options(949)).toMatch(/^<div class="screen"><p class="notice"[^>]*>The one you bought last time is \$9\.49 now, over Sam&#x27;s \$8 limit\.<\/p>/);
+  expect(options()).toMatch(/^<div class="screen"><p class="notice"[^>]*>Couldn&#x27;t find the one you bought last time today\.<\/p>/);
+  expect(options()).not.toContain("<strong>You bought this last time.</strong>");
+
+  const basket = withRebuy({
+    kind: "basket",
+    limitCents: 2000,
+    words: "AA batteries and a phone charger",
+    groups: [
+      { thing: "AA batteries", options: [energizer, aa24], last: { id: energizer.id, cents: 899, shop: "walmart.com" } },
+      { thing: "a phone charger", options: [belkin], last: { id: anker.id, cents: 1599, shop: "amazon.com" } },
+      { thing: "a night light", options: [], problem: "nothing found", last: { id: "prod_6Nl2tL", cents: 1249, shop: "target.com" } },
+    ],
+    picked: [energizer.id, undefined, undefined],
+  });
+  expect(basket).toContain("For “AA batteries and a phone charger”. Today&#x27;s prices for what you bought before. Pick one for each");
+  expect(basket).toMatch(/<h2[^>]*>a phone charger<\/h2><p class="notice"[^>]*>Couldn&#x27;t find the one you bought last time today\.<\/p>/);
+  expect(basket.match(/Couldn&#x27;t find the one you bought last time today/g)).toHaveLength(1);
+  expect(basket.match(/<strong>You bought this last time\.<\/strong> Same price as last time\./g)).toHaveLength(1);
+});
