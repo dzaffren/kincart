@@ -4,7 +4,8 @@
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** itemized-receipt
-**Page:** added at pause 3.
+**Page:** none. The slice stopped at pause 1.
+**Stopped:** 2026-10-23. Rose's saved PayPal pays only KinCart's account (O1, O2), so the user stopped the slice (O6, D108).
 
 Sam's OK pays each shop's own PayPal from Rose's saved PayPal, and the receipt names the shop. In sandbox, a stand-in business account plays each shop. It comes last in the after-review shape because it rests on two unproven PayPal claims (O1, O2).
 
@@ -129,6 +130,7 @@ Scenario: A thing with no shop pays KinCart's sandbox shop, as today
 | O3 | In sandbox, a stand-in business account plays each shop. Nothing ships, and the listing's real shop never sees the order (from shape O5) | flag | shape | user | Resolved | Accept it. The receipt names each shop and says "Paid to each shop's sandbox stand-in. In this demo, no order reaches the shops." A one-thing receipt says "Paid to amazon.com's sandbox stand-in." 2026-10-23 |
 | O4 | Which stand-in account a listing's shop pays. The recorded set has 39 shops in 116 listings, and a basket holds up to 5 things (`MOST_THINGS`, `lib/shop/find.ts:43`) | question | spec p1 | user | Resolved | A pool of 5 sandbox business accounts, made by hand. In each charge, the first shop pays stand-in 1, the next shop pays stand-in 2, and so on. No two shops in a basket share one. 2026-10-23 |
 | O5 | What happens when one shop's payment fails and another shop's goes through | question | spec p1 | user | Resolved | Keep what paid. The failed shop's things go back to Rose as left out, with one Find another (D97). Both receipts name the shop whose payment didn't go through. 2026-10-23 |
+| O6 | How Sam's OK pays a shop, now that Rose's saved PayPal pays only KinCart's account (O1, O2) | question | spec p1 | user | Resolved | Stop the slice. The money keeps going to KinCart's sandbox account, as the receipt says. Paying each shop needs PayPal's marketplace setup (D108). 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

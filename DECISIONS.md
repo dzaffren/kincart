@@ -553,7 +553,7 @@ Status: active
 Why: today the charge lands in KinCart's sandbox account and no order reaches the shop, so a judge asks who the merchant is. Paying the shop keeps refunds, returns and fraud with the shop. Two PayPal claims are unproven (after-review O3, O4).
 Rejected: KinCart buys for Rose as a reseller (refunds, returns and fraud become KinCart's), no build and a pitch to PayPal only (the review's worst gap stays).
 Source: docs/specs/after-review/shape.md
-Status: active
+Status: superseded by D108
 
 ## D83 · 2026-10-22 · A person approves every buy, and the AI only does more legwork
 
@@ -729,4 +729,12 @@ Status: active
 Why: the mark and the change line must survive the 3 s redraw (D19) and a reopened link, so they live in Neon with the search (D23). A basket's groups are jsonb already.
 Rejected: the page address, as D36 does for over-limit picks (a reopened link loses it, as D100 found for `tried`), only the paid ask's id in `rose_search` (today's price over the limit must be kept too).
 Source: docs/specs/ask-again.md
+Status: active
+
+## D108 · 2026-10-23 · Sam's OK keeps paying KinCart's sandbox account, because a saved PayPal can't pay the shop
+
+Why: the pay-the-shop spike charged Rose's saved PayPal with a stand-in shop as payee, and PayPal answered `422 BILLING_AGREEMENT_NOT_FOUND`. The same call to KinCart's own account completed. One order with two payees gave `500` three times. A real product pays each shop through PayPal's marketplace setup, never as a reseller, as D82 said.
+Rejected: Rose approves each shop's payment on PayPal after Sam's OK (Sam's one OK no longer pays), a spike of PayPal's marketplace setup in sandbox (a Platform app, each shop signed up, Rose links again, and a possible manual review).
+Supersedes: D82
+Source: docs/specs/pay-the-shop.md
 Status: active
