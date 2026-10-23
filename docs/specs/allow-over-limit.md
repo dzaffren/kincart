@@ -273,37 +273,7 @@ Single chunk. It changes about 60 lines of app code beyond pause 2's, and its un
 
 ### Decisions to record
 
-```
-## D109 · 2026-10-23 · Sam's OK is the allow: Rose asks for a listing over the limit like any other, and Sam's page says how far over it is
-
-Why: Sam already approves every buy (D83), so one OK covers the price too.
-Rejected: Sam allows the listing first, then Rose asks and Sam taps OK (Sam answers twice for one thing).
-Source: docs/specs/allow-over-limit.md
-Status: active
-
-## D110 · 2026-10-23 · Find another tries other words when Rose or Sam taps it, and a search that finds nothing under Sam's limit shows listings over it straight away
-
-Why: in find-another's /build, other words found the right thing under the limit in 0 of 9 runs on 3 real over-limit asks. Waiting for Find another cost Rose 10 to 15 s and one of 20 daily Finds. Find another stays one control for an empty search, a No and an untick, and runs only on a tap.
-Rejected: listings over the limit only after Find another also finds nothing (D84's order, a wasted Find), a scheduled search that pings Rose later (Vercel Hobby runs crons once a day), other words only (a low limit still finds nothing), a separate slice each for a swap after a No and for keep looking (two controls for one job).
-Supersedes: D84
-Source: docs/specs/allow-over-limit.md
-Status: active
-
-## D111 · 2026-10-23 · Rose sees up to 3 listings over the limit that the pick step says fit, cheapest first, and none above double Sam's limit
-
-Why: closest to the limit first, and a ceiling at double, keep the options near what Sam meant to spend. For a folding shower chair at a $30 limit, Rose sees the $44.99 chair and not the $90.99 one. In Ask again, last time's listing still comes first and picked (D104), because Sam approved it once.
-Rejected: only the cheapest (no choice for Rose), the pick step's order (the first can cost far more than the next), no ceiling (Rose may ask for a $90.99 chair on a $30 limit), $20 over the limit (the same step for a $5 limit and a $500 one), strictly cheapest first in Ask again too (last time's listing could land last and unpicked).
-Source: docs/specs/allow-over-limit.md
-Status: active
-
-## D112 · 2026-10-23 · A second pick call checks the 5 cheapest listings up to double Sam's limit, with photos, only when the first finds nothing under the limit and says one above fits
-
-Why: Rose can now pick a listing over the limit, so its photo must pass the pick step (D89). The first call and its prompt stay as the recorded set tests them (D90). In the allow-over-limit /poc, one thing took 5.8 to 14.9 s and five took 12.9 to 15.7 s, inside D91. The second call took 5.1 to 6.3 s with 8 photos and 2.8 to 3.6 s with 5. D92 still holds for the first call: each listing under the limit goes with its photo, those above as names only, and KinCart sends the bytes because the API refuses Channel3's photo URLs.
-Rejected: one call with photos for listings above the limit too (up to 10 more photos on almost every Find, and a new prompt for the recorded set), every listing up to double the limit (8 photos took a one-thing Find to 14.9 s), photo URLs in the request (the API refuses them), a third call that checks the 3 picks' photos on every Find (one more call in a row, as D92 found).
-Supersedes: D92
-Source: docs/specs/allow-over-limit.md
-Status: active
-```
+Recorded as D109, D110, D111, D112.
 
 ## Open items
 
