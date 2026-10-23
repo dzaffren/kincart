@@ -324,49 +324,7 @@ Chunk A owns the shared types: `Last`, `Group`, `Single`, `Rebuy` and `SavedSear
 
 ### Decisions to record
 
-Drafted at pause 3. `/build` appends them to `DECISIONS.md`.
-
-## D102 · 2026-10-23 · Bought before lists Sam's 3 newest paid asks, the same listings once, and Ask again repeats only what Sam paid for
-
-Why: older shoppers rebuy what Sam approved before. Three cards fit under Find on a phone. A No already offers Find another (D97), and a left-out thing has it on the receipt.
-Rejected: refused and failed asks too (Find another covers a No), every paid ask (household 1 has dozens from judges and CI), the whole basket with its left-out things (Sam never bought them).
-Source: docs/specs/ask-again.md
-Status: active
-
-## D103 · 2026-10-23 · Code, not Haiku, says what changed about last time's listing: its price, its shop, over the limit now, or not found
-
-Why: a price and a shop compare exactly in code. Haiku could word a price wrong, and its sentence is harder to test.
-Rejected: Haiku writes what changed (it can be wrong), the price only (a new shop or a missing listing goes unsaid).
-Source: docs/specs/ask-again.md
-Status: active
-
-## D104 · 2026-10-23 · Last time's listing goes to the pick call labelled as bought last time, and comes first and picked when the pick step keeps it
-
-Why: Sam approved it once, so Rose taps Ask again, then Ask Sam. D89 stands: a listing whose photo shows something else never reaches Rose, also when Sam paid for it before the photo check.
-Rejected: only where the pick step ranks it (Rose must find it), show it first with last time's words and no pick step (it supersedes D89 for asks paid before Oct 22), every option unpicked (one more tap for the usual rebuy).
-Source: docs/specs/ask-again.md
-Status: active
-
-## D105 · 2026-10-23 · Ask again searches last time's query, and adds one unfiltered search by last time's listing name to find that listing
-
-Why: a /poc on 2026-10-23 found that, a day later, the query alone returned 8 of 14 listings by id, and one search by name returned 13 of 13. Ids held. The search runs at the same time as the other two.
-Rejected: the query alone (it misses about 4 in 10), the listing name in place of the query (the other options become the same product from other shops), a lookup by product id (no Channel3 endpoint for it was checked).
-Source: docs/specs/ask-again.md
-Status: active
-
-## D106 · 2026-10-23 · Each Ask again counts as a Find, and one that finds nothing offers one Find another
-
-Why: it sends Channel3 and Haiku calls as a Find does, so it counts toward the address's 20 a day (D73) and on `/status` (D78), as D97 says for Find another.
-Rejected: a free Ask again (a script could rebuy past the daily limit), no Find another after an empty one (Rose must think of other words alone).
-Source: docs/specs/ask-again.md
-Status: active
-
-## D107 · 2026-10-23 · A one-thing rebuy keeps last time's listing in a new rose_search.last jsonb column, and a basket keeps it in each group
-
-Why: the mark and the change line must survive the 3 s redraw (D19) and a reopened link, so they live in Neon with the search (D23). A basket's groups are jsonb already.
-Rejected: the page address, as D36 does for over-limit picks (a reopened link loses it, as D100 found for `tried`), only the paid ask's id in `rose_search` (today's price over the limit must be kept too).
-Source: docs/specs/ask-again.md
-Status: active
+Recorded as D102, D103, D104, D105, D106, D107.
 
 ## Open items
 
