@@ -40,6 +40,7 @@ Used by older shoppers and the relative who helps them pay online.
 - When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused.
 - Rose taps Ask again next to something Sam paid for before. KinCart finds today's listings for the same things, puts the one Rose bought last time first, and says what changed.
 - When nothing fits under Sam's price limit, Rose sees the nearest listings over it, and Sam's OK pays one. Sam sees how far over the limit it is first.
+- Every KinCart page tells the browser to refuse a frame from another site, and to send no page address to other sites. The home page's own phones still show Rose's and Sam's pages.
 
 ## Docs
 

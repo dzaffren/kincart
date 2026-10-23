@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-23 by /ship allow-over-limit
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-23 by /ship security-headers
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -52,6 +52,7 @@ Used by older shoppers and the relative who helps them pay online.
 | find-another | Shipped | When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused. | docs/specs/find-another.md |
 | ask-again | Shipped | Rose taps Ask again next to something Sam paid for before. KinCart finds today's listings for the same things, puts the one Rose bought last time first, and says what changed. | docs/specs/ask-again.md |
 | allow-over-limit | Shipped | When nothing fits under Sam's price limit, Rose sees the nearest listings over it, and Sam's OK pays one. Sam sees how far over the limit it is first. | docs/specs/allow-over-limit.md |
+| security-headers | Shipped | Every KinCart page tells the browser to refuse a frame from another site, and to send no page address to other sites. The home page's own phones still show Rose's and Sam's pages. | docs/specs/security-headers.md |
 
 ## More
 

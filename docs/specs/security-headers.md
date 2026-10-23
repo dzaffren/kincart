@@ -1,6 +1,6 @@
 # Security headers
 
-**Version:** v1 · **Status:** Built · **Type:** Technical · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Technical · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** None
