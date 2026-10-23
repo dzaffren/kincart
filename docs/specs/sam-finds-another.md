@@ -345,6 +345,7 @@ _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
+- **Backfill** — filling a new column from the data already there, before the code reads it. This slice has none.
 - **Channel3** — the hackathon sponsor whose API returns real product listings.
 - **Untick** — Sam clears a thing's box in a basket, so Sam's OK doesn't pay for it.
 - **Push** — a phone notification from a web page, sent while the page is closed.
