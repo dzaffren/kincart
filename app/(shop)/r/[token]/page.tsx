@@ -8,8 +8,8 @@ import { settleStuck } from "../../../../lib/shop/pay";
 import { demoLogin } from "../../../../lib/shop/paypal";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
-import { getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
-import { askSam, find, findAnother, skipLink, startLink, tryAgain } from "../../actions";
+import { boughtBefore, getLimit, getSearch, getTotal, getVault, latest } from "../../../../lib/shop/requests";
+import { askSam, find, findAnother, rebuy, skipLink, startLink, tryAgain } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -37,12 +37,13 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
   const settled = await settleStuck(household);
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
-  const [vault, request, saved, limitCents, totalCents] = await Promise.all([
+  const [vault, request, saved, limitCents, totalCents, bought] = await Promise.all([
     getVault(household),
     latest(household),
     on ? getSearch(household) : null,
     on ? getLimit(household) : 0,
     on ? getTotal(household) : null,
+    on ? boughtBefore(household) : [],
   ]);
   const state = roseState(
     vault,
@@ -58,7 +59,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
       over: typeof query.over === "string" ? query.over.split(",") : undefined,
       picked: typeof query.picked === "string" ? query.picked.split(",") : undefined,
     },
-    on ? { saved, limitCents, totalCents } : undefined,
+    on ? { saved, limitCents, totalCents, bought } : undefined,
   );
 
   return (
@@ -76,6 +77,7 @@ export default async function RosePage({ params, searchParams }: PageProps<"/r/[
           find={find.bind(null, token)}
           tryAgain={tryAgain.bind(null, token)}
           findAnother={findAnother.bind(null, token)}
+          rebuy={rebuy.bind(null, token)}
           notify={pushOn() ? <NotifyControl who="rose" token={token} publicKey={publicKey()} /> : undefined}
         />
         <Refresher />
