@@ -1,6 +1,6 @@
 # Ask again
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** find-another
@@ -319,7 +319,7 @@ Chunk A owns the shared types: `Last`, `Group`, `Single`, `Rebuy` and `SavedSear
 | The spike's gap was one day. Over weeks, Channel3 may change a listing's id, so Ask again says "Couldn't find the one you bought last time today." | `same=` in the log line shows it in prod. If it drops, match by exact name and shop too |
 | The pick step leaves out last time's listing, though it's the right thing, so the e2e fails | The `LAST` sentence asks for it first, and the recorded-set cases run it 3 times. A failure here is the signal O13 accepted |
 | An ask from before Oct 22 has no `queries`, so its rebuy searches the listing name, and the other options are mostly the same product | Accepted. Every ask since find-another keeps its query (D100) |
-| A third search and one more photo slow Find past D91's 15 s | They run at the same time as the other two searches. `/build` times 3 real rebuys and writes the numbers here |
+| A third search and one more photo slow Find past D91's 15 s | They run at the same time as the other two searches. `/build` times 3 real rebuys and writes the numbers here. **Measured by /build, 2026-10-23:** 8.8 s for AA batteries in the e2e, 9.3 s for a phone charger and 8.8 s for reading glasses +2.0, each a few minutes after its Find, and each with `same=1/1` |
 | The e2e makes one more sandbox charge each CI run | The approve-and-pay and itemized-receipt e2e do the same, on the saved e2e PayPal (D20) |
 
 ### Decisions to record

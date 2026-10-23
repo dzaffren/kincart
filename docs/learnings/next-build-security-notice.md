@@ -1,0 +1,9 @@
+# Run next build again when it stops on a security notice
+
+**Learned:** 2026-10-23 · **From:** /build ask-again
+
+On Next 16.4.0, `pnpm build` once failed with `SecurityFatalError: Your version of Next.js is affected by a known security vulnerability`. It stops one time to show an upgrade advice, and the same command passes when it runs again. The e2e's web server then failed to start, with only "Process from config.webServer was not able to start".
+
+Wrong: reading the e2e failure as a broken build, or running the upgrade it names in the middle of a slice.
+
+Right: run the e2e again. Tell the user about the upgrade advice, and let them decide on the Next.js upgrade apart from the slice.
