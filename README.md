@@ -39,6 +39,7 @@ Used by older shoppers and the relative who helps them pay online.
 - The home page cites a checked US survey under its claim: about 1 in 10 of 657 adults had signed in to someone's money or medical account with their login. Step 1 of How it works says Rose can send a photo.
 - When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused.
 - Rose taps Ask again next to something Sam paid for before. KinCart finds today's listings for the same things, puts the one Rose bought last time first, and says what changed.
+- When nothing fits under Sam's price limit, Rose sees the nearest listings over it, and Sam's OK pays one. Sam sees how far over the limit it is first.
 
 ## Docs
 

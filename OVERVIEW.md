@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-23 by /ship ask-again
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-23 by /ship allow-over-limit
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -51,6 +51,7 @@ Used by older shoppers and the relative who helps them pay online.
 | home-page-proof | Shipped | The home page cites a checked US survey under its claim: about 1 in 10 of 657 adults had signed in to someone's money or medical account with their login. Step 1 of How it works says Rose can send a photo. | docs/specs/home-page-proof.md |
 | find-another | Shipped | When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused. | docs/specs/find-another.md |
 | ask-again | Shipped | Rose taps Ask again next to something Sam paid for before. KinCart finds today's listings for the same things, puts the one Rose bought last time first, and says what changed. | docs/specs/ask-again.md |
+| allow-over-limit | Shipped | When nothing fits under Sam's price limit, Rose sees the nearest listings over it, and Sam's OK pays one. Sam sees how far over the limit it is first. | docs/specs/allow-over-limit.md |
 
 ## More
 
