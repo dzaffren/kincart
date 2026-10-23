@@ -192,7 +192,7 @@ it("labels the listing Rose bought last time, and asks Haiku to pick it first on
   await choose(words, [kohls, muji], [], "prod_4Fd6sW");
 
   const { system, messages } = sent(fetch).body;
-  expect(system).toMatch(/Then say whether any listing above their limit is the thing they asked for\. If a listing says they bought it last time, pick it first when it passes every check above\.$/);
+  expect(system).toMatch(/Then say whether any listing above their limit is the thing they asked for\. A listing that says they bought it last time gets no pass on the checks above: leave it out like any other when its photo or words fail them, and pick it first only when it passes every one\.$/);
   expect(messages[0].content.map(({ text }: { text?: string }) => text)).toEqual([
     `They asked: ${JSON.stringify(words)}\n\nUnder their price limit, pick from these:`,
     `Listing prod_7Hq2kZ: ${JSON.stringify({ name: kohls.name, details: kohls.details })}`,
