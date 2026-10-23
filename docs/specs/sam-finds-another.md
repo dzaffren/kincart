@@ -1,6 +1,6 @@
 # Sam finds another
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** find-another, allow-over-limit
@@ -311,6 +311,7 @@ Recorded as D113, D114, D115, D116.
 | O4 | Is the one Find another for each No shared by Rose and Sam, or does each get one | question | spec p1 | user | Resolved | Shared. Whoever taps first uses it (D115, which supersedes D97). 2026-10-23 |
 | O5 | What Rose's page says about options from Sam's tap | question | spec p2 | user | Resolved | It names Sam: "Sam asked KinCart to look again with other words." KinCart keeps who tapped with the search (D116). 2026-10-23 |
 | O6 | Rose and Sam tap Find another within the same 10 to 15 s: both search, both count a Find, and the last save wins | flag | spec p3 | user | Accepted risk | Rare, since both must tap within seconds. The cost is one extra Find and 2 Channel3 searches, and both results are valid. No guard. 2026-10-23 |
+| O7 | The e2e can't run: Channel3 answers `402` to every search (`find outcome=nothing-found ... reason=channel3 402`), so Rose's first Find finds nothing. find-another's e2e, on code this branch didn't change, fails the same way. `e2e/sam-finds-another.spec.ts` is written but has never passed. Every other test passes | question | build | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
