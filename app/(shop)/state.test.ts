@@ -98,6 +98,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   blankPhotos: 0,
   query: null,
   tried: false,
+  bySam: false,
   last: null,
   searchedAt,
 });

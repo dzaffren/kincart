@@ -73,6 +73,8 @@ export type SavedSearch = {
   // query is a one-thing search's shop query; a basket keeps one in each group. tried: Find another ran it.
   query: string | null;
   tried: boolean;
+  // Sam's Find another ran it, not Rose's (D116).
+  bySam: boolean;
   // A one-thing rebuy's listing from last time; a basket keeps one in each group (D107).
   last: Last | null;
   searchedAt: Date;
@@ -200,10 +202,11 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
     blank_photos: number;
     query: string | null;
     tried: boolean;
+    by_sam: boolean;
     last: Last | null;
     searched_at: Date;
   }>(
-    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last, searched_at FROM rose_search WHERE id = $1",
+    "SELECT words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, by_sam, last, searched_at FROM rose_search WHERE id = $1",
     [household],
   );
   const row = rows[0];
@@ -218,6 +221,7 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
         blankPhotos: row.blank_photos,
         query: row.query,
         tried: row.tried,
+        bySam: row.by_sam,
         last: row.last,
         searchedAt: row.searched_at,
       }
@@ -234,14 +238,15 @@ export async function saveSearch(
   photos = 0,
   blank = 0,
   tried = false,
+  bySam = false,
 ): Promise<void> {
   await query(
-    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last, by_sam)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
          from_photo = EXCLUDED.from_photo, photos = EXCLUDED.photos, blank_photos = EXCLUDED.blank_photos,
-         query = EXCLUDED.query, tried = EXCLUDED.tried, last = EXCLUDED.last, searched_at = now()`,
+         query = EXCLUDED.query, tried = EXCLUDED.tried, last = EXCLUDED.last, by_sam = EXCLUDED.by_sam, searched_at = now()`,
     [
       household,
       words,
@@ -254,6 +259,7 @@ export async function saveSearch(
       ("query" in result && result.query) || null,
       tried,
       "last" in result && result.last ? JSON.stringify(result.last) : null,
+      bySam,
     ],
   );
 }
