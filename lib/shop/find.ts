@@ -1,4 +1,4 @@
-import { choose, otherWords, readNeed, readPhoto, type Need, type PhotoNeed } from "./ai";
+import { choose, otherWords, readNeed, readPhoto, type Choice, type Need, type PhotoNeed } from "./ai";
 import { reasonOf } from "./paypal";
 import { searchListings, withPhotos, type Found, type Listing } from "./search";
 
@@ -14,7 +14,12 @@ export type Last = { id: string; cents: number; shop: string; nowCents?: number 
 // Find another avoids, and tried marks a group that Find another searched. last marks a group that Ask again searched.
 export type Group = { thing: string; options: Option[]; problem?: Problem; query?: string; tried?: boolean; last?: Last };
 
-type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string; last?: Last };
+// An over-limit search keeps the listings over Sam's limit that the pick step says fit, when it found some (D111).
+type Single = (
+  | { outcome: "options"; options: Option[] }
+  | { outcome: "over limit"; options?: Option[] }
+  | { outcome: "nothing found" }
+) & { query?: string; last?: Last };
 
 // A basket whose every group found nothing keeps its groups, so Find another can search each thing again (D99).
 export type Search =
@@ -41,6 +46,9 @@ export type Rebuy = { words: string; query: string; last: { id: string; name: st
 export type Sent = { searches: number; checked: number; unloaded: number };
 
 const MOST_THINGS = 5;
+
+// The second pick call sees this many of the cheapest listings over Sam's limit, and none above double it (D112).
+const MOST_OVER = 5;
 
 // Find never runs without its limit, so it needs ADDRESS_KEY too (D74).
 export function searchOn(): boolean {
@@ -251,15 +259,46 @@ async function searchThing(
 
   const lastId = kept.find((listing) => listing.id === last?.id)?.id;
   const choice = await choose(words, kept, above, lastId);
-  const options: Option[] = [];
-  for (const { id, what, why, watch } of choice.picks) {
-    const found = kept.find((listing) => listing.id === id);
-    if (found && !options.some((option) => option.id === id)) options.push({ ...listingOf(found), what, why, watch });
-  }
+  const options = optionsOf(choice.picks, kept);
   // Last time's listing goes first when the pick step keeps it (D104).
   options.sort((a, b) => Number(b.id === lastId) - Number(a.id === lastId));
   if (options.length) return done({ outcome: "options", options: options.slice(0, 3) });
-  return done({ outcome: choice.aboveLimit ? "over limit" : "nothing found" });
+  if (!choice.aboveLimit) return done({ outcome: "nothing found" });
+  const over = await overLimit(words, [...above, ...(bought ? [bought] : [])], limitCents, sent, last?.id);
+  return done(over.length ? { outcome: "over limit", options: over } : { outcome: "over limit" });
+}
+
+// A second pick call checks the cheapest listings up to double Sam's limit with their photos, and last time's
+// listing too, so a listing over the limit passes the same photo check (D89, D112). Its picks come cheapest
+// first, after last time's listing (D104, D111). A failed call shows none, as a failed pick step does (D93).
+async function overLimit(words: string, above: Found[], limitCents: number, sent: Sent, lastId?: string): Promise<Option[]> {
+  const near = above
+    .filter(
+      (listing, index) =>
+        listing.cents > limitCents && listing.cents <= limitCents * 2 && above.findIndex(({ id }) => id === listing.id) === index,
+    )
+    .sort((a, b) => a.cents - b.cents)
+    .filter((listing, index) => index < MOST_OVER || listing.id === lastId);
+  const kept = await withPhotos(near);
+  sent.checked += kept.filter((listing) => listing.photo).length;
+  sent.unloaded += near.length - kept.length;
+  if (!kept.length) return [];
+
+  const keptLast = kept.find((listing) => listing.id === lastId)?.id;
+  const choice = await choose(words, kept, [], keptLast).catch(() => undefined);
+  const options = choice ? optionsOf(choice.picks, kept) : [];
+  options.sort((a, b) => Number(b.id === keptLast) - Number(a.id === keptLast) || a.cents - b.cents);
+  return options.slice(0, 3);
+}
+
+// The pick step's picks, each once, from the listings it was sent.
+function optionsOf(picks: Choice["picks"], listings: Found[]): Option[] {
+  const options: Option[] = [];
+  for (const { id, what, why, watch } of picks) {
+    const found = listings.find((listing) => listing.id === id);
+    if (found && !options.some((option) => option.id === id)) options.push({ ...listingOf(found), what, why, watch });
+  }
+  return options;
 }
 
 // How many things show the listing Sam paid for last time, of how many Ask again searched.
@@ -270,7 +309,7 @@ function sameOf(result: Search, things: Rebuy[]): string {
 }
 
 function counts(result: Search): string {
-  if (result.outcome !== "basket") return `listings=${result.outcome === "options" ? result.options.length : 0}`;
+  if (result.outcome !== "basket") return `listings=${"options" in result ? (result.options?.length ?? 0) : 0}`;
   const shown = result.groups.filter((group) => group.options.length);
   const listings = shown.reduce((sum, group) => sum + group.options.length, 0);
   return `things=${result.groups.length} shown=${shown.length} listings=${listings}`;

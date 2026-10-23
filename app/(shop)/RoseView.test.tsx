@@ -339,6 +339,38 @@ it("puts the day's limit notice on the basket and the receipt, and keeps an empt
   expect(declined.match(/a lot of Finds/g)).toHaveLength(1);
 });
 
+const fourPoint = { ...listing("prod_9Fp4cN", "Four Point Cane", 2024), shop: "lowes.com" };
+const quadCane = { ...listing("prod_2Sq8aQ", "Small Base Aluminum Quad Cane", 2389), shop: "staples.com" };
+const stick = "a walking stick that stands up by itself";
+
+it("says nothing fits under Sam's limit over the options above it, marks each, and offers one Find another", () => {
+  const canes: RoseState = { kind: "options", limitCents: 2000, words: stick, listings: [fourPoint, quadCane] };
+  const html = render(canes);
+  expect(html).toMatch(
+    /^<div class="screen"><p class="notice"[^>]*>Nothing under \$20 for that\. These cost a little more, and Sam sees the price before saying OK\.<\/p>/,
+  );
+  expect(html).toMatch(/<span class="option-price">\$20\.24<\/span> <span class="small">at lowes\.com<\/span><\/span><span><strong>\$0\.24 over Sam&#x27;s \$20 limit\.<\/strong><\/span>/);
+  expect(html).toContain("<strong>$3.89 over Sam&#x27;s $20 limit.</strong>");
+  expect(html).toContain("For “a walking stick that stands up by itself”.</p>");
+  expect(html).toMatch(new RegExp(`Ask Sam</button></form><form[^>]*>${findAnother("KinCart tries other words for you.").source}`));
+  expect(html).toMatch(/<button[^>]*>Try other words<\/button>/);
+
+  const still = render({ ...canes, tried: true });
+  expect(still).toContain("Still nothing under $20 for that. These cost a little more, and Sam sees the price before saying OK.");
+  expect(still).not.toContain("Find another");
+
+  // Sam raised the limit after the Find, so both canes are under it now.
+  const raised = render({ ...canes, limitCents: 2500 });
+  expect(raised).not.toContain("over Sam");
+  expect(raised).not.toContain("These cost a little more");
+  expect(raised).toContain("Only 2 found at $25 or less.");
+
+  const stopped = render({ ...canes, waitMinutes: 170 });
+  expect(stopped).toMatch(/^<div class="screen"><p class="notice"[^>]*>That&#x27;s a lot of Finds from here today\. Try again in 3 hours\.<\/p>/);
+  expect(stopped).toMatch(findAnother("KinCart tries other words for you."));
+  expect(html).not.toContain("a lot of Finds");
+});
+
 const energizer = { ...listing("prod_4En8aA", "Energizer MAX AA Batteries, 8 Pack", 899), shop: "walmart.com" };
 const anker = listing("prod_2Ak5cH", "Anker 312 USB C Charger, 20W", 1599);
 const bought = [

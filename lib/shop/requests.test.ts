@@ -182,6 +182,9 @@ it("keeps Rose's one current search until the next one or a clear", async () => 
     options: [strap],
   });
 
+  await saveSearch(owner, "a walking stick that stands up by itself", { outcome: "over limit", options: [strap] });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "over limit", options: [strap] });
+
   await saveSearch(owner, "AA batteries, a tablet for video calls", {
     outcome: "basket",
     groups: [

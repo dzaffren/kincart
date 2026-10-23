@@ -64,6 +64,7 @@ export type RoseState =
       overCents?: number;
       tried?: boolean;
       last?: Last;
+      waitMinutes?: number;
       busy?: boolean;
     }
   | {
@@ -266,6 +267,7 @@ export function RoseView({
     return (
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick one first.</Notice>}
+        {state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
         <LastNotice last={state.last} listings={state.listings} limitCents={state.limitCents} />
         <OverNotice totalCents={state.totalCents} overCents={state.overCents} several={false} />
         <BlankNotice blankPhotos={state.blankPhotos} />

@@ -541,6 +541,27 @@ it("tells Rose's screens when Find another ran their search", () => {
   expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ tried: undefined });
 });
 
+it("shows a search's listings over Sam's limit as options, with one Find another and the limit notice", () => {
+  const over = { ...saved("over limit", [strap]), query: "self-standing walking stick" };
+  expect(roseState(vault, null, {}, on(over, 2000))).toEqual({
+    kind: "options",
+    limitCents: 2000,
+    words,
+    listings: [strap],
+    error: false,
+  });
+  expect(againOf(over, null)).toEqual({ words, things: [{ words, query: "self-standing walking stick", refused: [] }] });
+  expect(againOf({ ...over, tried: true }, null)).toBeNull();
+  expect(roseState(vault, null, { limitWait: 170 }, on(over, 2000))).toMatchObject({ kind: "options", waitMinutes: 170 });
+  expect(roseState(vault, null, { limitWait: 0 }, on(over, 2000))).not.toHaveProperty("waitMinutes");
+  expect(roseState(vault, null, {}, on(saved("over limit"), 2000))).toEqual({
+    kind: "ask",
+    limitCents: 2000,
+    words,
+    problem: "over limit",
+  });
+});
+
 it("keeps Rose's other picks after a group's Find another, when they're still in their group", () => {
   const basket = on(jarSearch({ options: [{ ...strap, id: "prod_5Jo1xO" }], problem: undefined, tried: true }));
 

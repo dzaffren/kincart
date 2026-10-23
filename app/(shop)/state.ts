@@ -49,7 +49,8 @@ export function roseState(
   const totalCents = search.totalCents ?? undefined;
   const tried = current?.tried || undefined;
   const stopped = params.limitWait !== undefined && params.limitWait > 0;
-  if (current?.outcome === "options") {
+  // A search that found nothing under Sam's limit shows the listings over it that fit (D110).
+  if (current?.outcome === "options" || (current?.outcome === "over limit" && current.options.length)) {
     const over = overOf([current.options.find(({ id }) => id === params.over?.[0])], totalCents);
     return {
       kind: "options",
@@ -65,6 +66,7 @@ export function roseState(
       overCents: over?.cents,
       tried,
       last: current.last ?? undefined,
+      ...(stopped && { waitMinutes: params.limitWait }),
     };
   }
   if (current?.outcome === "basket") {

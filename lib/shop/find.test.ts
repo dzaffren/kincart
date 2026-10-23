@@ -29,7 +29,8 @@ const pick = (id: string) => ({
 const isNeed = (body: { output_config: { format: { schema: { required: string[] } } } }) =>
   body.output_config.format.schema.required[0] === "things";
 
-type Answers = { need: unknown; under?: unknown[]; all?: unknown[]; choice?: unknown };
+// over answers a second pick call, on the listings over the limit, and overFails fails it.
+type Answers = { need: unknown; under?: unknown[]; all?: unknown[]; choice?: unknown; over?: unknown; overFails?: boolean };
 
 const webp = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#e8e8e8" } }).webp().toBuffer();
 
@@ -40,12 +41,15 @@ const photoAnswer = (url: string) =>
     : new Response(new Uint8Array(webp), { headers: { "content-type": "image/webp" } });
 
 function stubServices(answers: Answers | (() => never)) {
+  let picks = 0;
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
     if (typeof answers === "function") return answers();
     if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
-      const data = isNeed(body) ? answers.need : answers.choice;
+      const second = !isNeed(body) && picks++ > 0;
+      if (second && answers.overFails) return Response.json({ error: "overloaded" }, { status: 529 });
+      const data = isNeed(body) ? answers.need : second ? answers.over : answers.choice;
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     return Response.json({ products: body.filters ? answers.under : answers.all });
@@ -179,11 +183,22 @@ type Thing = {
   under?: unknown[];
   all?: unknown[];
   choice?: unknown;
+  over?: unknown;
   fails?: boolean;
 };
 
+// Each thing's first pick call gets its choice, and a second one, on the listings over the limit, its over.
+function pickAnswers() {
+  const seen = new Set<string>();
+  return (thing?: Thing) => {
+    if (!thing || !seen.has(thing.words)) return thing && (seen.add(thing.words), thing.choice);
+    return thing.over;
+  };
+}
+
 // Each thing's searches and pick are answered by its own query and words. A photo Find also gets blank.
 function stubBasket(things: Thing[], blank?: number[]) {
+  const answer = pickAnswers();
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
     if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
@@ -191,8 +206,7 @@ function stubBasket(things: Thing[], blank?: number[]) {
       const data =
         isNeed(body)
           ? { things: things.map(({ words, query, photos }) => ({ words, query, photos })), ...(blank && { blank }) }
-          : things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))
-              ?.choice;
+          : answer(things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`)));
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     const thing = things.find(({ query }) => query === body.query)!;
@@ -518,6 +532,7 @@ type Again = Thing & { last: string; refused?: string[]; otherFails?: boolean };
 
 // Each thing's other-words call answers with its query, and its searches and pick are answered as in stubBasket.
 function stubAgain(things: Again[]) {
+  const answer = pickAnswers();
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
     if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
@@ -527,7 +542,7 @@ function stubAgain(things: Again[]) {
         if (thing.otherFails) return Response.json({ error: "overloaded" }, { status: 529 });
         return Response.json({ content: [{ type: "text", text: JSON.stringify({ query: thing.query }) }], stop_reason: "end_turn" });
       }
-      const data = things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))?.choice;
+      const data = answer(things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`)));
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     const thing = things.find(({ query }) => query === body.query)!;
@@ -698,11 +713,12 @@ type Rebought = Thing & { last: { id: string; name: string; cents: number; shop:
 // Each thing's query searches and pick are answered as in stubBasket, and its search by last time's listing
 // name with named.
 function stubRebuy(things: Rebought[]) {
+  const answer = pickAnswers();
   const fetch = vi.fn(async (url: string, init: RequestInit) => {
     if (url.includes("cdn.trychannel3.com")) return photoAnswer(url);
     const body = JSON.parse(String(init.body));
     if (url.includes("anthropic")) {
-      const data = things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`))?.choice;
+      const data = answer(things.find((thing) => body.messages[0].content[0].text.startsWith(`They asked: ${JSON.stringify(thing.words)}`)));
       return Response.json({ content: [{ type: "text", text: JSON.stringify(data) }], stop_reason: "end_turn" });
     }
     const named = things.find(({ last }) => last.name === body.query);
@@ -836,4 +852,76 @@ it("searches each paid thing at once, each group with its last listing, and blan
     outcome: "nothing found",
     groups: [{ thing: "AA batteries", problem: "nothing found" }, { thing: "a phone charger", problem: "nothing found" }],
   });
+});
+
+const caneTip = product("prod_3Ct7tP", "Replacement Rubber Cane Tips, 2 Pack", 8.99, "amazon.com");
+const fourPoint = product("prod_9Fp4cN", "Four Point Cane", 20.24, "lowes.com");
+const quadCane = product("prod_2Sq8aQ", "Small Base Aluminum Quad Cane", 23.89, "staples.com");
+const walgreensCane = product("prod_6Wq3sB", "Walgreens Quad Cane Small Base", 24.99, "walgreens.com");
+const largeBase = product("prod_8Hc5qL", "Hugo Quad Cane, Large Base", 44.99, "walmart.com");
+const stick = "a walking stick that stands up by itself";
+const caneSearch = { need: { things: [{ words: stick, query: "self-standing walking stick" }] }, under: [caneTip] };
+
+it("shows up to 3 listings over Sam's limit, cheapest first, when none under it fits and one above does", async () => {
+  const fetch = stubServices({
+    ...caneSearch,
+    all: [caneTip, walgreensCane, largeBase, fourPoint, quadCane],
+    choice: { picks: [], aboveLimit: true },
+    over: { picks: [pick("prod_6Wq3sB"), pick("prod_9Fp4cN"), pick("prod_2Sq8aQ")], aboveLimit: false },
+  });
+  const sent = { searches: 0, checked: 0, unloaded: 0 };
+
+  const result = await find(stick, 2000, sent);
+
+  expect(result).toEqual({
+    outcome: "over limit",
+    options: [
+      expect.objectContaining({ id: "prod_9Fp4cN", name: "Four Point Cane", cents: 2024, shop: "lowes.com" }),
+      expect.objectContaining({ id: "prod_2Sq8aQ", cents: 2389, shop: "staples.com", why: pick("prod_2Sq8aQ").why }),
+      expect.objectContaining({ id: "prod_6Wq3sB", cents: 2499, shop: "walgreens.com" }),
+    ],
+    query: "self-standing walking stick",
+  });
+  const [, first, second] = anthropicBodies(fetch);
+  expect(JSON.stringify(first.messages[0].content.at(-1).text)).toContain("Hugo Quad Cane, Large Base");
+  expect(second.system).toBe(first.system);
+  expect(second.messages[0].content.map((block: { type: string; text?: string }) => block.text?.split(":")[0] ?? block.type)).toEqual([
+    "They asked",
+    "Listing prod_9Fp4cN",
+    "image",
+    "Listing prod_2Sq8aQ",
+    "image",
+    "Listing prod_6Wq3sB",
+    "image",
+    "Above their price limit, not to pick from",
+  ]);
+  expect(second.messages[0].content.at(-1).text).toBe("Above their price limit, not to pick from:\n[]");
+  expect(sent).toEqual({ searches: 2, checked: 4, unloaded: 0 });
+  expect(console.log).toHaveBeenCalledWith(
+    expect.stringMatching(/^find outcome=over-limit listings=3 searches=2 ms=\d+ checked=4 unloaded=0$/),
+  );
+});
+
+it("sends the second pick call only the 5 cheapest listings up to double the limit, without what Sam refused", async () => {
+  const canes = [2999, 2123, 3950, 2601, 2275, 3399, 2788].map((cents, index) =>
+    product(`prod_${index}Qc${index}cN`, `Quad Cane ${index}`, cents / 100, "walmart.com"),
+  );
+  const fetch = stubAgain([
+    {
+      words: stick,
+      last: "self-standing walking stick",
+      query: "quad cane that stands on its own",
+      under: [caneTip],
+      all: [...canes, largeBase],
+      choice: { picks: [], aboveLimit: true },
+      over: { picks: [pick("prod_1Qc1cN")], aboveLimit: false },
+    },
+  ]);
+
+  const result = await findAgain(stick, [{ words: stick, query: "self-standing walking stick", refused: ["prod_4Qc4cN"] }], 2000);
+
+  expect(result).toMatchObject({ outcome: "over limit", options: [{ id: "prod_1Qc1cN", cents: 2123 }] });
+  const [, , second] = anthropicBodies(fetch);
+  const sentToPick = second.messages[0].content.flatMap((block: { text?: string }) => block.text?.match(/^Listing (\w+)/)?.[1] ?? []);
+  expect(sentToPick).toEqual(["prod_1Qc1cN", "prod_3Qc3cN", "prod_6Qc6cN", "prod_0Qc0cN", "prod_5Qc5cN"]);
 });
