@@ -2,6 +2,7 @@ import { useId, type ReactNode } from "react";
 import type { Option } from "../../lib/shop/find";
 import type { Item } from "../../lib/shop/items";
 import type { Line } from "../../lib/shop/requests";
+import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
 
 export const RELATIVE = "Rose";
@@ -229,5 +230,26 @@ export function PhoneFrame({ who, href, children }: { who: string; href?: string
         </div>
       )}
     </figure>
+  );
+}
+
+// A Find or a Find another past the address's 20 for the day (D77, D101).
+export function LimitNotice({ waitMinutes }: { waitMinutes?: number }) {
+  return (
+    <Notice tone="neutral">
+      That&apos;s a lot of Finds from here today. Try again in {waitFor(waitMinutes ?? 0)}.
+    </Notice>
+  );
+}
+
+export function AnotherForm({ action, hint }: { action?: (formData: FormData) => void | Promise<void>; hint?: string }) {
+  if (!hint) return null;
+  return (
+    <form className="stack" action={action}>
+      <Button type="submit" kind="secondary" busyLabel="Looking…">
+        Find another
+      </Button>
+      <p className="small">{hint}</p>
+    </form>
   );
 }

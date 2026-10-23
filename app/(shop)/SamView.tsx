@@ -4,12 +4,26 @@ import type { Line, Source } from "../../lib/shop/requests";
 import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, type Receipt } from "./ui";
+import {
+  AnotherForm,
+  LimitNotice,
+  listed,
+  money,
+  Notice,
+  ReceiptCard,
+  RELATIVE,
+  Summary,
+  wholeDollars,
+  type Receipt,
+} from "./ui";
+
+// Find another after Sam's No or untick: offered, or how the search for Rose ended (D113, D115).
+export type Again = "offer" | "options" | "nothing";
 
 export type SamState =
-  | { kind: "nothing"; declined?: Item; lines?: Line[] }
+  | { kind: "nothing"; declined?: Item; lines?: Line[]; again?: Again; waitMinutes?: number }
   | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source; lines?: Line[]; limitCents?: number }
-  | { kind: "paid"; receipt: Receipt }
+  | { kind: "paid"; receipt: Receipt; again?: Again; waitMinutes?: number }
   | { kind: "failed"; item: Item; lines?: Line[] };
 
 export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
@@ -25,10 +39,11 @@ type Props = {
   setLimit?: Action;
   total?: Total;
   setTotal?: Action;
+  findAnother?: Action;
   notify?: ReactNode;
 };
 
-export function SamView({ state, answer, limit, setLimit, total, setTotal, notify }: Props) {
+export function SamView({ state, answer, limit, setLimit, total, setTotal, findAnother, notify }: Props) {
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
@@ -100,7 +115,8 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, notif
 
   return (
     <div className="screen">
-      <SamOutcome state={state} />
+      {state.kind !== "failed" && state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
+      <SamOutcome state={state} findAnother={findAnother} />
       {notify}
       {limit && (
         <LimitForm
@@ -135,18 +151,23 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, notif
   );
 }
 
-function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }) {
+function SamOutcome({ state, findAnother }: { state: Exclude<SamState, { kind: "request" }>; findAnother?: Action }) {
   if (state.kind === "paid") {
+    const several = (state.receipt.leftOut?.length ?? 0) > 1;
     return (
       <>
         <h1>Paid from {RELATIVE}&apos;s PayPal</h1>
         <ReceiptCard receipt={state.receipt} />
         {state.receipt.leftOut && (
           <Notice tone="neutral">
-            You left out {listed(state.receipt.leftOut)}. {RELATIVE} can ask for{" "}
-            {state.receipt.leftOut.length > 1 ? "them" : "it"} again.
+            You left out {listed(state.receipt.leftOut)}. {RELATIVE} can ask for {several ? "them" : "it"} again.
           </Notice>
         )}
+        <LookAgain
+          again={state.again}
+          findAnother={findAnother}
+          hint={`KinCart looks again for ${RELATIVE}, without ${several ? "the ones" : "the one"} you left out. ${RELATIVE} picks from what it finds.`}
+        />
         <p className="small">{RELATIVE} sees this receipt too.</p>
       </>
     );
@@ -172,12 +193,40 @@ function SamOutcome({ state }: { state: Exclude<SamState, { kind: "request" }> }
           {RELATIVE} can see that.
         </Notice>
       )}
+      <LookAgain
+        again={state.again}
+        findAnother={findAnother}
+        hint={
+          state.lines
+            ? `KinCart looks again for each of ${RELATIVE}'s things, without the ones you said no to. ${RELATIVE} picks from what it finds.`
+            : `KinCart looks again for ${RELATIVE}, without the one you said no to. ${RELATIVE} picks from what it finds.`
+        }
+      />
       <div className="heading">
         <h1>Nothing to approve</h1>
         <p className="lead">When {RELATIVE} asks for something, it shows up here.</p>
       </div>
     </>
   );
+}
+
+function LookAgain({ again, findAnother, hint }: { again?: Again; findAnother?: Action; hint: string }) {
+  if (again === "offer") return <AnotherForm action={findAnother} hint={hint} />;
+  if (again === "options") {
+    return (
+      <Notice tone="neutral">
+        KinCart found new options for {RELATIVE}. {RELATIVE} picks one and asks you.
+      </Notice>
+    );
+  }
+  if (again === "nothing") {
+    return (
+      <Notice tone="neutral">
+        KinCart looked again and found nothing. {RELATIVE} can try different words.
+      </Notice>
+    );
+  }
+  return null;
 }
 
 type LimitFormProps = {

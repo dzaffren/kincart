@@ -7,8 +7,10 @@ import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
 import { PhotoPicker } from "./PhotoPicker";
 import {
+  AnotherForm,
   HELPER,
   ItemPicker,
+  LimitNotice,
   LineItems,
   listed,
   ListingPicker,
@@ -17,7 +19,6 @@ import {
   ReceiptCard,
   Summary,
   type Receipt,
-  waitFor,
   wholeDollars,
 } from "./ui";
 
@@ -46,6 +47,8 @@ export type RoseState =
       outcome?: Outcome;
       problem?: "empty" | "nothing found" | "over limit" | "too many" | "nothing in photo" | "not a photo" | "limit";
       tried?: boolean;
+      // Sam's Find another ran the search, not Rose's.
+      bySam?: boolean;
       waitMinutes?: number;
       bought?: Bought[];
       busy?: boolean;
@@ -63,6 +66,7 @@ export type RoseState =
       error?: boolean;
       overCents?: number;
       tried?: boolean;
+      bySam?: boolean;
       last?: Last;
       // The search found nothing under Sam's limit, so these listings are over it (D110).
       overLimit?: boolean;
@@ -83,6 +87,7 @@ export type RoseState =
       error?: boolean;
       overCents?: number;
       tried?: boolean;
+      bySam?: boolean;
       waitMinutes?: number;
       busy?: boolean;
     }
@@ -201,7 +206,10 @@ export function RoseView({
         {state.linked && <Notice tone="neutral">Your PayPal is linked. You won&apos;t need to do this again.</Notice>}
         <OutcomeNotice outcome={state.outcome} />
         {state.problem === "nothing found" && (
-          <Notice tone="neutral">{state.tried ? "Still couldn't" : "Couldn't"} find that. Try different words.</Notice>
+          <Notice tone="neutral">
+            {state.bySam && `${HELPER} asked KinCart to look again. `}
+            {state.tried ? "Still couldn't" : "Couldn't"} find that. Try different words.
+          </Notice>
         )}
         {state.problem === "nothing in photo" && (
           <Notice tone="neutral">
@@ -216,6 +224,7 @@ export function RoseView({
         {state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
         {state.problem === "over limit" && (
           <Notice tone="neutral">
+            {state.bySam && `${HELPER} asked KinCart to look again. `}
             {state.tried ? "Still nothing" : "Nothing"} under {limit} for that. Try different words, or ask {HELPER} to
             raise the limit.
           </Notice>
@@ -284,7 +293,7 @@ export function RoseView({
           <p className="small">
             For &ldquo;{state.words}&rdquo;
             {state.fromPhoto && fromPhotos(state.photos)}
-            {state.tried && ". Looked again with other words"}
+            {state.tried && lookedAgain(state.bySam)}
             {state.last && ". Today's prices for what you bought before"}
             {state.listings.length < 3 &&
               !overLimit &&
@@ -334,7 +343,7 @@ export function RoseView({
           <h1>Which ones would you like?</h1>
           <p className="small">
             For &ldquo;{state.words}&rdquo;{state.fromPhoto && fromPhotos(state.photos)}
-            {state.tried && ". Looked again with other words"}
+            {state.tried && lookedAgain(state.bySam)}
             {state.groups.some(({ last }) => last) && ". Today's prices for what you bought before"}. Pick one for each
             thing you want.
           </p>
@@ -465,6 +474,10 @@ function BasketGroup({ group, index, limitCents, picked, basketTried }: GroupPro
   );
 }
 
+function lookedAgain(bySam?: boolean): string {
+  return bySam ? `. ${HELPER} asked KinCart to look again with other words` : ". Looked again with other words";
+}
+
 // One Find another for each empty Find, No or untick (D97): a search it ran itself offers none.
 function anotherHint(state: Extract<RoseState, { kind: "ask" }>): string | undefined {
   if (state.outcome?.kind === "declined") {
@@ -534,27 +547,6 @@ function LastNotice({ last, listings, limitCents }: { last?: Last; listings: Opt
       The one you bought last time is {money(last.nowCents)} now
       {last.nowCents > limitCents ? `, over ${HELPER}'s ${wholeDollars(limitCents)} limit` : ""}.
     </Notice>
-  );
-}
-
-// A Find or a Find another past the address's 20 for the day (D77, D101).
-function LimitNotice({ waitMinutes }: { waitMinutes?: number }) {
-  return (
-    <Notice tone="neutral">
-      That&apos;s a lot of Finds from here today. Try again in {waitFor(waitMinutes ?? 0)}.
-    </Notice>
-  );
-}
-
-function AnotherForm({ action, hint }: { action?: Action; hint?: string }) {
-  if (!hint) return null;
-  return (
-    <form className="stack" action={action}>
-      <Button type="submit" kind="secondary" busyLabel="Looking…">
-        Find another
-      </Button>
-      <p className="small">{hint}</p>
-    </form>
   );
 }
 
