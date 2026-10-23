@@ -64,6 +64,8 @@ export type RoseState =
       overCents?: number;
       tried?: boolean;
       last?: Last;
+      // The search found nothing under Sam's limit, so these listings are over it (D110).
+      overLimit?: boolean;
       waitMinutes?: number;
       busy?: boolean;
     }
@@ -262,8 +264,8 @@ export function RoseView({
 
   // The page comes back scrolled to the top after Ask Sam, so its notices go at the top.
   if (state.kind === "options") {
-    // Listings over Sam's limit show only when nothing fits under it (D110), so every one is over.
-    const overLimit = state.listings.every(({ cents }) => cents > state.limitCents);
+    // Only a search over the limit offers Find another here, and its notice goes once Sam's limit covers every price.
+    const overLimit = state.overLimit && state.listings.every(({ cents }) => cents > state.limitCents);
     return (
       <div className="screen">
         {state.error && <Notice tone="neutral">Pick one first.</Notice>}

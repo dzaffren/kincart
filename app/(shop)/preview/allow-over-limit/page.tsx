@@ -111,28 +111,28 @@ export default function AllowOverLimitPreview() {
         <h2>Rose: one thing over the limit</h2>
         <div className="frames">
           <Frame label="Nothing under $20, three canes over it (scenario 1)">
-            <RoseView state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes }} items={[]} />
+            <RoseView state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, overLimit: true }} items={[]} />
           </Frame>
           <Frame label="Ask Sam with nothing picked">
             <RoseView
-              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, error: true }}
+              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, overLimit: true, error: true }}
               items={[]}
             />
           </Frame>
           <Frame label="Asking Sam for the $23.89 cane">
             <RoseView
-              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, picked: "cane-quad", busy: true }}
+              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, overLimit: true, picked: "cane-quad", busy: true }}
               items={[]}
             />
           </Frame>
           <Frame label="After Find another, still over $20">
             <RoseView
-              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, tried: true }}
+              state={{ kind: "options", limitCents: 2000, words: caneWords, listings: canes, overLimit: true, tried: true }}
               items={[]}
             />
           </Frame>
           <Frame label="Sam raised the limit to $24 since">
-            <RoseView state={{ kind: "options", limitCents: 2400, words: caneWords, listings: canes }} items={[]} />
+            <RoseView state={{ kind: "options", limitCents: 2400, words: caneWords, listings: canes, overLimit: true }} items={[]} />
           </Frame>
           <Frame label="Stopped by Sam's $20 total limit (scenario 5)">
             <RoseView
@@ -142,6 +142,7 @@ export default function AllowOverLimitPreview() {
                 totalCents: 2000,
                 words: caneWords,
                 listings: canes,
+                overLimit: true,
                 picked: "cane-quad",
                 overCents: 2389,
               }}

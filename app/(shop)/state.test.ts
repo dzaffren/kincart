@@ -554,7 +554,9 @@ it("shows a search's listings over Sam's limit as options, with one Find another
     words,
     listings: [strap],
     error: false,
+    overLimit: true,
   });
+  expect(roseState(vault, null, {}, on(saved("options"), 2000))).not.toHaveProperty("overLimit", true);
   expect(againOf(over, null)).toEqual({ words, things: [{ words, query: "self-standing walking stick", refused: [] }] });
   expect(againOf({ ...over, tried: true }, null)).toBeNull();
   expect(roseState(vault, null, { limitWait: 170 }, on(over, 2000))).toMatchObject({ kind: "options", waitMinutes: 170 });

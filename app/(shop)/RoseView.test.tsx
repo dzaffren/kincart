@@ -344,7 +344,7 @@ const quadCane = { ...listing("prod_2Sq8aQ", "Small Base Aluminum Quad Cane", 23
 const stick = "a walking stick that stands up by itself";
 
 it("says nothing fits under Sam's limit over the options above it, marks each, and offers one Find another", () => {
-  const canes: RoseState = { kind: "options", limitCents: 2000, words: stick, listings: [fourPoint, quadCane] };
+  const canes: RoseState = { kind: "options", limitCents: 2000, words: stick, listings: [fourPoint, quadCane], overLimit: true };
   const html = render(canes);
   expect(html).toMatch(
     /^<div class="screen"><p class="notice"[^>]*>Nothing under \$20 for that\. These cost a little more, and Sam sees the price before saying OK\.<\/p>/,
@@ -364,6 +364,12 @@ it("says nothing fits under Sam's limit over the options above it, marks each, a
   expect(raised).not.toContain("over Sam");
   expect(raised).not.toContain("These cost a little more");
   expect(raised).toContain("Only 2 found at $25 or less.");
+
+  // Sam lowered the limit under a search that found listings under the old one, which Find another can't search again.
+  const lowered = render({ ...canes, overLimit: undefined });
+  expect(lowered).toContain("<strong>$3.89 over Sam&#x27;s $20 limit.</strong>");
+  expect(lowered).not.toContain("These cost a little more");
+  expect(lowered).not.toContain("Find another");
 
   const stopped = render({ ...canes, waitMinutes: 170 });
   expect(stopped).toMatch(/^<div class="screen"><p class="notice"[^>]*>That&#x27;s a lot of Finds from here today\. Try again in 3 hours\.<\/p>/);

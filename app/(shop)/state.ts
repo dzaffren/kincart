@@ -66,6 +66,7 @@ export function roseState(
       overCents: over?.cents,
       tried,
       last: current.last ?? undefined,
+      overLimit: current.outcome === "over limit" || undefined,
       ...(stopped && { waitMinutes: params.limitWait }),
     };
   }
