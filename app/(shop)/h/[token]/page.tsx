@@ -5,8 +5,9 @@ import { searchOn } from "../../../../lib/shop/find";
 import { settleStuck } from "../../../../lib/shop/pay";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
-import { getLimit, getTotal, latest } from "../../../../lib/shop/requests";
-import { answer, setLimit, setTotal } from "../../actions";
+import { minutesUntil } from "../../../../lib/shop/limits";
+import { getLimit, getSearch, getTotal, latest } from "../../../../lib/shop/requests";
+import { answer, findAnother, setLimit, setTotal } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -32,10 +33,12 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
   const settled = await settleStuck(household);
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
-  const [request, limitCents, totalCents] = await Promise.all([
+  // Rose's search, for Sam's Find another after a No or an untick (D113).
+  const [request, limitCents, totalCents, saved] = await Promise.all([
     latest(household),
     on ? getLimit(household) : null,
     on ? getTotal(household) : null,
+    on ? getSearch(household) : undefined,
   ]);
   const limit =
     limitCents === null
@@ -48,12 +51,18 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
       <PageHead />
       <main>
         <SamView
-          state={samState(request, limitCents ?? undefined)}
+          state={samState(
+            request,
+            limitCents ?? undefined,
+            saved,
+            query.find === "limit" ? minutesUntil(Number(query.until)) : undefined,
+          )}
           answer={request ? answer.bind(null, token, request.id) : undefined}
           limit={limit}
           setLimit={setLimit.bind(null, token)}
           total={total}
           setTotal={setTotal.bind(null, token)}
+          findAnother={findAnother.bind(null, token)}
           notify={pushOn() ? <NotifyControl who="sam" token={token} publicKey={publicKey()} /> : undefined}
         />
         <Refresher />
