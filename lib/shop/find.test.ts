@@ -967,3 +967,48 @@ it("shows one thing of a basket over Sam's limit with its own notice, and the ot
     groups: [{ problem: "nothing found", options: [] }, { problem: "over limit", options: [{ id: "prod_7Fb4sH" }] }],
   });
 });
+
+it("says nothing under the limit, with no options, when nothing above fits within double it, or the second call fails", async () => {
+  const bathSeat = product("prod_7Fb4sH", "Folding Bath Seat Bench Shower Chair", 44.99, "bestbuy.com");
+  const chair = { need: { things: [{ words: "a folding shower chair", query: "folding shower chair" }] }, under: [caneTip] };
+  const fetch = stubServices({ ...chair, all: [bathSeat], choice: { picks: [], aboveLimit: true }, over: { picks: [pick("prod_7Fb4sH")] } });
+
+  expect(await find("a folding shower chair", 2000)).toEqual({ outcome: "over limit", query: "folding shower chair" });
+  expect(anthropicBodies(fetch)).toHaveLength(2);
+  expect(console.log).toHaveBeenLastCalledWith(
+    expect.stringMatching(/^find outcome=over-limit listings=0 searches=2 ms=\d+ checked=1 unloaded=0$/),
+  );
+
+  const failing = stubServices({ ...caneSearch, all: [quadCane], choice: { picks: [], aboveLimit: true }, overFails: true });
+  expect(await find(stick, 2000)).toEqual({ outcome: "over limit", query: "self-standing walking stick" });
+  expect(anthropicBodies(failing)).toHaveLength(3);
+  expect(console.log).toHaveBeenLastCalledWith(expect.stringMatching(/^find outcome=over-limit listings=0 searches=2 /));
+});
+
+it("puts last time's listing first among the options over the limit in Ask again, then the rest cheapest first", async () => {
+  const paidCane = { id: "prod_6Wq3sB", name: "Walgreens Quad Cane Small Base", cents: 1999, shop: "walgreens.com" };
+  const cheaper = product("prod_1Qc1cN", "Medline Quad Cane, Small Base", 21.23, "amazon.com");
+  const fetch = stubRebuy([
+    {
+      words: stick,
+      query: "self-standing walking stick",
+      under: [caneTip],
+      all: [caneTip, cheaper],
+      named: [walgreensCane],
+      last: paidCane,
+      choice: { picks: [], aboveLimit: true },
+      over: { picks: [pick("prod_1Qc1cN"), pick("prod_6Wq3sB")], aboveLimit: false },
+    },
+  ]);
+
+  expect(await findRebuy(stick, [{ words: stick, query: "self-standing walking stick", last: paidCane }], 2000)).toEqual({
+    outcome: "over limit",
+    options: [expect.objectContaining({ id: "prod_6Wq3sB", cents: 2499 }), expect.objectContaining({ id: "prod_1Qc1cN", cents: 2123 })],
+    query: "self-standing walking stick",
+    last: { id: "prod_6Wq3sB", cents: 1999, shop: "walgreens.com", nowCents: 2499 },
+  });
+  const [first, second] = anthropicBodies(fetch);
+  expect(first.system).not.toContain("last time");
+  expect(JSON.stringify(second.messages[0].content)).toContain("Listing prod_6Wq3sB (they bought this one last time):");
+  expect(second.system).toContain("last time");
+});
