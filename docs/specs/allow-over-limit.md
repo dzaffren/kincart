@@ -280,8 +280,8 @@ Recorded as D109, D110, D111, D112.
 
 2026-10-23 · 3 raw findings, 2 survived, 2 fixed.
 
-- correctness · `app/(shop)/RoseView.tsx:266` · the over-limit notice and Find another need a search over the limit, not only prices over Sam's limit now · `e49f0bf`
-- correctness · `lib/shop/find.ts:308` · Ask again's `same=` log count reads an over-limit search's options · `dad06fc`
+- correctness · `app/(shop)/RoseView.tsx:266` · the over-limit notice and Find another need a search over the limit, not only prices over Sam's limit now · `67b28b1`
+- correctness · `lib/shop/find.ts:308` · Ask again's `same=` log count reads an over-limit search's options · `f300b8f`
 
 ## Open items
 
@@ -298,7 +298,7 @@ Recorded as D109, D110, D111, D112.
 | O9 | In Ask again, last time's listing can be over the limit now and among the options over it. D104 puts it first, and D111 says cheapest first | question | spec p3 | user | Resolved | Last time's listing comes first and picked, as D104 says. The rest follow cheapest first. 2026-10-23 |
 | O10 | How many listings the second pick call sees. The walking stick sent 8 photos and took 14.9 s | question | spec p3 | user | Resolved | The 5 cheapest up to double the limit, and last time's listing when it is within double. 2026-10-23 |
 | O11 | `CHANNEL3_API_KEY` in `.env.local` is out of Channel3's free credits: every search answers `402`. Vercel's production key and GitHub's CI key may be the same one | flag | spec p3 | user | Resolved | Use `CHANNEL3_API_KEY_II`. `/build` runs its tests with `CHANNEL3_API_KEY="$CHANNEL3_API_KEY_II"` in the shell, which wins over `.env.local`, so no code changes. Swapping the key on Vercel and in GitHub's secrets is the user's call. 2026-10-23 |
-| O12 | The plan's options screen had no day's limit notice. A stopped Find another on Rose's over-limit options screen would show the same screen and say nothing, where D101 puts the limit notice on top | flag | build | user | Decided alone | Chose: the options screen takes `waitMinutes` and shows the day's limit notice on top, as the basket screen does. Other: no notice there, so Rose's tap seems to do nothing. Undo: remove the `waitMinutes` lines from `roseState()` and from the options screen in `RoseView.tsx`, added in c7450a4. 2026-10-23 |
+| O12 | The plan's options screen had no day's limit notice. A stopped Find another on Rose's over-limit options screen would show the same screen and say nothing, where D101 puts the limit notice on top | flag | build | user | Decided alone | Chose: the options screen takes `waitMinutes` and shows the day's limit notice on top, as the basket screen does. Other: no notice there, so Rose's tap seems to do nothing. Undo: remove the `waitMinutes` lines from `roseState()` and from the options screen in `RoseView.tsx`, added in 8b03116. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
