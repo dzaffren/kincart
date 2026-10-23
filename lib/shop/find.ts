@@ -305,7 +305,7 @@ function optionsOf(picks: Choice["picks"], listings: Found[]): Option[] {
 // How many things show the listing Sam paid for last time, of how many Ask again searched.
 function sameOf(result: Search, things: Rebuy[]): string {
   const shown =
-    result.outcome === "options" ? result.options : "groups" in result ? result.groups.flatMap(({ options }) => options) : [];
+    "groups" in result ? result.groups.flatMap(({ options }) => options) : "options" in result ? (result.options ?? []) : [];
   return `${things.filter(({ last }) => shown.some(({ id }) => id === last.id)).length}/${things.length}`;
 }
 

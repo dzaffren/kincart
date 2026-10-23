@@ -1011,4 +1011,5 @@ it("puts last time's listing first among the options over the limit in Ask again
   expect(first.system).not.toContain("last time");
   expect(JSON.stringify(second.messages[0].content)).toContain("Listing prod_6Wq3sB (they bought this one last time):");
   expect(second.system).toContain("last time");
+  expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^find outcome=over-limit listings=2 .* rebuy=1 same=1\/1$/));
 });
