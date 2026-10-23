@@ -14,7 +14,7 @@ export type Last = { id: string; cents: number; shop: string; nowCents?: number 
 // Find another avoids, and tried marks a group that Find another searched. last marks a group that Ask again searched.
 export type Group = { thing: string; options: Option[]; problem?: Problem; query?: string; tried?: boolean; last?: Last };
 
-type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string };
+type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string; last?: Last };
 
 // A basket whose every group found nothing keeps its groups, so Find another can search each thing again (D99).
 export type Search =

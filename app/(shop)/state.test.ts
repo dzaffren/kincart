@@ -93,6 +93,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   blankPhotos: 0,
   query: null,
   tried: false,
+  last: null,
   searchedAt,
 });
 const on = (search: SavedSearch | null = null, limitCents = 5000, totalCents: number | null = null) => ({
