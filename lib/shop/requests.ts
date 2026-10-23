@@ -246,7 +246,7 @@ export async function saveSearch(
       household,
       words,
       result.outcome,
-      JSON.stringify(result.outcome === "options" ? result.options : []),
+      JSON.stringify(("options" in result && result.options) || []),
       JSON.stringify("groups" in result ? result.groups : []),
       photos > 0,
       photos,

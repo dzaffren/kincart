@@ -8,7 +8,7 @@ import { listed, money, Notice, ReceiptCard, RELATIVE, Summary, wholeDollars, ty
 
 export type SamState =
   | { kind: "nothing"; declined?: Item; lines?: Line[] }
-  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source; lines?: Line[] }
+  | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source; lines?: Line[]; limitCents?: number }
   | { kind: "paid"; receipt: Receipt }
   | { kind: "failed"; item: Item; lines?: Line[] };
 
@@ -32,15 +32,26 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, notif
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
-        <BasketAnswer lines={state.lines} askedAt={state.askedAt} answer={answer} busy={state.busy} />
+        <BasketAnswer
+          lines={state.lines}
+          askedAt={state.askedAt}
+          answer={answer}
+          busy={state.busy}
+          limitCents={state.limitCents}
+        />
       </div>
     );
   }
 
   if (state.kind === "request") {
-    const { found } = state;
+    const { found, limitCents } = state;
     return (
       <div className="screen">
+        {limitCents !== undefined && state.item.cents > limitCents && (
+          <Notice tone="neutral">
+            This is {money(state.item.cents - limitCents)} over your {wholeDollars(limitCents)} limit.
+          </Notice>
+        )}
         <h1>{found ? `${RELATIVE} would like this` : `${RELATIVE} would like ${state.item.name}`}</h1>
         <Summary
           title={found && state.item.name}

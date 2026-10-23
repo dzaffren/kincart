@@ -71,6 +71,11 @@ it("shows Sam nothing, a request, the payment in progress, or the outcome", () =
   expect(samState(request("declined", batteries))).toEqual({ kind: "nothing", declined: batteries });
 });
 
+it("gives Sam's limit to Sam's request, so Sam's page can say how far over it an ask is", () => {
+  expect(samState(request("waiting"), 2000)).toEqual({ kind: "request", item: glasses, askedAt, busy: false, limitCents: 2000 });
+  expect(samState(request("paid"), 2000)).toEqual({ kind: "paid", receipt });
+});
+
 const strap = {
   id: "prod_9Wz4hY",
   name: "Adjustable Wide Slippers with Hook-and-Loop Strap",
@@ -539,6 +544,29 @@ it("tells Rose's screens when Find another ran their search", () => {
   expect(roseState(vault, null, {}, on({ ...saved("options"), tried: true }))).toMatchObject({ kind: "options", tried: true });
   expect(roseState(vault, null, {}, on({ ...jarSearch(), tried: true }))).toMatchObject({ kind: "basket", tried: true });
   expect(roseState(vault, null, {}, on(saved("options")))).toMatchObject({ tried: undefined });
+});
+
+it("shows a search's listings over Sam's limit as options, with one Find another and the limit notice", () => {
+  const over = { ...saved("over limit", [strap]), query: "self-standing walking stick" };
+  expect(roseState(vault, null, {}, on(over, 2000))).toEqual({
+    kind: "options",
+    limitCents: 2000,
+    words,
+    listings: [strap],
+    error: false,
+    overLimit: true,
+  });
+  expect(roseState(vault, null, {}, on(saved("options"), 2000))).not.toHaveProperty("overLimit", true);
+  expect(againOf(over, null)).toEqual({ words, things: [{ words, query: "self-standing walking stick", refused: [] }] });
+  expect(againOf({ ...over, tried: true }, null)).toBeNull();
+  expect(roseState(vault, null, { limitWait: 170 }, on(over, 2000))).toMatchObject({ kind: "options", waitMinutes: 170 });
+  expect(roseState(vault, null, { limitWait: 0 }, on(over, 2000))).not.toHaveProperty("waitMinutes");
+  expect(roseState(vault, null, {}, on(saved("over limit"), 2000))).toEqual({
+    kind: "ask",
+    limitCents: 2000,
+    words,
+    problem: "over limit",
+  });
 });
 
 it("keeps Rose's other picks after a group's Find another, when they're still in their group", () => {

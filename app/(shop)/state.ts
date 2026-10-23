@@ -49,7 +49,8 @@ export function roseState(
   const totalCents = search.totalCents ?? undefined;
   const tried = current?.tried || undefined;
   const stopped = params.limitWait !== undefined && params.limitWait > 0;
-  if (current?.outcome === "options") {
+  // A search that found nothing under Sam's limit shows the listings over it that fit (D110).
+  if (current?.outcome === "options" || (current?.outcome === "over limit" && current.options.length)) {
     const over = overOf([current.options.find(({ id }) => id === params.over?.[0])], totalCents);
     return {
       kind: "options",
@@ -65,6 +66,8 @@ export function roseState(
       overCents: over?.cents,
       tried,
       last: current.last ?? undefined,
+      overLimit: current.outcome === "over limit" || undefined,
+      ...(stopped && { waitMinutes: params.limitWait }),
     };
   }
   if (current?.outcome === "basket") {
@@ -237,7 +240,8 @@ function fixedListState(request: PurchaseRequest | null, params: RoseParams): Ro
   }
 }
 
-export function samState(request: PurchaseRequest | null): SamState {
+// Sam's limit as Sam has it now, so Sam's page says how far over it the ask is (D109).
+export function samState(request: PurchaseRequest | null, limitCents?: number): SamState {
   if (!request) return { kind: "nothing" };
   switch (request.status) {
     case "waiting":
@@ -249,6 +253,7 @@ export function samState(request: PurchaseRequest | null): SamState {
         busy: request.status === "paying",
         found: request.found ?? undefined,
         lines: request.lines ?? undefined,
+        limitCents,
       };
     case "paid":
       return { kind: "paid", receipt: receiptOf(request) };

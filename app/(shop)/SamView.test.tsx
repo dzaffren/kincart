@@ -62,3 +62,42 @@ it("shows each line's photo and note only when the line has one", () => {
   expect(text(html)).toContain("Good to know: It needs 3 AAA batteries, which aren't included.");
   expect(text(html).split("Why it fits:").length - 1).toBe(2);
 });
+
+it("tells Sam how far over Sam's limit one thing is, above the ask, and says nothing under it", () => {
+  const cane = { id: "prod_2Sq8aQ", name: "Small Base Aluminum Quad Cane", cents: 2389 };
+  const found = { shop: "staples.com", url: "https://www.staples.com/p/prod_2Sq8aQ", reason: "It stands up on its own." };
+  const over = renderToStaticMarkup(<SamView state={{ kind: "request", item: cane, askedAt, found, limitCents: 2000 }} />);
+  expect(over).toMatch(/^<div class="screen"><p class="notice"[^>]*>This is \$3\.89 over your \$20 limit\.<\/p><h1>Rose would like this<\/h1>/);
+  expect(over).toMatch(/<button[^>]*>OK, pay \$23\.89<\/button>/);
+
+  const under = renderToStaticMarkup(<SamView state={{ kind: "request", item: cane, askedAt, found, limitCents: 2500 }} />);
+  expect(under).not.toContain("over your");
+});
+
+it("marks only the basket lines over Sam's limit, each with how far over it is", () => {
+  const chair = {
+    id: "prod_7Fb4sH",
+    name: "Folding Bath Seat Bench Shower Chair",
+    cents: 4499,
+    shop: "bestbuy.com",
+    url: "https://www.bestbuy.com/p/prod_7Fb4sH",
+    reason: "It folds flat against the wall when nobody is using it.",
+    thing: "a folding shower chair",
+  };
+  const html = renderToStaticMarkup(
+    <SamView
+      state={{
+        kind: "request",
+        item: { id: "basket", name: "2 things", cents: 5378 },
+        askedAt,
+        lines: [batteries, chair],
+        limitCents: 3000,
+      }}
+    />,
+  );
+
+  expect(html.match(/ over your/g)).toHaveLength(1);
+  expect(html).toMatch(/Folding Bath Seat Bench Shower Chair.*<span><strong>\$14\.99 over your \$30 limit\.<\/strong><\/span>/);
+  expect(html).not.toMatch(/Duracell Coppertop AA Batteries, 8 Pack.*over your.*Folding Bath Seat/);
+  expect(html).not.toContain("This is");
+});

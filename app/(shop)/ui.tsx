@@ -127,9 +127,11 @@ type ListingPickerProps = {
   none?: string;
   // The listing Rose bought last time, and what changed about it since.
   bought?: { id: string; note: string };
+  // Sam's price limit, read on each redraw, so a listing over it says by how much.
+  limitCents?: number;
 };
 
-export function ListingPicker({ listings, labelledBy, name = "listing", picked, none, bought }: ListingPickerProps) {
+export function ListingPicker({ listings, labelledBy, name = "listing", picked, none, bought, limitCents }: ListingPickerProps) {
   return (
     <fieldset className="options" aria-labelledby={labelledBy}>
       {listings.map((listing) => (
@@ -149,6 +151,13 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
                 <span className="option-price">{money(listing.cents)}</span>{" "}
                 <span className="small">at {listing.shop}</span>
               </span>
+              {limitCents !== undefined && listing.cents > limitCents && (
+                <span>
+                  <strong>
+                    {money(listing.cents - limitCents)} over {HELPER}&apos;s {wholeDollars(limitCents)} limit.
+                  </strong>
+                </span>
+              )}
               {bought?.id === listing.id && (
                 <span>
                   <strong>You bought this last time.</strong> {bought.note}

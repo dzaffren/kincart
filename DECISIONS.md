@@ -553,7 +553,7 @@ Status: active
 Why: today the charge lands in KinCart's sandbox account and no order reaches the shop, so a judge asks who the merchant is. Paying the shop keeps refunds, returns and fraud with the shop. Two PayPal claims are unproven (after-review O3, O4).
 Rejected: KinCart buys for Rose as a reseller (refunds, returns and fraud become KinCart's), no build and a pitch to PayPal only (the review's worst gap stays).
 Source: docs/specs/after-review/shape.md
-Status: active
+Status: superseded by D108
 
 ## D83 · 2026-10-22 · A person approves every buy, and the AI only does more legwork
 
@@ -567,7 +567,7 @@ Status: active
 Why: one control serves a No, an untick and an empty search. Other words alone leave a search empty when Sam's limit is low, so Sam can then allow one listing over it.
 Rejected: a scheduled search that pings Rose later (it needs a background job, and Vercel Hobby runs crons once a day), other words only (a low limit still finds nothing), a separate slice each for a swap after a No and for keep looking (two controls for one job).
 Source: docs/specs/after-review/shape.md
-Status: active
+Status: superseded by D110
 
 ## D85 · 2026-10-22 · Secret links stay, with no accounts or family invites for now
 
@@ -624,7 +624,7 @@ Status: active
 Why: Channel3's words can say "AA batteries" over a photo of a basket, so only the photo shows the mismatch (O1). One call keeps D22's two fixed steps, and Haiku can pick another listing in place of a misfit. The API refuses Channel3's photo URLs because the CDN's robots.txt disallows crawlers, so KinCart sends the bytes.
 Rejected: a third call that checks the 3 picks' photos (one more call in a row against the 15 s limit, and Rose may see 1 option when others fit), photo URLs in the request (the API refuses them), photos for listings above the limit too (up to 10 more photos a call, for a wrong message, not a wrong pick).
 Source: docs/specs/picks-that-match.md
-Status: active
+Status: superseded by D112
 
 ## D93 · 2026-10-22 · A photo KinCart can't download drops its listing, and a failed pick call finds nothing, as today
 
@@ -729,4 +729,42 @@ Status: active
 Why: the mark and the change line must survive the 3 s redraw (D19) and a reopened link, so they live in Neon with the search (D23). A basket's groups are jsonb already.
 Rejected: the page address, as D36 does for over-limit picks (a reopened link loses it, as D100 found for `tried`), only the paid ask's id in `rose_search` (today's price over the limit must be kept too).
 Source: docs/specs/ask-again.md
+Status: active
+
+## D108 · 2026-10-23 · Sam's OK keeps paying KinCart's sandbox account, because a saved PayPal can't pay the shop
+
+Why: the pay-the-shop spike charged Rose's saved PayPal with a stand-in shop as payee, and PayPal answered `422 BILLING_AGREEMENT_NOT_FOUND`. The same call to KinCart's own account completed. One order with two payees gave `500` three times. A real product pays each shop through PayPal's marketplace setup, never as a reseller, as D82 said.
+Rejected: Rose approves each shop's payment on PayPal after Sam's OK (Sam's one OK no longer pays), a spike of PayPal's marketplace setup in sandbox (a Platform app, each shop signed up, Rose links again, and a possible manual review).
+Supersedes: D82
+Source: docs/specs/pay-the-shop.md
+Status: active
+
+## D109 · 2026-10-23 · Sam's OK is the allow: Rose asks for a listing over the limit like any other, and Sam's page says how far over it is
+
+Why: Sam already approves every buy (D83), so one OK covers the price too.
+Rejected: Sam allows the listing first, then Rose asks and Sam taps OK (Sam answers twice for one thing).
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D110 · 2026-10-23 · Find another tries other words when Rose or Sam taps it, and a search that finds nothing under Sam's limit shows listings over it straight away
+
+Why: in find-another's /build, other words found the right thing under the limit in 0 of 9 runs on 3 real over-limit asks. Waiting for Find another cost Rose 10 to 15 s and one of 20 daily Finds. Find another stays one control for an empty search, a No and an untick, and runs only on a tap.
+Rejected: listings over the limit only after Find another also finds nothing (D84's order, a wasted Find), a scheduled search that pings Rose later (Vercel Hobby runs crons once a day), other words only (a low limit still finds nothing), a separate slice each for a swap after a No and for keep looking (two controls for one job).
+Supersedes: D84
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D111 · 2026-10-23 · Rose sees up to 3 listings over the limit that the pick step says fit, cheapest first, and none above double Sam's limit
+
+Why: closest to the limit first, and a ceiling at double, keep the options near what Sam meant to spend. For a folding shower chair at a $30 limit, Rose sees the $44.99 chair and not the $90.99 one. In Ask again, last time's listing still comes first and picked (D104), because Sam approved it once.
+Rejected: only the cheapest (no choice for Rose), the pick step's order (the first can cost far more than the next), no ceiling (Rose may ask for a $90.99 chair on a $30 limit), $20 over the limit (the same step for a $5 limit and a $500 one), strictly cheapest first in Ask again too (last time's listing could land last and unpicked).
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D112 · 2026-10-23 · A second pick call checks the 5 cheapest listings up to double Sam's limit, with photos, only when the first finds nothing under the limit and says one above fits
+
+Why: Rose can now pick a listing over the limit, so its photo must pass the pick step (D89). The first call and its prompt stay as the recorded set tests them (D90). In the allow-over-limit /poc, one thing took 5.8 to 14.9 s and five took 12.9 to 15.7 s, inside D91. The second call took 5.1 to 6.3 s with 8 photos and 2.8 to 3.6 s with 5. D92 still holds for the first call: each listing under the limit goes with its photo, those above as names only, and KinCart sends the bytes because the API refuses Channel3's photo URLs.
+Rejected: one call with photos for listings above the limit too (up to 10 more photos on almost every Find, and a new prompt for the recorded set), every listing up to double the limit (8 photos took a one-thing Find to 14.9 s), photo URLs in the request (the API refuses them), a third call that checks the 3 picks' photos on every Find (one more call in a row, as D92 found).
+Supersedes: D92
+Source: docs/specs/allow-over-limit.md
 Status: active

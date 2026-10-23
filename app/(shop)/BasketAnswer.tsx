@@ -5,14 +5,14 @@ import { things } from "../../lib/shop/items";
 import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, RELATIVE, Summary } from "./ui";
+import { money, RELATIVE, Summary, wholeDollars } from "./ui";
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { lines: Line[]; askedAt: Date; answer?: Action; busy?: boolean; unticked?: string[] };
+type Props = { lines: Line[]; askedAt: Date; answer?: Action; busy?: boolean; unticked?: string[]; limitCents?: number };
 
 // Sam's OK button names the total of the ticked lines, so it changes as Sam ticks.
-export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [] }: Props) {
+export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents }: Props) {
   const [ticked, setTicked] = useState(() => lines.filter((line) => !unticked.includes(line.id)).map((line) => line.id));
   const paying = lines.filter((line) => ticked.includes(line.id));
   const total = paying.reduce((sum, line) => sum + line.cents, 0);
@@ -57,6 +57,13 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [] }: Pr
                             <span className="option-price">{money(line.cents)}</span>{" "}
                             <span className="small">at {line.shop}</span>
                           </span>
+                          {limitCents !== undefined && line.cents > limitCents && (
+                            <span>
+                              <strong>
+                                {money(line.cents - limitCents)} over your {wholeDollars(limitCents)} limit.
+                              </strong>
+                            </span>
+                          )}
                         </span>
                         <span className="listing-text">
                           {line.imageUrl && (
