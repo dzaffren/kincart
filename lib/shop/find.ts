@@ -6,9 +6,13 @@ export type Option = Listing & { what: string; why: string; watch: string };
 
 type Problem = "nothing found" | "over limit";
 
+// The listing Sam paid for last time, which Ask again looks for in today's search. nowCents is its price
+// today when it's over Sam's limit now.
+export type Last = { id: string; cents: number; shop: string; nowCents?: number };
+
 // thing is what Rose called it, such as "a night light". query is the shop search it last ran, which
-// Find another avoids, and tried marks a group that Find another searched.
-export type Group = { thing: string; options: Option[]; problem?: Problem; query?: string; tried?: boolean };
+// Find another avoids, and tried marks a group that Find another searched. last marks a group that Ask again searched.
+export type Group = { thing: string; options: Option[]; problem?: Problem; query?: string; tried?: boolean; last?: Last };
 
 type Single = ({ outcome: "options"; options: Option[] } | { outcome: Problem }) & { query?: string };
 

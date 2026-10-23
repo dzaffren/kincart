@@ -123,6 +123,46 @@ Scenario: Ask again past the address's daily Finds
 - A rebuy without Ask Sam. A person approves every buy (D83). Never.
 - A reminder to rebuy, such as each month. KinCart searches only when Rose or Sam taps (D84). No later slice.
 
+## Interface
+
+Rose's page gets one new section, "Bought before", and one new line on a listing. Sam's page doesn't change. Every piece comes from the design system: no new component, class or token.
+
+```mermaid
+flowchart LR
+    A["Ask: Bought before"] -- "Ask again" --> L["Looking…"]
+    L -- "last time's listing under the limit" --> O["Options: it's first and picked, with what changed"]
+    L -- "over the limit now, or not found today" --> N["Options: a notice on top, nothing picked"]
+    L -- "found nothing" --> E["Ask: Couldn't find that. Find another"]
+    L -- "past 20 Finds" --> X["Ask: That's a lot of Finds… Bought before stays"]
+```
+
+Rose taps Ask again under "Bought before". The search ends in options with last time's listing picked, options with a notice about it, an empty search with Find another, or the daily-limit notice.
+
+**Bought before.** It sits under the Find form and the limit line, above Notifications (O9). It shows only when Sam paid for something.
+
+- A heading, "Bought before", and one hint under it: "Ask again looks for the same things at today's prices."
+- One card for each paid ask, newest first. A card lists each paid listing with its price, as the waiting screen does. A basket's card has "2 things" on top. The last line is "Paid Thu, Oct 22, 10:16 AM", in Rose's own time.
+- A secondary Ask again button under each card. Each card is its own form, so only the pressed button shows "Looking…".
+
+**After the tap:**
+
+| Result | What Rose sees |
+| ------ | -------------- |
+| Last time's listing is under Sam's limit | "Which one would you like?", with `For "AA batteries". Today's prices for what you bought before.` Last time's listing is first and already picked (O10). Under its price: **You bought this last time.** and the change: "Same price as last time.", "Now $9.49. It was $8.99.", "Now from target.com. It was from walmart.com.", or "Now $9.49 from target.com. It was $8.99 from walmart.com." |
+| It's over Sam's limit now | A notice on top: "The one you bought last time is $9.49 now, over Sam's $8 limit." Nothing is picked |
+| It isn't in today's search | A notice on top: "Couldn't find the one you bought last time today." Nothing is picked |
+| Nothing found | The ask screen after an empty Find: "Couldn't find that. Try different words.", Find another, and "AA batteries" in the box. Bought before stays |
+| Stopped by the daily limit | The ask screen with "That's a lot of Finds from here today. Try again in 3 hours." on top. Bought before and its Ask again stay |
+| A basket | "Which ones would you like?", with the same line. Each group shows its own mark or notice, under the group's heading. Only the things Sam paid for come back |
+
+**Motion tier:** 1, as before (O11). Nothing new moves: the notices rise and fade like every notice, and "Looking…" turns the existing spinner. Under reduced motion, nothing moves.
+
+**Components used:** `Notice`, `Button` (secondary), `LineItems`, `LocalTime` (`day`), `ListingPicker` (with a new `bought` prop that adds one line), `.summary`, `.summary-title`, `.groups`, `.heading`, `.stack` and `.small`. The tokens come from `docs/design/design-system/` (D15).
+
+**Built at pause 2:** `RoseView` takes `rebuy`, the ask screen takes `bought`, and the options screen takes `last`. `Group` gains `last` (`lib/shop/find.ts`), with a new `Last` type: last time's listing id, price and shop, and its price today when it's over the limit.
+
+**Preview:** `/preview/ask-again` on `pnpm dev`, from `app/(shop)/preview/ask-again/page.tsx`. It shows Rose's real page in 10 frames, one or more for each scenario.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -135,6 +175,9 @@ Scenario: Ask again past the address's daily Finds
 | O6 | Does an Ask again count as a Find? | question | spec p1 | user | Resolved | Yes: toward the address's 20 a day, and on `/status`, as Find another (D97). 2026-10-23 |
 | O7 | When an Ask again finds nothing for a thing, does Rose get Find another? | question | spec p1 | user | Resolved | Yes, one, as after a Find (D97). 2026-10-23 |
 | O8 | Does Sam's page say that an ask is a rebuy? | question | spec p1 | user | Resolved | No, not in this slice. Sam sees the ask as today. 2026-10-23 |
+| O9 | Where "Bought before" sits on the ask screen | question | spec p2 | user | Resolved | Under the Find form and the limit line. A new ask stays first. 2026-10-23 |
+| O10 | Is last time's listing already picked, when today's options have it? | question | spec p2 | user | Resolved | Yes. Rose taps Ask again, then Ask Sam, and Sam still approves. 2026-10-23 |
+| O11 | Which motion tier | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

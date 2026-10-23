@@ -125,9 +125,11 @@ type ListingPickerProps = {
   name?: string;
   picked?: string;
   none?: string;
+  // The listing Rose bought last time, and what changed about it since.
+  bought?: { id: string; note: string };
 };
 
-export function ListingPicker({ listings, labelledBy, name = "listing", picked, none }: ListingPickerProps) {
+export function ListingPicker({ listings, labelledBy, name = "listing", picked, none, bought }: ListingPickerProps) {
   return (
     <fieldset className="options" aria-labelledby={labelledBy}>
       {listings.map((listing) => (
@@ -147,6 +149,11 @@ export function ListingPicker({ listings, labelledBy, name = "listing", picked, 
                 <span className="option-price">{money(listing.cents)}</span>{" "}
                 <span className="small">at {listing.shop}</span>
               </span>
+              {bought?.id === listing.id && (
+                <span>
+                  <strong>You bought this last time.</strong> {bought.note}
+                </span>
+              )}
             </span>
             <span className="listing-text">
               {listing.imageUrl && (
