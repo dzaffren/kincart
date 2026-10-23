@@ -1,10 +1,10 @@
 # Allow over limit
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI, with an LLM path
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI, with an LLM path
 
 **Shape doc:** docs/specs/after-review/shape.md
 **Depends on:** find-another
-**Page:** added at pause 3.
+**Page:** none. Skipped: you read the `.md` directly.
 
 When nothing fits under Sam's price limit, Rose sees the nearest listings over it, and Sam's OK pays one. It ships now because Find another's other words never fixed an over-limit ask in find-another's measurement.
 
@@ -138,6 +138,173 @@ The marks compare the price with Sam's limit on each redraw. When Sam raises the
 
 **Preview:** `/preview/allow-over-limit` on `pnpm dev`, from `app/(shop)/preview/allow-over-limit/page.tsx`. It shows Rose's and Sam's real pages in 12 frames, one or more for each scenario.
 
+## Technical plan
+
+### Approach
+
+`searchThing()` runs a second pick call when the first one finds nothing under Sam's limit and says a listing above it fits. The second call gets the 5 cheapest listings over the limit and up to double it, with their photos, through the same `choose()`. Its picks come back cheapest first, after last time's listing in Ask again, as the search's options, with outcome `over limit`. `rose_search` keeps them in its `listings` column, and Rose's page shows them as options, with the marks built at pause 2. Nothing in the schema changes.
+
+Relies on: D19, D23, D31, D34, D73, D83, D89, D90, D91, D93, D95, D97, D103, D104, D109, D110, D111, D112
+
+```mermaid
+flowchart TB
+    subgraph "Rose's page"
+        RV["RoseView: options marked over the limit"]
+    end
+    subgraph server
+        FA["find() / findAgain() / findRebuy()"] -- "words, query, limit" --> ST["searchThing() find.ts:215"]
+        ST -- "query, limit" --> C3[Channel3 search x2]
+        ST -- "listings under, names above" --> P1["choose() 1st call"]
+        ST -- "5 cheapest up to 2x, with photos" --> P2["choose() 2nd call"]
+        FA -- "outcome over limit + options" --> RS[("rose_search.listings")]
+        RS -- "saved search" --> RO["roseState() state.ts:52"]
+        AS["askSam() actions.ts:207"] -- "pick at its stored price" --> PR[("purchase_requests")]
+        PR -- "request + Sam's limit" --> SS["samState() state.ts:240"]
+    end
+    RO --> RV
+    RV -- "Ask Sam, listing id" --> AS
+    SS --> SV["SamView: This is $3.89 over your $20 limit"]
+```
+
+Find's search and pick step return the options over the limit, Neon keeps them, and Rose's and Sam's pages compare each price with Sam's limit as they draw.
+
+```mermaid
+sequenceDiagram
+    participant R as Rose's page
+    participant F as find action
+    participant C as Channel3
+    participant CDN as cdn.trychannel3.com
+    participant H as Haiku
+    participant D as Neon
+    R->>F: Find "a walking stick that stands up by itself"
+    F->>H: readNeed: query "self-standing walking stick"
+    F->>C: search under $20, and search all
+    F->>CDN: photos of the listings under $20
+    F->>H: pick call 1: listings under $20 with photos, the rest as names
+    H-->>F: no picks, aboveLimit true
+    F->>CDN: photos of the 5 cheapest from $20.01 to $40
+    F->>H: pick call 2: those 5 with photos
+    H-->>F: 3 picks
+    F->>D: saveSearch: outcome over limit, listings $20.24, $23.89, $24.99
+    F-->>R: redirect
+    R->>D: roseState: options with Sam's $20 limit
+    Note over R: Notice, and "$3.89 over Sam's $20 limit." on each
+```
+
+```mermaid
+flowchart LR
+    C3[Channel3] -- "names, details, photo URLs, prices" --> F["searchThing()"]
+    CDN[cdn.trychannel3.com only] -- "photo bytes, 3 s, 1 MB" --> F
+    F -- "names, details, photos" --> H[Haiku]
+    F -- "options with prices" --> N[(rose_search)]
+    N -- "price of the pick" --> PR[(purchase_requests)]
+    PR -- "amount" --> PP[PayPal]
+```
+
+Listing data from Channel3 crosses into Haiku and Neon as today. Photos come only from Channel3's CDN (D95), and the price charged comes only from Neon (D23).
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `lib/shop/find.ts:17` | `Single`'s `over limit` outcome takes optional `options` | Scenarios 1, 3 |
+| `lib/shop/find.ts:215` | After the first `choose()` finds nothing under the limit and says `aboveLimit`, take the 5 cheapest listings over the limit and up to double it, and last time's listing when it is within double. `withPhotos()` them, call `choose(words, kept, [], lastId)`, and return the picks cheapest first, last time's first, as `{ outcome: "over limit", options }`. No picks, no listing within double, or a failed call give `{ outcome: "over limit" }`, as today (D93). The `checked` and `unloaded` counts add the second call's photos | Scenarios 1, 3, 4; O7, O9, O10 |
+| `lib/shop/find.ts:151` | `groupOf()` keeps an over-limit result's options in the group, with `problem: "over limit"` | Scenario 3 |
+| `lib/shop/find.ts:272` | `counts()` counts an over-limit search's options, so the log line says `listings=3` | Proof it works |
+| `lib/shop/requests.ts:249` | `saveSearch()` stores the options of an `over limit` search too | Scenario 1 |
+| `app/(shop)/state.ts:52` | `roseState()` shows an `over limit` search that has options as the options screen. `emptyOf()` already offers it one Find another | Scenario 1; O6 |
+| `app/(shop)/state.ts:240` | `samState(request, limitCents)` puts Sam's limit on the request state | Scenarios 2, 3 |
+| `app/(shop)/h/[token]/page.tsx:51` | Passes `limitCents` to `samState()` | Scenarios 2, 3 |
+| `app/(shop)/ui.tsx`, `RoseView.tsx`, `SamView.tsx`, `BasketAnswer.tsx` | Built at pause 2: the marks and notices | Scenarios 1 to 3 |
+| `e2e/db.ts:15` | `reset()`'s search takes an `outcome`, so a test can seed an over-limit search | The e2e |
+| `lib/shop/find.test.ts`, `lib/shop/requests.test.ts`, `app/(shop)/state.test.ts`, `app/(shop)/actions.test.ts`, `app/(shop)/RoseView.test.tsx`, `app/(shop)/SamView.test.tsx` | The tests in the plan below | Every scenario |
+| `e2e/allow-over-limit.spec.ts` | New. The e2e below | Scenarios 1, 2 |
+
+Reusing: `choose()` and its prompt as they are, `withPhotos()` and its CDN rules (D95), `groupOf()`, `saveSearch()` and `getSearch()`, `emptyOf()` and `againOf()` for Find another, `askSam()` and its total-limit check (D34) unchanged, `lastPick()` for last time's listing, `stubServices()` and `product()` in `find.test.ts`, and `reset()`, `listing()` and `sql()` in `e2e/db.ts`.
+
+`choose()` labels the second call's listings "Under their price limit, pick from these". They are over it. Haiku never sees a price, and the /poc found the right listings with this exact call, so the label stays and the first call's text stays as the recorded set tests it (D90).
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| A second `choose()` call in `searchThing()` | Scenario 1, and D89: a listing Rose can pick must pass the photo check. O7 |
+| The cap of 5 listings for the second call | O8 and O10: 8 photos took a one-thing Find to 14.9 s, against D91's 15 s |
+| `options` on the `over limit` outcome | Scenario 1: the options must survive the 3 s redraw (D19) and Ask Sam reads them from Neon (D23) |
+| `limitCents` on Sam's request state | Scenario 2: Sam's page must say how far over the limit the ask is |
+| An `outcome` on `reset()`'s search in `e2e/db.ts` | The e2e seeds an over-limit search. No helper seeds one today |
+
+### Non-functionals
+
+|                      |                                                                               |
+| -------------------- | ----------------------------------------------------------------------------- |
+| **Load**             | The second call runs only on a thing whose first call finds nothing under the limit and says one above fits: all 3 over-limit asks in the /poc, and none of the AA batteries or night light runs. It adds one Haiku call with up to 5 photos for that thing, and no Channel3 search |
+| **Breaks first**     | At 10 times the Finds, many pick calls with photos at once time Haiku out, as 10 Finds at once did (learning: run real Finds two at a time). The thing then falls back to today's "Nothing under $20" (D93). D73's 20 Finds a day bound each address |
+| **Security surface** | No new route or caller: `find`, `askSam` and `answer` check Rose's or Sam's link as today. Channel3's listing data is trusted as before, and photos come only from `cdn.trychannel3.com` (D95). The amount charged comes from Neon (D23). No new secret. `rose_search.listings` stores over-limit options as it stores options today |
+| **Proof it works**   | In Vercel's logs, `find outcome=over-limit listings=3 searches=2 ms=<n> checked=<n> unloaded=0`. Today an over-limit Find logs `listings=0`. Mask the link tokens in any log line before sharing it |
+| **Rollout**          | No flag, no migration, no new env value. Merge, CI tests, and Vercel promotes (D10). Rollback: revert the merge. A saved over-limit search with options then shows today's "Nothing under $20" screen, and an ask already sent to Sam stays payable |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1 Rose sees listings over the limit | `find.test.ts`: a first call with no picks and `aboveLimit` sends a second call only the listings from $20.01 to $40, with photos, and returns its picks cheapest first as `over limit` with options. The log line says `listings=3`. `requests.test.ts`: an `over limit` search with options saves and reads back. `state.test.ts`: it shows as the options screen, and `againOf()` offers Find another until it has run. `RoseView.test.tsx`: the notice, each mark, Find another before it has run and not after, no "Only 2 found" line, and no mark once the limit covers the price | `pnpm test` |
+| 2 Sam's OK pays it | `state.test.ts`: `samState()` carries Sam's limit. `SamView.test.tsx`: "This is $3.89 over your $20 limit." `actions.test.ts`: Ask Sam sends an over-limit pick at its stored $23.89. The e2e | `pnpm test`, `pnpm test:e2e e2e/allow-over-limit.spec.ts` |
+| 3 A basket with one thing over | `find.test.ts`: the shower chair's group comes back with `problem: "over limit"` and its option, and the batteries' group as today. `RoseView.test.tsx`: the group's notice and mark. `SamView.test.tsx`: only the chair's line is marked | `pnpm test` |
+| 4 Nothing within double | `find.test.ts`: with the only fit at $44.99 on a $20 limit, no second call runs, and the outcome is `over limit` with no options. A second call that fails gives the same | `pnpm test` |
+| 5 The total limit still stops it | `actions.test.ts`: Ask Sam with the $23.89 cane and a $20 total limit redirects with `over=` and asks Sam nothing | `pnpm test` |
+| O9 Last time's listing first | `find.test.ts`: in Ask again, last time's listing at $24.99 comes first among the options over the limit, ahead of a $21.23 one | `pnpm test` |
+| O10 The 5 cheapest | `find.test.ts`: with 7 listings up to double the limit, the second call gets the 5 cheapest | `pnpm test` |
+
+**E2E:** `e2e/allow-over-limit.spec.ts`, from an already-saved PayPal (D20). It seeds Sam's $20 limit and an over-limit search for "a walking stick that stands up by itself" with the three canes. Rose sees "Nothing under $20 for that." and "$3.89 over Sam's $20 limit.", picks "Small Base Aluminum Quad Cane" and taps Ask Sam. Sam's page says "This is $3.89 over your $20 limit.", and Sam taps "OK, pay $23.89". Both pages show the $23.89 receipt. It seeds the search, as `basket-cap.spec.ts` does, so Channel3 and Haiku answers don't change the walk. Stop `pnpm dev` before it runs (learning: stop pnpm dev before running the e2e).
+
+### Chunks
+
+Single chunk. It changes about 60 lines of app code beyond pause 2's, and its unit tests and e2e share the local database (learning: build chunks one after another when their tests share the local database).
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| An over-limit Find runs close to D91's 15 s. The walking stick took 14.9 s with 8 photos | The cap of 5 (O10). Each Haiku call keeps its 10 s timeout, and a timed-out second call shows today's "Nothing under $20" (D93). The page's `maxDuration` is 30 s |
+| `CHANNEL3_API_KEY` is out of free credits (O11). Every Find fails with `channel3 402` where it is set | Local runs use `CHANNEL3_API_KEY_II` (O11). The e2e above seeds its search. The e2e specs that call Channel3 for real (D24) fail in CI until GitHub's key has credits |
+| The second call finds nothing for a real ask. The sock aid's call found a fit in 1 of 3 runs | Rose sees today's "Nothing under $10" screen and Find another, as before |
+| Sam lowers the limit after Rose asks, so an ask made under the old limit shows as over it | The mark is true for the limit Sam has now. Sam's OK still pays it |
+
+### Decisions to record
+
+```
+## D109 · 2026-10-23 · Sam's OK is the allow: Rose asks for a listing over the limit like any other, and Sam's page says how far over it is
+
+Why: Sam already approves every buy (D83), so one OK covers the price too.
+Rejected: Sam allows the listing first, then Rose asks and Sam taps OK (Sam answers twice for one thing).
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D110 · 2026-10-23 · Find another tries other words when Rose or Sam taps it, and a search that finds nothing under Sam's limit shows listings over it straight away
+
+Why: in find-another's /build, other words found the right thing under the limit in 0 of 9 runs on 3 real over-limit asks. Waiting for Find another cost Rose 10 to 15 s and one of 20 daily Finds. Find another stays one control for an empty search, a No and an untick, and runs only on a tap.
+Rejected: listings over the limit only after Find another also finds nothing (D84's order, a wasted Find), a scheduled search that pings Rose later (Vercel Hobby runs crons once a day), other words only (a low limit still finds nothing), a separate slice each for a swap after a No and for keep looking (two controls for one job).
+Supersedes: D84
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D111 · 2026-10-23 · Rose sees up to 3 listings over the limit that the pick step says fit, cheapest first, and none above double Sam's limit
+
+Why: closest to the limit first, and a ceiling at double, keep the options near what Sam meant to spend. For a folding shower chair at a $30 limit, Rose sees the $44.99 chair and not the $90.99 one. In Ask again, last time's listing still comes first and picked (D104), because Sam approved it once.
+Rejected: only the cheapest (no choice for Rose), the pick step's order (the first can cost far more than the next), no ceiling (Rose may ask for a $90.99 chair on a $30 limit), $20 over the limit (the same step for a $5 limit and a $500 one), strictly cheapest first in Ask again too (last time's listing could land last and unpicked).
+Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D112 · 2026-10-23 · A second pick call checks the 5 cheapest listings up to double Sam's limit, with photos, only when the first finds nothing under the limit and says one above fits
+
+Why: Rose can now pick a listing over the limit, so its photo must pass the pick step (D89). The first call and its prompt stay as the recorded set tests them (D90). In the allow-over-limit /poc, one thing took 5.8 to 14.9 s and five took 12.9 to 15.7 s, inside D91. The second call took 5.1 to 6.3 s with 8 photos and 2.8 to 3.6 s with 5. D92 still holds for the first call: each listing under the limit goes with its photo, those above as names only, and KinCart sends the bytes because the API refuses Channel3's photo URLs.
+Rejected: one call with photos for listings above the limit too (up to 10 more photos on almost every Find, and a new prompt for the recorded set), every listing up to double the limit (8 photos took a one-thing Find to 14.9 s), photo URLs in the request (the API refuses them), a third call that checks the 3 picks' photos on every Find (one more call in a row, as D92 found).
+Supersedes: D92
+Source: docs/specs/allow-over-limit.md
+Status: active
+```
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -148,6 +315,11 @@ The marks compare the price with Sam's limit on each redraw. When Sam raises the
 | O4 | How far over Sam's limit a listing can be. For "a folding shower chair" at a $30 limit, the fits run $44.99, $90.99 and more | question | spec p1 | user | Resolved | Up to double Sam's limit. For a $30 limit, nothing above $60. 2026-10-23 |
 | O5 | Which motion tier the slice uses. The new notices rise and fade like every notice, and nothing else moves | question | spec p2 | user | Resolved | Tier 1, as before. Nothing new moves. 2026-10-23 |
 | O6 | Rose's one-thing screen over the limit shows Find another and Try other words, both under Ask Sam | question | spec p2 | user | Resolved | Keep both. Try other words stays, as on every options screen. 2026-10-23 |
+| O7 | How the pick step checks listings over the limit. D92 rejected one more call in a row, and photos for listings above the limit | question | spec p3 | user | Resolved | A second pick call, with photos, on the listings up to double the limit. It runs only when the first call finds nothing under the limit and says one above fits. The pick prompt stays as the recorded set tests it. Supersedes D92 (D112). 2026-10-23 |
+| O8 | A Find that needs the second pick call stays within D91: one thing within 15 s, five within 20 s | unproven | spec p3 | poc | Resolved | Yes, with no margin for the walking stick. A /poc ran real Haiku and Channel3 on `CHANNEL3_API_KEY_II`: 12 searches, each run once and timed, and the Haiku calls and photo downloads run 3 times. One thing, two at a time: the walking stick at $20 took 13.8, 14.9 and 14.9 s, the shower chair at $30 5.8 to 8.0 s, and the sock aid at $10 7.7 to 8.4 s. Five things at $20 took 12.9 to 15.7 s. The second call took 1.5 to 2.4 s with 1 photo, 2.8 to 3.6 s with 5, and 5.1 to 6.3 s with 8. It found canes at $21.23 to $29.99, the $44.99 chair, and once a $15.99 sock aid. 2026-10-23 |
+| O9 | In Ask again, last time's listing can be over the limit now and among the options over it. D104 puts it first, and D111 says cheapest first | question | spec p3 | user | Resolved | Last time's listing comes first and picked, as D104 says. The rest follow cheapest first. 2026-10-23 |
+| O10 | How many listings the second pick call sees. The walking stick sent 8 photos and took 14.9 s | question | spec p3 | user | Resolved | The 5 cheapest up to double the limit, and last time's listing when it is within double. 2026-10-23 |
+| O11 | `CHANNEL3_API_KEY` in `.env.local` is out of Channel3's free credits: every search answers `402`. Vercel's production key and GitHub's CI key may be the same one | flag | spec p3 | user | Resolved | Use `CHANNEL3_API_KEY_II`. `/build` runs its tests with `CHANNEL3_API_KEY="$CHANNEL3_API_KEY_II"` in the shell, which wins over `.env.local`, so no code changes. Swapping the key on Vercel and in GitHub's secrets is the user's call. 2026-10-23 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
