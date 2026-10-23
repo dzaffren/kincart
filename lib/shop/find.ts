@@ -33,6 +33,9 @@ export type PhotoSearch = { words: string; result: Search; photos: number; blank
 // and the listing ids Sam refused (D98).
 export type Again = { words: string; query: string; refused: string[] };
 
+// A thing that Ask again searches: what Rose called it, last time's query, and the listing Sam paid for.
+export type Rebuy = { words: string; query: string; last: { id: string; name: string; cents: number; shop: string } };
+
 // searches are the Channel3 calls a Find sent, whatever they answered, for /status (D81). checked are the
 // listings sent to Haiku with a photo, and unloaded the listings dropped for their photo. Those two are for the log.
 export type Sent = { searches: number; checked: number; unloaded: number };
@@ -104,7 +107,41 @@ export async function findAgain(
       const shown = groups.some((group) => group.options.length);
       return { words, result: shown ? { outcome: "basket", groups } : { outcome: "nothing found" } };
     },
-    true,
+    () => " again=1",
+  );
+  return result;
+}
+
+// Each thing Sam paid for searches last time's query again, and last time's listing by its name (D105). One
+// thing gives a single search, and several a basket, or nothing found with its groups, as Find gives (D99).
+export async function findRebuy(
+  words: string,
+  things: Rebuy[],
+  limitCents: number,
+  sent: Sent = { searches: 0, checked: 0, unloaded: 0 },
+): Promise<Search> {
+  const { result } = await logged(
+    words,
+    0,
+    sent,
+    async (reasons) => {
+      // A thing whose search fails blanks only itself (D31).
+      const found = await Promise.all(
+        things.map(async ({ words: thing, query, last }): Promise<Single> => {
+          try {
+            return { ...(await searchThing(thing, query, limitCents, sent, [], last)), query };
+          } catch (error) {
+            reasons.push(reasonOf(error));
+            return { outcome: "nothing found", query };
+          }
+        }),
+      );
+      if (things.length === 1) return { words, result: found[0] };
+      const groups = things.map(({ words: thing }, index) => groupOf(thing, found[index]));
+      const shown = groups.some((group) => group.options.length);
+      return { words, result: shown ? { outcome: "basket", groups } : { outcome: "nothing found", groups } };
+    },
+    (result) => ` rebuy=1 same=${sameOf(result, things)}`,
   );
   return result;
 }
@@ -113,8 +150,9 @@ export async function findAgain(
 // group come out alike.
 export function groupOf(thing: string, result: Search): Group {
   const query = "query" in result ? result.query : undefined;
-  if (result.outcome === "options") return { thing, options: result.options, query };
-  return { thing, options: [], problem: result.outcome === "over limit" ? "over limit" : "nothing found", query };
+  const last = "last" in result ? result.last : undefined;
+  if (result.outcome === "options") return { thing, options: result.options, query, last };
+  return { thing, options: [], problem: result.outcome === "over limit" ? "over limit" : "nothing found", query, last };
 }
 
 // A photo that a thing is in is never blank, and a number past Rose's photos never counts (D69).
@@ -124,14 +162,14 @@ function blankOf({ things, blank }: PhotoNeed, photos: number): number {
   return new Set(counted).size;
 }
 
-// A search that fails says nothing found under Rose's own words, and the log line says why. again marks
-// a Find another.
+// A search that fails says nothing found under Rose's own words, and the log line says why. mark adds to the
+// line for a Find another or an Ask again.
 async function logged(
   words: string,
   photos: number,
   sent: Sent,
   run: (reasons: string[]) => Promise<Searched>,
-  again = false,
+  mark: (result: Search) => string = () => "",
 ): Promise<Searched> {
   const started = Date.now();
   const reasons: string[] = [];
@@ -143,7 +181,7 @@ async function logged(
   const photo = photos ? ` photos=${photos} blank=${searched.blank ?? 0}` : "";
   const reason = reasons.length ? ` reason=${reasons.join(",")}` : "";
   console.log(
-    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} searches=${sent.searches} ms=${Date.now() - started} checked=${sent.checked} unloaded=${sent.unloaded}${photo}${again ? " again=1" : ""}${reason}`,
+    `find outcome=${result.outcome.replaceAll(" ", "-")} ${counts(result)} searches=${sent.searches} ms=${Date.now() - started} checked=${sent.checked} unloaded=${sent.unloaded}${photo}${mark(result)}${reason}`,
   );
   return searched;
 }
@@ -172,33 +210,63 @@ async function searchThings(
   return groups.some((group) => group.options.length) ? { outcome: "basket", groups } : { outcome: "nothing found", groups };
 }
 
-// refused are listings Sam said no to, which Find another leaves out (D98).
+// refused are listings Sam said no to, which Find another leaves out (D98). last is the listing Sam paid for
+// last time, which Ask again also searches by its name (D105).
 async function searchThing(
   words: string,
   query: string,
   limitCents: number,
   sent: Sent,
   refused: string[] = [],
+  last?: Rebuy["last"],
 ): Promise<Single> {
   if (!query.trim()) return { outcome: "nothing found" };
 
-  sent.searches += 2;
-  const [under, all] = await Promise.all([searchListings(query, limitCents), searchListings(query)]);
-  const affordable = under.filter((listing) => listing.cents <= limitCents && !refused.includes(listing.id));
+  sent.searches += last ? 3 : 2;
+  const [under, all, named] = await Promise.all([
+    searchListings(query, limitCents),
+    searchListings(query),
+    last ? searchListings(last.name) : [],
+  ]);
+  const bought = last && [...under, ...all, ...named].find((listing) => listing.id === last.id);
+  const affordable = [...under, ...(bought ? [bought] : [])].filter(
+    (listing, index, listings) =>
+      listing.cents <= limitCents &&
+      !refused.includes(listing.id) &&
+      listings.findIndex(({ id }) => id === listing.id) === index,
+  );
   const above = all.filter((listing) => listing.cents > limitCents && !refused.includes(listing.id));
   const kept = await withPhotos(affordable);
   sent.checked += kept.filter((listing) => listing.photo).length;
   sent.unloaded += affordable.length - kept.length;
-  if (!kept.length && !above.length) return { outcome: "nothing found" };
+  // Rose's page says what changed from last time, and the price today only when it's over the limit (D103).
+  const was = last && {
+    id: last.id,
+    cents: last.cents,
+    shop: last.shop,
+    ...(bought && bought.cents > limitCents && { nowCents: bought.cents }),
+  };
+  const done = (single: Single): Single => (was ? { ...single, last: was } : single);
+  if (!kept.length && !above.length) return done({ outcome: "nothing found" });
 
-  const choice = await choose(words, kept, above);
+  const lastId = kept.find((listing) => listing.id === last?.id)?.id;
+  const choice = await choose(words, kept, above, lastId);
   const options: Option[] = [];
   for (const { id, what, why, watch } of choice.picks) {
     const found = kept.find((listing) => listing.id === id);
     if (found && !options.some((option) => option.id === id)) options.push({ ...listingOf(found), what, why, watch });
   }
-  if (options.length) return { outcome: "options", options: options.slice(0, 3) };
-  return { outcome: choice.aboveLimit ? "over limit" : "nothing found" };
+  // Last time's listing goes first when the pick step keeps it (D104).
+  options.sort((a, b) => Number(b.id === lastId) - Number(a.id === lastId));
+  if (options.length) return done({ outcome: "options", options: options.slice(0, 3) });
+  return done({ outcome: choice.aboveLimit ? "over limit" : "nothing found" });
+}
+
+// How many things show the listing Sam paid for last time, of how many Ask again searched.
+function sameOf(result: Search, things: Rebuy[]): string {
+  const shown =
+    result.outcome === "options" ? result.options : "groups" in result ? result.groups.flatMap(({ options }) => options) : [];
+  return `${things.filter(({ last }) => shown.some(({ id }) => id === last.id)).length}/${things.length}`;
 }
 
 function counts(result: Search): string {
