@@ -768,6 +768,38 @@ it("lets any total through when Sam has set no total limit", async () => {
   expect(await latest(owner)).toMatchObject({ item: { name: "3 things", cents: 4747 } });
 });
 
+const quadCane = option("prod_2Sq8aQ", "Small Base Aluminum Quad Cane", 2389, "staples.com");
+const stick = "a walking stick that stands up by itself";
+const saveCanes = () => saveSearch(owner, stick, { outcome: "over limit", options: [quadCane], query: "self-standing walking stick" });
+
+it("asks Sam for a pick over Sam's limit at its saved price, never the form's, and pings Sam", async () => {
+  searchOn();
+  await saveCanes();
+
+  expect(await redirectOf(askSam(rose, form({ listing: "prod_2Sq8aQ", cents: "2000" })))).toBe(`/r/${rose}`);
+  expect(await latest(owner)).toMatchObject({
+    item: { id: "prod_2Sq8aQ", name: "Small Base Aluminum Quad Cane", cents: 2389 },
+    found: { shop: "staples.com", url: quadCane.url, reason: quadCane.why },
+    queries: [{ id: "prod_2Sq8aQ", thing: stick, query: "self-standing walking stick" }],
+    status: "waiting",
+  });
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "sam", {
+    title: "Rose would like something",
+    body: "Small Base Aluminum Quad Cane, $23.89. Tap to see it and say OK or No.",
+  });
+});
+
+it("stops a pick over Sam's limit that is also over Sam's total limit, before it reaches Sam", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await saveTotal(owner, 2000);
+  await saveCanes();
+
+  expect(await redirectOf(askSam(rose, form({ listing: "prod_2Sq8aQ" })))).toBe(`/r/${rose}?over=prod_2Sq8aQ`);
+  expect(await latest(owner)).toBeNull();
+  expect(notify).not.toHaveBeenCalled();
+});
+
 function ticked(...lines: string[]) {
   const data = form({ answer: "ok" });
   for (const line of lines) data.append("line", line);

@@ -62,3 +62,14 @@ it("shows each line's photo and note only when the line has one", () => {
   expect(text(html)).toContain("Good to know: It needs 3 AAA batteries, which aren't included.");
   expect(text(html).split("Why it fits:").length - 1).toBe(2);
 });
+
+it("tells Sam how far over Sam's limit one thing is, above the ask, and says nothing under it", () => {
+  const cane = { id: "prod_2Sq8aQ", name: "Small Base Aluminum Quad Cane", cents: 2389 };
+  const found = { shop: "staples.com", url: "https://www.staples.com/p/prod_2Sq8aQ", reason: "It stands up on its own." };
+  const over = renderToStaticMarkup(<SamView state={{ kind: "request", item: cane, askedAt, found, limitCents: 2000 }} />);
+  expect(over).toMatch(/^<div class="screen"><p class="notice"[^>]*>This is \$3\.89 over your \$20 limit\.<\/p><h1>Rose would like this<\/h1>/);
+  expect(over).toMatch(/<button[^>]*>OK, pay \$23\.89<\/button>/);
+
+  const under = renderToStaticMarkup(<SamView state={{ kind: "request", item: cane, askedAt, found, limitCents: 2500 }} />);
+  expect(under).not.toContain("over your");
+});

@@ -71,6 +71,11 @@ it("shows Sam nothing, a request, the payment in progress, or the outcome", () =
   expect(samState(request("declined", batteries))).toEqual({ kind: "nothing", declined: batteries });
 });
 
+it("gives Sam's limit to Sam's request, so Sam's page can say how far over it an ask is", () => {
+  expect(samState(request("waiting"), 2000)).toEqual({ kind: "request", item: glasses, askedAt, busy: false, limitCents: 2000 });
+  expect(samState(request("paid"), 2000)).toEqual({ kind: "paid", receipt });
+});
+
 const strap = {
   id: "prod_9Wz4hY",
   name: "Adjustable Wide Slippers with Hook-and-Loop Strap",

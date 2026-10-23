@@ -48,7 +48,7 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
       <PageHead />
       <main>
         <SamView
-          state={samState(request)}
+          state={samState(request, limitCents ?? undefined)}
           answer={request ? answer.bind(null, token, request.id) : undefined}
           limit={limit}
           setLimit={setLimit.bind(null, token)}

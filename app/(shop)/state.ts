@@ -239,7 +239,8 @@ function fixedListState(request: PurchaseRequest | null, params: RoseParams): Ro
   }
 }
 
-export function samState(request: PurchaseRequest | null): SamState {
+// Sam's limit as Sam has it now, so Sam's page says how far over it the ask is (D109).
+export function samState(request: PurchaseRequest | null, limitCents?: number): SamState {
   if (!request) return { kind: "nothing" };
   switch (request.status) {
     case "waiting":
@@ -251,6 +252,7 @@ export function samState(request: PurchaseRequest | null): SamState {
         busy: request.status === "paying",
         found: request.found ?? undefined,
         lines: request.lines ?? undefined,
+        limitCents,
       };
     case "paid":
       return { kind: "paid", receipt: receiptOf(request) };
