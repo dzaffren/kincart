@@ -41,7 +41,7 @@ import {
 } from "../../lib/shop/requests";
 import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
-import { againOf, rebuyOf } from "./state";
+import { againOf, currentOf, rebuyOf } from "./state";
 
 // Try KinCart and Start a new one: a new household, whose two links this browser keeps (D44). One address
 // starts 5 a day at most, and a stopped one keeps this browser's own household.
@@ -133,16 +133,20 @@ export async function find(token: string, formData: FormData): Promise<void> {
   redirect(`/r/${token}`);
 }
 
-// Searches again what Rose's screen offers Find another for, worked out from Neon only (D23). It counts as a
-// Find, toward the address's 20 a day and on /status (D97), and a stopped one saves nothing (D101).
+// Searches again what Rose's screen offers Find another for, worked out from Neon only (D23). Sam's link
+// searches only after a No or an untick, never Rose's own Find, and Rose hears how it ended (D113, D114). It
+// counts as a Find, toward the tapper's address's 20 a day and on /status (D115), and a stopped one saves
+// nothing (D101).
 export async function findAnother(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
-  if (who?.person !== "rose" || !searchOn()) return;
+  if (!who || !searchOn()) return;
   const { household } = who;
-  const tapped = formData.get("another");
+  const bySam = who.person === "sam";
+  const page = bySam ? `/h/${token}` : `/r/${token}`;
+  const tapped = bySam ? null : formData.get("another");
   const [saved, request] = await Promise.all([getSearch(household), latest(household)]);
-  const again = againOf(saved, request, tapped === null ? undefined : Number(tapped));
-  if (!again) redirect(`/r/${token}`);
+  const again = bySam && currentOf(saved, request) ? null : againOf(saved, request, tapped === null ? undefined : Number(tapped));
+  if (!again) redirect(page);
 
   // A group's Find another sends the Ask Sam form, so Rose's picks in the other groups come back (D36).
   const picked =
@@ -154,7 +158,7 @@ export async function findAnother(token: string, formData: FormData): Promise<vo
   if (stopped) {
     await countUse({ stoppedFinds: 1 });
     console.log(`limit kind=find status=stopped wait=${minutesUntil(stopped.getTime())}`);
-    redirect(`/r/${token}?find=limit&until=${stopped.getTime()}${back && `&${back}`}`);
+    redirect(`${page}?find=limit&until=${stopped.getTime()}${back && `&${back}`}`);
   }
 
   const sent: Sent = { searches: 0, checked: 0, unloaded: 0 };
@@ -166,10 +170,15 @@ export async function findAnother(token: string, formData: FormData): Promise<vo
     );
     await saveSearch(household, saved.words, { outcome: "basket", groups }, saved.photos, saved.blankPhotos, saved.tried);
   } else {
-    await saveSearch(household, again.words, found, 0, 0, true);
+    await saveSearch(household, again.words, found, 0, 0, true, bySam);
   }
   await countUse({ finds: 1, searches: sent.searches });
-  redirect(back ? `/r/${token}?${back}` : `/r/${token}`);
+  if (bySam) {
+    // A search over Sam's limit shows Rose the listings above it that fit (D110).
+    const options = found.outcome === "options" || found.outcome === "basket" || (found.outcome === "over limit" && found.options?.length);
+    sendPing(household, options ? "options again" : "nothing again", request!);
+  }
+  redirect(back ? `${page}?${back}` : page);
 }
 
 // Searches again what Sam paid for in one of Rose's asks, found in Neon by its id for Rose's household only

@@ -18,12 +18,12 @@ import {
 } from "./ui";
 
 // Find another after Sam's No or untick: offered, or how the search for Rose ended (D113, D115).
-export type Again = "offer" | "options" | "nothing";
+export type SamAgain = "offer" | "options" | "nothing";
 
 export type SamState =
-  | { kind: "nothing"; declined?: Item; lines?: Line[]; again?: Again; waitMinutes?: number }
+  | { kind: "nothing"; declined?: Item; lines?: Line[]; again?: SamAgain; waitMinutes?: number }
   | { kind: "request"; item: Item; askedAt: Date; busy?: boolean; found?: Source; lines?: Line[]; limitCents?: number }
-  | { kind: "paid"; receipt: Receipt; again?: Again; waitMinutes?: number }
+  | { kind: "paid"; receipt: Receipt; again?: SamAgain; waitMinutes?: number }
   | { kind: "failed"; item: Item; lines?: Line[] };
 
 export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
@@ -210,7 +210,7 @@ function SamOutcome({ state, findAnother }: { state: Exclude<SamState, { kind: "
   );
 }
 
-function LookAgain({ again, findAnother, hint }: { again?: Again; findAnother?: Action; hint: string }) {
+function LookAgain({ again, findAnother, hint }: { again?: SamAgain; findAnother?: Action; hint: string }) {
   if (again === "offer") return <AnotherForm action={findAnother} hint={hint} />;
   if (again === "options") {
     return (
