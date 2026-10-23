@@ -505,14 +505,15 @@ function changeOf(last: Last, now: Option): string {
   return "Same price as last time.";
 }
 
-// Said when today's options don't have the listing Rose bought last time.
+// Said when today's options don't have the listing Rose bought last time. The limit is read on each redraw,
+// so after Sam raises it past the price, the notice gives the price alone.
 function LastNotice({ last, listings, limitCents }: { last?: Last; listings: Option[]; limitCents: number }) {
   if (!last || listings.some(({ id }) => id === last.id)) return null;
+  if (!last.nowCents) return <Notice tone="neutral">Couldn&apos;t find the one you bought last time today.</Notice>;
   return (
     <Notice tone="neutral">
-      {last.nowCents
-        ? `The one you bought last time is ${money(last.nowCents)} now, over ${HELPER}'s ${wholeDollars(limitCents)} limit.`
-        : "Couldn't find the one you bought last time today."}
+      The one you bought last time is {money(last.nowCents)} now
+      {last.nowCents > limitCents ? `, over ${HELPER}'s ${wholeDollars(limitCents)} limit` : ""}.
     </Notice>
   );
 }

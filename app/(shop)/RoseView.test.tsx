@@ -404,6 +404,16 @@ it("says when last time's listing is over Sam's limit now, or wasn't found today
   expect(options(949)).toMatch(/^<div class="screen"><p class="notice"[^>]*>The one you bought last time is \$9\.49 now, over Sam&#x27;s \$8 limit\.<\/p>/);
   expect(options()).toMatch(/^<div class="screen"><p class="notice"[^>]*>Couldn&#x27;t find the one you bought last time today\.<\/p>/);
   expect(options()).not.toContain("<strong>You bought this last time.</strong>");
+  // Sam raised the limit after the Ask again ran, so $9.49 is no longer over it.
+  const raised = withRebuy({
+    kind: "options",
+    limitCents: 2000,
+    words: "AA batteries",
+    listings: [aa24],
+    last: { id: energizer.id, cents: 899, shop: "walmart.com", nowCents: 949 },
+  });
+  expect(raised).toMatch(/^<div class="screen"><p class="notice"[^>]*>The one you bought last time is \$9\.49 now\.<\/p>/);
+  expect(raised).not.toContain("over Sam");
 
   const basket = withRebuy({
     kind: "basket",
