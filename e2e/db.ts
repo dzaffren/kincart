@@ -1,5 +1,5 @@
 import pg from "pg";
-import type { Group, Option } from "../lib/shop/find";
+import type { Group, Option, Search } from "../lib/shop/find";
 import { addressOf, keyOf } from "../lib/shop/limits";
 
 export async function sql(text: string, params: unknown[] = []) {
@@ -12,7 +12,11 @@ export async function sql(text: string, params: unknown[] = []) {
   }
 }
 
-export async function reset(paypal: string | null, search?: { words: string; options?: Option[]; groups?: Group[] }) {
+// A search is options, or a basket with groups, unless it names its outcome, such as "over limit".
+export async function reset(
+  paypal: string | null,
+  search?: { words: string; outcome?: Search["outcome"]; options?: Option[]; groups?: Group[] },
+) {
   await sql("TRUNCATE purchase_requests");
   await sql("DELETE FROM paypal_vault");
   await sql("DELETE FROM rose_search");
@@ -26,7 +30,7 @@ export async function reset(paypal: string | null, search?: { words: string; opt
   if (search) {
     await sql("INSERT INTO rose_search (words, outcome, listings, groups) VALUES ($1, $2, $3, $4)", [
       search.words,
-      search.groups ? "basket" : "options",
+      search.outcome ?? (search.groups ? "basket" : "options"),
       JSON.stringify(search.options ?? []),
       JSON.stringify(search.groups ?? []),
     ]);
