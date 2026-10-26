@@ -7,7 +7,7 @@ import {
   type PublicKeyCredentialRequestOptionsJSON,
 } from "@simplewebauthn/server";
 
-export type Passkey = { credentialId: string; publicKey: Uint8Array };
+export type Passkey = { credentialId: string; publicKey: Uint8Array<ArrayBuffer> };
 
 // Every passkey needs Sam's face or fingerprint, not only a tap (D122), and belongs to KinCart's own host.
 export async function createOptions(origin: string): Promise<PublicKeyCredentialCreationOptionsJSON> {

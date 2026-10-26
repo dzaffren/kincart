@@ -120,7 +120,7 @@ export async function replaceLinks(
 }
 
 // Sam's one passkey (D122). The first one saved stays, so a second Turn on, a leaker's too, can't replace it.
-export async function getPasskey(household: number): Promise<{ credentialId: string; publicKey: Uint8Array } | null> {
+export async function getPasskey(household: number): Promise<{ credentialId: string; publicKey: Uint8Array<ArrayBuffer> } | null> {
   const rows = await query<{ credential_id: string; public_key: Buffer }>(
     "SELECT credential_id, public_key FROM sam_passkeys WHERE id = $1",
     [household],
