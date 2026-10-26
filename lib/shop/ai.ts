@@ -108,6 +108,7 @@ export function readPhoto(words: string, jpegs: Buffer[]): Promise<PhotoNeed> {
 
 // Each listing under the limit goes under its own "Listing <id>:" label, with its photo after it when
 // it has one (D92). Listings above the limit stay names only. lastId is the listing Rose bought last time.
+// With up to 10 photos the call takes 7 to 9 s, so it waits 15 s where the other calls wait 10 (D119).
 export function choose(words: string, under: Found[], above: Found[], lastId?: string): Promise<Choice> {
   const content = [
     { type: "text", text: `They asked: ${JSON.stringify(words)}\n\nUnder their price limit, pick from these:` },
@@ -120,12 +121,18 @@ export function choose(words: string, under: Found[], above: Found[], lastId?: s
     ]),
     { type: "text", text: `Above their price limit, not to pick from:\n${JSON.stringify(above.map((listing) => listing.name))}` },
   ];
-  return haiku(lastId ? `${CHOOSE} ${LAST}` : CHOOSE, content, CHOOSE_SCHEMA, 4000);
+  return haiku(lastId ? `${CHOOSE} ${LAST}` : CHOOSE, content, CHOOSE_SCHEMA, 4000, 15000);
 }
 
 // Low effort still thinks now and then, and the thinking counts toward max_tokens: a pick that
 // thought used about 700 of them, against about 360 without.
-async function haiku<T>(system: string, message: string | object[], schema: object, maxTokens: number): Promise<T> {
+async function haiku<T>(
+  system: string,
+  message: string | object[],
+  schema: object,
+  maxTokens: number,
+  timeoutMs = 10000,
+): Promise<T> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -141,7 +148,7 @@ async function haiku<T>(system: string, message: string | object[], schema: obje
       output_config: { effort: "low", format: { type: "json_schema", schema } },
     }),
     cache: "no-store",
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) throw new Error(`anthropic ${response.status}`);
   const body: { content?: { type: string; text?: string }[]; stop_reason?: string } = await response.json();

@@ -206,6 +206,26 @@ it("labels the listing Rose bought last time, and asks Haiku to pick it first on
   expect(JSON.stringify(sent(fetch).body.messages)).not.toContain("last time");
 });
 
+it("waits 15 s for the pick call, with its photos, and 10 s for every other call", async () => {
+  const timeout = vi.spyOn(AbortSignal, "timeout");
+
+  stubHaiku(() => reply({ picks: [], aboveLimit: false }));
+  await choose(words, [kohls], []);
+  expect(timeout).toHaveBeenLastCalledWith(15000);
+
+  stubHaiku(() => reply({ things: [] }));
+  await readNeed(words);
+  expect(timeout).toHaveBeenLastCalledWith(10000);
+
+  stubHaiku(() => reply({ query: "fleece-lined slip-on slippers size 8" }));
+  await otherWords(words, "warm slip-on slippers size 8");
+  expect(timeout).toHaveBeenLastCalledWith(10000);
+
+  stubHaiku(() => reply({ things: [], blank: [1] }));
+  await readPhoto("", [jpeg]);
+  expect(timeout).toHaveBeenLastCalledWith(10000);
+});
+
 it("throws when Haiku fails or its answer is cut off", async () => {
   stubHaiku(() => Response.json({ type: "error", error: { type: "overloaded_error" } }, { status: 529 }));
   await expect(readNeed(words)).rejects.toThrow("anthropic 529");
