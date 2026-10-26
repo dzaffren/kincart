@@ -1,6 +1,6 @@
 # Picks that match
 
-**Version:** v2 · **Status:** Refined · **Type:** Bug · **Project type:** Data/LLM
+**Version:** v2 · **Status:** Built · **Type:** Bug · **Project type:** Data/LLM
 
 **Supersedes:** archive/picks-that-match-v1.md
 **Shape doc:** docs/specs/after-review/shape.md
@@ -151,6 +151,7 @@ Recorded as D119.
 | O17 | The plan said the recorded set had about 10 asks, built from Channel3's answers for each ask | flag | build | user | Decided alone | Chose: 7 asks with 27 real wrong listings, each beside 2 right ones, composed from 20 real searches and 2 product lookups. Wrong listings outnumber right ones, so Haiku can't fill three picks without a misfit. Other: 10 asks with Channel3's own 10-listing answers (5 to 7 MB of photos, and right listings outnumber wrong ones, so Haiku skips misfits without the photo, as O1 found). Undo: add asks to `lib/shop/picks/asks.json` and their photos. 2026-10-22 |
 | O18 | The pick call carries up to 10 photos (D92), and `haiku()` stops every call at 10 s (`lib/shop/ai.ts:144`). Measured 2026-10-26: 6 real picks took 7.3 to 9.1 s. A slower one throws `TimeoutError`, and Find shows nothing found (D93). It failed `e2e/sam-finds-another.spec.ts` on main twice (run 40273470921). Give the pick call more time, or send fewer or smaller photos | question | debug | user | Resolved | The pick call gets 15 s, and the other Haiku calls keep 10 s (D119). 2026-10-26 |
 | O19 | A real Haiku call can't be made slow on purpose, so what test proves the fix | question | spec p1 | user | Resolved | A unit test in `lib/shop/ai.test.ts` checks the limit each call asks `AbortSignal.timeout` for. The real-Find e2e on main's CI is the end-to-end walk. 2026-10-26 |
+| O20 | The first full e2e run on the fix failed 3 tests at their 30 s limit: \`find-limits\`, \`photo-ask-several\` and \`photo-ask\`. Finds took 18 to 25 s, and one 4-thing basket logged \`reason=TimeoutError\` at 24.6 s. In the same hour, 6 single pick calls took 6.6 to 10.7 s | flag | build | user | Decided alone | Chose: keep 15 s. The 3 tests passed when run again, with Finds at 8.6 to 11.8 s, and a second full run passed all 32, with its slowest Finds at 14.4 to 15.2 s. A 10 s limit fails those slow stretches too, by cutting picks off. Other: give the photo and basket e2e tests more than 30 s. Undo: none needed. 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
