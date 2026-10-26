@@ -230,7 +230,8 @@ export async function getSearch(household: number): Promise<SavedSearch | null> 
 
 // photos: how many photos Find read, when words are the AI's words for them (D67). blank: how
 // many of them showed nothing to buy (D72). from_photo stays, so the code from before still reads it.
-// tried: Find another ran this search, so it offers no second one (D97).
+// tried: Find another ran this search, so it offers no second one (D97). since: save only when the search
+// is still the one read then, so a Find Rose ran meanwhile stays; false when it didn't save.
 export async function saveSearch(
   household: number,
   words: string,
@@ -239,14 +240,17 @@ export async function saveSearch(
   blank = 0,
   tried = false,
   bySam = false,
-): Promise<void> {
-  await query(
+  since?: Date | null,
+): Promise<boolean> {
+  const saved = await query(
     `INSERT INTO rose_search (id, words, outcome, listings, groups, from_photo, photos, blank_photos, query, tried, last, by_sam)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      ON CONFLICT (id) DO UPDATE
      SET words = EXCLUDED.words, outcome = EXCLUDED.outcome, listings = EXCLUDED.listings, groups = EXCLUDED.groups,
          from_photo = EXCLUDED.from_photo, photos = EXCLUDED.photos, blank_photos = EXCLUDED.blank_photos,
-         query = EXCLUDED.query, tried = EXCLUDED.tried, last = EXCLUDED.last, by_sam = EXCLUDED.by_sam, searched_at = now()`,
+         query = EXCLUDED.query, tried = EXCLUDED.tried, last = EXCLUDED.last, by_sam = EXCLUDED.by_sam, searched_at = now()
+     ${since === undefined ? "" : "WHERE rose_search.searched_at IS NOT DISTINCT FROM $13"}
+     RETURNING id`,
     [
       household,
       words,
@@ -260,8 +264,10 @@ export async function saveSearch(
       tried,
       "last" in result && result.last ? JSON.stringify(result.last) : null,
       bySam,
+      ...(since === undefined ? [] : [since]),
     ],
   );
+  return saved.length > 0;
 }
 
 export async function clearSearch(household: number): Promise<void> {

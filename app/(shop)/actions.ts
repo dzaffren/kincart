@@ -163,6 +163,7 @@ export async function findAnother(token: string, formData: FormData): Promise<vo
 
   const sent: Sent = { searches: 0, checked: 0, unloaded: 0 };
   const found = await findAgain(again.words, again.things, await getLimit(household), sent);
+  let kept = true;
   if (again.group !== undefined && saved?.outcome === "basket") {
     // Only the tapped group changes. The basket keeps its photo counts, and its own tried.
     const groups = saved.groups.map((group, index) =>
@@ -170,10 +171,11 @@ export async function findAnother(token: string, formData: FormData): Promise<vo
     );
     await saveSearch(household, saved.words, { outcome: "basket", groups }, saved.photos, saved.blankPhotos, saved.tried);
   } else {
-    await saveSearch(household, again.words, found, 0, 0, true, bySam);
+    // A Find Rose ran while Sam's searched stays, and Rose hears nothing of Sam's.
+    kept = await saveSearch(household, again.words, found, 0, 0, true, bySam, bySam ? (saved?.searchedAt ?? null) : undefined);
   }
   await countUse({ finds: 1, searches: sent.searches });
-  if (bySam) {
+  if (bySam && kept) {
     // A search over Sam's limit shows Rose the listings above it that fit (D110).
     const options = found.outcome === "options" || found.outcome === "basket" || (found.outcome === "over limit" && found.options?.length);
     sendPing(household, options ? "options again" : "nothing again", request!);

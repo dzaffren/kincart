@@ -1365,6 +1365,22 @@ it("sends no push for Rose's own Find another, and keeps it as Rose's", async ()
   expect(notify).not.toHaveBeenCalled();
 });
 
+it("keeps the Find Rose ran while Sam's Find another searched, and doesn't tell Rose about Sam's", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await samSaysNoToSlippers();
+  const services = stubAgainServices([strap, isotoner]);
+  const search = services.getMockImplementation()!;
+  services.mockImplementationOnce(async (url, init) => {
+    await saveSearch(owner, "a pill box that beeps", { outcome: "nothing found" });
+    return search(url, init);
+  });
+
+  expect(await redirectOf(findAnother(sam, form({})))).toBe(`/h/${sam}`);
+  expect(await getSearch(owner)).toMatchObject({ words: "a pill box that beeps", tried: false, bySam: false });
+  expect(notify).not.toHaveBeenCalled();
+});
+
 it("stops Sam's Find another past 20 Finds from Sam's address, saves nothing, and keeps Sam on Sam's page", async () => {
   searchOn();
   vi.spyOn(console, "log").mockImplementation(() => {});
