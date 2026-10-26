@@ -32,6 +32,7 @@ import {
   getVault,
   latest,
   paidAsk,
+  replaceLinks,
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
@@ -64,15 +65,28 @@ export async function start(): Promise<void> {
     console.log(`limit kind=household status=stopped wait=${minutesUntil(until)}`);
     redirect(`/?started=limit&until=${until}`);
   }
-  jar.set("household", `${rose}.${sam}`, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 90 * 24 * 60 * 60,
-  });
+  jar.set("household", `${rose}.${sam}`, HOUSEHOLD_COOKIE);
   console.log(`household id=${started.household} status=started`);
   redirect(`/?started=${had ? "fresh" : "ready"}`);
+}
+
+const HOUSEHOLD_COOKIE = { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 90 * 24 * 60 * 60 } as const;
+
+// New links, from Sam's link of a household other than 1, whose links live in Vercel's env (D45). This browser
+// follows the new pair when it kept the old one (D44), and Sam's new page gets Rose's new link for 10
+// minutes, since only hashes are stored (D47, D120, D121).
+export async function makeLinks(token: string): Promise<void> {
+  const who = await whoIs(token);
+  if (who?.person !== "sam" || who.household === 1) return;
+  const [rose, sam] = [newLink(), newLink()];
+  const replaced = await replaceLinks(who.household, hashOf(token), hashOf(rose), hashOf(sam));
+  if (!replaced) redirect(`/h/${token}`);
+  console.log(`links household=${who.household} status=replaced phones=${replaced.phones}`);
+
+  const jar = await cookies();
+  if (jar.get("household")?.value.split(".")[1] === token) jar.set("household", `${rose}.${sam}`, HOUSEHOLD_COOKIE);
+  jar.set("new_rose", rose, { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${sam}`, maxAge: 10 * 60 });
+  redirect(`/h/${sam}`);
 }
 
 export async function startLink(token: string): Promise<void> {
