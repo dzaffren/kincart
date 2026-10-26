@@ -259,6 +259,13 @@ Single chunk.
 
 Recorded as D122, D123, D124, D125.
 
+## Review
+
+2026-10-26 · 2 raw findings, 2 survived, 2 fixed.
+
+- correctness · `app/(shop)/actions.ts:381` · Sam's answer forms send `in=phone` from a home page phone, and `answer()` keeps it, so the next OK still opens a new tab · `e6c754c`
+- A03 Software Supply Chain Failures · `package.json:16` · the two `@simplewebauthn` packages stay pinned exactly, with no advisory, as D123 accepts · `28db10f`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
