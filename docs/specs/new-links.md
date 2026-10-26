@@ -1,6 +1,6 @@
 # New links
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** households
@@ -220,6 +220,7 @@ Recorded as D120, D121.
 | O7 | Whoever holds a leaked Sam link can tap New links first and lock the real Rose and Sam out. A new household then has no saved PayPal and no receipts | flag | spec p1 | user | Accepted risk | A leaked Sam link can already approve charges, and this adds a lockout, not money. `confirm-ok` (slice 5) is the guard. 2026-10-26 |
 | O8 | Sam's page shows only OK and No while an ask waits (`app/(shop)/SamView.tsx:61`), so Your links isn't there. Scenario 2 says Sam makes new links while Rose's slippers ask waits | question | spec p2 | user | Resolved | Sam answers first. Your links shows only when no ask waits, so the OK and No screen stays as it is. Scenario 2 no longer has a waiting ask. 2026-10-26 |
 | O9 | How Rose's new link reaches Sam's new page, when only hashes are kept (D47) | question | spec p3 | user | Resolved | A one-time cookie, httpOnly, sent only to Sam's new link, for 10 minutes (D121). 2026-10-26 |
+| O10 | The plan reused `origin()` from `app/(shop)/actions.ts:338` for Sam's page. That file is `"use server"`, so an exported helper there becomes a server action anyone can call | flag | build | user | Decided alone | Chose: move `origin()` to `app/(shop)/origin.ts`, which `actions.ts` and Sam's page both import. Other: put Rose's whole link, origin and all, in the `new_rose` cookie, and keep `origin()` private. Undo: `git revert 069a3d6`, then build the link in `makeLinks`. 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
