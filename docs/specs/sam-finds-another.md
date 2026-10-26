@@ -301,6 +301,12 @@ Single chunk. The change is small, and the views were built at pause 2.
 
 Recorded as D113, D114, D115, D116.
 
+## Review
+
+2026-10-26 · 2 raw findings, 1 survived, 1 fixed.
+
+- correctness · `app/(shop)/actions.ts:175` · Sam's Find another saves only when `rose_search` is still the search Sam's tap read, so a Find Rose ran meanwhile stays · `e628c31`
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -313,6 +319,7 @@ Recorded as D113, D114, D115, D116.
 | O6 | Rose and Sam tap Find another within the same 10 to 15 s: both search, both count a Find, and the last save wins | flag | spec p3 | user | Accepted risk | Rare, since both must tap within seconds. The cost is one extra Find and 2 Channel3 searches, and both results are valid. No guard. 2026-10-23 |
 | O7 | The e2e can't run: Channel3 answers `402` to every search (`find outcome=nothing-found ... reason=channel3 402`), so Rose's first Find finds nothing. find-another's e2e, on code this branch didn't change, fails the same way. `e2e/sam-finds-another.spec.ts` is written but has never passed. Every other test passes | question | build | user | Accepted risk | The 402 was Channel3 out of credit, not this code. A new key made the 8 other real-Find e2e tests and CI pass on 2026-10-23 (security-headers O6). Ship without seeing this e2e pass locally; CI runs it on the PR. 2026-10-26 |
 | O8 | `.env.local`'s `CHANNEL3_API_KEY` still answers `402`. `CHANNEL3_API_KEY_II` and `_III` in the same file answer `200` | flag | build | user | Decided alone | Chose: run the e2e with `CHANNEL3_API_KEY` set from `_II` in the shell, for the run only. All 32 e2e tests passed, `sam-finds-another` among them, and 326 unit tests. Other: put the `_II` key in `CHANNEL3_API_KEY` in `.env.local`. Undo: none needed; `.env.local` is unchanged. 2026-10-26 |
+| O9 | Sam's Find another saved over `rose_search` when it finished, so a Find Rose ran during Sam's 10 to 15 s search was lost, and Rose got a push for Sam's options | flag | review | user | Decided alone | Chose: Sam's save runs only when `rose_search` is still the search Sam's tap read. When it isn't, Sam's result is dropped, Rose gets no push, and the Find still counts. Other: let Sam's result win, as before. Undo: `git revert e628c31`. 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
