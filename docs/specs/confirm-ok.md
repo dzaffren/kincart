@@ -310,4 +310,7 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Virtual authenticator** — a fake passkey device that Chrome's DevTools give a test, so an e2e can turn the passkey on without a real phone.
 - **rp id** — the site name a passkey belongs to, here the host of `kincart.vercel.app`. A passkey made for one site doesn't work on another.
 - **@simplewebauthn** — a pair of open-source packages that make and check passkey requests, one for the server and one for the browser.
+- **Lockfile** — `pnpm-lock.yaml`, the file that pins the exact version of every package.
+- **Pentest** — a penetration test: someone attacks the app on purpose to find holes.
+- **Backfill** — filling a new table or column from the data already there. This slice needs none.
 - **e2e** — end to end: an automated test that drives the app the way a person would, start to finish.
