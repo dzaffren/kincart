@@ -617,7 +617,7 @@ Status: active
 Why: these are find-and-explain's and the basket's limits (D31). A slower Find makes a worse first look for a judge.
 Rejected: 5 s more for each (one thing within 20 s, five within 25 s).
 Source: docs/specs/picks-that-match.md
-Status: active
+Status: superseded by D119
 
 ## D92 · 2026-10-22 · The pick call sees each listing's photo, downloaded by KinCart, and listings above the limit stay names only
 
@@ -810,4 +810,12 @@ Status: active
 Why: the values are the same for every request, so no code needs to run for each one. `next start` sends them too, so the local e2e proves them.
 Rejected: `proxy.ts` (code on every request, needed only for a nonce, which D117 drops), `vercel.json` headers (`next start` doesn't read them, so the e2e couldn't prove them).
 Source: docs/specs/security-headers.md
+Status: active
+
+## D119 · 2026-10-26 · The pick call waits 15 s for Haiku, and the other Haiku calls keep 10 s
+
+Why: with up to 10 photos (D92), the pick call took 7.3 to 9.1 s, and a slower one turned a Find with real listings into nothing found (D93). A Find still shows one thing in 10 to 13 s and five within 20 s most of the time. A slow pick call can take one thing to about 20 s, which beats nothing found.
+Rejected: smaller or fewer photos at 10 s (unproven faster, and D90's recorded set would have to prove the picks again), a retry on timeout (up to 25 s, and twice the Haiku cost on slow calls), 15 s for every Haiku call (the other calls take 1 to 2.4 s, and a hung one would hold Rose 5 s longer).
+Supersedes: D91
+Source: docs/specs/picks-that-match.md
 Status: active

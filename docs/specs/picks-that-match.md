@@ -126,13 +126,7 @@ Single chunk.
 
 ### Decisions to record
 
-## D119 · 2026-10-26 · The pick call waits 15 s for Haiku, and the other Haiku calls keep 10 s
-
-Why: with up to 10 photos (D92), the pick call took 7.3 to 9.1 s, and a slower one turned a Find with real listings into nothing found (D93). A Find still shows one thing in 10 to 13 s and five within 20 s most of the time. A slow pick call can take one thing to about 20 s, which beats nothing found.
-Rejected: smaller or fewer photos at 10 s (unproven faster, and D90's recorded set would have to prove the picks again), a retry on timeout (up to 25 s, and twice the Haiku cost on slow calls), 15 s for every Haiku call (the other calls take 1 to 2.4 s, and a hung one would hold Rose 5 s longer).
-Supersedes: D91
-Source: docs/specs/picks-that-match.md
-Status: active
+Recorded as D119.
 
 ## Open items
 
