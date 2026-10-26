@@ -18,6 +18,7 @@ import {
   getVault,
   keep,
   latest,
+  replaceLinks,
   paidAsk,
   record,
   saveSearch,
@@ -489,6 +490,28 @@ it("starts a household with no saved PayPal, even when household 1 has one, and 
   expect(await findHousehold("rose-hash-2c3d")).toEqual({ household: fresh, person: "rose" });
   expect(await findHousehold("sam-hash-2c3d")).toEqual({ household: fresh, person: "sam" });
   expect(await findHousehold("rose-hash-ffff")).toBeNull();
+});
+
+it("swaps a household's two link hashes while Sam's old one matches, and forgets only its phones", async () => {
+  const swapped = await startHousehold("rose-hash-4e5f", "sam-hash-4e5f");
+  const other = await startHousehold("rose-hash-6a7b", "sam-hash-6a7b");
+  await saveSubscription(swapped, "sam", samPhone);
+  await saveSubscription(swapped, "rose", rosePhone);
+  await saveSubscription(other, "sam", { ...samPhone, endpoint: "https://fcm.googleapis.com/fcm/send/eT2mVw8nZ4:APA91bQ5" });
+
+  expect(await replaceLinks(swapped, "sam-hash-4e5f", "rose-hash-8c9d", "sam-hash-8c9d")).toEqual({ phones: 2 });
+
+  expect(await findHousehold("rose-hash-4e5f")).toBeNull();
+  expect(await findHousehold("sam-hash-4e5f")).toBeNull();
+  expect(await findHousehold("rose-hash-8c9d")).toEqual({ household: swapped, person: "rose" });
+  expect(await findHousehold("sam-hash-8c9d")).toEqual({ household: swapped, person: "sam" });
+  expect(await subscriptionsFor(swapped, "sam")).toEqual([]);
+  expect(await subscriptionsFor(swapped, "rose")).toEqual([]);
+  expect(await subscriptionsFor(other, "sam")).toHaveLength(1);
+  expect(await findHousehold("sam-hash-6a7b")).toEqual({ household: other, person: "sam" });
+
+  expect(await replaceLinks(swapped, "sam-hash-4e5f", "rose-hash-0e1f", "sam-hash-0e1f")).toBeNull();
+  expect(await findHousehold("sam-hash-8c9d")).toEqual({ household: swapped, person: "sam" });
 });
 
 it("copies household 1's saved PayPal into a household that skips, but never over one it linked", async () => {

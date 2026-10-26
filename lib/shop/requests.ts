@@ -99,6 +99,26 @@ export async function findHousehold(hash: string): Promise<{ household: number; 
   return rows[0] ? { household: Number(rows[0].id), person: rows[0].rose ? "rose" : "sam" } : null;
 }
 
+// New links: both hashes change only while Sam's old one is still there, so two taps at once make one new
+// pair, and the household's phones go in the same statement, since each would open a dead link (D120).
+export async function replaceLinks(
+  household: number,
+  oldSamHash: string,
+  roseHash: string,
+  samHash: string,
+): Promise<{ phones: number } | null> {
+  const rows = await query<{ swapped: string; phones: string }>(
+    `WITH swapped AS (
+       UPDATE households SET rose_hash = $3, sam_hash = $4 WHERE id = $1 AND sam_hash = $2 RETURNING id
+     ), gone AS (
+       DELETE FROM push_subscriptions WHERE household_id IN (SELECT id FROM swapped) RETURNING 1
+     )
+     SELECT (SELECT count(*) FROM swapped) AS swapped, (SELECT count(*) FROM gone) AS phones`,
+    [household, oldSamHash, roseHash, samHash],
+  );
+  return Number(rows[0].swapped) ? { phones: Number(rows[0].phones) } : null;
+}
+
 // The one-row tables' id is the household's id (D46).
 export async function getVault(household: number): Promise<string | null> {
   const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = $1", [

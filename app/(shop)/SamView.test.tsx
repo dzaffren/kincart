@@ -145,3 +145,46 @@ it("puts the day's limit notice on top of Sam's page, and keeps Find another und
   );
   expect(sam({ kind: "nothing", declined: slippers, again: "offer" })).not.toContain("a lot of Finds");
 });
+
+const paidBatteries = {
+  kind: "paid" as const,
+  receipt: { item: { id: "prod_2Dc8aA", name: batteries.name, cents: 879 }, paidAt: askedAt, transactionId: "3VD91528KJ402714T" },
+};
+
+it("offers Sam new links under the limits, as a form that opens the confirm screen", () => {
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} limit={{ cents: 4000 }} links={{ kind: "offer" }} />);
+
+  expect(text(html)).toContain("Your links");
+  expect(text(html)).toContain("If someone else may have seen Rose's link or yours, make new ones.");
+  const button = html.match(/<button[^>]*>Make new links<\/button>/)![0];
+  expect(button).toContain('name="links"');
+  expect(button).toContain('value="new"');
+});
+
+it("asks Sam before making new links, with Make new links and Keep these", () => {
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} links={{ kind: "confirm" }} />);
+
+  expect(text(html)).toContain("Make new links?");
+  expect(text(html)).toContain("Rose's old link stops working.");
+  expect(text(html)).toContain("Notifications turn off on both phones");
+  expect(text(html)).toContain("Keep these");
+  expect(text(html)).not.toContain("Paid");
+});
+
+it("shows Sam's new page with Rose's new link to send, and Copy", () => {
+  const roseLink = "https://kincart.vercel.app/r/Qm7vT2kXp9Lw4NcR8sYb3A";
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} links={{ kind: "made", roseLink }} />);
+
+  expect(text(html)).toContain("New links made. This page is your new link");
+  expect(text(html)).toContain("Send Rose this new link");
+  expect(text(html)).toContain(roseLink);
+  expect(text(html)).toContain("Copy");
+  expect(text(html)).toContain("Your links");
+});
+
+it("shows no Your links without links, as for household 1 or inside the home page's phones", () => {
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} limit={{ cents: 4000 }} />);
+
+  expect(text(html)).not.toContain("Your links");
+  expect(text(html)).not.toContain("Make new links");
+});

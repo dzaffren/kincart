@@ -31,6 +31,7 @@ import {
   setLimit,
   setTotal,
   skipLink,
+  makeLinks,
   start,
   startLink,
   subscribe,
@@ -53,6 +54,7 @@ vi.mock("next/headers", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/headers")>()),
   cookies: async () => ({
     has: (name: string) => jar.has(name),
+    get: (name: string) => jar.get(name),
     set: (name: string, value: string, options?: object) => jar.set(name, { value, options }),
   }),
   headers: async () => new Headers({ "x-forwarded-for": client.address }),
@@ -916,6 +918,58 @@ it("stops a sixth household from one address in a day, and leaves this browser's
   expect(await households()).toEqual([{ count }]);
   expect(jar.get("household")!.value).toBe(own);
   expect(console.log).toHaveBeenCalledWith("limit kind=household status=stopped wait=300");
+});
+
+it("makes Sam new links: the old pair stops, the household keeps its PayPal, phones go, and Sam's page gets Rose's link", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await redirectOf(start());
+  const [oldRose, oldSam] = jar.get("household")!.value.split(".");
+  const { household } = (await whoIs(oldSam))!;
+  await saveVault(household, "8tm05472xk4815307");
+  await subscribe(oldSam, samPhone);
+
+  const page = await redirectOf(makeLinks(oldSam));
+
+  const [newRose, newSam] = jar.get("household")!.value.split(".");
+  expect(page).toBe(`/h/${newSam}`);
+  expect(await whoIs(oldRose)).toBeNull();
+  expect(await whoIs(oldSam)).toBeNull();
+  expect(await whoIs(newRose)).toEqual({ household, person: "rose" });
+  expect(await whoIs(newSam)).toEqual({ household, person: "sam" });
+  expect(await getVault(household)).toBe("8tm05472xk4815307");
+  expect(await subscriptionsFor(household, "sam")).toEqual([]);
+  expect(jar.get("new_rose")).toEqual({
+    value: newRose,
+    options: { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${newSam}`, maxAge: 10 * 60 },
+  });
+  expect(console.log).toHaveBeenCalledWith(`links household=${household} status=replaced phones=1`);
+});
+
+it("keeps another household's cookie in this browser when Sam makes new links", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await redirectOf(start());
+  const [, otherSam] = jar.get("household")!.value.split(".");
+  await redirectOf(start());
+  const own = jar.get("household")!.value;
+
+  const page = await redirectOf(makeLinks(otherSam));
+
+  expect(jar.get("household")!.value).toBe(own);
+  expect(await whoIs(page.slice("/h/".length))).toMatchObject({ person: "sam" });
+  expect(await whoIs(otherSam)).toBeNull();
+});
+
+it("makes no new links from Rose's link or for household 1", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+
+  expect(await redirectOf(makeLinks(sam))).toBe("no redirect");
+  expect(await whoIs(sam)).toEqual({ household: owner, person: "sam" });
+
+  await redirectOf(start());
+  const [ownRose] = jar.get("household")!.value.split(".");
+  expect(await redirectOf(makeLinks(ownRose))).toBe("no redirect");
+  expect(await whoIs(ownRose)).toMatchObject({ person: "rose" });
+  expect(jar.has("new_rose")).toBe(false);
 });
 
 it("starts no household without ADDRESS_KEY, and says why", async () => {

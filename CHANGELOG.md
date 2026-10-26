@@ -20,6 +20,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - When nothing fits under Sam's price limit, Rose sees up to 3 listings that cost more, cheapest first and never above double the limit. Each says how far over the limit it is, and Sam's page says so too before Sam taps OK, for one thing or one thing in a basket.
 - No other site can show a KinCart page inside a frame, so nobody can hide Sam's OK under a button of their own. Shops' image hosts no longer learn which KinCart page asked for a photo.
 - After Sam says no, or leaves a thing out, Sam can tap Find another on Sam's own page. KinCart searches again with other words for Rose, Rose's page says Sam asked, and Rose's phone buzzes with the result. A Find Rose starts meanwhile is kept. Each tap counts as one of the day's 20 Finds, and Rose or Sam gets one between them.
+- Sam can replace both of a household's secret links with Make new links, after a confirm screen. The old links stop working at once, Sam's page gives Rose's new link to share or copy, and the saved PayPal, limits and past buys stay. Saved phones are forgotten, so Rose and Sam turn notifications on again from the new links.
 
 ### Fixed
 

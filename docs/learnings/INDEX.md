@@ -46,3 +46,4 @@
 - Read the find log's reason before debugging a failed Find e2e
 - Time a call again when what it sends grows
 - Write glossary lines with a dash, and list every term the spec uses
+- Keep helpers out of a "use server" file

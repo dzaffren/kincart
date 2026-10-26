@@ -95,7 +95,8 @@ body {
   font: var(--type-title);
 }
 
-.login {
+.login,
+.changes {
   gap: var(--space-3);
 }
 
@@ -320,7 +321,8 @@ body {
 }
 
 .limit,
-.notify {
+.notify,
+.links {
   padding-top: var(--space-6);
   border-top: var(--border-width) solid var(--color-line);
 }
