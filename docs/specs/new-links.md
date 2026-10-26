@@ -188,7 +188,7 @@ Reusing: `newLink()`, `hashOf()` and `whoIs()` from `lib/shop/people.ts`, `start
 | 1, 3 | `lib/shop/requests.test.ts`: `replaceLinks` | `pnpm test lib/shop/requests.test.ts` |
 | 1, 5 | `app/(shop)/actions.test.ts`: `makeLinks` | `pnpm test "app/(shop)/actions.test.ts"` |
 | 1, 4, 5 | `app/(shop)/SamView.test.tsx`: each `links` state | `pnpm test "app/(shop)/SamView.test.tsx"` |
-| 1 to 4 | `e2e/new-links.spec.ts`: Try KinCart, Skip, a $40 limit, Keep these, Make new links, Copy, the old links' "This link doesn't work", Rose's new link with the $40 limit and Notifications offered again | `pnpm test:e2e e2e/new-links.spec.ts --workers=1` |
+| 1 to 4 | `e2e/new-links.spec.ts`: Try KinCart, Skip, a $40 limit, Keep these, Make new links, Copy, the old links' "This link doesn't work", Rose's new link with the receipt, the $40 limit and Bought before, and the home page on the new pair. Scenario 3's forgotten phones are proven by `replaceLinks`' test, not the e2e | `pnpm test:e2e e2e/new-links.spec.ts --workers=1` |
 
 ### Chunks
 
@@ -206,6 +206,10 @@ Single chunk.
 ### Decisions to record
 
 Recorded as D120, D121.
+
+## Review
+
+2026-10-26 · 2 raw findings, 0 survived. Clean.
 
 ## Open items
 
