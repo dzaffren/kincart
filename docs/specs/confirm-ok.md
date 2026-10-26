@@ -1,6 +1,6 @@
 # Confirm OK
 
-**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** new-links
@@ -180,7 +180,7 @@ flowchart LR
 
 | File | What changes | Why |
 | ---- | ------------ | --- |
-| `db/migrations/0016_sam_passkeys.up.sql`, `.down.sql` (new) | `CREATE TABLE IF NOT EXISTS sam_passkeys (id bigint PRIMARY KEY REFERENCES households (id), credential_id text NOT NULL, public_key bytea NOT NULL, made_at timestamptz NOT NULL DEFAULT now())`. Down: `DROP TABLE IF EXISTS sam_passkeys` | 1, 4 |
+| `db/migrations/0016_sam_passkeys.up.sql`, `.down.sql` (new) | `CREATE TABLE IF NOT EXISTS sam_passkeys (id bigint PRIMARY KEY REFERENCES households (id) ON DELETE CASCADE, credential_id text NOT NULL, public_key bytea NOT NULL, made_at timestamptz NOT NULL DEFAULT now())`. Down: `DROP TABLE IF EXISTS sam_passkeys` | 1, 4 |
 | `lib/shop/requests.ts:123` | New `getPasskey(household)`, `savePasskey(household, credentialId, publicKey)` as `INSERT ... ON CONFLICT (id) DO NOTHING RETURNING id`, so the first passkey wins and a second Turn on can't replace it, and `dropPasskey(household)`. Same query style as `getVault()` | 1, 4 |
 | `lib/shop/passkey.ts` (new) | `createOptions()`, `getOptions(credentialId)`, `checkCreate(json, challenge, origin)` and `checkGet(json, stored, challenge, origin)`. They wrap `@simplewebauthn/server`'s generate and verify calls with `userVerification: "required"` and the rp id from `origin()`'s host. Each check returns `false` on any throw | 1, 2, 3, 4 |
 | `app/(shop)/actions.ts:79` | New `passkeyOptions(token)`, `turnOnPasskey(token, json)` and `turnOffPasskey(token, json)`, each only for Sam of a household other than 1. A private `confirmed(household, formData)` reads the `passkey` field and the `passkey_challenge` cookie, then clears the cookie. `answer()` (`:294`) checks it for `ok` only when the household has a passkey. `makeLinks()` takes `formData` and checks it the same way. A refusal logs `passkey household=<id> status=refused for=<ok\|links\|off>` and redirects with `?refused=` | 2, 3, 4 |
@@ -271,6 +271,9 @@ Recorded as D122, D123, D124, D125.
 | O6 | Whether household 1, whose links live in Vercel's env and which the e2e tests use, gets the switch | question | spec p1 | user | Resolved | No, as with New links. 2026-10-26 |
 | O7 | How the server checks Sam's passkey | question | spec p3 | user | Resolved | `@simplewebauthn/server` v14.0.3 (D123). 2026-10-26 |
 | O8 | Where the one-time challenge lives between asking the phone and checking its answer | question | spec p3 | user | Resolved | An httpOnly cookie on Sam's link for 5 minutes, cleared once checked (D124). 2026-10-26 |
+| O9 | The plan's table had a plain `REFERENCES households (id)`. Every test and e2e reset deletes households other than 1 without deleting their passkeys first | flag | build | user | Decided alone | Chose: `ON DELETE CASCADE` on `sam_passkeys`, so a deleted household takes its passkey with it, and no reset changes. Other: a plain reference, and `DELETE FROM sam_passkeys` added to each reset in `lib/shop/requests.test.ts`, `app/(shop)/actions.test.ts`, `scripts/migrate.test.ts` and `e2e/db.ts`. Undo: drop `ON DELETE CASCADE` from `0016_sam_passkeys.up.sql`, and add the deletes. 2026-10-26 |
+| O10 | The plan named no shared test phone. `lib/shop/passkey.test.ts` and `app/(shop)/actions.test.ts` both need a phone that answers Turn on and signs a challenge | flag | build | user | Decided alone | Chose: `lib/shop/passkeyPhone.ts`, imported by both tests. Other: a copy of the phone in each test. Undo: inline the file into both tests. 2026-10-26 |
+| O11 | The full e2e run had 9 failures: ask-again, basket, find-and-explain, find-another, find-limits, photo-ask-several, photo-ask, sam-finds-another and usage-on-status. Every one ran a real Find, and Channel3 answered each search with HTTP 402 | flag | build | user | Decided alone | Chose: leave them. This slice changes no Find code, and `confirm-ok.spec.ts` and the 18 others passed. Other: stub Channel3 in those e2e (D24 says they call it for real). Undo: none needed once Channel3's quota or plan is back; run `pnpm test:e2e --workers=1` again. 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
