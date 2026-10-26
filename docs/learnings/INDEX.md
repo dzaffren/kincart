@@ -45,3 +45,4 @@
 - Play another site in an e2e with a real local server
 - Read the find log's reason before debugging a failed Find e2e
 - Time a call again when what it sends grows
+- Write glossary lines with a dash, and list every term the spec uses
