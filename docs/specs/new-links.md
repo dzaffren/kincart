@@ -1,6 +1,6 @@
 # New links
 
-**Version:** v1 · **Status:** Draft · **Type:** Feature · **Project type:** Web UI
+**Version:** v1 · **Status:** Refined · **Type:** Feature · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** households
@@ -111,6 +111,114 @@ Three states on Sam's page, built in the repo behind `/preview/new-links`, and s
 
 **Preview:** `app/(shop)/preview/new-links/page.tsx`, at `/preview/new-links` on `pnpm dev`. Not served in production.
 
+## Technical plan
+
+### Approach
+
+New links swaps the two hashes on the household's own `households` row, so every table keyed by the household id keeps its rows (D46). One SQL statement swaps them only while Sam's old hash is still there, and deletes the household's saved phones. The action then points this browser's household cookie at the new pair, if it held the old one, and hands Rose's new link to Sam's new page in a one-time cookie.
+
+Relies on: D42, D44, D46, D47, D52, D117, D120 and D121 (drafted here)
+
+```mermaid
+flowchart TB
+    subgraph browser["Sam's browser"]
+        P["/h/<old> Your links"] -- "?links=new" --> C[Make new links?]
+    end
+    subgraph server
+        A["makeLinks(token)"] -- "replaceLinks(): one UPDATE + DELETE" --> DB[(households, push_subscriptions)]
+        A -- "sets household and new_rose cookies" --> J[cookie jar]
+    end
+    C -- "POST makeLinks" --> A
+    A -- "redirect /h/<new>" --> N["/h/<new> New links made"]
+    J -- "new_rose, path /h/<new>, 10 min" --> N
+```
+
+```mermaid
+sequenceDiagram
+    participant S as Sam's browser
+    participant A as makeLinks (actions.ts)
+    participant R as replaceLinks (requests.ts)
+    participant D as Neon
+    S->>A: POST, Sam's old token
+    A->>A: whoIs: Sam, not household 1
+    A->>R: household, old Sam hash, two new hashes
+    R->>D: WITH swapped AS (UPDATE households ... WHERE sam_hash = old), DELETE FROM push_subscriptions ...
+    D-->>R: swapped 1, phones 2
+    A->>S: Set-Cookie household (if it held the old pair), new_rose (path /h/new, 10 min)
+    A->>S: 303 /h/<new>
+    S->>S: GET /h/<new>: whoIs finds Sam, page reads new_rose, shows New links made
+```
+
+### Changes
+
+| File | What changes | Why |
+| ---- | ------------ | --- |
+| `lib/shop/requests.ts:94` | New `replaceLinks(household, oldSamHash, roseHash, samHash)`: one statement, `WITH swapped AS (UPDATE households SET rose_hash = $3, sam_hash = $4 WHERE id = $1 AND sam_hash = $2 RETURNING id), gone AS (DELETE FROM push_subscriptions WHERE household_id IN (SELECT id FROM swapped) RETURNING 1)`, returning how many rows swapped and how many phones went, or `null` when none swapped | 1, 2, 3 |
+| `app/(shop)/actions.ts:44` | New `makeLinks(token)`, beside `start()`. It returns unless `whoIs` gives Sam of a household other than 1. It makes two links with `newLink()`, calls `replaceLinks` with `hashOf()`, and logs `links household=<id> status=replaced phones=<n>`. When the household cookie's second part is this token, it sets the cookie to the new pair with `start()`'s options. It sets `new_rose` to Rose's new token: httpOnly, secure, sameSite lax, path `/h/<new>`, 10 minutes. Then it redirects to `/h/<new>`. When nothing swapped, it redirects to the old page, which no longer works | 1, 2, 3, 5 |
+| `app/(shop)/h/[token]/page.tsx:63` | Passes `links` and `makeLinks` to `SamView` only for a household other than 1, without `?in=phone`, and when no ask waits. `?links=new` gives `confirm`, a `new_rose` cookie gives `made` with `/r/<token>` on the request's origin, otherwise `offer` | 1, 4, 5 |
+| `app/(shop)/SamView.tsx`, `app/(shop)/ShareLink.tsx`, `app/(shop)/shop.css`, `app/(shop)/preview/new-links/page.tsx` | Built at pause 2. `/build` breaks each new line once, as the lesson says | 1, 4, 5 |
+| `lib/shop/requests.test.ts` | `replaceLinks` swaps both hashes, deletes only this household's phones, leaves another household alone, and returns `null` for an old hash that no longer matches | 1, 3 |
+| `app/(shop)/actions.test.ts` | `makeLinks` does nothing for Rose's link or household 1, and for Sam it swaps the links, sets both cookies, keeps another browser's household cookie, and redirects to `/h/<new>` | 1, 5 |
+| `app/(shop)/SamView.test.tsx` | Each `links` state: Your links with its button, the confirm screen with Make new links and Keep these, the made notice with Rose's link and Copy. No Your links without `links` | 1, 4, 5 |
+| `e2e/new-links.spec.ts` (new) | Walks scenarios 1 to 4 on a household from Try KinCart | 1, 2, 3, 4 |
+
+Reusing: `newLink()`, `hashOf()` and `whoIs()` from `lib/shop/people.ts`, `start()`'s cookie options, `findHousehold()`'s query style, `origin()` in `actions.ts:338`, `startOwn()` and `skipsLinking()` from `e2e/households.spec.ts`, and the `?in=phone` flag from `PhoneFrame` (`app/(shop)/ui.tsx:226`).
+
+### Earn-it
+
+| Added | Triggered by |
+| ----- | ------------ |
+| `new_rose` cookie | Scenario 1: Sam's new page shows Rose's new link, and only hashes are kept (D47). D121 |
+| `ShareLink` | Scenario 1: Share and Copy (O6) |
+
+### Non-functionals
+
+|                      |                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Load**             | A few taps a day at most. Each is one SQL statement and two cookies, with no Claude, Channel3 or PayPal call                                                                        |
+| **Breaks first**     | Nothing at 10×. Two taps from Sam's old page at once: the second finds Sam's old hash gone, and lands on "This link doesn't work"                                                   |
+| **Security surface** | Callable by whoever holds a Sam link of a household other than 1 (O7). Trusts only the token, through `whoIs`. Writes new hashes, never the links themselves. `new_rose` holds Rose's link for 10 minutes, httpOnly, sent only to `/h/<new>` |
+| **Proof it works**   | `links household=<id> status=replaced phones=<n>` in Vercel's logs, and the old Sam link answering 404 right after                                                                 |
+| **Rollout**          | No flag. Vercel promotes after main's CI (D10). Rollback: promote the previous deploy. Swapped households keep working, since no schema changes                                     |
+
+### Test plan
+
+| Scenario | Test | Command |
+| -------- | ---- | ------- |
+| 1, 3 | `lib/shop/requests.test.ts`: `replaceLinks` | `pnpm test lib/shop/requests.test.ts` |
+| 1, 5 | `app/(shop)/actions.test.ts`: `makeLinks` | `pnpm test "app/(shop)/actions.test.ts"` |
+| 1, 4, 5 | `app/(shop)/SamView.test.tsx`: each `links` state | `pnpm test "app/(shop)/SamView.test.tsx"` |
+| 1 to 4 | `e2e/new-links.spec.ts`: Try KinCart, Skip, a $40 limit, Keep these, Make new links, Copy, the old links' "This link doesn't work", Rose's new link with the $40 limit and Notifications offered again | `pnpm test:e2e e2e/new-links.spec.ts --workers=1` |
+
+### Chunks
+
+Single chunk.
+
+### Risks
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Whoever holds a leaked Sam link makes new links first and locks the family out (O7) | Accepted. `confirm-ok` (slice 5) guards it |
+| Rose's old Home Screen icon opens a link that no longer works (O2) | Accepted. Rose opens the new link and adds it again. The confirm screen says to |
+| A browser with the household cookie of the old pair, other than Sam's, opens the home page | `linksIn()` finds no household for the old pair, and the home page offers Try KinCart, as for any lost cookie |
+| Rose is on PayPal's page, linking from her old link, when Sam makes new links | PayPal returns to the old link, which no longer works. Rose taps Link PayPal again from the new link |
+
+### Decisions to record
+
+## D120 · 2026-10-26 · New links swaps the two hashes on the household's own row, and forgets its saved phones in the same statement
+
+Why: every table is keyed by the household id (D46), so swapping the hashes keeps the saved PayPal, the limits, the asks and the receipts. One statement means a half-done swap can't leave phones that push to a dead link. The swap runs only while Sam's old hash is still there, so two taps at once make one new pair.
+Rejected: a new household that copies the old one's rows (a copy for every table, and every later table must join it), keeping the old hashes to show "this link was replaced" (O3), keeping the saved phones (a tap opens a dead link, O2).
+Source: docs/specs/new-links.md
+Status: active
+
+## D121 · 2026-10-26 · Rose's new link reaches Sam's new page in a one-time cookie for 10 minutes
+
+Why: only hashes are kept (D47), so Rose's link exists in plain form only inside the action. An httpOnly cookie, sent only to Sam's new link, keeps it out of page addresses, history and bookmarks.
+Rejected: Rose's link in Sam's page address (a saved Home Screen icon or bookmark keeps it, and the "New links made" card shows forever), storing Rose's link itself (D47 keeps hashes only).
+Source: docs/specs/new-links.md
+Status: active
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
@@ -123,6 +231,7 @@ Three states on Sam's page, built in the repo behind `/preview/new-links`, and s
 | O6 | How Sam gets Rose's new link to Rose | question | spec p1 | user | Resolved | Share, through the phone's share sheet, and Copy. Sam's own page says to save the new link. 2026-10-26 |
 | O7 | Whoever holds a leaked Sam link can tap New links first and lock the real Rose and Sam out. A new household then has no saved PayPal and no receipts | flag | spec p1 | user | Accepted risk | A leaked Sam link can already approve charges, and this adds a lockout, not money. `confirm-ok` (slice 5) is the guard. 2026-10-26 |
 | O8 | Sam's page shows only OK and No while an ask waits (`app/(shop)/SamView.tsx:61`), so Your links isn't there. Scenario 2 says Sam makes new links while Rose's slippers ask waits | question | spec p2 | user | Resolved | Sam answers first. Your links shows only when no ask waits, so the OK and No screen stays as it is. Scenario 2 no longer has a waiting ask. 2026-10-26 |
+| O9 | How Rose's new link reaches Sam's new page, when only hashes are kept (D47) | question | spec p3 | user | Resolved | A one-time cookie, httpOnly, sent only to Sam's new link, for 10 minutes (D121). 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
@@ -132,3 +241,5 @@ _Never delete this section or its rows. See references/ledger.md._
 - **Household** — one Rose and one Sam, with their own asks, limits, phones and saved PayPal (D42).
 - **Share sheet** — the phone's own menu for sending something to another app, such as Messages or WhatsApp.
 - **e2e** — end to end: an automated test that drives the app the way a person would, start to finish.
+- **Hash** — a fixed scramble of a link. KinCart can check a link against it, but can't turn it back into the link (D47).
+- **httpOnly cookie** — a cookie the browser sends to the server but the page's own scripts can't read.
