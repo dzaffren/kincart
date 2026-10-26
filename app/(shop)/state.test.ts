@@ -98,6 +98,7 @@ const saved = (outcome: SavedSearch["outcome"], options = outcome === "options" 
   blankPhotos: 0,
   query: null,
   tried: false,
+  bySam: false,
   last: null,
   searchedAt,
 });
@@ -681,4 +682,53 @@ it("picks last time's listing for Rose when today's options have it, in one sear
   expect(roseState(vault, null, {}, basket)).toMatchObject({ kind: "basket", picked: [strap.id, undefined] });
   expect(roseState(vault, null, { picked: ["", light.id] }, basket)).toMatchObject({ picked: [undefined, light.id] });
   expect(roseState(vault, null, {}, on(jarSearch()))).toMatchObject({ picked: undefined });
+});
+
+it("offers Sam Find another under a No or a left-out thing while Rose has no newer search", () => {
+  const declined = { ...request("declined", strap), queries: [slipperPick] };
+  const older = { ...saved("options"), searchedAt: new Date("2026-10-20T10:00:00Z") };
+  expect(samState(declined, 5000, null)).toEqual({ kind: "nothing", declined: strap, again: "offer" });
+  expect(samState(declined, 5000, older)).toMatchObject({ again: "offer" });
+  expect(samState({ ...asked("declined"), queries: [aaPick, lightPick] }, 5000, null)).toMatchObject({
+    lines: [aa, light],
+    again: "offer",
+  });
+  expect(samState({ ...trimmed("paid"), queries: [aaPick, lightPick] }, 5000, null)).toEqual({
+    kind: "paid",
+    receipt: trimmedReceipt,
+    again: "offer",
+  });
+  expect(samState({ ...request("paid", strap), queries: [slipperPick] }, 5000, null)).toEqual({
+    kind: "paid",
+    receipt: { ...receipt, item: strap },
+  });
+});
+
+it("tells Sam how either person's Find another ended, and offers no second one", () => {
+  const declined = { ...request("declined", strap), queries: [slipperPick] };
+  expect(samState(declined, 5000, { ...saved("options"), tried: true })).toMatchObject({ again: "options" });
+  expect(samState(declined, 5000, { ...saved("over limit", [strap]), tried: true })).toMatchObject({ again: "options" });
+  expect(samState(declined, 5000, { ...jarSearch(), tried: true })).toMatchObject({ again: "options" });
+  expect(samState(declined, 5000, { ...saved("nothing found"), tried: true })).toMatchObject({ again: "nothing" });
+  expect(samState(declined, 5000, { ...saved("over limit"), tried: true })).toMatchObject({ again: "nothing" });
+  expect(samState({ ...trimmed("paid"), queries: [aaPick, lightPick] }, 5000, { ...saved("options"), tried: true })).toMatchObject({
+    again: "options",
+  });
+});
+
+it("offers Sam nothing once Rose searched again by hand, and keeps the wait after a stopped Find another", () => {
+  const declined = { ...request("declined", strap), queries: [slipperPick] };
+  expect(samState(declined, 5000, saved("nothing found"))).not.toHaveProperty("again");
+  expect(samState(declined, 5000, saved("options"))).not.toHaveProperty("again");
+  expect(samState(declined, 5000, saved("retry"))).not.toHaveProperty("again");
+  expect(samState(declined, 5000, null, 170)).toEqual({ kind: "nothing", declined: strap, again: "offer", waitMinutes: 170 });
+  expect(samState(request("waiting"), 5000, null, 170)).not.toHaveProperty("waitMinutes");
+});
+
+it("tells Rose's screens when Sam's Find another ran their search", () => {
+  const bySam = (search: SavedSearch) => on({ ...search, tried: true, bySam: true });
+  expect(roseState(vault, null, {}, bySam(saved("nothing found")))).toMatchObject({ kind: "ask", bySam: true });
+  expect(roseState(vault, null, {}, bySam(saved("options")))).toMatchObject({ kind: "options", bySam: true });
+  expect(roseState(vault, null, {}, bySam(jarSearch()))).toMatchObject({ kind: "basket", bySam: true });
+  expect(roseState(vault, null, {}, on({ ...saved("options"), tried: true }))).toMatchObject({ bySam: undefined });
 });

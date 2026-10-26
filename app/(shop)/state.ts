@@ -2,7 +2,7 @@ import type { Again, Group, Last, Option, Rebuy } from "../../lib/shop/find";
 import type { PurchaseRequest, SavedSearch } from "../../lib/shop/requests";
 import type { NotifyState } from "./Notify";
 import type { Bought, RoseState } from "./RoseView";
-import type { SamState } from "./SamView";
+import type { SamAgain, SamState } from "./SamView";
 import { listed, type Receipt } from "./ui";
 
 type RoseParams = {
@@ -48,6 +48,7 @@ export function roseState(
   const { limitCents } = search;
   const totalCents = search.totalCents ?? undefined;
   const tried = current?.tried || undefined;
+  const bySam = current?.bySam || undefined;
   const stopped = params.limitWait !== undefined && params.limitWait > 0;
   // A search that found nothing under Sam's limit shows the listings over it that fit (D110).
   if (current?.outcome === "options" || (current?.outcome === "over limit" && current.options.length)) {
@@ -65,6 +66,7 @@ export function roseState(
       picked: over?.ids[0] ?? lastPick(current.last, current.options),
       overCents: over?.cents,
       tried,
+      bySam,
       last: current.last ?? undefined,
       overLimit: current.outcome === "over limit" || undefined,
       ...(stopped && { waitMinutes: params.limitWait }),
@@ -88,6 +90,7 @@ export function roseState(
       picked: over?.ids ?? pickedOf(current.groups, params.picked) ?? lastPicks(current.groups),
       overCents: over?.cents,
       tried,
+      bySam,
       ...(stopped && { waitMinutes: params.limitWait }),
     };
   }
@@ -120,13 +123,14 @@ export function roseState(
     outcome,
     problem,
     tried,
+    bySam,
     ...(stopped && { waitMinutes: params.limitWait }),
     bought: search.bought?.length ? search.bought.map(boughtOf) : undefined,
   };
 }
 
 // Rose's page shows the saved search while it's newer than the latest ask.
-function currentOf(saved: SavedSearch | null, request: PurchaseRequest | null): SavedSearch | null {
+export function currentOf(saved: SavedSearch | null, request: PurchaseRequest | null): SavedSearch | null {
   return saved && (!request || saved.searchedAt > request.askedAt) ? saved : null;
 }
 
@@ -240,9 +244,17 @@ function fixedListState(request: PurchaseRequest | null, params: RoseParams): Ro
   }
 }
 
-// Sam's limit as Sam has it now, so Sam's page says how far over it the ask is (D109).
-export function samState(request: PurchaseRequest | null, limitCents?: number): SamState {
+// Sam's limit as Sam has it now, so Sam's page says how far over it the ask is (D109). saved is Rose's
+// search once Find is on, for Sam's Find another, and waitMinutes is left on a Find another stopped for the day.
+export function samState(
+  request: PurchaseRequest | null,
+  limitCents?: number,
+  saved?: SavedSearch | null,
+  waitMinutes?: number,
+): SamState {
   if (!request) return { kind: "nothing" };
+  const again = saved === undefined ? undefined : againFor(saved, request);
+  const extra = { ...(again && { again }), ...(waitMinutes !== undefined && waitMinutes > 0 && { waitMinutes }) };
   switch (request.status) {
     case "waiting":
     case "paying":
@@ -256,12 +268,23 @@ export function samState(request: PurchaseRequest | null, limitCents?: number): 
         limitCents,
       };
     case "paid":
-      return { kind: "paid", receipt: receiptOf(request) };
+      return { kind: "paid", receipt: receiptOf(request), ...extra };
     case "failed":
       return { kind: "failed", item: request.item, lines: request.lines ?? undefined };
     case "declined":
-      return { kind: "nothing", declined: request.item, lines: request.lines ?? undefined };
+      return { kind: "nothing", declined: request.item, lines: request.lines ?? undefined, ...extra };
   }
+}
+
+// Sam's Find another answers only a No or an untick, never Rose's own Find (D113). Rose and Sam share it (D115),
+// so a search that either ran since says how it ended, and one that Rose typed since offers nothing.
+function againFor(saved: SavedSearch | null, request: PurchaseRequest): SamAgain | undefined {
+  if (request.status !== "declined" && !(request.status === "paid" && request.leftOut)) return undefined;
+  const current = currentOf(saved, request);
+  if (!current) return againOf(null, request) ? "offer" : undefined;
+  if (!current.tried) return undefined;
+  const found = current.outcome === "options" || current.outcome === "basket" || (current.outcome === "over limit" && current.options.length);
+  return found ? "options" : "nothing";
 }
 
 function receiptOf(request: PurchaseRequest): Receipt {

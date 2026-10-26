@@ -19,6 +19,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Rose's page lists the 3 newest things Sam paid for under Bought before. Ask again looks for the same things at today's prices, puts the one Rose bought last time first and picked, and says if its price or shop changed. Each Ask again counts as one of the day's 20 Finds.
 - When nothing fits under Sam's price limit, Rose sees up to 3 listings that cost more, cheapest first and never above double the limit. Each says how far over the limit it is, and Sam's page says so too before Sam taps OK, for one thing or one thing in a basket.
 - No other site can show a KinCart page inside a frame, so nobody can hide Sam's OK under a button of their own. Shops' image hosts no longer learn which KinCart page asked for a photo.
+- After Sam says no, or leaves a thing out, Sam can tap Find another on Sam's own page. KinCart searches again with other words for Rose, Rose's page says Sam asked, and Rose's phone buzzes with the result. A Find Rose starts meanwhile is kept. Each tap counts as one of the day's 20 Finds, and Rose or Sam gets one between them.
 
 ## [1.2.0] - 2026-10-16
 

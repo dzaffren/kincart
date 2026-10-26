@@ -101,3 +101,47 @@ it("marks only the basket lines over Sam's limit, each with how far over it is",
   expect(html).not.toMatch(/Duracell Coppertop AA Batteries, 8 Pack.*over your.*Folding Bath Seat/);
   expect(html).not.toContain("This is");
 });
+
+const slippers = { id: "prod_3Df7cS", name: "Dearfoams Women's Cozy Comfort Slippers", cents: 2499 };
+const receipt = {
+  item: { id: "basket", name: "1 thing", cents: 879 },
+  paidAt: askedAt,
+  transactionId: "7BM91101S1572292D",
+  lines: [batteries],
+  leftOut: ["a night light"],
+};
+const sam = (state: Parameters<typeof SamView>[0]["state"]) => text(renderToStaticMarkup(<SamView state={state} />));
+
+it("offers Sam Find another under a No and a left-out thing, saying Rose picks from what it finds", () => {
+  expect(sam({ kind: "nothing", declined: slippers, again: "offer" })).toContain(
+    "You said no to Dearfoams Women's Cozy Comfort Slippers. Rose can see that.Find anotherKinCart looks again for Rose, without the one you said no to. Rose picks from what it finds.",
+  );
+  expect(sam({ kind: "nothing", declined: { id: "basket", name: "2 things", cents: 2578 }, lines: [batteries, nightLight], again: "offer" })).toContain(
+    "KinCart looks again for each of Rose's things, without the ones you said no to. Rose picks from what it finds.",
+  );
+  expect(sam({ kind: "paid", receipt, again: "offer" })).toContain(
+    "You left out a night light. Rose can ask for it again.Find anotherKinCart looks again for Rose, without the one you left out. Rose picks from what it finds.",
+  );
+  expect(sam({ kind: "paid", receipt: { ...receipt, leftOut: ["a night light", "a phone charger"] }, again: "offer" })).toContain(
+    "without the ones you left out.",
+  );
+  expect(sam({ kind: "nothing", declined: slippers })).not.toContain("Find another");
+  expect(sam({ kind: "paid", receipt })).not.toContain("Find another");
+});
+
+it("tells Sam how the search for Rose ended, with no second Find another", () => {
+  const found = sam({ kind: "nothing", declined: slippers, again: "options" });
+  expect(found).toContain("KinCart found new options for Rose. Rose picks one and asks you.");
+  expect(found).not.toContain("Find another");
+  expect(sam({ kind: "paid", receipt, again: "options" })).toContain("KinCart found new options for Rose.");
+  const nothing = sam({ kind: "nothing", declined: slippers, again: "nothing" });
+  expect(nothing).toContain("KinCart looked again and found nothing. Rose can try different words.");
+  expect(nothing).not.toContain("Find another");
+});
+
+it("puts the day's limit notice on top of Sam's page, and keeps Find another under the No", () => {
+  expect(sam({ kind: "nothing", declined: slippers, again: "offer", waitMinutes: 170 })).toMatch(
+    /^That's a lot of Finds from here today\. Try again in 3 hours\.You said no to .*Find another/,
+  );
+  expect(sam({ kind: "nothing", declined: slippers, again: "offer" })).not.toContain("a lot of Finds");
+});

@@ -314,6 +314,24 @@ it("says Find another looked again with other words, on its options, its basket,
   expect(one.match(/Looked again/g)).toHaveLength(1);
 });
 
+it("names Sam when Sam's Find another ran the search", () => {
+  const listings = [aa24, aa16, belkin];
+  expect(render({ kind: "options", limitCents: 5000, words: jar, listings, tried: true, bySam: true })).toContain(
+    "For “something to grip jar lids”. Sam asked KinCart to look again with other words.</p>",
+  );
+  const again = groups.map((group) => ({ ...group, tried: true }));
+  expect(render({ kind: "basket", limitCents: 5000, words: "batteries", groups: again, tried: true, bySam: true })).toContain(
+    "For “batteries”. Sam asked KinCart to look again with other words. Pick one for each thing you want.",
+  );
+  expect(render({ kind: "ask", limitCents: 2000, words: jar, problem: "nothing found", tried: true, bySam: true })).toContain(
+    "Sam asked KinCart to look again. Still couldn&#x27;t find that. Try different words.",
+  );
+  expect(render({ kind: "ask", limitCents: 2000, words: jar, problem: "over limit", tried: true, bySam: true })).toContain(
+    "Sam asked KinCart to look again. Still nothing under $20 for that.",
+  );
+  expect(render({ kind: "ask", limitCents: 2000, words: jar, problem: "nothing found", tried: true })).not.toContain("Sam asked");
+});
+
 it("puts the day's limit notice on the basket and the receipt, and keeps an empty search's Find another under it", () => {
   const notice = "That&#x27;s a lot of Finds from here today. Try again in 3 hours.";
   expect(render({ kind: "basket", limitCents: 5000, words: "batteries", groups, waitMinutes: 170 })).toContain(notice);

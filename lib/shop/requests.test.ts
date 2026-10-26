@@ -239,7 +239,10 @@ it("keeps a search's query, and whether Find another ran it", async () => {
   expect(await getSearch(owner)).toMatchObject({ query: "warm slip-on slippers size 8", tried: false });
 
   await saveSearch(owner, "a lamp for reading in bed", { outcome: "over limit", query: "bedside reading lamp" }, 0, 0, true);
-  expect(await getSearch(owner)).toMatchObject({ outcome: "over limit", query: "bedside reading lamp", tried: true });
+  expect(await getSearch(owner)).toMatchObject({ outcome: "over limit", query: "bedside reading lamp", tried: true, bySam: false });
+
+  await saveSearch(owner, "a lamp for reading in bed", { outcome: "nothing found" }, 0, 0, true, true);
+  expect(await getSearch(owner)).toMatchObject({ tried: true, bySam: true });
 
   await saveSearch(owner, "AA batteries, something to grip jar lids", {
     outcome: "basket",
@@ -258,7 +261,7 @@ it("keeps a search's query, and whether Find another ran it", async () => {
   });
 
   await saveSearch(owner, "a lamp for reading in bed", { outcome: "retry" });
-  expect(await getSearch(owner)).toMatchObject({ query: null, tried: false });
+  expect(await getSearch(owner)).toMatchObject({ query: null, tried: false, bySam: false });
 
   const empty = [
     { thing: "AA batteries", options: [], problem: "nothing found" as const, query: "AA batteries" },

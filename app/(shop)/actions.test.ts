@@ -1290,16 +1290,112 @@ it("stops a Find another past 20 Finds, saves nothing, counts a stopped Find, an
   expect(fetch).not.toHaveBeenCalled();
 });
 
-it("won't find another from Sam's link, or while search is off", async () => {
+it("won't find another for Rose's own empty Find from Sam's link, or while search is off", async () => {
   searchOn();
   await saveSearch(owner, jarWords, { outcome: "nothing found", query: "jar lid grip" });
 
-  await expect(findAnother(sam, form({}))).resolves.toBeUndefined();
+  expect(await redirectOf(findAnother(sam, form({})))).toBe(`/h/${sam}`);
   vi.stubEnv("ADDRESS_KEY", "");
   await expect(findAnother(rose, form({}))).resolves.toBeUndefined();
 
   expect(fetch).not.toHaveBeenCalled();
   expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", tried: false });
+});
+
+async function samSaysNoToSlippers() {
+  await saveSearch(owner, slippers, { outcome: "options", options: [strap], query: "warm slip-on slippers size 8" });
+  await redirectOf(askSam(rose, form({ listing: strap.id })));
+  await decline(owner, (await latest(owner))!.id);
+  vi.mocked(notify).mockClear();
+}
+
+it("after Sam's No, Sam's Find another searches for Rose without the refused listing, and tells Rose", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await samSaysNoToSlippers();
+  const services = stubAgainServices([strap, isotoner]);
+
+  expect(await redirectOf(findAnother(sam, form({ another: "0" })))).toBe(`/h/${sam}`);
+
+  expect(await getSearch(owner)).toMatchObject({
+    words: slippers,
+    outcome: "options",
+    options: [{ id: isotoner.id }],
+    tried: true,
+    bySam: true,
+  });
+  expect(askedForOtherWords(services)).toEqual([`They want: "${slippers}"\nThe last query: "warm slip-on slippers size 8"`]);
+  expect(await usesFrom("203.0.113.7", "find")).toBe(1);
+  expect(await usedToday()).toMatchObject({ finds: 1, stopped_finds: 0 });
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
+    title: "Sam asked KinCart to look again",
+    body: "New options are ready. Tap to pick one.",
+  });
+});
+
+it("tells Rose when Sam's Find another finds nothing, and offers no second one", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await samSaysNoToSlippers();
+  stubAgainServices([strap]);
+
+  expect(await redirectOf(findAnother(sam, form({})))).toBe(`/h/${sam}`);
+  expect(await getSearch(owner)).toMatchObject({ outcome: "nothing found", tried: true, bySam: true });
+  expect(notify).toHaveBeenCalledExactlyOnceWith(owner, "rose", {
+    title: "Sam asked KinCart to look again",
+    body: "KinCart found nothing this time. Tap to try different words.",
+  });
+
+  vi.mocked(fetch).mockClear();
+  vi.mocked(notify).mockClear();
+  expect(await redirectOf(findAnother(sam, form({})))).toBe(`/h/${sam}`);
+  expect(await redirectOf(findAnother(rose, form({})))).toBe(`/r/${rose}`);
+  expect(fetch).not.toHaveBeenCalled();
+  expect(notify).not.toHaveBeenCalled();
+});
+
+it("sends no push for Rose's own Find another, and keeps it as Rose's", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await samSaysNoToSlippers();
+  stubAgainServices([strap, isotoner]);
+
+  await redirectOf(findAnother(rose, form({})));
+  expect(await getSearch(owner)).toMatchObject({ tried: true, bySam: false });
+  expect(notify).not.toHaveBeenCalled();
+});
+
+it("keeps the Find Rose ran while Sam's Find another searched, and doesn't tell Rose about Sam's", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await samSaysNoToSlippers();
+  const services = stubAgainServices([strap, isotoner]);
+  const search = services.getMockImplementation()!;
+  services.mockImplementationOnce(async (url, init) => {
+    await saveSearch(owner, "a pill box that beeps", { outcome: "nothing found" });
+    return search(url, init);
+  });
+
+  expect(await redirectOf(findAnother(sam, form({})))).toBe(`/h/${sam}`);
+  expect(await getSearch(owner)).toMatchObject({ words: "a pill box that beeps", tried: false, bySam: false });
+  expect(notify).not.toHaveBeenCalled();
+});
+
+it("stops Sam's Find another past 20 Finds from Sam's address, saves nothing, and keeps Sam on Sam's page", async () => {
+  searchOn();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  await usedFrom("203.0.113.7", "find", 20, 21);
+  await samSaysNoToSlippers();
+  vi.mocked(fetch).mockClear();
+
+  const to = await redirectOf(findAnother(sam, form({})));
+
+  const until = Number(new URL(to, "https://kincart.vercel.app").searchParams.get("until"));
+  expect(to).toBe(`/h/${sam}?find=limit&until=${until}`);
+  expect(fetch).not.toHaveBeenCalled();
+  expect(await getSearch(owner)).toBeNull();
+  expect(await usedToday()).toMatchObject({ finds: 0, stopped_finds: 1 });
+  expect(notify).not.toHaveBeenCalled();
 });
 
 // Sam's OK, without a charge: claim() keeps the ticked lines, and the charge is recorded as paid.

@@ -659,7 +659,7 @@ Status: active
 Why: one try with other words gives Rose new options without a loop of empty searches. It sends the same Claude and Channel3 calls as a Find, so it counts toward the address's 20 a day (D73) and on `/status` (D78).
 Rejected: taps until the daily limit, each with untried words (a loop of empty results, and KinCart must keep every tried query), a Find another that runs free (a script could tap it past the daily limit).
 Source: docs/specs/find-another.md
-Status: active
+Status: superseded by D115
 
 ## D98 · 2026-10-22 · Find another leaves out only what Sam just refused, and after a basket No it searches every thing
 
@@ -767,6 +767,35 @@ Why: Rose can now pick a listing over the limit, so its photo must pass the pick
 Rejected: one call with photos for listings above the limit too (up to 10 more photos on almost every Find, and a new prompt for the recorded set), every listing up to double the limit (8 photos took a one-thing Find to 14.9 s), photo URLs in the request (the API refuses them), a third call that checks the 3 picks' photos on every Find (one more call in a row, as D92 found).
 Supersedes: D92
 Source: docs/specs/allow-over-limit.md
+Status: active
+
+## D113 · 2026-10-23 · Sam's Find another shows only after a No or an untick, and Rose picks from what it finds
+
+Why: Rose is the one who shops, and Sam's OK still checks every buy (D83). The new options land on Rose's page as Rose's search, so Sam's page gets one button and Rose's page doesn't change.
+Rejected: Sam picks and Sam's OK pays it (Rose never chooses the swap, and Sam's page needs a picker), Sam picks and Rose agrees (two new steps and a new state), a third button "No, find another" on the request screen (one more choice next to OK and No).
+Source: docs/specs/sam-finds-another.md
+Status: active
+
+## D114 · 2026-10-23 · Rose gets a push when Sam's Find another finishes, with new options or with nothing found
+
+Why: Sam's tap starts a search that Rose didn't ask for, so Rose must hear how it ended. A push for nothing found tells Rose to try different words instead of waiting.
+Rejected: a push only for new options (Rose waits after an empty result), no push (Rose already heard "Sam said no", and may not open the page again).
+Source: docs/specs/sam-finds-another.md
+Status: active
+
+## D115 · 2026-10-23 · Rose or Sam gets one Find another for each empty Find, No or untick, shared, and each one counts as a Find
+
+Why: one try with other words gives Rose new options without a loop of empty searches. Rose's and Sam's pages read the same `againOf` rule, so whoever taps first uses it. It sends the same Claude and Channel3 calls as a Find, so it counts toward the tapper's address's 20 a day (D73) and on `/status` (D78).
+Rejected: one each for Rose and Sam (two searches for one No, and KinCart must keep who tapped), taps until the daily limit, each with untried words (a loop of empty results, and KinCart must keep every tried query), a Find another that runs free (a script could tap it past the daily limit).
+Supersedes: D97
+Source: docs/specs/sam-finds-another.md
+Status: active
+
+## D116 · 2026-10-23 · Rose's page says when Sam asked KinCart to look again
+
+Why: Sam's tap changes Rose's page while Rose didn't tap anything. An older shopper needs to see why new options appeared, and Rose's push may be off. A `by_sam` flag on `rose_search` keeps it through the 3 s redraw (D19), as `tried` does.
+Rejected: the same "Looked again with other words." line as Rose's own tap (no data change, but Rose learns it was Sam only from the push).
+Source: docs/specs/sam-finds-another.md
 Status: active
 
 ## D117 · 2026-10-23 · KinCart sends frame-ancestors 'self', X-Frame-Options SAMEORIGIN and Referrer-Policy same-origin, and no other CSP

@@ -6,7 +6,7 @@ import { notify } from "../../lib/shop/push";
 import type { Line, PurchaseRequest } from "../../lib/shop/requests";
 import { HELPER, listed, money, RELATIVE } from "./ui";
 
-export type PingKind = "asked" | "paid" | "declined" | "failed";
+export type PingKind = "asked" | "paid" | "declined" | "failed" | "options again" | "nothing again";
 
 // A request, or what Rose just asked for: a basket has lines.
 type Subject = { item: Item; lines?: Line[] | null; leftOut?: string[] | null };
@@ -50,6 +50,15 @@ export function ping(kind: PingKind, { item, lines, leftOut }: Subject): { to: P
         to: "rose",
         title: "Payment didn't go through",
         body: `${HELPER} said OK, but the payment didn't go through. Nothing was taken.`,
+      };
+    // How Sam's Find another ended, since Rose didn't tap it (D114).
+    case "options again":
+      return { to: "rose", title: `${HELPER} asked KinCart to look again`, body: "New options are ready. Tap to pick one." };
+    case "nothing again":
+      return {
+        to: "rose",
+        title: `${HELPER} asked KinCart to look again`,
+        body: "KinCart found nothing this time. Tap to try different words.",
       };
   }
 }

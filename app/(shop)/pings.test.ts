@@ -70,3 +70,16 @@ it("tells Rose a basket was paid, what Sam left out, or that Sam said no", () =>
     "Sam said OK, but the payment didn't go through. Nothing was taken.",
   );
 });
+
+it("tells Rose how Sam's Find another ended", () => {
+  expect(ping("options again", { item: slippers })).toEqual({
+    to: "rose",
+    title: "Sam asked KinCart to look again",
+    body: "New options are ready. Tap to pick one.",
+  });
+  expect(ping("nothing again", { item: slippers })).toEqual({
+    to: "rose",
+    title: "Sam asked KinCart to look again",
+    body: "KinCart found nothing this time. Tap to try different words.",
+  });
+});
