@@ -62,10 +62,10 @@ Scenario: Sam replaces both links
   And in this browser, the home page's phones open the new links
 
 Scenario: The household keeps everything but its links
-  Given Sam set a $40 price limit, paid for "AA batteries" last week, and Rose has an ask for slippers waiting
+  Given Sam set a $40 price limit and paid for "AA batteries" on 2026-10-19, and no ask is waiting
   When Sam makes new links
-  Then Rose's new link shows the saved PayPal, the $40 limit, the AA batteries under Bought before, and Waiting for Sam
-  And Sam's new page shows the slippers ask with OK and No
+  Then Rose's new link shows the saved PayPal, the $40 limit and the AA batteries under Bought before
+  And Sam's new page shows the AA batteries receipt and the $40 limit
 
 Scenario: Saved phones are forgotten
   Given Rose's and Sam's phones each had notifications on
@@ -81,13 +81,14 @@ Scenario: Sam keeps the links
 Scenario: No New links where it can't or shouldn't run
   Given household 1, whose links live in Vercel's env
   Or Sam's page inside the home page's phones
+  Or an ask from Rose waiting for Sam's OK or No
   When Sam's page shows
   Then it has no New links button
 ```
 
 ## Scope
 
-**In:** New links on Sam's own page for households started from Try KinCart, the confirm screen, Share and Copy for Rose's new link, the old pair ending at once, saved phones forgotten, and this browser's home page following the new links.
+**In:** New links on Sam's own page for households started from Try KinCart, when no ask waits for Sam, the confirm screen, Share and Copy for Rose's new link, the old pair ending at once, saved phones forgotten, and this browser's home page following the new links.
 
 **Out:**
 - New links for household 1. Its links stay a manual change in Vercel's env (D45, D47). No later slice.
@@ -95,6 +96,20 @@ Scenario: No New links where it can't or shouldn't run
 - A second check before New links, so a leaked Sam link can't take the household over. `confirm-ok` (slice 5).
 - A page that says an old link was replaced. Old links show the same page as any wrong link. No later slice.
 - New links inside the home page's phones (D52's reasoning). No later slice.
+
+## Interface
+
+Three states on Sam's page, built in the repo behind `/preview/new-links`, and shown in light and dark.
+
+- **Your links**, under the limits on Sam's page when there's no ask to answer: one line on when to use it, and a secondary Make new links button. It's a plain form that opens `?links=new`.
+- **Make new links?**, a screen of its own: what changes, in a `summary` card, then a primary Make new links button and a secondary Keep these. Make new links says "Making new links…" with the spinner while it works.
+- **New links made**, on Sam's new page: a neutral notice to save the page, then a `summary` card, "Send Rose this new link", with the link broken after `/r/`, and Share and Copy. Share shows only where the browser has a share sheet, and Copy is then secondary. "Copied." appears under the buttons.
+
+**Motion tier:** 1. The button press and spinner the pages already have. "Copied." appears as text, with no animation.
+
+**Components used:** `Button`, `Notice`, the `summary`, `heading`, `field-label`, `small` and `lead` styles, and a new `ShareLink` built from two `Button`s. `shop.css` adds `.links` to the divider rule of `.limit, .notify`, and `.changes` to the spacing rule of `.login`. No new token or value.
+
+**Preview:** `app/(shop)/preview/new-links/page.tsx`, at `/preview/new-links` on `pnpm dev`. Not served in production.
 
 ## Open items
 
@@ -107,6 +122,7 @@ Scenario: No New links where it can't or shouldn't run
 | O5 | Whether New links acts on one tap or asks first | question | spec p1 | user | Resolved | A confirm screen with Make new links and Keep these, which says the old links stop, Rose needs the new one, and notifications turn off. 2026-10-26 |
 | O6 | How Sam gets Rose's new link to Rose | question | spec p1 | user | Resolved | Share, through the phone's share sheet, and Copy. Sam's own page says to save the new link. 2026-10-26 |
 | O7 | Whoever holds a leaked Sam link can tap New links first and lock the real Rose and Sam out. A new household then has no saved PayPal and no receipts | flag | spec p1 | user | Accepted risk | A leaked Sam link can already approve charges, and this adds a lockout, not money. `confirm-ok` (slice 5) is the guard. 2026-10-26 |
+| O8 | Sam's page shows only OK and No while an ask waits (`app/(shop)/SamView.tsx:61`), so Your links isn't there. Scenario 2 says Sam makes new links while Rose's slippers ask waits | question | spec p2 | user | Resolved | Sam answers first. Your links shows only when no ask waits, so the OK and No screen stays as it is. Scenario 2 no longer has a waiting ask. 2026-10-26 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

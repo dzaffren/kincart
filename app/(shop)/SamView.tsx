@@ -4,6 +4,7 @@ import type { Line, Source } from "../../lib/shop/requests";
 import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
+import { ShareLink } from "./ShareLink";
 import {
   AnotherForm,
   LimitNotice,
@@ -26,6 +27,9 @@ export type SamState =
   | { kind: "paid"; receipt: Receipt; again?: SamAgain; waitMinutes?: number }
   | { kind: "failed"; item: Item; lines?: Line[] };
 
+// New links: offered under the limits, the screen that asks first, or made, with Rose's new link to send.
+export type Links = { kind: "offer" } | { kind: "confirm" } | { kind: "made"; roseLink: string };
+
 export type Limit = { cents: number; saved?: boolean; error?: boolean; busy?: boolean };
 
 export type Total = { cents: number | null; saved?: boolean; error?: boolean; busy?: boolean };
@@ -41,9 +45,13 @@ type Props = {
   setTotal?: Action;
   findAnother?: Action;
   notify?: ReactNode;
+  links?: Links;
+  makeLinks?: Action;
 };
 
-export function SamView({ state, answer, limit, setLimit, total, setTotal, findAnother, notify }: Props) {
+export function SamView({ state, answer, limit, setLimit, total, setTotal, findAnother, notify, links, makeLinks }: Props) {
+  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} />;
+
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
@@ -115,6 +123,7 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
 
   return (
     <div className="screen">
+      {links?.kind === "made" && <LinksMade roseLink={links.roseLink} />}
       {state.kind !== "failed" && state.waitMinutes !== undefined && <LimitNotice waitMinutes={state.waitMinutes} />}
       <SamOutcome state={state} findAnother={findAnother} />
       {notify}
@@ -147,7 +156,80 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
           action={setTotal}
         />
       )}
+      {links && <OfferLinks />}
     </div>
+  );
+}
+
+function OfferLinks() {
+  const labelId = useId();
+  return (
+    <form className="stack links" aria-labelledby={labelId}>
+      <div className="heading">
+        <p className="field-label" id={labelId}>
+          Your links
+        </p>
+        <p className="small">
+          If someone else may have seen {RELATIVE}&apos;s link or yours, make new ones. The old links stop working
+          straight away.
+        </p>
+      </div>
+      <Button type="submit" name="links" value="new" kind="secondary">
+        Make new links
+      </Button>
+    </form>
+  );
+}
+
+function ConfirmLinks({ makeLinks }: { makeLinks?: Action }) {
+  const listId = useId();
+  return (
+    <div className="screen">
+      <h1>Make new links?</h1>
+      <p className="lead">
+        You and {RELATIVE} each get a new link. Nobody can open KinCart with the old ones again.
+      </p>
+      <section className="summary changes" aria-labelledby={listId}>
+        <h2 className="summary-title" id={listId}>
+          What changes
+        </h2>
+        <p>{RELATIVE}&apos;s old link stops working. You send {RELATIVE} the new one from the next screen.</p>
+        <p>This page moves to your new link, so save it again.</p>
+        <p>Notifications turn off on both phones until you each turn them on from the new link.</p>
+        <p className="small">{RELATIVE}&apos;s PayPal, your limits and past buys stay as they are.</p>
+      </section>
+      <form className="stack" action={makeLinks}>
+        <Button type="submit" busyLabel="Making new links…">
+          Make new links
+        </Button>
+      </form>
+      <form className="stack">
+        <Button type="submit" kind="secondary">
+          Keep these
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+function LinksMade({ roseLink }: { roseLink: string }) {
+  const titleId = useId();
+  const cut = roseLink.lastIndexOf("/") + 1;
+  return (
+    <>
+      <Notice tone="neutral">New links made. This page is your new link: save it, or add it to your Home Screen again.</Notice>
+      <section className="summary" aria-labelledby={titleId}>
+        <h2 className="summary-title" id={titleId}>
+          Send {RELATIVE} this new link
+        </h2>
+        <p>
+          {roseLink.slice(0, cut)}
+          <wbr />
+          {roseLink.slice(cut)}
+        </p>
+        <ShareLink url={roseLink} title={`${RELATIVE}'s KinCart`} />
+      </section>
+    </>
   );
 }
 
