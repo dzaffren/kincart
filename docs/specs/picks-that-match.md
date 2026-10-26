@@ -162,6 +162,7 @@ _Never delete this section or its rows. See references/ledger.md._
 
 ## Glossary
 
-- **Pick call:** the Haiku call that checks each listing's words and photo, and keeps only the ones that match what Rose asked for.
-- **TimeoutError:** the error `fetch` throws when `AbortSignal.timeout` stops a call.
-- **Light path:** zuko's short route for a small bug fix: one pause, no design pass, one reviewer.
+- **Pick call** — the Haiku call that checks each listing's words and photo, and keeps only the ones that match what Rose asked for.
+- **TimeoutError** — the error `fetch` throws when `AbortSignal.timeout` stops a call.
+- **Light path** — zuko's short route for a small bug fix: one pause, no design pass, one reviewer.
+- **e2e** — end to end: an automated test that drives the app the way a person would, start to finish.
