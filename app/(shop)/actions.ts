@@ -40,6 +40,7 @@ import {
   startHousehold,
   takeUse,
 } from "../../lib/shop/requests";
+import { origin } from "./origin";
 import { beginLink, setupCookie } from "./paypalLink";
 import { sendPayment, sendPing } from "./pings";
 import { againOf, currentOf, rebuyOf } from "./state";
@@ -347,9 +348,4 @@ function basketPicks(groups: Group[], formData: FormData): { thing: string; quer
 // The address Vercel says the request came from, as the key its uses are counted under.
 async function addressKey(): Promise<string> {
   return keyOf(addressOf((await headers()).get("x-forwarded-for")));
-}
-
-async function origin(): Promise<string> {
-  const head = await headers();
-  return `${head.get("x-forwarded-proto") ?? "http"}://${head.get("x-forwarded-host") ?? head.get("host")}`;
 }
