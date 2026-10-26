@@ -11,6 +11,7 @@ import {
   listed,
   money,
   Notice,
+  OkInTabHint,
   ReceiptCard,
   RELATIVE,
   Summary,
@@ -47,15 +48,34 @@ type Props = {
   notify?: ReactNode;
   links?: Links;
   makeLinks?: Action;
+  passkey?: ReactNode;
+  refused?: "ok" | "links";
+  okInTab?: string;
 };
 
-export function SamView({ state, answer, limit, setLimit, total, setTotal, findAnother, notify, links, makeLinks }: Props) {
-  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} />;
+export function SamView({
+  state,
+  answer,
+  limit,
+  setLimit,
+  total,
+  setTotal,
+  findAnother,
+  notify,
+  links,
+  makeLinks,
+  passkey,
+  refused,
+  okInTab,
+}: Props) {
+  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} refused={refused === "links"} />;
 
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
+        {refused === "ok" && <RefusedOk />}
         <BasketAnswer
+          okInTab={okInTab}
           lines={state.lines}
           askedAt={state.askedAt}
           answer={answer}
@@ -70,6 +90,7 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
     const { found, limitCents } = state;
     return (
       <div className="screen">
+        {refused === "ok" && <RefusedOk />}
         {limitCents !== undefined && state.item.cents > limitCents && (
           <Notice tone="neutral">
             This is {money(state.item.cents - limitCents)} over your {wholeDollars(limitCents)} limit.
@@ -108,15 +129,22 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
             <Button type="submit" busy busyLabel="Paying…" />
           ) : (
             <>
-              <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
-                OK, pay {money(state.item.cents)}
-              </Button>
+              {okInTab ? (
+                <Button type="submit" formAction={okInTab} formMethod="get" formTarget="_blank">
+                  OK, pay {money(state.item.cents)}
+                </Button>
+              ) : (
+                <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
+                  OK, pay {money(state.item.cents)}
+                </Button>
+              )}
               <Button type="submit" name="answer" value="no" kind="secondary">
                 No
               </Button>
             </>
           )}
         </form>
+        {okInTab && <OkInTabHint />}
       </div>
     );
   }
@@ -156,9 +184,14 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
           action={setTotal}
         />
       )}
+      {passkey}
       {links && <OfferLinks />}
     </div>
   );
+}
+
+function RefusedOk() {
+  return <Notice tone="neutral">Not paid. This OK needs your face or fingerprint, on the phone that turned it on.</Notice>;
 }
 
 function OfferLinks() {
@@ -181,10 +214,15 @@ function OfferLinks() {
   );
 }
 
-function ConfirmLinks({ makeLinks }: { makeLinks?: Action }) {
+function ConfirmLinks({ makeLinks, refused }: { makeLinks?: Action; refused?: boolean }) {
   const listId = useId();
   return (
     <div className="screen">
+      {refused && (
+        <Notice tone="neutral">
+          No new links made. This needs your face or fingerprint, on the phone that turned it on.
+        </Notice>
+      )}
       <h1>Make new links?</h1>
       <p className="lead">
         You and {RELATIVE} each get a new link. Nobody can open KinCart with the old ones again.
