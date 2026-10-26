@@ -7,9 +7,10 @@ import { settleStuck } from "../../../../lib/shop/pay";
 import { whoIs } from "../../../../lib/shop/people";
 import { publicKey, pushOn } from "../../../../lib/shop/push";
 import { minutesUntil } from "../../../../lib/shop/limits";
-import { getLimit, getSearch, getTotal, latest } from "../../../../lib/shop/requests";
+import { getLimit, getPasskey, getSearch, getTotal, latest } from "../../../../lib/shop/requests";
 import { answer, findAnother, makeLinks, setLimit, setTotal } from "../../actions";
 import { NotifyControl } from "../../NotifyControl";
+import { PasskeyControl } from "../../PasskeyControl";
 import { origin } from "../../origin";
 import { sendPayment } from "../../pings";
 import { Refresher } from "../../Refresher";
@@ -36,11 +37,12 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
   if (settled) sendPayment(settled.result, settled.request);
   const on = searchOn();
   // Rose's search, for Sam's Find another after a No or an untick (D113).
-  const [request, limitCents, totalCents, saved] = await Promise.all([
+  const [request, limitCents, totalCents, saved, passkey] = await Promise.all([
     latest(household),
     on ? getLimit(household) : null,
     on ? getTotal(household) : null,
     on ? getSearch(household) : undefined,
+    household === 1 ? null : getPasskey(household),
   ]);
   const limit =
     limitCents === null
@@ -65,6 +67,11 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
           ? { kind: "made", roseLink: `${await origin()}/r/${newRose}` }
           : { kind: "offer" };
 
+  // Confirm each OK shows only on Sam's own page, never for household 1. Inside the home page's phones, an OK
+  // with the passkey on opens Sam's own page in a new tab (D122, D125).
+  const inPhone = query.in === "phone";
+  const refused = query.refused === "ok" || query.refused === "links" ? query.refused : undefined;
+
   return (
     <>
       <PageHead />
@@ -80,6 +87,10 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
           notify={pushOn() ? <NotifyControl who="sam" token={token} publicKey={publicKey()} /> : undefined}
           links={links}
           makeLinks={makeLinks.bind(null, token)}
+          passkey={household === 1 || inPhone ? undefined : <PasskeyControl token={token} on={!!passkey} />}
+          refused={refused}
+          guard={passkey && !inPhone ? token : undefined}
+          okInTab={passkey && inPhone ? `/h/${token}` : undefined}
         />
         <Refresher />
       </main>

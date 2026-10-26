@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
+import { PasskeySection, type PasskeyState } from "./Passkey";
 import { SamView } from "./SamView";
 
 const askedAt = new Date("2026-10-15T09:30:00Z");
@@ -187,4 +188,54 @@ it("shows no Your links without links, as for household 1 or inside the home pag
 
   expect(text(html)).not.toContain("Your links");
   expect(text(html)).not.toContain("Make new links");
+});
+
+const askedBatteries = {
+  kind: "request" as const,
+  item: { id: batteries.id, name: batteries.name, cents: batteries.cents },
+  askedAt,
+  found: { shop: batteries.shop, url: batteries.url, reason: batteries.reason },
+};
+
+it("tells Sam an OK without the passkey paid nothing, for one thing and for a basket", () => {
+  const notice = "Not paid. This OK needs your face or fingerprint, on the phone that turned it on.";
+  expect(text(renderToStaticMarkup(<SamView state={askedBatteries} refused="ok" />))).toContain(notice);
+  const basket = { kind: "request" as const, item: { id: "basket", name: "2 things", cents: 2578 }, askedAt, lines: [nightLight, batteries] };
+  const html = renderToStaticMarkup(<SamView state={basket} refused="ok" />);
+  expect(text(html)).toContain(notice);
+  expect(text(html)).toContain("OK, pay $25.78");
+  expect(text(renderToStaticMarkup(<SamView state={askedBatteries} />))).not.toContain("Not paid.");
+});
+
+it("tells Sam new links without the passkey made nothing, on the confirm screen", () => {
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} links={{ kind: "confirm" }} refused="links" />);
+  expect(text(html)).toContain("No new links made. This needs your face or fingerprint, on the phone that turned it on.");
+  expect(text(html)).toContain("Make new links?");
+});
+
+it("opens Sam's own page in a new tab for an OK inside the home page's phones", () => {
+  const html = renderToStaticMarkup(<SamView state={askedBatteries} okInTab="/h/sam-link-b81d5e30" />);
+  const ok = html.match(/<button[^>]*>OK, pay \$8.79<\/button>/)![0];
+  expect(ok).toContain('formAction="/h/sam-link-b81d5e30"');
+  expect(ok).toContain('formTarget="_blank"');
+  expect(ok).not.toContain('name="answer"');
+  expect(text(html)).toContain("OK opens your own page in a new tab, to ask for your face or fingerprint.");
+});
+
+it("shows Confirm each OK only where the page passes it", () => {
+  const off = <PasskeySection state={{ kind: "off" }} />;
+  const html = renderToStaticMarkup(<SamView state={paidBatteries} passkey={off} />);
+  expect(text(html)).toContain("Confirm each OK");
+  expect(text(html)).toContain("Then your link alone can't spend Rose's money.");
+  expect(text(html)).toContain("If you lose this phone and its passkeys don't sync, you'd need to start a new KinCart.");
+  expect(text(renderToStaticMarkup(<SamView state={paidBatteries} />))).not.toContain("Confirm each OK");
+});
+
+it("says what Turn on and Turn off did", () => {
+  const says = (state: PasskeyState) => text(renderToStaticMarkup(<PasskeySection state={state} />));
+  expect(says({ kind: "on", saved: true })).toContain("Turned on. Your next OK asks for your face or fingerprint.");
+  expect(says({ kind: "on" })).toContain("Turn off");
+  expect(says({ kind: "off", error: true })).toContain("Not turned on. Your phone didn't save a passkey.");
+  expect(says({ kind: "on", refused: true })).toContain("Still on. Turning it off needs your face or fingerprint");
+  expect(says({ kind: "off", saved: true })).toContain("Turned off. Each OK pays with one tap again.");
 });

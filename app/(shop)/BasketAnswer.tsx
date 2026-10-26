@@ -5,6 +5,7 @@ import { things } from "../../lib/shop/items";
 import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
+import { GuardedForm } from "./PasskeyControl";
 import { money, OkInTabHint, RELATIVE, Summary, wholeDollars } from "./ui";
 
 type Action = (formData: FormData) => void | Promise<void>;
@@ -17,10 +18,11 @@ type Props = {
   unticked?: string[];
   limitCents?: number;
   okInTab?: string;
+  guard?: string;
 };
 
 // Sam's OK button names the total of the ticked lines, so it changes as Sam ticks.
-export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents, okInTab }: Props) {
+export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents, okInTab, guard }: Props) {
   const [ticked, setTicked] = useState(() => lines.filter((line) => !unticked.includes(line.id)).map((line) => line.id));
   const paying = lines.filter((line) => ticked.includes(line.id));
   const total = paying.reduce((sum, line) => sum + line.cents, 0);
@@ -34,7 +36,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
       <h1>
         {RELATIVE} would like {things(lines.length)}
       </h1>
-      <form className="flow" action={answer}>
+      <GuardedForm className="flow" action={answer} guard={guard}>
         {busy ? (
           <>
             <Summary title="Paying" cents={total} lines={paying} />
@@ -104,7 +106,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
                 OK, pay {money(total)}
               </Button>
             ) : total ? (
-              <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
+              <Button type="submit" name="answer" value="ok" busyLabel={guard ? "Checking it's you…" : "Paying…"}>
                 OK, pay {money(total)}
               </Button>
             ) : (
@@ -118,7 +120,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
             {okInTab && <OkInTabHint />}
           </>
         )}
-      </form>
+      </GuardedForm>
     </>
   );
 }

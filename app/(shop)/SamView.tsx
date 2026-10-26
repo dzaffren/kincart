@@ -4,6 +4,7 @@ import type { Line, Source } from "../../lib/shop/requests";
 import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
+import { GuardedForm } from "./PasskeyControl";
 import { ShareLink } from "./ShareLink";
 import {
   AnotherForm,
@@ -51,6 +52,8 @@ type Props = {
   passkey?: ReactNode;
   refused?: "ok" | "links";
   okInTab?: string;
+  // Sam's link, when the passkey is on: OK and Make new links ask the phone first (D122).
+  guard?: string;
 };
 
 export function SamView({
@@ -67,8 +70,9 @@ export function SamView({
   passkey,
   refused,
   okInTab,
+  guard,
 }: Props) {
-  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} refused={refused === "links"} />;
+  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} refused={refused === "links"} guard={guard} />;
 
   if (state.kind === "request" && state.lines) {
     return (
@@ -76,6 +80,7 @@ export function SamView({
         {refused === "ok" && <RefusedOk />}
         <BasketAnswer
           okInTab={okInTab}
+          guard={guard}
           lines={state.lines}
           askedAt={state.askedAt}
           answer={answer}
@@ -124,7 +129,7 @@ export function SamView({
         <p className="small">
           Asked at <LocalTime at={state.askedAt} format="clock" />.
         </p>
-        <form className="stack" action={answer}>
+        <GuardedForm className="stack" action={answer} guard={guard}>
           {state.busy ? (
             <Button type="submit" busy busyLabel="Paying…" />
           ) : (
@@ -134,7 +139,7 @@ export function SamView({
                   OK, pay {money(state.item.cents)}
                 </Button>
               ) : (
-                <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
+                <Button type="submit" name="answer" value="ok" busyLabel={guard ? "Checking it's you…" : "Paying…"}>
                   OK, pay {money(state.item.cents)}
                 </Button>
               )}
@@ -143,7 +148,7 @@ export function SamView({
               </Button>
             </>
           )}
-        </form>
+        </GuardedForm>
         {okInTab && <OkInTabHint />}
       </div>
     );
@@ -214,7 +219,7 @@ function OfferLinks() {
   );
 }
 
-function ConfirmLinks({ makeLinks, refused }: { makeLinks?: Action; refused?: boolean }) {
+function ConfirmLinks({ makeLinks, refused, guard }: { makeLinks?: Action; refused?: boolean; guard?: string }) {
   const listId = useId();
   return (
     <div className="screen">
@@ -236,11 +241,11 @@ function ConfirmLinks({ makeLinks, refused }: { makeLinks?: Action; refused?: bo
         <p>Notifications turn off on both phones until you each turn them on from the new link.</p>
         <p className="small">{RELATIVE}&apos;s PayPal, your limits and past buys stay as they are.</p>
       </section>
-      <form className="stack" action={makeLinks}>
-        <Button type="submit" busyLabel="Making new links…">
+      <GuardedForm className="stack" action={makeLinks} guard={guard}>
+        <Button type="submit" busyLabel={guard ? "Checking it's you…" : "Making new links…"}>
           Make new links
         </Button>
-      </form>
+      </GuardedForm>
       <form className="stack">
         <Button type="submit" kind="secondary">
           Keep these
