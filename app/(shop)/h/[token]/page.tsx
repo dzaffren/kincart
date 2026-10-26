@@ -89,6 +89,7 @@ export default async function SamPage({ params, searchParams }: PageProps<"/h/[t
           makeLinks={makeLinks.bind(null, token)}
           passkey={household === 1 || inPhone ? undefined : <PasskeyControl token={token} on={!!passkey} />}
           refused={refused}
+          inPhone={inPhone}
           guard={passkey && !inPhone ? token : undefined}
           okInTab={passkey && inPhone ? `/h/${token}` : undefined}
         />

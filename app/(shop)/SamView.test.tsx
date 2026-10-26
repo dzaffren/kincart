@@ -239,3 +239,11 @@ it("says what Turn on and Turn off did", () => {
   expect(says({ kind: "on", refused: true })).toContain("Still on. Turning it off needs your face or fingerprint");
   expect(says({ kind: "off", saved: true })).toContain("Turned off. Each OK pays with one tap again.");
 });
+
+it("tells the server Sam's answer came from a home page phone", () => {
+  const html = renderToStaticMarkup(<SamView state={askedBatteries} okInTab="/h/sam-link-b81d5e30" inPhone />);
+  expect(html).toContain('<input type="hidden" name="in" value="phone"/>');
+  const basket = { kind: "request" as const, item: { id: "basket", name: "2 things", cents: 2578 }, askedAt, lines: [nightLight, batteries] };
+  expect(renderToStaticMarkup(<SamView state={basket} inPhone />)).toContain('name="in" value="phone"');
+  expect(renderToStaticMarkup(<SamView state={askedBatteries} />)).not.toContain('name="in"');
+});

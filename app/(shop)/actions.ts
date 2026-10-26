@@ -366,6 +366,8 @@ export async function answer(token: string, requestId: number, formData: FormDat
   const who = await whoIs(token);
   if (who?.person !== "sam") return;
   const choice = formData.get("answer");
+  // A home page phone keeps ?in=phone, so its next OK still opens Sam's own page in a new tab (D125).
+  const page = formData.get("in") === "phone" ? `/h/${token}?in=phone` : `/h/${token}`;
   const declined = choice === "no" ? await decline(who.household, requestId) : null;
   if (declined) {
     console.log(`purchase id=${requestId} status=declined`);
@@ -373,12 +375,12 @@ export async function answer(token: string, requestId: number, formData: FormDat
   } else if (choice === "ok") {
     if (!(await confirmed(who.household, token, formData.get("passkey")))) {
       console.log(`passkey household=${who.household} status=refused for=ok`);
-      redirect(`/h/${token}?refused=ok`);
+      redirect(`${page}${page.includes("?") ? "&" : "?"}refused=ok`);
     }
     const claimed = await claim(who.household, requestId, formData.getAll("line").map(String));
     if (claimed) sendPayment(await pay(claimed), claimed);
   }
-  redirect(`/h/${token}`);
+  redirect(page);
 }
 
 export async function setLimit(token: string, formData: FormData): Promise<void> {

@@ -18,11 +18,12 @@ type Props = {
   unticked?: string[];
   limitCents?: number;
   okInTab?: string;
+  inPhone?: boolean;
   guard?: string;
 };
 
 // Sam's OK button names the total of the ticked lines, so it changes as Sam ticks.
-export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents, okInTab, guard }: Props) {
+export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents, okInTab, inPhone, guard }: Props) {
   const [ticked, setTicked] = useState(() => lines.filter((line) => !unticked.includes(line.id)).map((line) => line.id));
   const paying = lines.filter((line) => ticked.includes(line.id));
   const total = paying.reduce((sum, line) => sum + line.cents, 0);
@@ -37,6 +38,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
         {RELATIVE} would like {things(lines.length)}
       </h1>
       <GuardedForm className="flow" action={answer} guard={guard}>
+        {inPhone && <input type="hidden" name="in" value="phone" />}
         {busy ? (
           <>
             <Summary title="Paying" cents={total} lines={paying} />

@@ -1684,3 +1684,17 @@ it("makes new links with Sam's face or fingerprint, and the passkey stays with t
   expect(await whoIs(page.slice("/h/".length))).toEqual({ household, person: "sam" });
   expect(await getPasskey(household)).not.toBeNull();
 });
+
+it("keeps a home page phone's ?in=phone after Sam's answer, so its next OK still opens a new tab", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household } = await passkeyOn();
+  await ask(household, glasses);
+  const first = (await latest(household))!;
+  expect(await redirectOf(answer(ownSam, first.id, form({ answer: "no", in: "phone" })))).toBe(`/h/${ownSam}?in=phone`);
+
+  await ask(household, glasses);
+  const second = (await latest(household))!;
+  expect(await redirectOf(answer(ownSam, second.id, form({ answer: "ok", in: "phone" })))).toBe(
+    `/h/${ownSam}?in=phone&refused=ok`,
+  );
+});

@@ -52,6 +52,7 @@ type Props = {
   passkey?: ReactNode;
   refused?: "ok" | "links";
   okInTab?: string;
+  inPhone?: boolean;
   // Sam's link, when the passkey is on: OK and Make new links ask the phone first (D122).
   guard?: string;
 };
@@ -70,6 +71,7 @@ export function SamView({
   passkey,
   refused,
   okInTab,
+  inPhone,
   guard,
 }: Props) {
   if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} refused={refused === "links"} guard={guard} />;
@@ -80,6 +82,7 @@ export function SamView({
         {refused === "ok" && <RefusedOk />}
         <BasketAnswer
           okInTab={okInTab}
+          inPhone={inPhone}
           guard={guard}
           lines={state.lines}
           askedAt={state.askedAt}
@@ -130,6 +133,7 @@ export function SamView({
           Asked at <LocalTime at={state.askedAt} format="clock" />.
         </p>
         <GuardedForm className="stack" action={answer} guard={guard}>
+          {inPhone && <input type="hidden" name="in" value="phone" />}
           {state.busy ? (
             <Button type="submit" busy busyLabel="Paying…" />
           ) : (
