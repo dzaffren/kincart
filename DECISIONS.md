@@ -819,3 +819,17 @@ Rejected: smaller or fewer photos at 10 s (unproven faster, and D90's recorded s
 Supersedes: D91
 Source: docs/specs/picks-that-match.md
 Status: active
+
+## D120 · 2026-10-26 · New links swaps the two hashes on the household's own row, and forgets its saved phones in the same statement
+
+Why: every table is keyed by the household id (D46), so swapping the hashes keeps the saved PayPal, the limits, the asks and the receipts. One statement means a half-done swap can't leave phones that push to a dead link. The swap runs only while Sam's old hash is still there, so two taps at once make one new pair.
+Rejected: a new household that copies the old one's rows (a copy for every table, and every later table must join it), keeping the old hashes to show "this link was replaced" (O3), keeping the saved phones (a tap opens a dead link, O2).
+Source: docs/specs/new-links.md
+Status: active
+
+## D121 · 2026-10-26 · Rose's new link reaches Sam's new page in a one-time cookie for 10 minutes
+
+Why: only hashes are kept (D47), so Rose's link exists in plain form only inside the action. An httpOnly cookie, sent only to Sam's new link, keeps it out of page addresses, history and bookmarks.
+Rejected: Rose's link in Sam's page address (a saved Home Screen icon or bookmark keeps it, and the "New links made" card shows forever), storing Rose's link itself (D47 keeps hashes only).
+Source: docs/specs/new-links.md
+Status: active
