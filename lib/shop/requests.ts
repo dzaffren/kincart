@@ -119,6 +119,27 @@ export async function replaceLinks(
   return Number(rows[0].swapped) ? { phones: Number(rows[0].phones) } : null;
 }
 
+// Sam's one passkey (D122). The first one saved stays, so a second Turn on, a leaker's too, can't replace it.
+export async function getPasskey(household: number): Promise<{ credentialId: string; publicKey: Uint8Array } | null> {
+  const rows = await query<{ credential_id: string; public_key: Buffer }>(
+    "SELECT credential_id, public_key FROM sam_passkeys WHERE id = $1",
+    [household],
+  );
+  return rows[0] ? { credentialId: rows[0].credential_id, publicKey: new Uint8Array(rows[0].public_key) } : null;
+}
+
+export async function savePasskey(household: number, credentialId: string, publicKey: Uint8Array): Promise<boolean> {
+  const rows = await query<{ id: string }>(
+    "INSERT INTO sam_passkeys (id, credential_id, public_key) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING RETURNING id",
+    [household, credentialId, Buffer.from(publicKey)],
+  );
+  return rows.length > 0;
+}
+
+export async function dropPasskey(household: number): Promise<void> {
+  await query("DELETE FROM sam_passkeys WHERE id = $1", [household]);
+}
+
 // The one-row tables' id is the household's id (D46).
 export async function getVault(household: number): Promise<string | null> {
   const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = $1", [
