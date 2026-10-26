@@ -21,6 +21,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - No other site can show a KinCart page inside a frame, so nobody can hide Sam's OK under a button of their own. Shops' image hosts no longer learn which KinCart page asked for a photo.
 - After Sam says no, or leaves a thing out, Sam can tap Find another on Sam's own page. KinCart searches again with other words for Rose, Rose's page says Sam asked, and Rose's phone buzzes with the result. A Find Rose starts meanwhile is kept. Each tap counts as one of the day's 20 Finds, and Rose or Sam gets one between them.
 
+### Fixed
+
+- A Find no longer shows "Couldn't find that" when the AI takes more than 10 seconds to check the listings' photos. It now waits up to 15 seconds, so a slow check still shows Rose the listings.
+
 ## [1.2.0] - 2026-10-16
 
 ### Added

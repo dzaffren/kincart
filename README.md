@@ -35,7 +35,7 @@ Used by older shoppers and the relative who helps them pay online.
 - One network address can run only 20 Finds, and start only 5 households, in 24 hours. Past that, nothing reaches Claude or Channel3, and the page says when to try again.
 - `/status` shows how many Finds and Channel3 searches ran today and this month, and how many Finds and Try KinCarts the limits stopped.
 - Rose's PayPal activity lists each thing Sam paid for, with its price, and KinCart's receipt says who got the money.
-- A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words.
+- A listing that isn't the thing Rose asked for, such as a storage bin sold as "Batteries", never reaches Rose. The AI checks each listing's photo as well as its words. It waits up to 15 s for that check, so a slow one no longer shows nothing found.
 - The home page cites a checked US survey under its claim: about 1 in 10 of 657 adults had signed in to someone's money or medical account with their login. Step 1 of How it works says Rose can send a photo.
 - When Find finds nothing, or Sam refuses a pick, Rose taps Find another, and the AI searches again with other words, without what Sam refused.
 - Rose taps Ask again next to something Sam paid for before. KinCart finds today's listings for the same things, puts the one Rose bought last time first, and says what changed.

@@ -1,6 +1,6 @@
 # Picks that match
 
-**Version:** v2 · **Status:** Built · **Type:** Bug · **Project type:** Data/LLM
+**Version:** v2 · **Status:** Shipped · **Type:** Bug · **Project type:** Data/LLM
 
 **Supersedes:** archive/picks-that-match-v1.md
 **Shape doc:** docs/specs/after-review/shape.md
