@@ -1,6 +1,6 @@
 # CI without Channel3
 
-**Version:** v1 · **Status:** Refined · **Type:** Technical · **Project type:** Web UI
+**Version:** v1 · **Status:** Draft · **Type:** Technical · **Project type:** Web UI
 
 **Depends on:** None
 **Page:** none. Skipped: you read the `.md` directly.
@@ -208,6 +208,7 @@ Recorded as D127, D128, D129.
 | O5  | Where the recorded Channel3 replies come from, while the key is out of credits until Nov 1                   | question | spec p1   | user  | Resolved | You get a new Channel3 API key, and one recording run uses it. Hand-built replies and waiting for Nov 1 were turned down. 2026-10-27 |
 | O6  | Each Claude call's text is the same on every e2e run, so a recorded reply always matches                     | unproven | spec p3   | build | Resolved | `/build` checks it on the first replay run. A call whose text changes each run then matches on fewer fields, as a decided-alone row. A `/poc` first was turned down. 2026-10-27 |
 | O7  | Whether listing photos download from the real CDN in the e2e                                                 | question | spec p3   | user  | Resolved | Yes, from cdn.trychannel3.com, which costs no credits. The fake server leaves photo bytes out of a Claude call's key (D129). Recorded photos were turned down. 2026-10-27 |
+| O8  | Scenario 4's recording run needs the new Channel3 key in `.env.local` as `CHANNEL3_API_KEY`, and the key needs credits. `.env.local` was last changed on Oct 23, so the key there is the old one, with 0 credits left. Everything else is built: with no recordings, the 9 Find e2e fail on `no recording:` lines, the 17 others pass, and no call reached Channel3 | question | build | user | Open | — |
 
 _Never delete this section or its rows. See references/ledger.md._
 
