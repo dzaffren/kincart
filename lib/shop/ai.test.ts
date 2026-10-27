@@ -145,6 +145,14 @@ it("calls Haiku 5.5 with low effort and a fixed answer shape", async () => {
   expect(body.output_config.format.type).toBe("json_schema");
 });
 
+it("calls the fake server instead when ANTHROPIC_URL is set, as the e2e does (D127)", async () => {
+  vi.stubEnv("ANTHROPIC_URL", "http://localhost:3999");
+  const fetch = stubHaiku(() => reply({ things: [{ words, query: "warm slippers easy to put on size 8" }] }));
+
+  await readNeed(words);
+  expect(sent(fetch).url).toBe("http://localhost:3999/v1/messages");
+});
+
 it("gives Haiku the listings under the limit by id, and only the names above it", async () => {
   const pick = {
     id: "prod_7Hq2kZ",
