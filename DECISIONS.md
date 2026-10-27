@@ -170,7 +170,7 @@ Status: active
 Why: no test-only layer, matching D20; results vary, so the e2e checks the shape of what comes back (find-and-explain O12).
 Rejected: recorded replies behind a test-only switch (more code, and the real path only checked by hand).
 Source: docs/specs/find-and-explain.md
-Status: active
+Status: superseded by D127
 
 ## D25 · 2026-10-14 · KinCart's mark is a tick on two wheels: the helper's OK carries the shopping
 
@@ -832,4 +832,26 @@ Status: active
 Why: only hashes are kept (D47), so Rose's link exists in plain form only inside the action. An httpOnly cookie, sent only to Sam's new link, keeps it out of page addresses, history and bookmarks.
 Rejected: Rose's link in Sam's page address (a saved Home Screen icon or bookmark keeps it, and the "New links made" card shows forever), storing Rose's link itself (D47 keeps hashes only).
 Source: docs/specs/new-links.md
+Status: active
+
+## D127 · 2026-10-27 · CI's e2e answers Channel3 and Claude from recorded replies on a local fake server
+
+Why: CI used all 1,000 of October's Channel3 credits in 4 days, at about 55 searches a run, and every Find e2e then failed with HTTP 402. December's credits must last through judging.
+Rejected: real calls on every push (D24, which this supersedes), real Claude with recorded Channel3 (each push still costs Claude calls, and replies vary), a real Channel3 run by hand or each night (a night run alone uses about 1,650 searches a month).
+Supersedes: D24
+Source: docs/specs/ci-without-channel3.md
+Status: active
+
+## D128 · 2026-10-27 · CI runs on every pull request, and on a push to main only
+
+Why: a push to a branch with a PR ran CI twice. main's push run stays, so the Neon migration (D11) and Vercel's check (D10) still follow a green main.
+Rejected: both events on every branch (twice the CI time and Claude calls in `pnpm test`).
+Source: docs/specs/ci-without-channel3.md
+Status: active
+
+## D129 · 2026-10-27 · The fake server matches a call on its text, without photo bytes, and a call with no recording fails
+
+Why: Chrome's JPEG encoding and Channel3's CDN can change a photo's bytes, so bytes in the key would miss on a new runner. A miss that answers 500 keeps CI from spending credits by accident.
+Rejected: the exact body as the key (a new Chrome breaks every photo test), falling back to the real service on a miss (credits leak again), recorded photos (loosens D95's host check).
+Source: docs/specs/ci-without-channel3.md
 Status: active
