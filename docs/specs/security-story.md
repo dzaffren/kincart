@@ -1,6 +1,6 @@
 # Security story
 
-**Version:** v1 · **Status:** Refined · **Type:** Enhancement · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Enhancement · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** confirm-ok
