@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-26 by /ship confirm-ok
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-27 by /ship security-story
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -56,6 +56,7 @@ Used by older shoppers and the relative who helps them pay online.
 | sam-finds-another | Shipped | After a No or a thing left out, Sam taps Find another on Sam's own page, and KinCart looks again for Rose. Rose's page says Sam asked, and Rose's phone buzzes when the search ends. | docs/specs/sam-finds-another.md |
 | new-links | Shipped | Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys. | docs/specs/new-links.md |
 | confirm-ok | Shipped | Sam can turn on a passkey, off by default, so each OK, Make new links and Turn off asks for Sam's face or fingerprint. A leaked Sam link alone then can't pay or lock the family out. | docs/specs/confirm-ok.md |
+| security-story | Shipped | The README's Security section says what each guard stops, what still stands in, and which code the three pentests covered. ROADMAP's rows on links and free tiers now match it. | docs/specs/security-story.md |
 
 ## More
 

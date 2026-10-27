@@ -861,3 +861,10 @@ Why: whether passkeys work inside the frames in Chrome and Safari was not checke
 Rejected: a passkey inside the frame (needs a spike, and Safari can't be tested here), hiding the OK in the phones (the side-by-side demo stops at the OK).
 Source: docs/specs/confirm-ok.md
 Status: active
+
+## D126 · 2026-10-27 · The README's Security section links the three pentests with their dates, and no new pentest runs for it
+
+Why: the five guards shipped after v1.2.0, and a pentest needs a `/release`, which needs #30 on main. Dating the links says plainly what was attacked and what wasn't.
+Rejected: a v1.3.0 pentest before the section ships (it waits on Channel3 and #30), leaving the pentest links out (the shape asked for them).
+Source: docs/specs/security-story.md
+Status: active

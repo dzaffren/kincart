@@ -44,6 +44,7 @@ Used by older shoppers and the relative who helps them pay online.
 - After a No or a thing left out, Sam taps Find another on Sam's own page, and KinCart looks again for Rose. Rose's page says Sam asked, and Rose's phone buzzes when the search ends.
 - Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys.
 - Sam can turn on a passkey, off by default, so each OK, Make new links and Turn off asks for Sam's face or fingerprint. A leaked Sam link alone then can't pay or lock the family out.
+- The README's Security section says what each guard stops, what still stands in, and which code the three pentests covered. ROADMAP's rows on links and free tiers now match it.
 
 ## Docs
 
@@ -64,6 +65,29 @@ KinCart is a hackathon proof of concept. The whole path works: Rose asks, AI fin
 - **Web push stands in for PayPal app notifications.** It needs https, and on iPhone works only from the Home Screen.
 
 What it would take to go further, and the two paths it could take, are in [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Security
+
+KinCart moves sandbox money only, and every guard below shipped with tests in CI.
+
+| Guard | What it stops |
+| ----- | ------------- |
+| [Hashed links](docs/specs/households.md) | A copy of the database holds no working link. Links are kept as SHA-256 hashes. |
+| [Find limits](docs/specs/find-limits.md) | One network address runs at most 20 Finds and starts 5 households in 24 hours, so one script can't use up Channel3's month or the Claude key. |
+| [Usage on /status](docs/specs/usage-on-status.md) | A script on many addresses shows up as today's and this month's searches before the quota runs out. |
+| [Security headers](docs/specs/security-headers.md) | Another site can't hide Sam's page in a frame to trick a tap on OK, and shops get no page address. |
+| [Make new links](docs/specs/new-links.md) | A leaked link stops working when Sam taps it. The household keeps its PayPal, limits and past buys. |
+| [Confirm each OK](docs/specs/confirm-ok.md) | With Sam's passkey on, a leaked Sam link alone can't pay, make new links or turn the passkey off. |
+
+**What still stands in:**
+
+- Secret links live in the page address, with no accounts. Whoever reads one has that page until Sam makes new links.
+- The passkey is off by default, so the demo stays one tap. A lost passkey has no recovery, and Sam starts a new household.
+- Household 1, whose links live in Vercel's env, gets neither Make new links nor the passkey.
+- A script on many addresses is seen on `/status`, not stopped.
+- Anyone can change the shared demo PayPal login's password. Skip still works.
+
+**Pentests:** [v1.0.0](docs/security/v1.0.0/report.md), [v1.1.0](docs/security/v1.1.0/report.md) and [v1.2.0](docs/security/v1.2.0/report.md), on 2026-10-15 and 2026-10-16, each passed with no findings. They cover the code up to v1.2.0, before every guard above except the hashed links.
 
 ## Setup
 
