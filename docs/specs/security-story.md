@@ -173,12 +173,7 @@ Single chunk.
 
 ### Decisions to record
 
-## D126 · 2026-10-27 · The README's Security section links the three pentests with their dates, and no new pentest runs for it
-
-Why: the five guards shipped after v1.2.0, and a pentest needs a `/release`, which needs #30 on main. Dating the links says plainly what was attacked and what wasn't.
-Rejected: a v1.3.0 pentest before the section ships (it waits on Channel3 and #30), leaving the pentest links out (the shape asked for them).
-Source: docs/specs/security-story.md
-Status: active
+Recorded as D126.
 
 ## Open items
 
@@ -188,6 +183,7 @@ Status: active
 | O2  | The last pentest, v1.2.0 on 2026-10-16, came before all five security slices                                                                 | flag     | spec p1   | user  | Resolved | Link all three reports with their dates, and say they cover the code up to v1.2.0. A v1.3.0 pentest first was turned down (D126). 2026-10-27 |
 | O3  | `docs/ROADMAP.md` still says anyone holding Sam's link can OK a charge, and lists rate limits as future work                                | question | spec p1   | user  | Resolved | Update the two rows in this slice. 2026-10-27                                                                                       |
 | O4  | The section describes the passkey, but PR #30 (confirm-ok) waits on Channel3 and isn't merged                                                | question | spec p1   | user  | Resolved | Spec now on `docs/security-story` from origin/main. `/build` waits until #30 is on main. 2026-10-27                                 |
+| O5  | O4 said `/build` waits until #30 is on main. `/build` ran on 2026-10-27 with #30 still open and its CI red on Channel3 | flag | build | user | Decided alone | Chose: build now on top of `feat/confirm-ok`, so the confirm-ok links resolve, and merge only after #30. Other: stop and wait for #30. Undo: after #30 squash-merges, run `git rebase --onto origin/main feat/confirm-ok`; if #30 is dropped, remove the Confirm each OK row and the passkey bullet. 2026-10-27 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
