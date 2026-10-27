@@ -1,6 +1,6 @@
 # KinCart · what's built, what's a stand-in, what comes next
 
-**Status:** Hackathon build, v1.2.0 · **Updated:** 2026-10-27 by /build security-story
+**Status:** Hackathon build, v1.2.0 · **Updated:** 2026-10-27 by /ship security-story
 
 KinCart is a proof of concept for the PayPal AI hackathon. Everything on kincart.vercel.app works end to end, but some parts stand in for what a shipped product would use. This page says which, and what it would take to go further. There is no commitment to go further; if the idea lands, this is the plan.
 
