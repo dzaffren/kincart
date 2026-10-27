@@ -1,6 +1,6 @@
 # KinCart · what's built, what's a stand-in, what comes next
 
-**Status:** Hackathon build, v1.0.0 · **Updated:** 2026-10-16 by /ship link-paypal-onboarding
+**Status:** Hackathon build, v1.2.0 · **Updated:** 2026-10-27 by /build security-story
 
 KinCart is a proof of concept for the PayPal AI hackathon. Everything on kincart.vercel.app works end to end, but some parts stand in for what a shipped product would use. This page says which, and what it would take to go further. There is no commitment to go further; if the idea lands, this is the plan.
 
@@ -28,9 +28,9 @@ flowchart LR
 | Today | Why | In a shipped product |
 | ----- | --- | -------------------- |
 | **Sandbox money.** The charge lands in a PayPal sandbox business account. No order reaches the shop, and nothing arrives at anyone's door. | The hackathon rules allow sandbox-only builds. A real order needs a shop that accepts orders by API. | A live PayPal app, and a checkout path to the shop (see the two paths below). |
-| **Secret links instead of accounts.** Rose's and Sam's pages open from a long random link each. There is no sign-up, login, or recovery. | A judge can try both sides in one tap. Anyone holding Sam's link could OK a sandbox charge. | Real accounts, and a family link that Rose accepts once. |
+| **Secret links instead of accounts.** Rose's and Sam's pages open from a long random link each. There is no sign-up, login, or recovery. | A judge can try both sides in one tap. A leaked link works until Sam taps Make new links. With Sam's passkey on, a leaked Sam link alone can't OK a charge. | Real accounts, and a family link that Rose accepts once. |
 | **One demo PayPal login, shown on screen.** A new Rose links on PayPal's own page with a shared sandbox login printed on the link screen, or taps Skip for a copy of the demo PayPal. | Judges have no sandbox login of their own. A stranger can change the shared login's password, which spoils linking but not Skip. | Each Rose links their own PayPal, with no login on screen and no Skip. |
-| **Free tiers.** Channel3 allows about 1,000 searches a month and returns US listings in US dollars. Claude Haiku runs on a personal API key with a spend limit. | Enough for judging. A stranger scripting the form could use the quota up. | Paid search with the family's country and currency, rate limits per household, and abuse checks. |
+| **Free tiers.** Channel3 allows about 1,000 searches a month and returns US listings in US dollars. Claude Haiku runs on a personal API key with a spend limit. | Enough for judging. Each network address gets 20 Finds a day, and `/status` shows the searches. A script on many addresses can still use the quota up. | Paid search with the family's country and currency, rate limits per household, and abuse checks. |
 | **AI that nobody checks.** Haiku reads Rose's words and explains each listing. It can misread a request or praise a poor listing. Sam's OK is the only check. | The point of the design: a person approves every purchase. | Keep Sam's OK. Add listing checks (seller rating, returns), and show Sam what the AI was unsure about. |
 | **Web push.** Pings go through Apple, Google and Mozilla's push services, need https, and on iPhone only work from the Home Screen. | The web is the fastest way to reach two phones with no app to install. | Inside PayPal these would be the PayPal app's own notifications. |
 | **No scam checks.** KinCart does not look at who the seller is or whether the ask looks odd. | PayPal already runs AI scam alerts on payments, with far more data than this app has. | Lean on PayPal's checks, and add a "this looks unusual" line for Sam. |
