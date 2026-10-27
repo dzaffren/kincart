@@ -1,5 +1,9 @@
 "use server";
 
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+} from "@simplewebauthn/server";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
@@ -14,6 +18,7 @@ import {
   type Sent,
 } from "../../lib/shop/find";
 import { findItem, things } from "../../lib/shop/items";
+import { checkCreate, checkGet, createOptions, getOptions } from "../../lib/shop/passkey";
 import { addressOf, FINDS_A_DAY, HOUSEHOLDS_A_DAY, keyOf, minutesUntil } from "../../lib/shop/limits";
 import { pay } from "../../lib/shop/pay";
 import { reasonOf } from "../../lib/shop/paypal";
@@ -26,13 +31,16 @@ import {
   copyDemoVault,
   countUse,
   decline,
+  dropPasskey,
   getLimit,
+  getPasskey,
   getSearch,
   getTotal,
   getVault,
   latest,
   paidAsk,
   replaceLinks,
+  savePasskey,
   saveSearch,
   saveSubscription,
   setLimit as saveLimit,
@@ -76,9 +84,13 @@ const HOUSEHOLD_COOKIE = { httpOnly: true, secure: true, sameSite: "lax", path: 
 // New links, from Sam's link of a household other than 1, whose links live in Vercel's env (D45). This browser
 // follows the new pair when it kept the old one (D44), and Sam's new page gets Rose's new link for 10
 // minutes, since only hashes are stored (D47, D120, D121).
-export async function makeLinks(token: string): Promise<void> {
+export async function makeLinks(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "sam" || who.household === 1) return;
+  if (!(await confirmed(who.household, token, formData.get("passkey")))) {
+    console.log(`passkey household=${who.household} status=refused for=links`);
+    redirect(`/h/${token}?links=new&refused=links`);
+  }
   const [rose, sam] = [newLink(), newLink()];
   const replaced = await replaceLinks(who.household, hashOf(token), hashOf(rose), hashOf(sam));
   if (!replaced) redirect(`/h/${token}`);
@@ -88,6 +100,65 @@ export async function makeLinks(token: string): Promise<void> {
   if (jar.get("household")?.value.split(".")[1] === token) jar.set("household", `${rose}.${sam}`, HOUSEHOLD_COOKIE);
   jar.set("new_rose", rose, { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${sam}`, maxAge: 10 * 60 });
   redirect(`/h/${sam}`);
+}
+
+// Confirm each OK, for Sam of a household other than 1 (D122). Each request for the phone gets a new challenge,
+// kept for 5 minutes in a cookie sent only to Sam's link, and cleared once checked (D124).
+export async function passkeyOptions(
+  token: string,
+): Promise<
+  | { kind: "create"; options: PublicKeyCredentialCreationOptionsJSON }
+  | { kind: "get"; options: PublicKeyCredentialRequestOptionsJSON }
+  | null
+> {
+  const who = await whoIs(token);
+  if (who?.person !== "sam" || who.household === 1) return null;
+  const passkey = await getPasskey(who.household);
+  const at = await origin();
+  const asked = passkey
+    ? ({ kind: "get", options: await getOptions(at, passkey.credentialId) } as const)
+    : ({ kind: "create", options: await createOptions(at) } as const);
+  (await cookies()).set(CHALLENGE, asked.options.challenge, challengeCookie(token, 5 * 60));
+  return asked;
+}
+
+export async function turnOnPasskey(token: string, answer: string): Promise<boolean> {
+  const who = await whoIs(token);
+  if (who?.person !== "sam" || who.household === 1) return false;
+  const passkey = await checkCreate(answer, await takeChallenge(token), await origin());
+  const saved = !!passkey && (await savePasskey(who.household, passkey.credentialId, passkey.publicKey));
+  console.log(`passkey household=${who.household} status=${saved ? "on" : "refused for=on"}`);
+  return saved;
+}
+
+export async function turnOffPasskey(token: string, answer: string): Promise<boolean> {
+  const who = await whoIs(token);
+  if (who?.person !== "sam" || who.household === 1) return false;
+  const off = (await getPasskey(who.household)) !== null && (await confirmed(who.household, token, answer));
+  if (off) await dropPasskey(who.household);
+  console.log(`passkey household=${who.household} status=${off ? "off" : "refused for=off"}`);
+  return off;
+}
+
+const CHALLENGE = "passkey_challenge";
+
+function challengeCookie(token: string, maxAge: number) {
+  return { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${token}`, maxAge } as const;
+}
+
+async function takeChallenge(token: string): Promise<string> {
+  const jar = await cookies();
+  const challenge = jar.get(CHALLENGE)?.value ?? "";
+  jar.set(CHALLENGE, "", challengeCookie(token, 0));
+  return challenge;
+}
+
+// True with no passkey on, or with the phone's signed answer to this browser's challenge.
+async function confirmed(household: number, token: string, answer: FormDataEntryValue | null): Promise<boolean> {
+  const passkey = await getPasskey(household);
+  if (!passkey) return true;
+  const challenge = await takeChallenge(token);
+  return !!challenge && (await checkGet(answer, passkey, challenge, await origin()));
 }
 
 export async function startLink(token: string): Promise<void> {
@@ -295,15 +366,21 @@ export async function answer(token: string, requestId: number, formData: FormDat
   const who = await whoIs(token);
   if (who?.person !== "sam") return;
   const choice = formData.get("answer");
+  // A home page phone keeps ?in=phone, so its next OK still opens Sam's own page in a new tab (D125).
+  const page = formData.get("in") === "phone" ? `/h/${token}?in=phone` : `/h/${token}`;
   const declined = choice === "no" ? await decline(who.household, requestId) : null;
   if (declined) {
     console.log(`purchase id=${requestId} status=declined`);
     sendPing(who.household, "declined", declined);
   } else if (choice === "ok") {
+    if (!(await confirmed(who.household, token, formData.get("passkey")))) {
+      console.log(`passkey household=${who.household} status=refused for=ok`);
+      redirect(`${page}${page.includes("?") ? "&" : "?"}refused=ok`);
+    }
     const claimed = await claim(who.household, requestId, formData.getAll("line").map(String));
     if (claimed) sendPayment(await pay(claimed), claimed);
   }
-  redirect(`/h/${token}`);
+  redirect(page);
 }
 
 export async function setLimit(token: string, formData: FormData): Promise<void> {

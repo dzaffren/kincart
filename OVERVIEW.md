@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-26 by /ship new-links
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-26 by /ship confirm-ok
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -20,7 +20,7 @@ Used by older shoppers and the relative who helps them pay online.
 
 - `app/status/` — the `/status` page and its view.
 - `lib/status/` — the database, PayPal and build checks, and the sums of today's and this month's usage.
-- `app/(shop)/` — the home page `/`, where Try KinCart starts your own Rose and Sam and a laptop shows both their pages side by side, Rose's page `/r/<link>`, which starts at Link PayPal with a demo sandbox login and Skip, Sam's page `/h/<link>`, the PayPal return route, the route a home page phone posts Link PayPal to in a new tab, each link's manifest, the notifications control, and the views they share.
+- `app/(shop)/` — the home page `/`, where Try KinCart starts your own Rose and Sam and a laptop shows both their pages side by side, Rose's page `/r/<link>`, which starts at Link PayPal with a demo sandbox login and Skip, Sam's page `/h/<link>`, with Confirm each OK for a passkey, the PayPal return route, the route a home page phone posts Link PayPal to in a new tab, each link's manifest, the notifications control, and the views they share.
 - `lib/shop/` — households and the link check, PayPal vault and charge calls, Channel3 search, the listing photo downloads, and Claude Haiku calls behind Rose's Find, with `picks/`, the recorded set of real listings that `picks.test.ts` runs against Haiku, request, search, price-limit, total-limit and phone storage, the daily Find and household limits for each network address, the usage counts for `/status`, `pay()`, and the pushes to saved phones.
 - `public/` — `sw.js`, the service worker that shows a push and opens the link on tap, and the KinCart icons.
 - `docs/design/design-system/` — the design tokens, and the showcase look, that the shop pages and `/status` load.
@@ -55,6 +55,7 @@ Used by older shoppers and the relative who helps them pay online.
 | security-headers | Shipped | Every KinCart page tells the browser to refuse a frame from another site, and to send no page address to other sites. The home page's own phones still show Rose's and Sam's pages. | docs/specs/security-headers.md |
 | sam-finds-another | Shipped | After a No or a thing left out, Sam taps Find another on Sam's own page, and KinCart looks again for Rose. Rose's page says Sam asked, and Rose's phone buzzes when the search ends. | docs/specs/sam-finds-another.md |
 | new-links | Shipped | Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys. | docs/specs/new-links.md |
+| confirm-ok | Shipped | Sam can turn on a passkey, off by default, so each OK, Make new links and Turn off asks for Sam's face or fingerprint. A leaked Sam link alone then can't pay or lock the family out. | docs/specs/confirm-ok.md |
 
 ## More
 

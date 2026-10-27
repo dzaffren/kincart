@@ -4,6 +4,7 @@ import type { Line, Source } from "../../lib/shop/requests";
 import { BasketAnswer } from "./BasketAnswer";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
+import { GuardedForm } from "./PasskeyControl";
 import { ShareLink } from "./ShareLink";
 import {
   AnotherForm,
@@ -11,6 +12,7 @@ import {
   listed,
   money,
   Notice,
+  OkInTabHint,
   ReceiptCard,
   RELATIVE,
   Summary,
@@ -47,15 +49,41 @@ type Props = {
   notify?: ReactNode;
   links?: Links;
   makeLinks?: Action;
+  passkey?: ReactNode;
+  refused?: "ok" | "links";
+  okInTab?: string;
+  inPhone?: boolean;
+  // Sam's link, when the passkey is on: OK and Make new links ask the phone first (D122).
+  guard?: string;
 };
 
-export function SamView({ state, answer, limit, setLimit, total, setTotal, findAnother, notify, links, makeLinks }: Props) {
-  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} />;
+export function SamView({
+  state,
+  answer,
+  limit,
+  setLimit,
+  total,
+  setTotal,
+  findAnother,
+  notify,
+  links,
+  makeLinks,
+  passkey,
+  refused,
+  okInTab,
+  inPhone,
+  guard,
+}: Props) {
+  if (links?.kind === "confirm") return <ConfirmLinks makeLinks={makeLinks} refused={refused === "links"} guard={guard} />;
 
   if (state.kind === "request" && state.lines) {
     return (
       <div className="screen">
+        {refused === "ok" && <RefusedOk />}
         <BasketAnswer
+          okInTab={okInTab}
+          inPhone={inPhone}
+          guard={guard}
           lines={state.lines}
           askedAt={state.askedAt}
           answer={answer}
@@ -70,6 +98,7 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
     const { found, limitCents } = state;
     return (
       <div className="screen">
+        {refused === "ok" && <RefusedOk />}
         {limitCents !== undefined && state.item.cents > limitCents && (
           <Notice tone="neutral">
             This is {money(state.item.cents - limitCents)} over your {wholeDollars(limitCents)} limit.
@@ -103,20 +132,28 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
         <p className="small">
           Asked at <LocalTime at={state.askedAt} format="clock" />.
         </p>
-        <form className="stack" action={answer}>
+        <GuardedForm className="stack" action={answer} guard={guard}>
+          {inPhone && <input type="hidden" name="in" value="phone" />}
           {state.busy ? (
             <Button type="submit" busy busyLabel="Paying…" />
           ) : (
             <>
-              <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
-                OK, pay {money(state.item.cents)}
-              </Button>
+              {okInTab ? (
+                <Button type="submit" formAction={okInTab} formMethod="get" formTarget="_blank">
+                  OK, pay {money(state.item.cents)}
+                </Button>
+              ) : (
+                <Button type="submit" name="answer" value="ok" busyLabel={guard ? "Checking it's you…" : "Paying…"}>
+                  OK, pay {money(state.item.cents)}
+                </Button>
+              )}
               <Button type="submit" name="answer" value="no" kind="secondary">
                 No
               </Button>
             </>
           )}
-        </form>
+        </GuardedForm>
+        {okInTab && <OkInTabHint />}
       </div>
     );
   }
@@ -156,9 +193,14 @@ export function SamView({ state, answer, limit, setLimit, total, setTotal, findA
           action={setTotal}
         />
       )}
+      {passkey}
       {links && <OfferLinks />}
     </div>
   );
+}
+
+function RefusedOk() {
+  return <Notice tone="neutral">Not paid. This OK needs your face or fingerprint, on the phone that turned it on.</Notice>;
 }
 
 function OfferLinks() {
@@ -181,10 +223,15 @@ function OfferLinks() {
   );
 }
 
-function ConfirmLinks({ makeLinks }: { makeLinks?: Action }) {
+function ConfirmLinks({ makeLinks, refused, guard }: { makeLinks?: Action; refused?: boolean; guard?: string }) {
   const listId = useId();
   return (
     <div className="screen">
+      {refused && (
+        <Notice tone="neutral">
+          No new links made. This needs your face or fingerprint, on the phone that turned it on.
+        </Notice>
+      )}
       <h1>Make new links?</h1>
       <p className="lead">
         You and {RELATIVE} each get a new link. Nobody can open KinCart with the old ones again.
@@ -198,11 +245,11 @@ function ConfirmLinks({ makeLinks }: { makeLinks?: Action }) {
         <p>Notifications turn off on both phones until you each turn them on from the new link.</p>
         <p className="small">{RELATIVE}&apos;s PayPal, your limits and past buys stay as they are.</p>
       </section>
-      <form className="stack" action={makeLinks}>
-        <Button type="submit" busyLabel="Making new links…">
+      <GuardedForm className="stack" action={makeLinks} guard={guard}>
+        <Button type="submit" busyLabel={guard ? "Checking it's you…" : "Making new links…"}>
           Make new links
         </Button>
-      </form>
+      </GuardedForm>
       <form className="stack">
         <Button type="submit" kind="secondary">
           Keep these

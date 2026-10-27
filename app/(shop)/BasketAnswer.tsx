@@ -5,14 +5,25 @@ import { things } from "../../lib/shop/items";
 import type { Line } from "../../lib/shop/requests";
 import { Button } from "./Button";
 import { LocalTime } from "./LocalTime";
-import { money, RELATIVE, Summary, wholeDollars } from "./ui";
+import { GuardedForm } from "./PasskeyControl";
+import { money, OkInTabHint, RELATIVE, Summary, wholeDollars } from "./ui";
 
 type Action = (formData: FormData) => void | Promise<void>;
 
-type Props = { lines: Line[]; askedAt: Date; answer?: Action; busy?: boolean; unticked?: string[]; limitCents?: number };
+type Props = {
+  lines: Line[];
+  askedAt: Date;
+  answer?: Action;
+  busy?: boolean;
+  unticked?: string[];
+  limitCents?: number;
+  okInTab?: string;
+  inPhone?: boolean;
+  guard?: string;
+};
 
 // Sam's OK button names the total of the ticked lines, so it changes as Sam ticks.
-export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents }: Props) {
+export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limitCents, okInTab, inPhone, guard }: Props) {
   const [ticked, setTicked] = useState(() => lines.filter((line) => !unticked.includes(line.id)).map((line) => line.id));
   const paying = lines.filter((line) => ticked.includes(line.id));
   const total = paying.reduce((sum, line) => sum + line.cents, 0);
@@ -26,7 +37,8 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
       <h1>
         {RELATIVE} would like {things(lines.length)}
       </h1>
-      <form className="flow" action={answer}>
+      <GuardedForm className="flow" action={answer} guard={guard}>
+        {inPhone && <input type="hidden" name="in" value="phone" />}
         {busy ? (
           <>
             <Summary title="Paying" cents={total} lines={paying} />
@@ -91,8 +103,12 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
             <p className="small">
               Asked at <LocalTime at={askedAt} format="clock" />.
             </p>
-            {total ? (
-              <Button type="submit" name="answer" value="ok" busyLabel="Paying…">
+            {total && okInTab ? (
+              <Button type="submit" formAction={okInTab} formMethod="get" formTarget="_blank">
+                OK, pay {money(total)}
+              </Button>
+            ) : total ? (
+              <Button type="submit" name="answer" value="ok" busyLabel={guard ? "Checking it's you…" : "Paying…"}>
                 OK, pay {money(total)}
               </Button>
             ) : (
@@ -103,9 +119,10 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
             <Button type="submit" name="answer" value="no" kind="secondary">
               No
             </Button>
+            {okInTab && <OkInTabHint />}
           </>
         )}
-      </form>
+      </GuardedForm>
     </>
   );
 }

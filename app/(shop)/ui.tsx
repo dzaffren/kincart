@@ -42,6 +42,11 @@ export function Notice({ tone, children }: { tone: "wait" | "danger" | "neutral"
   );
 }
 
+// Inside the home page's phones, a passkey can't be asked for, so OK opens Sam's own page.
+export function OkInTabHint() {
+  return <p className="small">OK opens your own page in a new tab, to ask for your face or fingerprint.</p>;
+}
+
 export function Summary({ title, cents, note, lines }: { title?: string; cents: number; note?: string; lines?: Item[] }) {
   return (
     <div className="summary">

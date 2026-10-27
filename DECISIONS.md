@@ -833,3 +833,31 @@ Why: only hashes are kept (D47), so Rose's link exists in plain form only inside
 Rejected: Rose's link in Sam's page address (a saved Home Screen icon or bookmark keeps it, and the "New links made" card shows forever), storing Rose's link itself (D47 keeps hashes only).
 Source: docs/specs/new-links.md
 Status: active
+
+## D122 · 2026-10-26 · Sam can turn on one passkey, off by default, and once on it guards OK, Make new links and Turn off
+
+Why: a leaked Sam link alone then can't pay, take the household over with new links (new-links O7), or turn the guard off first. Off by default keeps the one-tap demo and the video true (O2). No recovery: a lost, unsynced passkey means a new household (O5).
+Rejected: on by default (a judge's first OK would need a passkey), guarding OK only (a leaker turns it off), a second passkey or Rose turning it off (more screens, or a leaked Rose link undoes it).
+Source: docs/specs/confirm-ok.md
+Status: active
+
+## D123 · 2026-10-26 · Check passkeys with @simplewebauthn/server, and ask for them with @simplewebauthn/browser
+
+Why: the check guards payment, and the library handles every passkey format and its edge cases. A hand-written check is what a pentest finds holes in.
+Rejected: a hand-written check with `node:crypto` and the browser's `getPublicKey()` (no dependency, as D17 did for PayPal, but its browser support was not checked).
+Source: docs/specs/confirm-ok.md
+Status: active
+
+## D124 · 2026-10-26 · The passkey challenge lives in an httpOnly cookie on Sam's link for 5 minutes, cleared once checked
+
+Why: it ties a signed answer to this OK with no new table, as D121 did for Rose's new link. A replay needs Sam's own browser.
+Rejected: a Neon table of one-time challenges (holds against a stolen cookie, but adds a table and its clean-up).
+Source: docs/specs/confirm-ok.md
+Status: active
+
+## D125 · 2026-10-26 · Inside the home page's phones, an OK with the passkey on opens Sam's page in a new tab
+
+Why: whether passkeys work inside the frames in Chrome and Safari was not checked (O1). A new tab works everywhere, as PayPal's does (D60).
+Rejected: a passkey inside the frame (needs a spike, and Safari can't be tested here), hiding the OK in the phones (the side-by-side demo stops at the OK).
+Source: docs/specs/confirm-ok.md
+Status: active
