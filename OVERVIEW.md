@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-11-02 by /ship ci-without-channel3
+**Status:** Active · **Release:** v1.3.0 · **Updated:** 2026-11-02 by /ship ci-without-channel3
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.

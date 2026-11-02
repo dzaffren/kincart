@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-02
+
 ### Added
 
 - Each network address can run 20 Finds and start 5 new Roses and Sams in any 24 hours. Past that, nothing reaches Claude or Channel3, the page says how long to wait, and Rose's words stay in the box.
@@ -26,6 +28,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - A Find no longer shows "Couldn't find that" when the AI takes more than 10 seconds to check the listings' photos. It now waits up to 15 seconds, so a slow check still shows Rose the listings.
+
+### Security
+
+- Known low issue: A07:2025 Authentication Failures in app/(shop)/actions.ts; see docs/security/v1.3.0/report.md.
+- Known low issue: A03:2025 Software Supply Chain Failures in pnpm-lock.yaml; see docs/security/v1.3.0/report.md.
+- Known low issue: A03:2025 Software Supply Chain Failures in pnpm-lock.yaml; see docs/security/v1.3.0/report.md.
+- Known low issue: A03:2025 Software Supply Chain Failures in pnpm-lock.yaml; see docs/security/v1.3.0/report.md.
 
 ## [1.2.0] - 2026-10-16
 
@@ -85,7 +94,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.
 
-[unreleased]: https://github.com/dzaffren/kincart/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/dzaffren/kincart/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/dzaffren/kincart/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/dzaffren/kincart/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dzaffren/kincart/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/dzaffren/kincart/releases/tag/v1.0.0
