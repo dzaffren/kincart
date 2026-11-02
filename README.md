@@ -45,6 +45,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys.
 - Sam can turn on a passkey, off by default, so each OK, Make new links and Turn off asks for Sam's face or fingerprint. A leaked Sam link alone then can't pay or lock the family out.
 - CI's e2e gets Channel3's and Claude's answers from recorded replies, so a push spends no Channel3 credits.
+- Each passkey answer from Sam's phone works once, for the one action it was asked for, and only for 5 minutes. A captured answer can't pay, make new links or turn the passkey off.
 - The README's Security section says what each guard stops, what still stands in, and which code the three pentests covered. ROADMAP's rows on links and free tiers now match it.
 
 ## Docs

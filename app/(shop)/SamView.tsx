@@ -132,7 +132,7 @@ export function SamView({
         <p className="small">
           Asked at <LocalTime at={state.askedAt} format="clock" />.
         </p>
-        <GuardedForm className="stack" action={answer} guard={guard}>
+        <GuardedForm className="stack" action={answer} guard={guard} for="ok">
           {inPhone && <input type="hidden" name="in" value="phone" />}
           {state.busy ? (
             <Button type="submit" busy busyLabel="Paying…" />
@@ -245,7 +245,7 @@ function ConfirmLinks({ makeLinks, refused, guard }: { makeLinks?: Action; refus
         <p>Notifications turn off on both phones until you each turn them on from the new link.</p>
         <p className="small">{RELATIVE}&apos;s PayPal, your limits and past buys stay as they are.</p>
       </section>
-      <GuardedForm className="stack" action={makeLinks} guard={guard}>
+      <GuardedForm className="stack" action={makeLinks} guard={guard} for="links">
         <Button type="submit" busyLabel={guard ? "Checking it's you…" : "Making new links…"}>
           Make new links
         </Button>

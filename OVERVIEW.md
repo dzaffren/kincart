@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.3.0 · **Updated:** 2026-11-02 by /ship ci-without-channel3
+**Status:** Active · **Release:** v1.3.0 · **Updated:** 2026-11-02 by /ship passkey-one-time-challenge
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -57,6 +57,7 @@ Used by older shoppers and the relative who helps them pay online.
 | new-links | Shipped | Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys. | docs/specs/new-links.md |
 | confirm-ok | Shipped | Sam can turn on a passkey, off by default, so each OK, Make new links and Turn off asks for Sam's face or fingerprint. A leaked Sam link alone then can't pay or lock the family out. | docs/specs/confirm-ok.md |
 | ci-without-channel3 | Shipped | CI's e2e gets Channel3's and Claude's answers from recorded replies, so a push spends no Channel3 credits. | docs/specs/ci-without-channel3.md |
+| passkey-one-time-challenge | Shipped | Each passkey answer from Sam's phone works once, for the one action it was asked for, and only for 5 minutes. A captured answer can't pay, make new links or turn the passkey off. | docs/specs/passkey-one-time-challenge.md |
 | security-story | Shipped | The README's Security section says what each guard stops, what still stands in, and which code the three pentests covered. ROADMAP's rows on links and free tiers now match it. | docs/specs/security-story.md |
 
 ## More

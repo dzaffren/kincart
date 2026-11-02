@@ -32,6 +32,7 @@ flowchart LR
     S3 -- "what shipped" --> S6
     S4 -- "what shipped" --> S6
     S5 -- "what shipped" --> S6
+    S5 -- "pentest P1" --> S7["7 passkey-one-time-challenge"]
 ```
 
 Slices 1 and 2 answer the main worry, abuse of the Claude and Channel3 keys. Slices 3 to 5 are the basics of a real launch. Slice 6 tells judges about whatever shipped.
@@ -44,6 +45,7 @@ Slices 1 and 2 answer the main worry, abuse of the Claude and Channel3 keys. Sli
 | 4 | `new-links` | Sam taps one button to replace both links when one leaks. The old links stop working at once, and Sam gets the new Rose link to send. | Today a leaked Sam link approves charges forever. Start a new one loses the PayPal link and every receipt. |
 | 5 | `confirm-ok` | Sam can choose to confirm each OK with Face ID or a fingerprint. It is off by default. When it is on, a leaked link alone can't approve a charge. | The largest slice, with one unproven claim (O10). It comes after the cheaper slices so a late problem costs only this one. |
 | 6 | `security-story` | The README gets a Security section: what each slice guards, what still stands in, and links to the pentest reports. A matching paragraph goes into the Devpost text before Nov 12. | Describes what shipped, so it comes last, before the freeze. |
+| 7 | `passkey-one-time-challenge` | Each passkey answer works once, for the one action it was asked for, within 5 minutes. A captured answer can't pay, make new links or turn the passkey off. | Found by the v1.3.0 pentest (confirm-ok O13), after slice 6 shipped. |
 
 ## Not doing
 

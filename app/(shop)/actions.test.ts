@@ -13,6 +13,7 @@ import {
   decline,
   getLimit,
   getPasskey,
+  type PasskeyAction,
   getSearch,
   getTotal,
   getVault,
@@ -1589,40 +1590,49 @@ async function passkeyOn() {
   const [ownRose, ownSam] = jar.get("household")!.value.split(".");
   const { household } = (await whoIs(ownSam))!;
   const key = phone();
-  const options = await passkeyOptions(ownSam);
+  const options = await passkeyOptions(ownSam, "on");
   expect(await turnOnPasskey(ownSam, JSON.stringify(created(key, options!.options.challenge)))).toBe(true);
   return { ownRose, ownSam, household, key };
 }
 
+// The household's challenges on the server, oldest first.
+async function challengesOf(household: number) {
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  const { rows } = await db.query("SELECT challenge, action FROM passkey_challenges WHERE household_id = $1 ORDER BY made_at", [household]);
+  await db.end();
+  return rows;
+}
+
 // A signed answer to a fresh challenge, as the page's form sends it.
-async function signedBy(token: string, key: ReturnType<typeof phone>) {
-  const options = await passkeyOptions(token);
+async function signedBy(token: string, key: ReturnType<typeof phone>, action: PasskeyAction) {
+  const options = await passkeyOptions(token, action);
   return JSON.stringify(signed(key, options!.options.challenge));
 }
 
-it("offers the passkey only to Sam of a household from Try KinCart, with the challenge in a cookie on Sam's link", async () => {
+it("offers the passkey only to Sam of a household from Try KinCart, with the challenge kept on the server for its action", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
-  expect(await passkeyOptions(sam)).toBeNull();
+  expect(await passkeyOptions(sam, "on")).toBeNull();
   await redirectOf(start());
   const [ownRose, ownSam] = jar.get("household")!.value.split(".");
-  expect(await passkeyOptions(ownRose)).toBeNull();
+  expect(await passkeyOptions(ownRose, "on")).toBeNull();
+  expect(await passkeyOptions(ownSam, "pay" as PasskeyAction)).toBeNull();
 
-  const options = await passkeyOptions(ownSam);
+  const options = await passkeyOptions(ownSam, "on");
   expect(options).toMatchObject({ kind: "create", options: { rp: { id: "kincart.vercel.app" } } });
-  expect(jar.get("passkey_challenge")).toEqual({
-    value: options!.options.challenge,
-    options: { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${ownSam}`, maxAge: 5 * 60 },
-  });
+  const { household } = (await whoIs(ownSam))!;
+  expect(await challengesOf(household)).toEqual([{ challenge: options!.options.challenge, action: "on" }]);
+  expect(jar.has("passkey_challenge")).toBe(false);
 });
 
 it("turns the passkey on with Sam's face or fingerprint, once, and asks for it from then on", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   const { ownSam, household, key } = await passkeyOn();
   expect(await getPasskey(household)).toMatchObject({ credentialId: key.credentialId });
-  expect(jar.get("passkey_challenge")?.options).toMatchObject({ maxAge: 0 });
+  expect(await challengesOf(household)).toEqual([]);
   expect(console.log).toHaveBeenCalledWith(`passkey household=${household} status=on`);
 
-  const options = await passkeyOptions(ownSam);
+  const options = await passkeyOptions(ownSam, "on");
   expect(options).toMatchObject({ kind: "get", options: { allowCredentials: [{ id: key.credentialId }] } });
   const leaker = phone();
   expect(await turnOnPasskey(ownSam, JSON.stringify(created(leaker, options!.options.challenge)))).toBe(false);
@@ -1637,7 +1647,7 @@ it("pays nothing for an OK without Sam's face or fingerprint, and pays once it m
   const { id } = (await latest(household))!;
 
   expect(await redirectOf(answer(ownSam, id, form({ answer: "ok" })))).toBe(`/h/${ownSam}?refused=ok`);
-  await passkeyOptions(ownSam);
+  await passkeyOptions(ownSam, "ok");
   expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: JSON.stringify(signed(phone(), "made-up")) })))).toBe(
     `/h/${ownSam}?refused=ok`,
   );
@@ -1646,7 +1656,7 @@ it("pays nothing for an OK without Sam's face or fingerprint, and pays once it m
   expect(console.log).toHaveBeenCalledWith(`passkey household=${household} status=refused for=ok`);
 
   paypalAnswers(completed);
-  const passkey = await signedBy(ownSam, key);
+  const passkey = await signedBy(ownSam, key, "ok");
   expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey })))).toBe(`/h/${ownSam}`);
   expect((await latest(household))?.status).toBe("paid");
 });
@@ -1672,7 +1682,7 @@ it("makes no new links and keeps the passkey on without Sam's face or fingerprin
   expect(await getPasskey(household)).not.toBeNull();
   expect(console.log).toHaveBeenCalledWith(`passkey household=${household} status=refused for=off`);
 
-  expect(await turnOffPasskey(ownSam, await signedBy(ownSam, key))).toBe(true);
+  expect(await turnOffPasskey(ownSam, await signedBy(ownSam, key, "off"))).toBe(true);
   expect(await getPasskey(household)).toBeNull();
   expect(console.log).toHaveBeenCalledWith(`passkey household=${household} status=off`);
 });
@@ -1680,9 +1690,83 @@ it("makes no new links and keeps the passkey on without Sam's face or fingerprin
 it("makes new links with Sam's face or fingerprint, and the passkey stays with the household", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   const { ownSam, household, key } = await passkeyOn();
-  const page = await redirectOf(makeLinks(ownSam, form({ passkey: await signedBy(ownSam, key) })));
+  const page = await redirectOf(makeLinks(ownSam, form({ passkey: await signedBy(ownSam, key, "links") })));
   expect(await whoIs(page.slice("/h/".length))).toEqual({ household, person: "sam" });
   expect(await getPasskey(household)).not.toBeNull();
+});
+
+// A copy of an answer that already went through, sent again with its challenge as the cookie, as anyone can.
+async function replay(token: string, challenge: string, passkey: string) {
+  jar.set("passkey_challenge", { value: challenge });
+  return turnOffPasskey(token, passkey);
+}
+
+it("refuses a Turn off answer the second time, after Sam turned the passkey on again", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  const challenge = (await passkeyOptions(ownSam, "off"))!.options.challenge;
+  const passkey = JSON.stringify(signed(key, challenge));
+  expect(await turnOffPasskey(ownSam, passkey)).toBe(true);
+  const again = await passkeyOptions(ownSam, "on");
+  expect(await turnOnPasskey(ownSam, JSON.stringify(created(key, again!.options.challenge)))).toBe(true);
+
+  expect(await replay(ownSam, challenge, passkey)).toBe(false);
+  expect(await getPasskey(household)).not.toBeNull();
+  expect(console.log).toHaveBeenCalledWith(`passkey household=${household} status=refused for=off`);
+});
+
+it("refuses an OK whose challenge is over 5 minutes old, and pays on the next tap", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  await saveVault(household, "8tm05472xk4815307");
+  await ask(household, glasses);
+  const { id } = (await latest(household))!;
+
+  const passkey = await signedBy(ownSam, key, "ok");
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  await db.query("UPDATE passkey_challenges SET made_at = now() - interval '6 minutes' WHERE household_id = $1", [household]);
+  await db.end();
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey })))).toBe(`/h/${ownSam}?refused=ok`);
+  expect((await latest(household))?.status).toBe("waiting");
+
+  paypalAnswers(completed);
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: await signedBy(ownSam, key, "ok") })))).toBe(`/h/${ownSam}`);
+  expect((await latest(household))?.status).toBe("paid");
+});
+
+it("refuses an answer asked for Turn off when it comes with an OK or Make new links, and pays with an OK's own", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  await saveVault(household, "8tm05472xk4815307");
+  await ask(household, glasses);
+  const { id } = (await latest(household))!;
+
+  const forOff = await signedBy(ownSam, key, "off");
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: forOff })))).toBe(`/h/${ownSam}?refused=ok`);
+  expect(await redirectOf(makeLinks(ownSam, form({ passkey: forOff })))).toBe(`/h/${ownSam}?links=new&refused=links`);
+  expect(await whoIs(ownSam)).toEqual({ household, person: "sam" });
+  expect((await latest(household))?.status).toBe("waiting");
+  expect(fetch).not.toHaveBeenCalled();
+
+  paypalAnswers(completed);
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: await signedBy(ownSam, key, "ok") })))).toBe(`/h/${ownSam}`);
+  expect((await latest(household))?.status).toBe("paid");
+});
+
+it("lets Sam's two tabs each ask, for new links and for Turn off, and both go through", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  const forLinks = await signedBy(ownSam, key, "links");
+  const forOff = await signedBy(ownSam, key, "off");
+
+  const page = await redirectOf(makeLinks(ownSam, form({ passkey: forLinks })));
+  const newSam = page.slice("/h/".length);
+  expect(await whoIs(newSam)).toEqual({ household, person: "sam" });
+  expect(await getPasskey(household)).not.toBeNull();
+
+  expect(await turnOffPasskey(newSam, forOff)).toBe(true);
+  expect(await getPasskey(household)).toBeNull();
 });
 
 it("keeps a home page phone's ?in=phone after Sam's answer, so its next OK still opens a new tab", async () => {

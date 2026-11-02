@@ -13,28 +13,27 @@ it("asks for a passkey that needs Sam's face or fingerprint, on KinCart's host",
   expect(get.allowCredentials).toEqual([{ id: "BwcHBw", type: "public-key" }]);
 });
 
-it("saves a passkey made for this challenge with Sam's face or fingerprint", async () => {
+it("saves a passkey made with Sam's face or fingerprint, with the challenge it signed", async () => {
   const key = phone();
-  expect(await checkCreate(created(key, "turn-on"), "turn-on", origin)).toEqual({
+  expect(await checkCreate(created(key, "turn-on"), origin)).toEqual({
     credentialId: key.credentialId,
     publicKey: new Uint8Array(key.cose),
+    challenge: "turn-on",
   });
-  expect(await checkCreate(created(key, "old"), "turn-on", origin)).toBeNull();
-  expect(await checkCreate(created(key, "turn-on", 0x41), "turn-on", origin)).toBeNull();
-  expect(await checkCreate("not json at all", "turn-on", origin)).toBeNull();
+  expect(await checkCreate(created(key, "turn-on", 0x41), origin)).toBeNull();
+  expect(await checkCreate("not json at all", origin)).toBeNull();
 });
 
-it("passes only Sam's own signature, for this challenge, this site and a face or fingerprint", async () => {
+it("passes only Sam's own signature, for this site and a face or fingerprint, and gives the challenge it signed", async () => {
   const key = phone();
   const stored = { credentialId: key.credentialId, publicKey: new Uint8Array(key.cose) };
 
-  expect(await checkGet(signed(key, "pay-1299"), stored, "pay-1299", origin)).toBe(true);
-  expect(await checkGet(signed(key, "an-old-one"), stored, "pay-1299", origin)).toBe(false);
-  expect(await checkGet(signed(key, "pay-1299", 0x01), stored, "pay-1299", origin)).toBe(false);
-  expect(await checkGet(signed(key, "pay-1299", 0x05, "https://kincart.example"), stored, "pay-1299", origin)).toBe(false);
+  expect(await checkGet(signed(key, "pay-1299"), stored, origin)).toBe("pay-1299");
+  expect(await checkGet(signed(key, "pay-1299", 0x01), stored, origin)).toBeNull();
+  expect(await checkGet(signed(key, "pay-1299", 0x05, "https://kincart.example"), stored, origin)).toBeNull();
 
   const leaker = phone();
-  expect(await checkGet(signed({ ...leaker, credentialId: key.credentialId }, "pay-1299"), stored, "pay-1299", origin)).toBe(false);
-  expect(await checkGet(signed(phone("kincart.example"), "pay-1299"), stored, "pay-1299", origin)).toBe(false);
-  expect(await checkGet("", stored, "pay-1299", origin)).toBe(false);
+  expect(await checkGet(signed({ ...leaker, credentialId: key.credentialId }, "pay-1299"), stored, origin)).toBeNull();
+  expect(await checkGet(signed(phone("kincart.example"), "pay-1299"), stored, origin)).toBeNull();
+  expect(await checkGet("", stored, origin)).toBeNull();
 });

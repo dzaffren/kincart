@@ -140,6 +140,30 @@ export async function dropPasskey(household: number): Promise<void> {
   await query("DELETE FROM sam_passkeys WHERE id = $1", [household]);
 }
 
+export type PasskeyAction = "on" | "off" | "ok" | "links";
+
+// A challenge for one action, kept for 5 minutes; the household's older ones go in the same statement (D131, D132).
+export async function askChallenge(household: number, action: PasskeyAction, challenge: string): Promise<void> {
+  await query(
+    `WITH old AS (
+       DELETE FROM passkey_challenges WHERE household_id = $1 AND made_at <= now() - interval '5 minutes'
+     )
+     INSERT INTO passkey_challenges (challenge, household_id, action) VALUES ($3, $1, $2)`,
+    [household, action, challenge],
+  );
+}
+
+// Uses the challenge up. Only one of two copies of an answer finds the row.
+export async function spendChallenge(household: number, action: PasskeyAction, challenge: string): Promise<boolean> {
+  const rows = await query(
+    `DELETE FROM passkey_challenges
+     WHERE challenge = $3 AND household_id = $1 AND action = $2 AND made_at > now() - interval '5 minutes'
+     RETURNING 1`,
+    [household, action, challenge],
+  );
+  return rows.length > 0;
+}
+
 // The one-row tables' id is the household's id (D46).
 export async function getVault(household: number): Promise<string | null> {
   const rows = await query<{ payment_token: string }>("SELECT payment_token FROM paypal_vault WHERE id = $1", [
