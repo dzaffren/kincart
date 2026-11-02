@@ -224,6 +224,10 @@ Single chunk. The migration, the two statements, the actions and the forms chang
 
 Recorded as D131, D132.
 
+## Review
+
+2026-11-02 · 0 raw findings, 0 survived. Clean.
+
 ## Open items
 
 | ID | What | Type | Raised at | Owner | Status | Answer |
