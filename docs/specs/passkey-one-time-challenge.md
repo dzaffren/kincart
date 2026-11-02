@@ -1,6 +1,6 @@
 # Passkey one-time challenge
 
-**Version:** v1 · **Status:** Refined · **Type:** Bug · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Bug · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** confirm-ok
@@ -205,7 +205,7 @@ erDiagram
 | Sam's own taps work as before | `actions.test.ts`: two asks, one for `links` and one for `off`, both pass in either order; the confirm-ok e2e still passes | `pnpm test` and `pnpm test:e2e e2e/confirm-ok.spec.ts` |
 | The reverse path | `scripts/migrate.test.ts` | `pnpm test scripts/migrate.test.ts` |
 
-**E2E:** `e2e/passkey-one-time-challenge.spec.ts`. Sam turns the passkey on with the virtual authenticator, and Rose asks for "AA batteries" at $12.99. The test records the request that Turn off sends. It turns the passkey on again, then sends the recorded request with `page.request`, and the passkey stays on. The recorded answer sent with the OK pays nothing. Sam's own OK then pays $12.99. Run it with `pnpm test:e2e e2e/passkey-one-time-challenge.spec.ts`, with `pnpm dev` stopped.
+**E2E:** `e2e/passkey-one-time-challenge.spec.ts`. Sam turns the passkey on with the virtual authenticator and makes new links. The test sends that same signed answer again to Sam's new link, with its challenge as the cookie, and the new link still opens. Rose then asks for "AA batteries" at $12.99, and Sam's own OK pays. Run it with `pnpm test:e2e e2e/passkey-one-time-challenge.spec.ts`, with `pnpm dev` stopped.
 
 ### Chunks
 
@@ -215,7 +215,7 @@ Single chunk. The migration, the two statements, the actions and the forms chang
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| A replayed server action call in the e2e is shaped wrong for Next 16.4.1, so the test passes for the wrong reason | The e2e also checks that the same request shape, with a fresh answer from the authenticator, does pass |
+| A replayed server action call in the e2e is shaped wrong for Next 16.4.1, so the test passes for the wrong reason | The e2e was run against the code before the fix: there the replay made new links again, and the test failed with a 404 |
 | The signature counter stays pinned at 0 (`lib/shop/passkey.ts:55`) | No change. Synced passkeys from Apple and Google always send 0, so a counter can't stop a copy. The one-time row stops the replay |
 | A Sam with a Face ID prompt open during the deploy is refused once | Accepted: Sam taps again, and the refused message already says what to do |
 | `confirm-ok.spec.ts` and the other passkey tests rely on the cookie | They change in this chunk. `pnpm test` and the confirm-ok e2e run before `/review` |
@@ -235,6 +235,7 @@ Recorded as D131, D132.
 | O5 | D124 rejected a Neon table of one-time challenges. Supersede it? | question | spec p3 | user | Resolved | Yes. D131 supersedes D124. 2026-11-02 |
 | O6 | Keep the `passkey_challenge` cookie as a second check once the server keeps the row? | question | spec p3 | user | Resolved | No. The cookie goes; the caller can set any cookie. 2026-11-02 |
 | O7 | How old challenge rows go away | question | spec p3 | user | Resolved | The next ask deletes that household's rows over 5 minutes, in the same statement (D132). 2026-11-02 |
+| O8 | The E2E line said: the test records Turn off's request, turns the passkey on again, sends the recording, and also sends the recorded answer with the OK. A second Turn on makes a new passkey, so the old answer failed for the wrong key and the test also passed on the old code. An OK answer can't be moved into the OK's form without rewriting it | flag | build | user | Decided alone | Chose: replay Make new links, which keeps the same passkey; an answer for another action is proved by `actions.test.ts` only. Other: give the virtual authenticator a fixed passkey with CDP's WebAuthn.addCredential, and replay Turn off and the OK in the browser. Undo: rewrite the e2e that way. 2026-11-02 |
 
 _Never delete this section or its rows. See references/ledger.md._
 

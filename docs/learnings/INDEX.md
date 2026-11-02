@@ -51,3 +51,4 @@
 - Give each e2e page its own virtual authenticator for passkeys
 - Clear .next/dev before next build when another branch's dev server left its types
 - Fingerprint fixture photos in a recording's key
+- Replay a passkey answer on the same passkey, and run the test on the old code
