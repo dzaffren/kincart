@@ -6,6 +6,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Security
+
+- A passkey answer from Sam's phone that was already used, or is over 5 minutes old, or was asked for another action, no longer passes Sam's OK, Make new links or Turn off.
+
 ## [1.3.0] - 2026-11-02
 
 ### Added

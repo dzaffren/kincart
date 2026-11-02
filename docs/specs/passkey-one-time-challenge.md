@@ -1,6 +1,6 @@
 # Passkey one-time challenge
 
-**Version:** v1 · **Status:** Built · **Type:** Bug · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Bug · **Project type:** Web UI
 
 **Shape doc:** docs/specs/security/shape.md
 **Depends on:** confirm-ok
