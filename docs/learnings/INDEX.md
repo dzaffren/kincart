@@ -48,3 +48,4 @@
 - Write glossary lines with a dash, and list every term the spec uses
 - Keep helpers out of a "use server" file
 - Clear .next/dev before next build when another branch's dev server left its types
+- Fingerprint fixture photos in a recording's key
