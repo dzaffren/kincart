@@ -12,9 +12,17 @@ const services = {
   "/v1/messages": { name: "anthropic", url: "https://api.anthropic.com/v1/messages" },
 };
 
-// Photo bytes change with Chrome's JPEG encoder and Channel3's CDN, so a call matches on its text alone.
+// Listing photos come from Channel3's CDN and can change, so a call matches on its text alone. Rose's own
+// photos, each after a "Photo n:" label, come from e2e/photos/ and keep a fingerprint, or two Finds of
+// photos and no words would look the same.
 function withoutPhotos(value) {
-  if (Array.isArray(value)) return value.map(withoutPhotos);
+  if (Array.isArray(value)) {
+    return value.map((inner, index) =>
+      inner?.type === "image" && /^Photo \d+:$/.test(value[index - 1]?.text ?? "")
+        ? { type: "image", sha: createHash("sha256").update(inner.source?.data ?? "").digest("hex").slice(0, 16) }
+        : withoutPhotos(inner),
+    );
+  }
   if (!value || typeof value !== "object") return value;
   if (value.type === "image") return { type: "image" };
   return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, withoutPhotos(inner)]));

@@ -65,6 +65,14 @@ it("matches a Claude call on its text, whatever the photo's bytes", async () => 
   expect(keyOf("anthropic", pick("x"))).not.toBe(keyOf("anthropic", { ...pick("x"), system: "Pick one." }));
   expect(keyOf("anthropic", pick("x"))).not.toBe(keyOf("channel3", pick("x")));
 
+  // Rose's own photos come from e2e/photos/, so two Finds with different photos and no words stay apart.
+  const read = (photo: string) => ({
+    ...pick("x"),
+    messages: [{ role: "user", content: [{ type: "text", text: "Photo 1:" }, { type: "image", source: { data: photo } }] }],
+  });
+  expect(keyOf("anthropic", read("bGlzdA"))).not.toBe(keyOf("anthropic", read("d2FsbA")));
+  expect(keyOf("anthropic", read("bGlzdA"))).toBe(keyOf("anthropic", read("bGlzdA")));
+
   const reply = { content: [{ type: "text", text: '{"picks":["prod_7Hq2kZ"]}' }], stop_reason: "end_turn" };
   await writeFile(join(dir, `anthropic-${keyOf("anthropic", pick("old"))}.json`), JSON.stringify({ reply }));
   const response = await post("/v1/messages", pick("new"));
