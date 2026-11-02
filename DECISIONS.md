@@ -862,6 +862,13 @@ Rejected: a passkey inside the frame (needs a spike, and Safari can't be tested 
 Source: docs/specs/confirm-ok.md
 Status: active
 
+## D126 · 2026-10-27 · The README's Security section links the three pentests with their dates, and no new pentest runs for it
+
+Why: the five guards shipped after v1.2.0, and a pentest needs a `/release`, which needs #30 on main. Dating the links says plainly what was attacked and what wasn't.
+Rejected: a v1.3.0 pentest before the section ships (it waits on Channel3 and #30), leaving the pentest links out (the shape asked for them).
+Source: docs/specs/security-story.md
+Status: active
+
 ## D127 · 2026-10-27 · CI's e2e answers Channel3 and Claude from recorded replies on a local fake server
 
 Why: CI used all 1,000 of October's Channel3 credits in 4 days, at about 55 searches a run, and every Find e2e then failed with HTTP 402. December's credits must last through judging.
