@@ -89,5 +89,5 @@ export function serve(dir, record = false) {
 
 if (import.meta.filename === process.argv[1]) {
   const dir = new URL("../e2e/recordings/", import.meta.url).pathname;
-  serve(dir, process.env.RECORD === "1").listen(Number(process.env.FAKE_APIS_PORT ?? 3999), "localhost");
+  serve(dir, process.env.RECORD === "1").listen(3999, "localhost");
 }
