@@ -1,0 +1,176 @@
+{
+  "request": {
+    "model": "claude-haiku-5-5",
+    "max_tokens": 4000,
+    "system": "You help an older person choose something to buy. Each listing under their price limit comes with its photo, if it has one. A listing sells the main thing in its photo, whatever its words say. First leave out every listing that is not the product they asked for: a case, holder, organizer, charger, cable or other part for it, even when its photo shows the product inside it, since the product's own printed retail pack is the only packaging that counts as the product; another size or type than they said; and any listing whose photo shows something other than its name and words say, even when the words fit. Judge a listing with no photo by its name and words alone. Any brand or pack size of the product counts. From the listings left, pick up to three that fit what they asked, best first. Fewer than three is fine, and none if none is left. Never pick a listing that you would describe as only a part, or whose photo shows something else. For each pick write one short, plain sentence each: what it is, why it fits what they asked, and one thing to watch for, such as size, pack count, fit or delivery. Use only what the listing says. Never mention a price or the shop. Refer to listings only by their id. Then say whether any listing above their limit is the thing they asked for.",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "They asked: \"AA batteries\"\n\nUnder their price limit, pick from these:"
+          },
+          {
+            "type": "text",
+            "text": "Listing 6Z3WeF7: {\"name\":\"Super Alkaline AA Batteries\",\"details\":\"ACDelco AA Super Alkaline Batteries are equipped with advanced technology you can count on. ACDelco alkaline batteries perform better than the competition in high-drain and super high-drain devices and they provide consistent discharge performance. ACDelco alkaline batteries are designed for long sh\\nbattery-size: AA\\npattern: Solid\\nbattery-technology: Alkaline\\nbattery-type: Disposable\\nmaterial: Cardboard\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing YpLbPHn: {\"name\":\"AA Batteries\",\"details\":\"A 4-pack of Rayovac AA alkaline batteries designed with High Energy™ to provide long-lasting power for various appliances. These batteries are budget-friendly and manufactured in the USA.\\nbattery-type: Disposable\\nbattery-size: AA\\nbattery-technology: Alkaline\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing WUo0DX6: {\"name\":\"AA Batteries\",\"details\":\"This product is a pack of Energizer AA alkaline batteries, stored in a clear plastic case. The batteries are designed for everyday use and are ideal for powering a wide range of devices. The clear case allows for easy visibility and organization.\\nmaterial: Paper\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing VRZqvHA: {\"name\":\"ACDelco Alkaline AA Batteries (48-Pack)\",\"details\":\"These ACDelco Super Alkaline AA batteries (Model AC255) are designed for high-drain digital devices, offering long-lasting, dependable power. With a 10-year shelf life and leak protection, they provide trusted quality and great value in a convenient 48-pack.\\nmaterial: Metal\\npattern: Solid\\nbattery-size: AA\\nbattery-technology: Alkaline\\nbattery-type: Disposable\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing jgIVYuV: {\"name\":\"Alkaline Plus Power AA Batteries\",\"details\":\"Panasonic s AA and AAA alkaline plus power batteries protect power for up to 10 years (when unused and stored properly) and feature Panasonic s unique anti-leak technology. Alkaline plus power batteries are an affordable reliable battery power choice for a wide variety of household devices including\\nbattery-type: Disposable\\nbattery-technology: Alkaline\\nbattery-size: AA\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing qYGxLFs: {\"name\":\"AA Batteries\",\"details\":\"This is a pack of Energizer AA batteries. These are alkaline batteries that were manufactured in March 2016.\\nmaterial: Plastic\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing u1Ncn02: {\"name\":\"Power Boost AA Batteries\",\"details\":\"Duracell Power Boost AA batteries are designed to provide dependable, lasting performance for a variety of everyday household devices, including TV and gaming remotes, cameras, flashlights, and toys. These alkaline batteries feature patented power boost ingredients and are guaranteed to hold their p\\nbattery-type: Disposable\\nbattery-size: AA\\nbattery-technology: Alkaline\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing 1aF2iFr: {\"name\":\"AA Batteries\",\"details\":\"This OXO Good Grips soap dispensing palm brush is designed for efficient dishwashing. It features a comfortable, non-slip grip, a convenient pump button for dispensing soap directly from the handle, and durable nylon bristles for scrubbing away dirt and grime. It is perfect for cleaning dishes, pots\\npattern: Striped\\nbattery-technology: Alkaline\\nmaterial: Plastic\\nbattery-size: AA\\nbattery-type: Disposable\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing VISeFk2: {\"name\":\"AA Batteries\",\"details\":\"Duracell Coppertop AA alkaline batteries built in the with US and global parts contain Duracell’s exclusive POWER BOOST™ Ingredients which deliver dependable long-lasting power to your everyday devices throughout the home like toys baby devices home and kitchen accessories flashlights medical device\\nbattery-technology: Alkaline\\nbattery-size: AA\\nbattery-type: Disposable\\nmaterial: Cardboard\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing IlaZSsn: {\"name\":\"Aa Batteries\",\"details\":\"Stay prepared with this 4-pack of Rayovac High Energy AA alkaline batteries. Designed for long-lasting power, these batteries are ideal for various electronic devices, ensuring your gadgets keep running without emergency trips to the store.\\nbattery-technology: Alkaline\\nbattery-size: AA\\nbattery-type: Disposable\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Above their price limit, not to pick from:\n[\"Duracell AA Batteries - 4 packs of 36 (Case of 144)\",\"ACDelco Alkaline AA Batteries (100-Pack)\",\"AA Batteries\",\"AA Batteries\",\"AA Batteries\"]"
+          }
+        ]
+      }
+    ],
+    "output_config": {
+      "effort": "low",
+      "format": {
+        "type": "json_schema",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "picks",
+            "aboveLimit"
+          ],
+          "properties": {
+            "picks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "what",
+                  "why",
+                  "watch"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "what": {
+                    "type": "string"
+                  },
+                  "why": {
+                    "type": "string"
+                  },
+                  "watch": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "aboveLimit": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "reply": {
+    "model": "claude-haiku-5-5",
+    "id": "msg_011CgdNhm4uygX2vftb5zbWU",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "",
+        "signature": "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"
+      },
+      {
+        "type": "text",
+        "text": "{\"picks\":[{\"id\":\"IlaZSsn\",\"what\":\"A 4-pack of Rayovac High Energy AA alkaline batteries.\",\"why\":\"It is a small, affordable pack of AA alkaline batteries for everyday devices, which suits a simple purchase.\",\"watch\":\"The pack holds only 4 batteries, so it may run out sooner than larger packs.\"},{\"id\":\"VISeFk2\",\"what\":\"A 4-pack of Duracell Coppertop AA alkaline batteries.\",\"why\":\"It is a small pack of AA alkaline batteries for remotes, flashlights, and other household devices.\",\"watch\":\"Check that you need 4 batteries, since the pack holds only 4.\"},{\"id\":\"VRZqvHA\",\"what\":\"A 48-pack of ACDelco Super Alkaline AA batteries.\",\"why\":\"It gives a large supply of AA alkaline batteries that are described as long-lasting and suited to high-drain devices.\",\"watch\":\"This is a 48-pack, so it suits buyers who want a big supply rather than a few spares.\"}],\"aboveLimit\":true}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 5816,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 1243,
+      "output_tokens_details": {
+        "thinking_tokens": 885
+      },
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  }
+}

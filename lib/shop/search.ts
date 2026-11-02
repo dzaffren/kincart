@@ -23,7 +23,8 @@ type Product = {
 };
 
 export async function searchListings(query: string, maxCents?: number): Promise<Found[]> {
-  const response = await fetch("https://api.trychannel3.com/v1/search", {
+  // The e2e sends this to its fake server, which answers from recorded replies (D127).
+  const response = await fetch(`${process.env.CHANNEL3_URL ?? "https://api.trychannel3.com"}/v1/search`, {
     method: "POST",
     headers: { "x-api-key": process.env.CHANNEL3_API_KEY ?? "", "Content-Type": "application/json" },
     body: JSON.stringify({ query, limit: 10, ...(maxCents ? { filters: { price: { max_price: maxCents / 100 } } } : {}) }),

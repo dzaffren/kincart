@@ -1,0 +1,1908 @@
+{
+  "request": {
+    "query": "warm slippers easy to put on size 8",
+    "limit": 10
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "SgUE5YS",
+        "title": "Clarks Womens Memory Foam Slip-On Slippers",
+        "description": "These women's slip-on slippers from Clarks feature a cozy dark gray wool exterior with a faint floral pattern and a plush cream-colored faux fur lining for warmth and comfort. They are equipped with memory foam cushioning and a synthetic rubber blend sole for a gentle grip.",
+        "brands": [
+          {
+            "id": "cQMH",
+            "name": "Clarks"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/a8de8965-ac2c-4632-a4fb-c8db63fa52af?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/a8de8965-ac2c-4632-a4fb-c8db63fa52af?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Dark gray fuzzy slip-on slipper with cream trim on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/f3d86e7d-6e94-4258-aa1b-bacc38a06027?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/f3d86e7d-6e94-4258-aa1b-bacc38a06027?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Dark gray fuzzy slip-on slipper with cream trim on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/a345cf09-277b-42ac-8611-f651e750844f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/a345cf09-277b-42ac-8611-f651e750844f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Interior view of the slipper showing the cream faux fur lining."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/fd9e6ef1-6f28-4363-8ccc-e97cf6f554e1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/fd9e6ef1-6f28-4363-8ccc-e97cf6f554e1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Dark gray fuzzy slip-on slipper with cream trim on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cd76c14f-3eb0-4435-9faf-2c829319b86e?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "A pair of dark gray fuzzy slip-on slippers with cream trim."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8bc6789c-831d-4657-a96d-16b1372c2224?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/8bc6789c-831d-4657-a96d-16b1372c2224?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "A pair of dark gray fuzzy slip-on slippers with cream trim."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/a04e43a7-1796-461c-a168-46d2da5909da?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/a04e43a7-1796-461c-a168-46d2da5909da?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Outsole view of the slipper showing the textured rubber sole."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/1527fd2e-0ab9-46fa-ba69-83ded93ca6d4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/1527fd2e-0ab9-46fa-ba69-83ded93ca6d4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Qoqa",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Outsole view of the slipper showing the light tan rubber sole."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "100% Wool",
+          "Faux Fur",
+          "Synthetic Rubber Blend"
+        ],
+        "key_features": [
+          "Memory Foam",
+          "Slip-On",
+          "Closed Toe",
+          "Round Toe",
+          "Wipe Clean"
+        ],
+        "colors": [
+          {
+            "hex": "#393a3b",
+            "percentage": 0.6151
+          },
+          {
+            "hex": "#605f5d",
+            "percentage": 0.2566
+          },
+          {
+            "hex": "#d8cec2",
+            "percentage": 0.1283
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/SgUE5YS-Qoqa-bQpm8C?o=01M6997WM5079Z2BDR2P8VKNG8&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "jcpenney.com",
+            "price": {
+              "price": 50,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.042,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "occasion-style": [
+            "Casual"
+          ],
+          "slipper-style": [
+            "Mule"
+          ],
+          "insole-material": [
+            "Memory foam"
+          ],
+          "pattern": [
+            "Floral"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "lining-material": [
+            "Faux fur"
+          ],
+          "outsole-material": [
+            "Rubber"
+          ],
+          "shoe-features": [
+            "Cushioned"
+          ],
+          "footwear-material": [
+            "Wool",
+            "Faux fur",
+            "Rubber"
+          ]
+        },
+        "ratings": {
+          "value": 5,
+          "count": 1,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "pVkAjLS",
+        "title": "fuzzyeasy Women's Platform Slip-on Slippers",
+        "description": "Treat your feet to fluffy comfort and warmth with these platform slippers. These women's winter slippers feature a durable genuine suede upper and plush faux fur lining for a cozy feel. A 1.57-inch chunky EVA platform outsole visually elongates the legs while providing comfort for casual outings, running errands, or relaxing at home.",
+        "brands": [
+          {
+            "id": "U8To",
+            "name": "Dream Pairs"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/8bb57d16-e487-4ec8-9e10-e335627130b1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/8bb57d16-e487-4ec8-9e10-e335627130b1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black platform slipper shown from the side on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8b6ea4ec-9fbb-471a-9859-7eb1a0752ab0?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "on_model",
+            "alt_text": "Woman wearing black platform slippers and ripped jeans."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/4b04eea3-6e38-465e-a98b-1f30b9ac3cd2?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/4b04eea3-6e38-465e-a98b-1f30b9ac3cd2?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Two pairs of black platform slippers displayed together."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b60271fa-1a3b-4e42-a35f-b307b9a10a88?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Text overlay showing features of the slipper upper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/acb3b026-817f-4047-a71d-4ff7e66a3a03?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic highlighting the warmth retention feature of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ad56a081-87d6-4931-9ed1-04e0ec8de093?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic detailing the materials and sole of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/709b4014-d315-4887-8a72-65144fc23530?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/709b4014-d315-4887-8a72-65144fc23530?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up showing the elevated platform of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/0f5487a6-319c-4e89-ad1f-f89d1b2cf72a?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/0f5487a6-319c-4e89-ad1f-f89d1b2cf72a?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=fAZD",
+            "is_main_image": false,
+            "shot_type": "on_model",
+            "alt_text": "Woman wearing black platform slippers outdoors."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Suede",
+          "Faux Fur",
+          "Latex",
+          "Foam",
+          "EVA"
+        ],
+        "key_features": [
+          "Genuine Suede Upper",
+          "Faux Fur Lining",
+          "Faux Fur Covered Latex & Foam Insole",
+          "EVA Outsole",
+          "Platform Heel: 1.57-inches / 5cm",
+          "Slip-On style"
+        ],
+        "colors": [
+          {
+            "hex": "#2e2e2e",
+            "percentage": 0.5018
+          },
+          {
+            "hex": "#4e4e4e",
+            "percentage": 0.2443
+          },
+          {
+            "hex": "#6a6969",
+            "percentage": 0.1637
+          },
+          {
+            "hex": "#a19f9e",
+            "percentage": 0.0902
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/pVkAjLS-fAZD-bQpm8C?o=01M1RRG9PFTPMRE5WGN2FEGJ47&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "dreampairs.com",
+            "price": {
+              "price": 49.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.1,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": {
+                "number": 1.57,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": {
+          "options": [
+            {
+              "name": "Size",
+              "values": [
+                {
+                  "label": "Regular",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/8bb57d16-e487-4ec8-9e10-e335627130b1",
+                  "product_id": "pVkAjLS"
+                },
+                {
+                  "label": "Wide",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/50762361-dae9-4ba7-b1a9-7829bad5f1a2",
+                  "product_id": "GHUGuI0"
+                }
+              ]
+            },
+            {
+              "name": "Color",
+              "values": [
+                {
+                  "label": "BLACK",
+                  "exists": false,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/50762361-dae9-4ba7-b1a9-7829bad5f1a2",
+                  "product_id": "GHUGuI0"
+                },
+                {
+                  "label": "DARK BROWN",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/5d6e234c-1e12-4291-bca2-5f6dc866c147",
+                  "product_id": "DJRJSps"
+                },
+                {
+                  "label": "LIGHT PURPLE",
+                  "exists": false,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/f4b6c211-af8c-465a-80b0-31a7f94fb870",
+                  "product_id": "hrUFAIu"
+                },
+                {
+                  "label": "SAND",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/8bb57d16-e487-4ec8-9e10-e335627130b1",
+                  "product_id": "pVkAjLS"
+                }
+              ]
+            }
+          ],
+          "selected": [
+            {
+              "name": "Size",
+              "label": "Regular"
+            },
+            {
+              "name": "Color",
+              "label": "SAND"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "heel-height-type": [
+            "Low"
+          ],
+          "lining-material": [
+            "Faux fur"
+          ],
+          "outsole-material": [
+            "Ethylene vinyl acetate (EVA)"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "slipper-style": [
+            "Mule"
+          ],
+          "footwear-material": [
+            "Suede"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "shoe-features": [
+            "Breathable design",
+            "Lightweight"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "shoe-fit": [
+            "Regular",
+            "Wide"
+          ],
+          "occasion-style": [
+            "Casual"
+          ]
+        },
+        "ratings": {
+          "value": 5,
+          "count": 5,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "Pp6NYVE",
+        "title": "Womens Skechers BOBS Keepsakes Lite Warm Greetings Slippers",
+        "description": "These women's Skechers BOBS Keepsakes Lite - Warm Greetings slippers are designed for ultimate comfort. Featuring a cozy sweater knit upper, these clog-style slippers are lined with plush faux fur for warmth. The Skechers Memory Foam insole provides cushioned support, while the flexible traction outsole ensures durability. A portion of the proceeds from every BOBS purchase is donated to animals in need.",
+        "brands": [
+          {
+            "id": "4bks",
+            "name": "Skechers"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/80ca946b-c349-4b12-8346-cfc15ad29962?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/80ca946b-c349-4b12-8346-cfc15ad29962?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Gray faux fur slipper with black sole, viewed from a three-quarter angle."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/f8694eaf-962c-4528-bb42-ad90ff0b4902?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Gray faux fur slipper with black sole, viewed from a three-quarter angle."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/80702ed9-867c-44fb-b540-4d5c4caca9cc?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up of the inside of the slipper showing the fluffy gray lining."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/d9b765ca-437f-4843-9b59-0d4750a664ee?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up of the insole and fuzzy lining of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/35443749-e743-4a99-87b9-72ef707b0144?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=7uRn",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up of the textured sole and faux fur trim of the slipper."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Man Made",
+          "Faux Fur",
+          "Sweater knit"
+        ],
+        "key_features": [
+          "Skechers Memory Foam cushioned comfort insole",
+          "Sweater knit upper with faux-fur lining and footbed",
+          "Low-back clog-style slipper",
+          "Flexible traction outsole",
+          "1-inch heel height",
+          "BOBS® from Skechers® logo detail",
+          "Memory Foam",
+          "Care: Spot Clean"
+        ],
+        "colors": [
+          {
+            "hex": "#4d4d4f",
+            "percentage": 0.6951
+          },
+          {
+            "hex": "#c0c5c8",
+            "percentage": 0.1402
+          },
+          {
+            "hex": "#888a8d",
+            "percentage": 0.0918
+          },
+          {
+            "hex": "#343436",
+            "percentage": 0.0729
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/Pp6NYVE-7uRn-bQpm8C?o=01KR8RXN17PX6FR3M8CE65K7RG&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "boscovs.com",
+            "price": {
+              "price": 39.99,
+              "compare_at_price": 49.99,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "care-instructions": [
+            "Spot clean only"
+          ],
+          "shoe-features": [
+            "Cushioned"
+          ],
+          "heel-height-type": [
+            "Low"
+          ],
+          "lining-material": [
+            "Faux fur"
+          ],
+          "outsole-material": [
+            "Synthetic"
+          ],
+          "pattern": [
+            "Texture"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "insole-material": [
+            "Memory foam"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "slipper-style": [
+            "Clog"
+          ],
+          "upper-material": [
+            "Knit"
+          ],
+          "footwear-material": [
+            "Faux fur",
+            "Textile"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "activity": [
+            "Universal"
+          ]
+        },
+        "ratings": {
+          "value": 4.6,
+          "count": 5,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "j7jvl8j",
+        "title": "WARM FABRIC SLIPPERS",
+        "description": "Mule-style slippers crafted from a warm, textured dark gray fabric, featuring a closed toe, open heel, and a durable flat sole with piped trim for a clean finish.",
+        "brands": [
+          {
+            "id": "pjbn",
+            "name": "Zara"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/2d1f2835-d1bd-4395-86be-058f98c8b148?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Mnrl",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/2d1f2835-d1bd-4395-86be-058f98c8b148?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Mnrl",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Grey fabric slipper with wedge heel on a plain background."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "100% polyester",
+          "100% sbs"
+        ],
+        "key_features": [
+          "Mule design",
+          "Warm fabric construction",
+          "Open heel",
+          "Closed toe"
+        ],
+        "colors": [
+          {
+            "hex": "#69645d",
+            "percentage": 0.3943
+          },
+          {
+            "hex": "#433e38",
+            "percentage": 0.3898
+          },
+          {
+            "hex": "#928d86",
+            "percentage": 0.1154
+          },
+          {
+            "hex": "#2b2620",
+            "percentage": 0.1005
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/j7jvl8j-Mnrl-bQpm8C?o=01M45W7ATT5V4P4YNTSWY0VSXR&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "zara.com",
+            "price": {
+              "price": 49.9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "slipper-style": [
+            "Mule"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "lining-material": [
+            "Polyester"
+          ],
+          "footwear-material": [
+            "Polyester"
+          ],
+          "heel-height-type": [
+            "Flat",
+            "Low"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "5r8Wt8B",
+        "title": "Falke Cosyshoe Women Slippers",
+        "description": "These Cosyshoe slippers are made for home comfort with merino wool, a soft plush interior, and a slip-reducing sole. They feature a short cut, easy on/off design, and printed nubs on the sole for improved grip, offering warmth and comfort for indoor wear.",
+        "brands": [
+          {
+            "id": "eG2R",
+            "name": "Falke"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/59277160-800f-4283-9b75-b919f67f3f8c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "cleaned_url": "https://cdn.trychannel3.com/8f3b474f-6a70-4746-8c12-9b30f0912d3c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "is_main_image": true,
+            "shot_type": "on_model",
+            "alt_text": "Grey and black slippers with wool, side view"
+          },
+          {
+            "url": "https://static.falke.com/pdmain/1284508-62d8667b36e54.jpg",
+            "cleaned_url": "https://cdn.trychannel3.com/78a6d804-e3db-494b-b6fd-0d0becbcd62f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "is_main_image": false,
+            "shot_type": "angle_view",
+            "alt_text": "Front and back view of slippers on white"
+          },
+          {
+            "url": "https://static.falke.com/pdmain/1284496-62d866758f68d.jpg",
+            "cleaned_url": "https://cdn.trychannel3.com/17230d8e-e43f-4e66-9b44-cbbf9de6e224?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Two grey wool slippers side by side"
+          },
+          {
+            "url": "https://static.falke.com/pdmain/1284518-62d8667f1c8c9.jpg",
+            "cleaned_url": "https://cdn.trychannel3.com/8c5f17b9-d963-4a09-a226-14e4d71f54c4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "is_main_image": false,
+            "shot_type": null,
+            "alt_text": "Soles and interior of slippers"
+          },
+          {
+            "url": "https://static.falke.com/pdmain/1284526-62d866824581a.jpg",
+            "cleaned_url": "https://cdn.trychannel3.com/56fb996c-0f08-45ae-a217-439f4e990809?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=ZMv9",
+            "is_main_image": false,
+            "shot_type": "angle_view",
+            "alt_text": "Side views of slippers separated"
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Virgin wool",
+          "Polyamide"
+        ],
+        "key_features": [
+          "House slippers made of warm merino wool",
+          "With printed nubs on the sole for improved grip",
+          "Soft and comfortable thanks to inner plush layer",
+          "Can be washed in the washing machine",
+          "FALKE Perfect Fit",
+          "Please note: This product tends to be one size smaller"
+        ],
+        "colors": [
+          {
+            "hex": "#a9a3a0",
+            "percentage": 0.4396
+          },
+          {
+            "hex": "#282626",
+            "percentage": 0.3845
+          },
+          {
+            "hex": "#cac4bf",
+            "percentage": 0.0992
+          },
+          {
+            "hex": "#77706d",
+            "percentage": 0.0767
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/5r8Wt8B-ZMv9-bQpm8C?o=01KK9AQ7JGA58HZY3WDE04HHAZ&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "falke.com",
+            "price": {
+              "price": 70,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": {
+          "options": [
+            {
+              "name": "Color",
+              "values": [
+                {
+                  "label": "anthra mel.",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/59277160-800f-4283-9b75-b919f67f3f8c",
+                  "product_id": "5r8Wt8B"
+                },
+                {
+                  "label": "light grey",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/f4c07b10-f81b-4421-9994-3dda23e9a818",
+                  "product_id": "5jvwLee"
+                },
+                {
+                  "label": "light grey mel.",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/a54159e7-e47e-4b9b-8d60-00eaeebd9767",
+                  "product_id": "g7bvrCl"
+                },
+                {
+                  "label": "venice night",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/91aec7e0-1d22-4f81-bfae-6d1ae17897c1",
+                  "product_id": "53w3Iv8"
+                },
+                {
+                  "label": "marine mel.",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/585d9811-121c-4d14-be05-7d56d763be5f",
+                  "product_id": "konQeJr"
+                },
+                {
+                  "label": "peppermint",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/6787402d-e944-4ea2-95a8-960f5abaae6d",
+                  "product_id": "2OEnVvq"
+                },
+                {
+                  "label": "almond blossom",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/17513051-5e73-4752-b16f-77266a324cbc",
+                  "product_id": "3VP0vgV"
+                },
+                {
+                  "label": "ruby mel.",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/171fec40-0bf8-4983-bba2-27bb31526def",
+                  "product_id": "51KpHN6"
+                },
+                {
+                  "label": "wineberry",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/33bf6db6-39b9-4952-b89a-c931152dfcae",
+                  "product_id": "PEGhvQW"
+                },
+                {
+                  "label": "royal plum",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/9f9e9380-a7a5-4292-a30b-c37a1b360bb8",
+                  "product_id": "0KZqwta"
+                },
+                {
+                  "label": "phlox",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/385c4e32-0b91-4761-8f9e-2879918c1b90",
+                  "product_id": "SzpkBDA"
+                },
+                {
+                  "label": "nut mel.",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/ccacf2ba-a6a9-415b-af37-6320083d8871",
+                  "product_id": "DiuPchJ"
+                }
+              ]
+            },
+            {
+              "name": "Size",
+              "values": [
+                {
+                  "label": "6.5-7.5",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "8-9",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "9.5-10.5",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                }
+              ]
+            }
+          ],
+          "selected": [
+            {
+              "name": "Color",
+              "label": "anthra mel."
+            }
+          ]
+        },
+        "structured_attributes": {
+          "ankle-collar-style": [
+            "Low cut"
+          ],
+          "slipper-style": [
+            "Mule"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ],
+          "shoe-features": [
+            "Cushioned"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "footwear-cut": [
+            "Low cut"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "activity": [
+            "Universal"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "pattern": [
+            "Color-block"
+          ],
+          "outsole-material": [
+            "Synthetic"
+          ],
+          "footwear-material": [
+            "Wool",
+            "Polyester"
+          ],
+          "lining-material": [
+            "Synthetic"
+          ],
+          "shoe-collar-height": [
+            "Low-top"
+          ],
+          "upper-material": [
+            "Synthetic"
+          ],
+          "care-instructions": [
+            "Machine washable"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "HixMcfg",
+        "title": "Women's Rebecca Chenille Closed Back Slipper",
+        "description": "These women's Dearfoams Rebecca slippers feature a luxuriously soft chenille upper and a quilted, plush microfiber velour inner for maximum comfort. Designed with a memory foam-padded footbed and a non-skid thermoplastic rubber outsole, they provide support and stability for indoor and outdoor use. The sleek, low-profile closed back design conforms to the foot, and the slippers are machine washable for easy care.",
+        "brands": [
+          {
+            "id": "sO6v",
+            "name": "DearFoams"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/8da720f4-836d-4756-94c2-82a64fadd9e3?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/71f6e2df-1cdd-4df5-a1a9-03fbddf80c65?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Grey chenille closed back slipper shown from a side angle."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/39feb528-a7c4-465c-8ab1-75d2fefd5983?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/39feb528-a7c4-465c-8ab1-75d2fefd5983?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Grey chenille closed back slipper shown from a side angle."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b240a415-047e-4d7f-8218-c41eec8eabbc?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/b240a415-047e-4d7f-8218-c41eec8eabbc?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "angle_view",
+            "alt_text": "Grey chenille closed back slipper viewed from the side."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/38678474-ce20-4858-a24b-2dceb3ff83e4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/38678474-ce20-4858-a24b-2dceb3ff83e4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up detail of the textured chenille upper of a grey slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/91bddff5-e14f-4f18-8d96-4516e9333285?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/91bddff5-e14f-4f18-8d96-4516e9333285?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "View of the interior lining and insole of a grey slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/03109706-de09-4f76-b0b6-d215fa81c8c1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/03109706-de09-4f76-b0b6-d215fa81c8c1?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Interior view of the slipper showing the insole and brand tag."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8800e1f8-81cd-4ffd-81e1-0ab40875e9dd?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/8800e1f8-81cd-4ffd-81e1-0ab40875e9dd?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "scale_reference",
+            "alt_text": "Bottom sole of the grey chenille slipper showing the tread."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cfca1afc-6556-48c9-8d64-fc6dda3103c4?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "A grey chenille slipper and its matching sole laid out."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "chenille knit upper",
+          "memory foam insole",
+          "velour lining",
+          "outsole"
+        ],
+        "key_features": [
+          "Luxe chenille upper",
+          "Quilted, plush microfiber velour inner",
+          "Memory foam-padded footbed",
+          "Indoor/outdoor non-skid outsole",
+          "Machine washable",
+          "Slip-on style",
+          "Round toe",
+          "TEMPERATURE REGULATING: DF Adapt technology",
+          "Chenille knit upper with Dearfoams embroidery",
+          "Cozy quilted velour footbed"
+        ],
+        "colors": [
+          {
+            "hex": "#b2b2b7",
+            "percentage": 0.5233
+          },
+          {
+            "hex": "#97969b",
+            "percentage": 0.4132
+          },
+          {
+            "hex": "#636364",
+            "percentage": 0.0636
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/HixMcfg-Z87s-bQpm8C?o=01M1MGGS2VAS0CB8259J8CWAWP&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "kohls.com",
+            "price": {
+              "price": 22.2,
+              "compare_at_price": 37,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/HixMcfg-kzAJ-bQpm8C?o=01KYMB4T4Y8WG2FD8GGH7NNCYX&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "dearfoams.com",
+            "price": {
+              "price": 27,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.084,
+            "dimensions": null
+          }
+        ],
+        "variants": {
+          "options": [
+            {
+              "name": "Color",
+              "values": [
+                {
+                  "label": "Black",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/d208938c-f28c-488f-8b89-6464896db552",
+                  "product_id": "82vSmt1"
+                },
+                {
+                  "label": "Fresh Pink",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/e04828b8-31e8-4e6b-b509-94d1c64e58cc",
+                  "product_id": "Yt4ewKk"
+                },
+                {
+                  "label": "Peacoat",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/b41f1bf8-1531-4ba9-91ef-292ee504e468",
+                  "product_id": "3NDpWWY"
+                },
+                {
+                  "label": "Sleet",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/8da720f4-836d-4756-94c2-82a64fadd9e3",
+                  "product_id": "HixMcfg"
+                }
+              ]
+            },
+            {
+              "name": "Size",
+              "values": [
+                {
+                  "label": "S",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "M",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "L",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "XL",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "XXL",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                }
+              ]
+            },
+            {
+              "name": "Width",
+              "values": [
+                {
+                  "label": "Medium",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                },
+                {
+                  "label": "Wide",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": null,
+                  "product_id": null
+                }
+              ]
+            }
+          ],
+          "selected": [
+            {
+              "name": "Color",
+              "label": "Sleet"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "outsole-material": [
+            "Rubber",
+            "Thermoplastic rubber (TPR)"
+          ],
+          "lining-material": [
+            "Microfiber",
+            "Polyester"
+          ],
+          "footwear-material": [
+            "Leather",
+            "Polyester"
+          ],
+          "upper-material": [
+            "Leather",
+            "Synthetic"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "insole-material": [
+            "Memory foam"
+          ],
+          "shoe-features": [
+            "Breathable design",
+            "Lightweight",
+            "Cushioned",
+            "Slip resistant"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "flat-shoe-style": [
+            "Ballet"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "slipper-style": [
+            "Ballerina"
+          ],
+          "activity": [
+            "Walking"
+          ],
+          "care-instructions": [
+            "Machine washable"
+          ]
+        },
+        "ratings": {
+          "value": 4.2,
+          "count": 952,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "0bEWtC5",
+        "title": "Step Flowllow faux-fur trim slippers",
+        "description": "These Clarks Originals Step Flowllow slippers are designed for comfort and warmth, featuring a dark grey fabric exterior and a cozy white faux-fur trim lining. The slip-on style is completed with a flat rubber sole and a textured tread for better grip, making them ideal for indoor wear.",
+        "brands": [
+          {
+            "id": "cQMH",
+            "name": "Clarks"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d74b377e-00f2-4dd9-9a28-410e21ab3b47?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d74b377e-00f2-4dd9-9a28-410e21ab3b47?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Side view of a dark grey faux-fur trim slipper."
+          },
+          {
+            "url": "https://cdn-images.farfetch-contents.com/31/84/99/89/31849989_62513833_1000.jpg",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Side view of a dark grey faux-fur trim slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2618c078-b452-4957-a0af-6cc53544cc84?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/2618c078-b452-4957-a0af-6cc53544cc84?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Side view of a dark grey faux-fur trim slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/592aec64-368b-4f73-8dc4-0b17914db41f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/592aec64-368b-4f73-8dc4-0b17914db41f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Slipper showing interior and fur trim from the top."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/0c589dd3-232d-4f65-9526-18d00729a771?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/0c589dd3-232d-4f65-9526-18d00729a771?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Bottom view of the black rubber sole of the slipper."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Fabric",
+          "Artificial Fur",
+          "Rubber"
+        ],
+        "key_features": [
+          "Faux-fur trim",
+          "Slip-on style",
+          "Flat sole",
+          "Textured tread",
+          "Round toe"
+        ],
+        "colors": [
+          {
+            "hex": "#43403e",
+            "percentage": 0.5282
+          },
+          {
+            "hex": "#5d5a57",
+            "percentage": 0.1337
+          },
+          {
+            "hex": "#dcd8d1",
+            "percentage": 0.1242
+          },
+          {
+            "hex": "#7f7c79",
+            "percentage": 0.1165
+          },
+          {
+            "hex": "#262423",
+            "percentage": 0.0974
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/0bEWtC5-NuBr-bQpm8C?o=01M35KT5Z2F6RZTQMN4AAH36B0&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "farfetch.com",
+            "price": {
+              "price": 57,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "occasion-style": [
+            "Casual"
+          ],
+          "lining-material": [
+            "Faux fur"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "slipper-style": [
+            "Scuff"
+          ],
+          "outsole-material": [
+            "Rubber"
+          ],
+          "footwear-material": [
+            "Textile"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "uGKPcF8",
+        "title": "Amanda Chunky Sweater Knit Hoodback Women's Slippers",
+        "description": "These women's hoodback slippers by isotoner feature a chunky sweater-knit construction and a plush sherpaSoft trim for superior softness and warmth. Designed for comfort, they include a microterry lining, a round toe, and a thermoplastic rubber outsole suitable for indoor and outdoor use. These slippers are machine washable for easy care.",
+        "brands": [
+          {
+            "id": "MJ4E",
+            "name": "Isotoner"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/92cde49e-05b2-43bd-bf78-08545175e11e?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/92cde49e-05b2-43bd-bf78-08545175e11e?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Isotoner chunky knit slipper on a plain white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cffb70fb-9517-46c2-bd4a-cb5cb36881d8?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Isotoner chunky knit slipper on a plain white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9597b6fc-ffe1-473e-a855-de5598f09c60?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "on_model",
+            "alt_text": "Woman wearing fuzzy knit slippers on wooden floor."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/395d782e-8a35-4013-9ea6-671ffc828c4c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/395d782e-8a35-4013-9ea6-671ffc828c4c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "on_model",
+            "alt_text": "Woman wearing fuzzy knit slippers on white fur rug."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/665eea81-0d68-4c89-ab4b-b10ce43dc78c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/665eea81-0d68-4c89-ab4b-b10ce43dc78c?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up of the black sole texture on the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/216a46d4-c374-45a6-af4f-ca3f35978788?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/216a46d4-c374-45a6-af4f-ca3f35978788?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Interior view of the fuzzy lining of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b55d5559-1125-4000-b986-5ef93be43613?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/b55d5559-1125-4000-b986-5ef93be43613?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Close-up of the interior lining and knit upper of the slipper."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/5f3de946-9028-4e34-b33b-cdbcc0e4f73f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/5f3de946-9028-4e34-b33b-cdbcc0e4f73f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "on_model",
+            "alt_text": "Pair of colorful knit slippers on feet on a white rug."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/6815740e-d505-4a02-af82-dae62981c633?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Diagram showing heel cushion and footbed materials."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/92fe1f63-3d88-4c41-8b96-bcf2cde9658a?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=Z87s",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing machine washable feature."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Thermoplastic rubber",
+          "Microterry"
+        ],
+        "key_features": [
+          "SherpaSoft cuff for superior softness and warmth",
+          "Chunky knit upper",
+          "Microterry lining",
+          "Thermoplastic rubber outsole",
+          "Machine wash",
+          "Round toe",
+          "Slip on"
+        ],
+        "colors": [
+          {
+            "hex": "#2c2729",
+            "percentage": 0.259
+          },
+          {
+            "hex": "#d5d3d0",
+            "percentage": 0.2469
+          },
+          {
+            "hex": "#aeabab",
+            "percentage": 0.1385
+          },
+          {
+            "hex": "#6d6869",
+            "percentage": 0.1211
+          },
+          {
+            "hex": "#928e8f",
+            "percentage": 0.1205
+          },
+          {
+            "hex": "#494345",
+            "percentage": 0.114
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/uGKPcF8-Z87s-bQpm8C?o=01M36APENPVH6FVYGGBPZASM72&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "kohls.com",
+            "price": {
+              "price": 24,
+              "compare_at_price": 30,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "occasion-style": [
+            "Casual"
+          ],
+          "care-instructions": [
+            "Machine washable"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "pattern": [
+            "Texture"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "outsole-material": [
+            "Thermoplastic rubber (TPR)"
+          ],
+          "slipper-style": [
+            "Clog"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "q8MOK7s",
+        "title": "slippers",
+        "description": "Cozy and comfortable VINTERFINT slippers featuring a soft, fuzzy exterior and cushioned soles for added comfort. Designed for easy slip-on use, these slippers provide a steady grip and stability, making them an ideal choice for indoor relaxation and pampering during the winter season.",
+        "brands": [
+          {
+            "id": "Pu7O",
+            "name": "Ikea"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/4be55da3-df47-454e-b7cc-1fa7ae10e9e7?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=FwdJ",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/4be55da3-df47-454e-b7cc-1fa7ae10e9e7?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=FwdJ",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "A pair of black, fuzzy mules viewed from above on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/19decfbe-6019-4c58-a753-8e647529bd8f?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Black fuzzy mule sole and upper shown on a white background."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "Synthetic rubber",
+          "polyester",
+          "Polyurethane foam"
+        ],
+        "key_features": [
+          "Easy to put on and take off",
+          "Rugged soles for good grip",
+          "Soles filled with soft foam for comfort"
+        ],
+        "colors": [
+          {
+            "hex": "#282629",
+            "percentage": 0.4832
+          },
+          {
+            "hex": "#444245",
+            "percentage": 0.4592
+          },
+          {
+            "hex": "#6d6b6c",
+            "percentage": 0.0575
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/q8MOK7s-FwdJ-bQpm8C?o=01M1GXVS0D4R3FF5F1K946FFJ4&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "ikea.com",
+            "price": {
+              "price": 9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "pattern": [
+            "Solid"
+          ],
+          "shoe-features": [
+            "Cushioned"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "slipper-style": [
+            "Mule"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ],
+          "outsole-material": [
+            "Rubber"
+          ],
+          "activity": [
+            "Walking"
+          ],
+          "care-instructions": [
+            "Hand wash"
+          ],
+          "footwear-material": [
+            "Polyester"
+          ],
+          "lining-material": [
+            "Polyester"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "insole-material": [
+            "Memory foam"
+          ],
+          "upper-material": [
+            "Synthetic"
+          ]
+        },
+        "ratings": {
+          "value": 4.4,
+          "count": 7,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "0xuhcAL",
+        "title": "Step Flowllow faux-fur trim slippers",
+        "description": "These are comfortable women's slip-on slippers by Clarks Originals, featuring a soft felt or fabric upper accented with a white or light-colored faux-fur trim around the opening. They have a durable, dark-colored rubber sole with textured tread for grip, and a rounded toe. The main body of the slipper appears dark gray or charcoal.",
+        "brands": [
+          {
+            "id": "37Fp",
+            "name": "Max Clark"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/75186a58-52c3-429f-90d6-8139dad1150b?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/75186a58-52c3-429f-90d6-8139dad1150b?aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY&mid=NuBr",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black slipper with white faux fur trim, side view."
+          }
+        ],
+        "category": {
+          "slug": "slippers",
+          "title": "Slippers",
+          "path": [
+            {
+              "slug": "apparel-accessories",
+              "title": "Apparel & Accessories"
+            },
+            {
+              "slug": "shoes",
+              "title": "Shoes"
+            },
+            {
+              "slug": "slippers",
+              "title": "Slippers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": "female",
+        "age": "adult",
+        "materials": [
+          "Fabric",
+          "Artificial Fur",
+          "Rubber"
+        ],
+        "key_features": [
+          "faux-fur trim",
+          "slip-on style",
+          "flat sole",
+          "textured tread",
+          "round toe"
+        ],
+        "colors": [
+          {
+            "hex": "#282425",
+            "percentage": 0.3703
+          },
+          {
+            "hex": "#605e5e",
+            "percentage": 0.2934
+          },
+          {
+            "hex": "#e0d7d0",
+            "percentage": 0.1847
+          },
+          {
+            "hex": "#474444",
+            "percentage": 0.1195
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/0xuhcAL-NuBr-bQpm8C?o=01KBS919DXSSA5WJ2MMRJ4HHNY&aid=01M6D3ZVHAK2JNDV9JX2ZHKNMY",
+            "domain": "farfetch.com",
+            "price": {
+              "price": 57,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "footwear-material": [
+            "Textile"
+          ],
+          "occasion-style": [
+            "Casual"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "toe-style": [
+            "Round"
+          ],
+          "closure-type": [
+            "Slip-on"
+          ],
+          "slipper-style": [
+            "Scuff"
+          ],
+          "lining-material": [
+            "Faux fur"
+          ],
+          "outsole-material": [
+            "Rubber"
+          ],
+          "heel-height-type": [
+            "Flat"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOjM1NDg1NGMyYTA3YTc5MWQiLCAib2Zmc2V0IjogMTB9"
+  }
+}

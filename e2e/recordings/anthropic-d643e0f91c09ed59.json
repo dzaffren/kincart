@@ -1,0 +1,64 @@
+{
+  "request": {
+    "model": "claude-haiku-5-5",
+    "max_tokens": 2000,
+    "system": "You help an older person shop. Their last shop search for a product didn't give them one they could use: it found nothing that fits, or their helper said no to what it found. Write one new short shop search query for the same product in other words, such as another common name for it, or plainer and broader words. Never repeat the last query. Keep the sizes, colours, codes and other must-haves they gave.",
+    "messages": [
+      {
+        "role": "user",
+        "content": "They want: \"warm slippers that are easy to put on, size 8\"\nThe last query: \"warm slippers easy to put on size 8\""
+      }
+    ],
+    "output_config": {
+      "effort": "low",
+      "format": {
+        "type": "json_schema",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "reply": {
+    "model": "claude-haiku-5-5",
+    "id": "msg_011CgdNbCxTH6Ugg8kyEd4ud",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"query\": \"comfortable indoor slip-on house shoes size 8 women warm lined\"}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 348,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 33,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  }
+}

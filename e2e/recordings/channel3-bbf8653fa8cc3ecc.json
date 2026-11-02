@@ -1,0 +1,1320 @@
+{
+  "request": {
+    "query": "night light",
+    "limit": 10
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "RJIAQYN",
+        "title": "Manual LED Night Light",
+        "description": "The GE Manual LED Night Light is a functional and straightforward lighting solution designed for rooms that require a gentle glow after dark. It features a manual on/off switch for direct user control, ensuring the light operates only when needed. Utilizing energy-efficient LED technology, it consumes significantly less power than traditional incandescent bulbs, reducing electricity costs. The long-lasting LED design minimizes the need for frequent replacements, providing dependable illumination without complex sensors or programming, making it a practical choice for any room.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d1dae367-58d7-481e-82b7-d8e3f636c9f3?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d1dae367-58d7-481e-82b7-d8e3f636c9f3?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for a GE Manual LED Night Light with a clear plastic blister."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Manual On/Off Switch: Gives you direct control over when the night light operates",
+          "Energy-Saving LED: Draws less power than traditional incandescent night light options",
+          "Long-Lasting LED: Provides extended service life with minimal need for replacement",
+          "Easy Operation: Simple switch requires no automatic sensors or complex programming",
+          "Versatile Use: Works well in any room where a bit of extra light is needed"
+        ],
+        "colors": [
+          {
+            "hex": "#fffffe",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/RJIAQYN-cZlC-bQpm8C?o=01M3XAKVPCED8MPZ4QM99YTW01&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 4.29,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "switch-control-type": [
+            "Button"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "bulb-type": [
+            "LED"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "059Myn7",
+        "title": "Designer LED Photocell Night Light",
+        "description": "The Stanley Designer LED Photocell Night Light is an energy-efficient plug-in light designed for automated operation. It features a built-in photocell sensor that detects ambient light levels, automatically turning the light on at nightfall and off at daylight. With a styled, decorative profile and a compact 1.6 oz body, it provides a consistent low-level white glow ideal for hallways, bathrooms, bedrooms, and staircases.",
+        "brands": [
+          {
+            "id": "ZcPs",
+            "name": "Stanley"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d851faa9-e735-4d20-a671-38bd12315c1a?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d851faa9-e735-4d20-a671-38bd12315c1a?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Front view of a white Stanley LED photocell night light on a plain white background."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Dusk-to-Dawn Activation: Sensor engages the light at nightfall and disengages it at daylight",
+          "Energy-Saving LED: Photocell bulb consumes less power than traditional incandescent alternatives",
+          "Designer Shape: Styled profile adds a decorative accent to any wall outlet",
+          "Compact 1.6 oz Body: Lightweight build keeps a low, unobtrusive profile at the outlet",
+          "60Hz Electrical Rating: Compatible with standard residential wiring throughout North America"
+        ],
+        "colors": [
+          {
+            "hex": "#a7b5bd",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/059Myn7-cZlC-bQpm8C?o=01M3NNEMWHZ7RDFKCEXZ5V6RAK&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 5.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 1.6,
+                "unit": "oz"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "brightness-levels": [
+            "Low"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "light-temperature": [
+            "Cool white"
+          ],
+          "suitable-location": [
+            "Corridor",
+            "Bathroom",
+            "Bedroom"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "o0jH506",
+        "title": "GE Automatic LED Night Light",
+        "description": "The GE Automatic LED Night Light is an energy-efficient lighting solution designed for convenience and safety. Featuring a built-in light sensor, it automatically activates in darkness and shuts off during daylight hours. Its long-lasting LED design minimizes electricity costs and the need for frequent bulb replacements, while the durable construction ensures dependable nightly performance.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/386f2661-ce91-41b7-9f97-11175c9c6415?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/386f2661-ce91-41b7-9f97-11175c9c6415?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Cardboard packaging for a GE Automatic LED Night Light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Light Sensing Technology: Detects changes in ambient light and activates automatically",
+          "Quick Response: Activates within seconds of detecting surrounding darkness",
+          "Energy-Efficient LED: Helps lower electricity costs with minimal power draw",
+          "Long Life LED: Built to reduce the frequency of bulb replacements",
+          "Automatic Shutoff: Deactivates during daylight hours to conserve additional energy",
+          "Durable Construction: GE-engineered for dependable, long-term nightly use"
+        ],
+        "colors": [
+          {
+            "hex": "#5b75a1",
+            "percentage": 0.6112
+          },
+          {
+            "hex": "#899ab9",
+            "percentage": 0.3076
+          },
+          {
+            "hex": "#a5b3cc",
+            "percentage": 0.0812
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/o0jH506-cZlC-bQpm8C?o=01M4A3V7WBB5GHDGW9DE6PWVQC&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 4.29,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "suitable-location": [
+            "Bathroom"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "lBA66UZ",
+        "title": "Plug In Night Light",
+        "description": "The BON CHARGE Plug In Night Light is a sleep-friendly lighting solution designed to minimize sleep disruption. It emits a pure red light with a peak wavelength of 630nm, effectively blocking 100% of violet, blue, and green light to protect your circadian rhythm. This compact device features three lighting modes: constant illumination, motion activation (which turns off after 15 seconds of inactivity), and off. It also includes adjustable brightness settings, making it ideal for hallways, bathrooms, or bedrooms for adults and children.",
+        "brands": [
+          {
+            "id": "ewty",
+            "name": "BON CHARGE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/499c92f3-3391-4328-bef9-58933f295b27?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": "https://cdn.trychannel3.com/c8f4aa20-d133-444e-a18b-b49119df5be7?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White plug-in night light with red panel and silver button."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/fd5b6500-73a5-4ec7-9025-7e8c117fece4?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/fd5b6500-73a5-4ec7-9025-7e8c117fece4?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "White plug-in night light at an angle with red panel and button."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/167c1eea-d6b2-4f88-8e7f-ca52e254ab11?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Plug-in night light plugged into a wall with red light glowing."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/830c6a3f-cbac-49da-b0a3-48a4e16bc93c?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Plug-in night light plugged into a power strip."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/43c3c9d6-5acc-4d34-81b4-88c6b6dc37dc?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "White plug-in night light with white light panel."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/1314a404-31ae-42ca-9a5b-4fac8755e5a8?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "White plug-in night light shown from an angled perspective."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/3a143f5a-8bd7-4688-a906-5ddf7992bf6b?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Back view of plug-in night light showing power controls."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/fb672f01-89a2-441f-99df-623962e02922?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Specification label on a white plug-in night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/df2bb8a7-b412-40b1-a1d5-48988d5a8e46?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Plug-in night light with red light resting on a power strip."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/812686d6-a86d-4714-a366-eba6587e2d6c?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=2yh8",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing light output percentage vs wavelength."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "ABS"
+        ],
+        "key_features": [
+          "Pure red light (peak 630nm) to avoid sleep disruption",
+          "Blocks 100% of violet, blue, and green light",
+          "Three modes: Constant, Motion Activated, and Off",
+          "Adjustable brightness settings",
+          "Compact plug-in design for continuous power",
+          "Built-in motion sensor for hands-free illumination"
+        ],
+        "colors": [
+          {
+            "hex": "#fe352e",
+            "percentage": 0.7344
+          },
+          {
+            "hex": "#fc5637",
+            "percentage": 0.1716
+          },
+          {
+            "hex": "#d9a597",
+            "percentage": 0.094
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/lBA66UZ-2yh8-bQpm8C?o=01M0J76JZ7BS1ASCKAM9VMS647&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "uk.boncharge.com",
+            "price": {
+              "price": 34.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 6.9,
+                "unit": "cm"
+              },
+              "width": {
+                "number": 4.5,
+                "unit": "cm"
+              },
+              "height": {
+                "number": 7.8,
+                "unit": "cm"
+              },
+              "weight": {
+                "number": 78,
+                "unit": "g"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "lighting-features": [
+            "Adjustable brightness",
+            "Dimmable",
+            "Waterproof"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "plug-type": [
+            "UK",
+            "US",
+            "EU",
+            "AU"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "suitable-location": [
+            "Bathroom",
+            "Bedroom"
+          ],
+          "switch-control-type": [
+            "Button"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "PhnhiXT",
+        "title": "Everybody Night Light",
+        "description": "The Everybody Night Light by Dusen Dusen is a playful, sun-shaped plug-in light featuring a pale blue face with a red scalloped trim. Designed for both kids and adults, it incorporates a light sensor that automatically illuminates the space after dark and turns off when light returns, making it ideal for bedrooms, bathrooms, hallways, or parties.",
+        "brands": [
+          {
+            "id": "mIt5",
+            "name": "Dusen Dusen"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/72c11a3f-7e11-459b-ad31-031c046380b0?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Blue and red star-shaped night light object on white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b6f62fab-a9fd-4c93-b9f8-059f1ea9f290?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Blue star night light mounted on a white base, illuminated."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/a2716df4-7673-467c-b511-2b6ac9668ba9?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Star night light mounted on a wall in a room setting."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/5fb6c61f-952f-4a9b-8ad4-d27f556250e5?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Four star night lights in blue, purple, yellow, and green."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "ABS",
+          "LED light"
+        ],
+        "key_features": [
+          "Automatic light sensor (turns on in dark, off in light)",
+          "Plug-in design",
+          "Sun-face shape"
+        ],
+        "colors": [
+          {
+            "hex": "#91b4d0",
+            "percentage": 0.6198
+          },
+          {
+            "hex": "#d52829",
+            "percentage": 0.1337
+          },
+          {
+            "hex": "#d75153",
+            "percentage": 0.1192
+          },
+          {
+            "hex": "#b694a1",
+            "percentage": 0.0768
+          },
+          {
+            "hex": "#bfc6d1",
+            "percentage": 0.0505
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/PhnhiXT-NrWH-bQpm8C?o=01M3JF1XTF1WW0MHB4Q4M3MDW3&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "areaware.com",
+            "price": {
+              "price": 35,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 3.4,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3.4,
+                "unit": "in"
+              },
+              "height": {
+                "number": 2.1,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 454,
+                "unit": "g"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "lighting-features": [
+            "LED lighting"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "light-temperature": [
+            "Cool white"
+          ],
+          "suitable-location": [
+            "Bedroom",
+            "Bathroom",
+            "Kitchen",
+            "Hallway"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "WEpxG4P",
+        "title": "Night Light",
+        "description": "Illuminate your home with a gentle, comforting glow using the GE 4W Night Light bulbs. These soft white light bulbs are designed for use in hallways, bedrooms, and children's rooms to provide guided lighting without disturbing sleep. Each bulb features a candelabra base for a secure fit in standard night light fixtures and offers a long-lasting lifespan of up to 2000 hours.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/0832d219-7982-461e-ab4b-c7cf437fdeba?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=AYbp",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for 4w Night Light White 4 Ct."
+          }
+        ],
+        "category": {
+          "slug": "incandescent-light-bulbs",
+          "title": "Incandescent Light Bulbs",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "light-bulbs",
+              "title": "Light Bulbs"
+            },
+            {
+              "slug": "incandescent-light-bulbs",
+              "title": "Incandescent Light Bulbs"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Includes 4 night light bulbs",
+          "Each bulb provides 4 watts of soft, white light",
+          "Candelabra base for secure fit in standard night light fixtures",
+          "Long-lasting with up to 2000 hours of use"
+        ],
+        "colors": [
+          {
+            "hex": "#bdc5d5",
+            "percentage": 0.7769
+          },
+          {
+            "hex": "#8fafcd",
+            "percentage": 0.1246
+          },
+          {
+            "hex": "#6490b5",
+            "percentage": 0.0986
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/WEpxG4P-AYbp-bQpm8C?o=01M1F3EV71HXFGDBQXYHWFSDTH&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "dollargeneral.com",
+            "price": {
+              "price": 3.5,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "lighting-features": [
+            "Energy efficient"
+          ],
+          "light-temperature": [
+            "Warm white"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "qdbopu2",
+        "title": "Everybody Night Light",
+        "description": "This charming sun-shaped night light from Dusen Dusen features a friendly green face with a warm yellow border. Designed to brighten up nurseries, bedrooms, or hallways, it includes a built-in sensor that automatically turns the light on in the dark and off in the light. It plugs into any standard North American outlet to provide a gentle, comforting glow.",
+        "brands": [
+          {
+            "id": "mIt5",
+            "name": "Dusen Dusen"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/ad141d9a-5932-46b9-8216-6bc0689e32c7?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Three-quarter view of a green and yellow sun-shaped night light on a plain background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/33ee4963-395a-467a-a8a1-5ddc2db9a42a?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Front view of a green sun-shaped night light plugged into a wall outlet and illuminated."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/13306e7e-4078-4f75-802d-be0e75432f7d?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=NrWH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Group shot of three sun-shaped night lights in different color combinations on a plain background."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "ABS",
+          "LED light"
+        ],
+        "key_features": [
+          "Light sensor for automatic on/off functionality",
+          "Plugs into any standard outlet",
+          "Friendly sun-face design"
+        ],
+        "colors": [
+          {
+            "hex": "#299c60",
+            "percentage": 0.6288
+          },
+          {
+            "hex": "#e9bf4b",
+            "percentage": 0.1998
+          },
+          {
+            "hex": "#f4d880",
+            "percentage": 0.1547
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/qdbopu2-NrWH-bQpm8C?o=01M3QEBWKRW64ANAA5MJS7VNMP&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "areaware.com",
+            "price": {
+              "price": 35,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 3.4,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3.4,
+                "unit": "in"
+              },
+              "height": {
+                "number": 2.1,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 454,
+                "unit": "g"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ],
+          "suitable-location": [
+            "Bedroom",
+            "Bathroom",
+            "Kitchen",
+            "Hallway"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "lighting-features": [
+            "LED lighting"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "a5i2rri",
+        "title": "Night Light",
+        "description": "These sleek, white night lights provide soft, motion-activated illumination perfect for safely navigating dark spaces. Powered by a rechargeable USB-C battery that lasts for months on a single charge, they feature built-in motion and light sensors for automatic activation. Installation is simple with peel-and-stick mounting, allowing you to place them anywhere without needing a power outlet. Additionally, up to 10 units can be linked together for synchronized, directional lighting across longer areas. Note that this item is on final sale and is not eligible for exchange or return.",
+        "brands": [
+          {
+            "id": "fp7v",
+            "name": "Wyze"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/9f4ab99b-3446-457f-ba42-0a4823b392c9?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Three Wyze Night Lights shown individually, highlighting their shape and light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/95b707d8-5df8-4ed3-8ffd-c7ce9a945726?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": "https://cdn.trychannel3.com/3ff6d006-d05a-49e8-b99e-5af8e9feefa5?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Wyze Night Light mounted on a wall with a warm light glow."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/e811447f-2226-4da0-af6d-c93021443918?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Multiple Wyze Night Lights linked on a staircase providing directional lighting."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/e9b299aa-fc1a-40c0-917b-c9158ad4708e?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": "https://cdn.trychannel3.com/81b33194-6b33-49b5-8a32-da3d2d978556?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Wyze Night Light illuminating a room surface with soft, warm light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2520d5ba-826b-4f05-b22e-1e62b45173b8?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": "https://cdn.trychannel3.com/41aae7ec-47bd-4d48-9e46-4f1198360242?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Wyze Night Light activated by motion sensor above a bathroom sink."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/86dd4773-c8a2-48aa-82c9-fde18f3de94f?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": "https://cdn.trychannel3.com/5a8bcde7-3f67-487d-bcf2-70eec3c3677b?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Wyze Night Light installed on a dark wall next to books and a plant."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/d9b8a9af-d760-4efd-a86f-c58b7ba03890?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "cleaned_url": "https://cdn.trychannel3.com/59e98a6c-9b56-4450-9d75-b3d23256bf8b?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=iFo7",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Wyze Night Light with its battery and charging cord for power."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [],
+        "key_features": [
+          "Motion and light sensors for automatic activation",
+          "USB-C rechargeable battery with up to 3-months battery life (solo use)",
+          "Conveniently link up to 10 units for directional lighting",
+          "Peel-and-stick mounting for easy installation",
+          "Soft, warm 2500K light output",
+          "Does not require Wi-Fi or app integration"
+        ],
+        "colors": [
+          {
+            "hex": "#ada499",
+            "percentage": 0.9464
+          },
+          {
+            "hex": "#928471",
+            "percentage": 0.0536
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/a5i2rri-iFo7-bQpm8C?o=01KBPBH03GHRVHGDGH03MXVW3J&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "wyze.com",
+            "price": {
+              "price": 39.98,
+              "compare_at_price": 49.98,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "light-temperature": [
+            "Warm white"
+          ],
+          "suitable-location": [
+            "Bedroom",
+            "Corridor",
+            "Hallway",
+            "Toilet"
+          ],
+          "power-source": [
+            "Battery-powered",
+            "Rechargeable",
+            "USB"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "POPCQIE",
+        "title": "Led Night Light",
+        "description": "A whimsical LED night light designed to look like a floral arrangement in a vase. It features color-changing illumination and a built-in light control sensor that automatically turns the light on in the dark and off when it is bright.",
+        "brands": [
+          {
+            "id": "NRaL",
+            "name": "Natural Life"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/3b23d48a-6756-4e5e-88c4-08d00fabd027?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=jgjV",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/3b23d48a-6756-4e5e-88c4-08d00fabd027?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=jgjV",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Floral arrangement with pink and purple flowers illuminated by a green light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cce7d09f-726c-486d-a853-08d14a846f65?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=jgjV",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/cce7d09f-726c-486d-a853-08d14a846f65?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=jgjV",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Floral arrangement with colorful artificial flowers illuminated by a white light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Plastic",
+          "metal"
+        ],
+        "key_features": [
+          "LED color changing lightbulb included",
+          "Built-in light control sensor (automatic on/off)"
+        ],
+        "colors": [
+          {
+            "hex": "#13fc54",
+            "percentage": 0.2982
+          },
+          {
+            "hex": "#86fbd1",
+            "percentage": 0.1531
+          },
+          {
+            "hex": "#3cc83f",
+            "percentage": 0.1507
+          },
+          {
+            "hex": "#6a4bb1",
+            "percentage": 0.1119
+          },
+          {
+            "hex": "#7e7b9f",
+            "percentage": 0.1045
+          },
+          {
+            "hex": "#4dfc84",
+            "percentage": 0.1031
+          },
+          {
+            "hex": "#8dada5",
+            "percentage": 0.0784
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/POPCQIE-jgjV-bQpm8C?o=01M2JR492E70THWP5SBQF3DHQS&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "naturallife.com",
+            "price": {
+              "price": 9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 2.5,
+                "unit": "in"
+              },
+              "width": null,
+              "height": {
+                "number": 7,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": {
+          "options": [],
+          "selected": [
+            {
+              "name": "Style",
+              "label": "Floral Multi"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Tabletop"
+          ],
+          "lighting-features": [
+            "LED lighting"
+          ],
+          "material": [
+            "Plastic",
+            "Metal"
+          ],
+          "suitable-location": [
+            "Bedroom"
+          ],
+          "pattern": [
+            "Floral"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "0K45RvA",
+        "title": "Mushroom Night Light",
+        "description": "Illuminate any room with this playful LED night light. Featured in a fun mushroom design, this light features a color-changing LED bulb and a built-in sensor so the light can be kept plugged in and will turn on and off depending on the amount of light in the room. * LED color-changing light bulb * 4\" H x 3.5\" W * Perfect for placing in hallways, bathrooms, & near kitchen counters Mushroom Night Light by Natural Life at Free People",
+        "brands": [
+          {
+            "id": "NRaL",
+            "name": "Natural Life"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/88b7af52-fda9-41b7-a6d1-d8fb963677a0?aid=01M6D3YJTQ6KX5CR21G7DQFMC2&mid=ICa0",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White mushroom night light with orange stem illuminating a wall outlet."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "LED bulb"
+        ],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#59817e",
+            "percentage": 0.2157
+          },
+          {
+            "hex": "#6db6c4",
+            "percentage": 0.2026
+          },
+          {
+            "hex": "#a3dceb",
+            "percentage": 0.1659
+          },
+          {
+            "hex": "#371502",
+            "percentage": 0.1352
+          },
+          {
+            "hex": "#665126",
+            "percentage": 0.093
+          },
+          {
+            "hex": "#c6eaee",
+            "percentage": 0.0917
+          },
+          {
+            "hex": "#888d5f",
+            "percentage": 0.0754
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/0K45RvA-ICa0-bQpm8C?o=01M5V68R82NK6DXV72QKJDRP0V&aid=01M6D3YJTQ6KX5CR21G7DQFMC2",
+            "domain": "freepeople.com",
+            "price": {
+              "price": 9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.03,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "mounting-type": [
+            "Built-in"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "lighting-features": [
+            "LED lighting"
+          ],
+          "suitable-location": [
+            "Corridor",
+            "Bathroom",
+            "Kitchen"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "power-source": [
+            "AC-powered"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOjdiM2JiMzNlZGNjNDA4MzIiLCAib2Zmc2V0IjogMTB9"
+  }
+}

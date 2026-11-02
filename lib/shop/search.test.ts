@@ -95,6 +95,15 @@ it("searches with no price filter when there is no limit", async () => {
   expect(JSON.parse(String(init.body))).toEqual({ query: "tablet for video calls", limit: 10 });
 });
 
+it("searches the fake server instead when CHANNEL3_URL is set, as the e2e does (D127)", async () => {
+  vi.stubEnv("CHANNEL3_URL", "http://localhost:3999");
+  const fetch = stubChannel3(() => Response.json({ products: [] }));
+
+  await searchListings("tablet for video calls");
+  const [url] = fetch.mock.calls[0] as unknown as [string];
+  expect(url).toBe("http://localhost:3999/v1/search");
+});
+
 it("throws when Channel3 refuses, so the caller can say it couldn't find anything", async () => {
   stubChannel3(() => Response.json({ error: "rate limited" }, { status: 429 }));
 

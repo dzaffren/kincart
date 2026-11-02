@@ -1,0 +1,1309 @@
+{
+  "request": {
+    "query": "night light",
+    "limit": 10,
+    "filters": {
+      "price": {
+        "max_price": 25
+      }
+    }
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "RJIAQYN",
+        "title": "Manual LED Night Light",
+        "description": "The GE Manual LED Night Light is a functional and straightforward lighting solution designed for rooms that require a gentle glow after dark. It features a manual on/off switch for direct user control, ensuring the light operates only when needed. Utilizing energy-efficient LED technology, it consumes significantly less power than traditional incandescent bulbs, reducing electricity costs. The long-lasting LED design minimizes the need for frequent replacements, providing dependable illumination without complex sensors or programming, making it a practical choice for any room.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d1dae367-58d7-481e-82b7-d8e3f636c9f3?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d1dae367-58d7-481e-82b7-d8e3f636c9f3?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for a GE Manual LED Night Light with a clear plastic blister."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Manual On/Off Switch: Gives you direct control over when the night light operates",
+          "Energy-Saving LED: Draws less power than traditional incandescent night light options",
+          "Long-Lasting LED: Provides extended service life with minimal need for replacement",
+          "Easy Operation: Simple switch requires no automatic sensors or complex programming",
+          "Versatile Use: Works well in any room where a bit of extra light is needed"
+        ],
+        "colors": [
+          {
+            "hex": "#fffffe",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/RJIAQYN-cZlC-bQpm8C?o=01M3XAKVPCED8MPZ4QM99YTW01&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 4.29,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "switch-control-type": [
+            "Button"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "bulb-type": [
+            "LED"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "059Myn7",
+        "title": "Designer LED Photocell Night Light",
+        "description": "The Stanley Designer LED Photocell Night Light is an energy-efficient plug-in light designed for automated operation. It features a built-in photocell sensor that detects ambient light levels, automatically turning the light on at nightfall and off at daylight. With a styled, decorative profile and a compact 1.6 oz body, it provides a consistent low-level white glow ideal for hallways, bathrooms, bedrooms, and staircases.",
+        "brands": [
+          {
+            "id": "ZcPs",
+            "name": "Stanley"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d851faa9-e735-4d20-a671-38bd12315c1a?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d851faa9-e735-4d20-a671-38bd12315c1a?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Front view of a white Stanley LED photocell night light on a plain white background."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Dusk-to-Dawn Activation: Sensor engages the light at nightfall and disengages it at daylight",
+          "Energy-Saving LED: Photocell bulb consumes less power than traditional incandescent alternatives",
+          "Designer Shape: Styled profile adds a decorative accent to any wall outlet",
+          "Compact 1.6 oz Body: Lightweight build keeps a low, unobtrusive profile at the outlet",
+          "60Hz Electrical Rating: Compatible with standard residential wiring throughout North America"
+        ],
+        "colors": [
+          {
+            "hex": "#a7b5bd",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/059Myn7-cZlC-bQpm8C?o=01M3NNEMWHZ7RDFKCEXZ5V6RAK&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 5.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 1.6,
+                "unit": "oz"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "brightness-levels": [
+            "Low"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "light-temperature": [
+            "Cool white"
+          ],
+          "suitable-location": [
+            "Corridor",
+            "Bathroom",
+            "Bedroom"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "o0jH506",
+        "title": "GE Automatic LED Night Light",
+        "description": "The GE Automatic LED Night Light is an energy-efficient lighting solution designed for convenience and safety. Featuring a built-in light sensor, it automatically activates in darkness and shuts off during daylight hours. Its long-lasting LED design minimizes electricity costs and the need for frequent bulb replacements, while the durable construction ensures dependable nightly performance.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/386f2661-ce91-41b7-9f97-11175c9c6415?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/386f2661-ce91-41b7-9f97-11175c9c6415?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Cardboard packaging for a GE Automatic LED Night Light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Light Sensing Technology: Detects changes in ambient light and activates automatically",
+          "Quick Response: Activates within seconds of detecting surrounding darkness",
+          "Energy-Efficient LED: Helps lower electricity costs with minimal power draw",
+          "Long Life LED: Built to reduce the frequency of bulb replacements",
+          "Automatic Shutoff: Deactivates during daylight hours to conserve additional energy",
+          "Durable Construction: GE-engineered for dependable, long-term nightly use"
+        ],
+        "colors": [
+          {
+            "hex": "#5b75a1",
+            "percentage": 0.6112
+          },
+          {
+            "hex": "#899ab9",
+            "percentage": 0.3076
+          },
+          {
+            "hex": "#a5b3cc",
+            "percentage": 0.0812
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/o0jH506-cZlC-bQpm8C?o=01M4A3V7WBB5GHDGW9DE6PWVQC&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 4.29,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "motion-sensor-type": [
+            "Photocell"
+          ],
+          "suitable-location": [
+            "Bathroom"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "switch-control-type": [
+            "Sensor"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "bhCAHbi",
+        "title": "LED On/Off Night Light",
+        "description": "The Stanley LED On/Off Night Light is an energy-efficient lighting solution designed for low-level illumination in dark areas of the home. It features six built-in LEDs that provide bright visibility while consuming less wattage than traditional incandescent bulbs. The unit plugs directly into a standard wall outlet, eliminating the need for batteries, and includes a manual on/off toggle switch for simple control. It is ideal for use in hallways, bathrooms, nurseries, and stairways.",
+        "brands": [
+          {
+            "id": "ZcPs",
+            "name": "Stanley"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/9b12f2e4-92a0-481c-a7b9-8552a05216e2?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/9b12f2e4-92a0-481c-a7b9-8552a05216e2?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Yellow and black box packaging for a Stanley LED night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/026f1946-d9bf-42a9-8086-d29e832a88e1?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=cZlC",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of the Stanley LED night light unit."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Six Built-In LEDs: Produce an excellent brightness level for clear nighttime visibility",
+          "Lower Wattage: Consumes less energy than a traditional incandescent night light",
+          "On/Off Switch: Manual toggle provides quick, straightforward light control",
+          "Plug-In Power Source: Connects to a wall outlet and eliminates the need for batteries",
+          "Practical Placement: Suits hallways, bathrooms, nurseries, and stairways"
+        ],
+        "colors": [
+          {
+            "hex": "#fefffc",
+            "percentage": 0.8445
+          },
+          {
+            "hex": "#e1ce53",
+            "percentage": 0.0944
+          },
+          {
+            "hex": "#faf2c9",
+            "percentage": 0.0611
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/bhCAHbi-cZlC-bQpm8C?o=01M3NHQZYX8P4H5A8FFY9Y7JSS&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "farmandfleet.com",
+            "price": {
+              "price": 4.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "suitable-location": [
+            "Corridor",
+            "Bathroom",
+            "Children's room"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "switch-control-type": [
+            "Button"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "brightness-levels": [
+            "High"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "WEpxG4P",
+        "title": "Night Light",
+        "description": "Illuminate your home with a gentle, comforting glow using the GE 4W Night Light bulbs. These soft white light bulbs are designed for use in hallways, bedrooms, and children's rooms to provide guided lighting without disturbing sleep. Each bulb features a candelabra base for a secure fit in standard night light fixtures and offers a long-lasting lifespan of up to 2000 hours.",
+        "brands": [
+          {
+            "id": "1AfR",
+            "name": "GE"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/0832d219-7982-461e-ab4b-c7cf437fdeba?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=AYbp",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for 4w Night Light White 4 Ct."
+          }
+        ],
+        "category": {
+          "slug": "incandescent-light-bulbs",
+          "title": "Incandescent Light Bulbs",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "light-bulbs",
+              "title": "Light Bulbs"
+            },
+            {
+              "slug": "incandescent-light-bulbs",
+              "title": "Incandescent Light Bulbs"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Includes 4 night light bulbs",
+          "Each bulb provides 4 watts of soft, white light",
+          "Candelabra base for secure fit in standard night light fixtures",
+          "Long-lasting with up to 2000 hours of use"
+        ],
+        "colors": [
+          {
+            "hex": "#bdc5d5",
+            "percentage": 0.7769
+          },
+          {
+            "hex": "#8fafcd",
+            "percentage": 0.1246
+          },
+          {
+            "hex": "#6490b5",
+            "percentage": 0.0986
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/WEpxG4P-AYbp-bQpm8C?o=01M1F3EV71HXFGDBQXYHWFSDTH&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "dollargeneral.com",
+            "price": {
+              "price": 3.5,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "lighting-features": [
+            "Energy efficient"
+          ],
+          "light-temperature": [
+            "Warm white"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "75nvTwv",
+        "title": "The Casper Glow Night Light Single Pack",
+        "description": "The Casper Glow Night Light provides a soft, ambient illumination to guide your path without disrupting sleep. It features two light modes: motion-activated for hallways and bathrooms, and darkness-activated for bedrooms. Its design is easy on the eyes, with a gentle, indirect pool of light that won't keep you awake. The motion sensor ensures light is available when needed, and the ambient light sensor automatically turns it on as the room darkens. It's designed to plug into a standard wall outlet and offers a gentle glow throughout the night or when movement is detected. This night light is perfect for bedrooms, bathrooms, hallways, and kitchens, enhancing safety and comfort.",
+        "brands": [
+          {
+            "id": "IpHD",
+            "name": "Casper"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d5d3efc0-01d5-4dfb-95e0-0d059208e6fe?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=QnTm",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Wall-mounted glow night light with a circular light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/305b30b5-f0d5-46a3-90f7-d793bdd1e475?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=QnTm",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of the white base unit of the glow night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8e327b80-df84-45ec-ae24-45655e182895?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=QnTm",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/8e327b80-df84-45ec-ae24-45655e182895?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=QnTm",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Top and bottom circular parts of the glow night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ecbdd865-af00-4fc2-b4cd-77d94be8561e?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=QnTm",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Glow night light mounted on a textured wall in a bedroom."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "WON'T DISRUPT SLEEP: Softly illuminates your path without waking anyone up.",
+          "TWO LIGHT MODES: Activated by motion for hallways and bathrooms, or by darkness for bedrooms.",
+          "Night owl mode: The motion sensor gradually increases brightness when there’s any nearby movement.",
+          "Diameter: 2.5\"",
+          "Height (without plug): 1.5\"",
+          "Keeps the other outlet accessible for a standard plug.",
+          "Turns off only when it senses bright light in the room or when you unplug it.",
+          "LED Bulb",
+          "Electrical Plug Power Source",
+          "Dimmable"
+        ],
+        "colors": [
+          {
+            "hex": "#37474d",
+            "percentage": 0.6992
+          },
+          {
+            "hex": "#716b58",
+            "percentage": 0.1401
+          },
+          {
+            "hex": "#c2b694",
+            "percentage": 0.1123
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/75nvTwv-QnTm-bQpm8C?o=01M60Q5J5DP7XHNQH04J8HHXB0&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "target.com",
+            "price": {
+              "price": 19,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/75nvTwv-U1Gh-bQpm8C?o=01KQY6YRS4H5MCQCTYMYW2BWFA&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "casper.com",
+            "price": {
+              "price": 35,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.105,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "lighting-features": [
+            "Dimmable",
+            "LED lighting",
+            "Energy efficient"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "suitable-location": [
+            "Bedroom",
+            "Corridor",
+            "Kitchen",
+            "Hallway",
+            "Bathroom"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "mounting-type": [
+            "Wall"
+          ],
+          "motion-sensor-type": [
+            "PIR"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "light-temperature": [
+            "Warm white"
+          ]
+        },
+        "ratings": {
+          "value": 4.76,
+          "count": 228,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "eTWA9d3",
+        "title": "LED Manual Night Light",
+        "description": "The Meridian LED Manual Night Light is an energy-efficient, plug-in lighting solution designed for use in children's bedrooms, bathrooms, hallways, or kitchens. It features patented SMD LED technology and a convenient front-facing manual switch for easy operation. The light provides a bright daylight source of light while remaining maintenance-free, as there is no bulb to replace. It is designed to eliminate the need for overhead lighting or lamps for easy maneuvering at night.",
+        "brands": [
+          {
+            "id": "BszV",
+            "name": "Meridian"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/9cb3d839-0c17-4199-921e-a17bc6a1a58b?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/9cb3d839-0c17-4199-921e-a17bc6a1a58b?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Manual LED night light with white base and ribbed cover."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/aff3ad8a-c220-4319-938a-8708d0da61aa?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/aff3ad8a-c220-4319-938a-8708d0da61aa?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Plug and base assembly for a manual LED night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/e48b02ef-2965-4f64-a7a8-830c27847e72?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/e48b02ef-2965-4f64-a7a8-830c27847e72?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Lamp head and white base of a manual LED night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/7f63e3c4-3d43-4b72-8c45-78ddcb46610d?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/7f63e3c4-3d43-4b72-8c45-78ddcb46610d?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=KojF",
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for a Meridian Daylight LED Night Light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Energy Efficient LED",
+          "Convenient front-facing manual switch",
+          "Costs less than $1 to operate per year",
+          "Features patented SMD LED technology",
+          "Ideal for children's bedrooms and dark hallways",
+          "Eliminates need for lamps and over-head lighting",
+          "Provides a bright daylight source of light for any room in your home"
+        ],
+        "colors": [
+          {
+            "hex": "#aeaea7",
+            "percentage": 0.6635
+          },
+          {
+            "hex": "#dbdacc",
+            "percentage": 0.2583
+          },
+          {
+            "hex": "#84847d",
+            "percentage": 0.0782
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/eTWA9d3-KojF-bQpm8C?o=01M3DWGP02J69R6TZ0NF62KG72&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "menards.com",
+            "price": {
+              "price": 2.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 2,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3,
+                "unit": "in"
+              },
+              "height": {
+                "number": 6,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.08,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "plug-type": [
+            "US"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "suitable-location": [
+            "Bathroom",
+            "Bedroom",
+            "Children's room",
+            "Hallway",
+            "Kitchen"
+          ],
+          "lighting-features": [
+            "Energy efficient",
+            "LED lighting"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "light-temperature": [
+            "Daylight"
+          ],
+          "switch-control-type": [
+            "Button"
+          ],
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "POPCQIE",
+        "title": "Led Night Light",
+        "description": "A whimsical LED night light designed to look like a floral arrangement in a vase. It features color-changing illumination and a built-in light control sensor that automatically turns the light on in the dark and off when it is bright.",
+        "brands": [
+          {
+            "id": "NRaL",
+            "name": "Natural Life"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/3b23d48a-6756-4e5e-88c4-08d00fabd027?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=jgjV",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/3b23d48a-6756-4e5e-88c4-08d00fabd027?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=jgjV",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Floral arrangement with pink and purple flowers illuminated by a green light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cce7d09f-726c-486d-a853-08d14a846f65?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=jgjV",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/cce7d09f-726c-486d-a853-08d14a846f65?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=jgjV",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Floral arrangement with colorful artificial flowers illuminated by a white light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Plastic",
+          "metal"
+        ],
+        "key_features": [
+          "LED color changing lightbulb included",
+          "Built-in light control sensor (automatic on/off)"
+        ],
+        "colors": [
+          {
+            "hex": "#13fc54",
+            "percentage": 0.2982
+          },
+          {
+            "hex": "#86fbd1",
+            "percentage": 0.1531
+          },
+          {
+            "hex": "#3cc83f",
+            "percentage": 0.1507
+          },
+          {
+            "hex": "#6a4bb1",
+            "percentage": 0.1119
+          },
+          {
+            "hex": "#7e7b9f",
+            "percentage": 0.1045
+          },
+          {
+            "hex": "#4dfc84",
+            "percentage": 0.1031
+          },
+          {
+            "hex": "#8dada5",
+            "percentage": 0.0784
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/POPCQIE-jgjV-bQpm8C?o=01M2JR492E70THWP5SBQF3DHQS&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "naturallife.com",
+            "price": {
+              "price": 9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 2.5,
+                "unit": "in"
+              },
+              "width": null,
+              "height": {
+                "number": 7,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": {
+          "options": [],
+          "selected": [
+            {
+              "name": "Style",
+              "label": "Floral Multi"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "switch-control-type": [
+            "Sensor"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "mounting-type": [
+            "Tabletop"
+          ],
+          "lighting-features": [
+            "LED lighting"
+          ],
+          "material": [
+            "Plastic",
+            "Metal"
+          ],
+          "suitable-location": [
+            "Bedroom"
+          ],
+          "pattern": [
+            "Floral"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "iUz0ubn",
+        "title": "TÖVÄDER LED night light",
+        "description": "This adorable bear-shaped LED night light from IKEA is designed to bring comfort and a sense of security to children at bedtime. It can switch between five different colors—red, yellow, orange, green, and white—to create a relaxing atmosphere. The light features a built-in timer that can be set for 30 minutes or 8 hours, and it slowly dims during the last 15 minutes to prevent waking a sleeping child. Children can easily turn the light on and off and change colors by pressing the soft silicone surface. With a lifetime of approximately 8 years, this durable and child-friendly night light is a perfect addition to any child's room.",
+        "brands": [
+          {
+            "id": "Pu7O",
+            "name": "Ikea"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/424741eb-8afc-4ba4-89af-16adcdcfabd6?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White bear night light on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/a5f0bba4-6f3a-48a7-8df7-ecc835bb555f?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Bear night light on a bedside table in a room."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/68055f7c-d67a-4f30-a81a-37accfb4afb7?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": "https://cdn.trychannel3.com/692c8c50-1f24-46c0-bedb-7fc6c596b8f8?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Hand touching a glowing bear night light."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/89e2b4c4-f680-4f42-a959-5fb2b6b60c7c?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "White bear night light with yellow ears on blue."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9d777184-9cdc-4678-9ff9-b33b9d048d5d?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "White bear night light with yellow accents on white."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "silicone rubber",
+          "polypropylene",
+          "polycarbonate plastic",
+          "ABS plastic"
+        ],
+        "key_features": [
+          "Battery-operated",
+          "Built-in timer (30 minutes or 8 hours)",
+          "Changes between 5 different colors",
+          "Dims slowly before turning off",
+          "Easy for children to operate",
+          "Child-friendly design",
+          "LED light source",
+          "Tested to tough safety requirements"
+        ],
+        "colors": [
+          {
+            "hex": "#e1d3b8",
+            "percentage": 0.7594
+          },
+          {
+            "hex": "#aca084",
+            "percentage": 0.1222
+          },
+          {
+            "hex": "#524c36",
+            "percentage": 0.1185
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/iUz0ubn-FwdJ-bQpm8C?o=01KWM89P7PFKG0QHJB9K7GH8X3&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "ikea.com",
+            "price": {
+              "price": 19,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": {
+              "length": {
+                "number": 4,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3,
+                "unit": "in"
+              },
+              "height": {
+                "number": 5,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "lighting-features": [
+            "Adjustable brightness",
+            "Dimmable",
+            "LED lighting",
+            "Programmable timer function"
+          ],
+          "power-source": [
+            "Battery-powered",
+            "Batteries"
+          ],
+          "material": [
+            "Silicone",
+            "Plastic",
+            "Polycarbonate (PC)"
+          ],
+          "bulb-type": [
+            "LED"
+          ],
+          "switch-control-type": [
+            "Touch"
+          ],
+          "light-temperature": [
+            "Warm white",
+            "Cool white",
+            "Blue light",
+            "Daylight",
+            "Ember glow"
+          ],
+          "suitable-location": [
+            "Bedroom",
+            "Children's room"
+          ]
+        },
+        "ratings": {
+          "value": 4.1,
+          "count": 177,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "I4m4pBR",
+        "title": "SPIKEN LED night light",
+        "description": "SPIKEN LED night light in the shape of an otter, multicolour, 13 cm. Provides a mood night light with 7 selectable colours, powered via mains, designed for indoor use. Suitable for children with a safe, child-friendly LED light and a tail switch to change colours.",
+        "brands": [
+          {
+            "id": "Pu7O",
+            "name": "Ikea"
+          },
+          {
+            "id": "h8lI",
+            "name": "IBBARBO"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/e45ebe44-a979-41be-8c87-a6840ed0a4f8?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": "https://cdn.trychannel3.com/3daaa2c6-4b32-43f4-8917-3a09c9318751?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White and teal cat-shaped LED night light with a wire."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/7f095524-6a1d-457f-a3a7-2d9cf779f3b5?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Cat-shaped LED night light on a surface next to books."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8a55b8e7-aa32-4d70-8ca5-83438e2c7c8e?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Pink LED night light illuminating a surface next to a book and a giraffe toy."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/7f09858e-6b76-485c-a806-533dcc3383a9?aid=01M6D434AKK4RYDZP3ZSDEMWVM&mid=FwdJ",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of the white and pink cat face design on the LED night light."
+          }
+        ],
+        "category": {
+          "slug": "night-lights-ambient-lighting",
+          "title": "Night Lights & Ambient Lighting",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "lighting",
+              "title": "Lighting"
+            },
+            {
+              "slug": "night-lights-ambient-lighting",
+              "title": "Night Lights & Ambient Lighting"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lower body/ Upper body/ Ear: Polypropylene plastic",
+          "Optical lens/ Switch cover: Polycarbonate plastic"
+        ],
+        "key_features": [
+          "Adjustable colour",
+          "Built-in LED light source",
+          "The lamp can illuminate in 7 colours"
+        ],
+        "colors": [
+          {
+            "hex": "#a3d4d0",
+            "percentage": 0.5623
+          },
+          {
+            "hex": "#e1e1df",
+            "percentage": 0.3947
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/I4m4pBR-FwdJ-bQpm8C?o=01M04EQSEV6NP5Z3DHM1BW6CG4&aid=01M6D434AKK4RYDZP3ZSDEMWVM",
+            "domain": "ikea.com",
+            "price": {
+              "price": 14,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": {
+              "length": {
+                "number": 8,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3.25,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.25,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 7,
+                "unit": "oz"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "bulb-type": [
+            "LED"
+          ],
+          "switch-control-type": [
+            "Touch"
+          ],
+          "power-source": [
+            "AC-powered"
+          ],
+          "material": [
+            "Polyethylene (PE)",
+            "Polycarbonate (PC)"
+          ],
+          "suitable-location": [
+            "Children's room"
+          ],
+          "lighting-features": [
+            "Adjustable brightness",
+            "Adjustable color temperature",
+            "LED lighting"
+          ]
+        },
+        "ratings": {
+          "value": 4.6,
+          "count": 226,
+          "source_count": 1
+        }
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOjhkOGE3ZDQ3MDU1NmU5N2MiLCAib2Zmc2V0IjogMTB9"
+  }
+}

@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:record": "RECORD=1 playwright test",
     "db:up": "node --env-file-if-exists=.env.local scripts/migrate.mjs up",
     "db:down": "node --env-file-if-exists=.env.local scripts/migrate.mjs down"
   },
