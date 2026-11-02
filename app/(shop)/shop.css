@@ -322,6 +322,7 @@ body {
 
 .limit,
 .notify,
+.passkey,
 .links {
   padding-top: var(--space-6);
   border-top: var(--border-width) solid var(--color-line);

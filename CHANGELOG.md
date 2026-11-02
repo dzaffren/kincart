@@ -21,6 +21,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - No other site can show a KinCart page inside a frame, so nobody can hide Sam's OK under a button of their own. Shops' image hosts no longer learn which KinCart page asked for a photo.
 - After Sam says no, or leaves a thing out, Sam can tap Find another on Sam's own page. KinCart searches again with other words for Rose, Rose's page says Sam asked, and Rose's phone buzzes with the result. A Find Rose starts meanwhile is kept. Each tap counts as one of the day's 20 Finds, and Rose or Sam gets one between them.
 - Sam can replace both of a household's secret links with Make new links, after a confirm screen. The old links stop working at once, Sam's page gives Rose's new link to share or copy, and the saved PayPal, limits and past buys stay. Saved phones are forgotten, so Rose and Sam turn notifications on again from the new links.
+- Sam can turn on Confirm each OK on Sam's own page. Each OK, Make new links and Turn off then asks for Sam's face or fingerprint, so someone with only Sam's link can't pay or replace the links. It is off by default, and inside the home page's phones an OK opens Sam's page in a new tab.
 
 ### Fixed
 

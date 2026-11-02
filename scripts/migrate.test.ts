@@ -30,10 +30,11 @@ async function downFile(file: string) {
   await sql(await readFile(new URL(`../db/migrations/${file}`, import.meta.url), "utf8"));
 }
 
-// Steps back past 0015, 0014, 0013, 0012, 0011, 0010, 0009 and 0008 to the households migration.
+// Steps back past 0016, 0015, 0014, 0013, 0012, 0011, 0010, 0009 and 0008 to the households migration.
 async function downToHouseholds() {
   await migrate("down", url);
   for (const file of [
+    "0015_sam_finds_another.down.sql",
     "0014_ask_again.down.sql",
     "0013_find_another.down.sql",
     "0012_usage_on_status.down.sql",
@@ -72,6 +73,7 @@ it("migrates up, back down, and up again", async () => {
     "households",
     "address_uses",
     "usage_days",
+    "sam_passkeys",
   ]) {
     expect(await tableExists(table)).toBe(true);
   }
@@ -92,6 +94,10 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "by_sam")).toBe(true);
 
   await migrate("down", url);
+  expect(await tableExists("sam_passkeys")).toBe(false);
+  expect(await columnExists("rose_search", "by_sam")).toBe(true);
+
+  await downFile("0015_sam_finds_another.down.sql");
   expect(await columnExists("rose_search", "by_sam")).toBe(false);
   expect(await columnExists("rose_search", "last")).toBe(true);
 
@@ -138,6 +144,7 @@ it("reruns with a photo search that saw nothing to buy, and goes back down to no
   await expect(migrate("up", url)).resolves.toBeDefined();
 
   await migrate("down", url);
+  await downFile("0015_sam_finds_another.down.sql");
   await downFile("0014_ask_again.down.sql");
   await downFile("0013_find_another.down.sql");
   await downFile("0012_usage_on_status.down.sql");

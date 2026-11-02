@@ -47,5 +47,7 @@
 - Time a call again when what it sends grows
 - Write glossary lines with a dash, and list every term the spec uses
 - Keep helpers out of a "use server" file
+- Branch the next slice from origin/main after a squash merge
+- Give each e2e page its own virtual authenticator for passkeys
 - Clear .next/dev before next build when another branch's dev server left its types
 - Fingerprint fixture photos in a recording's key

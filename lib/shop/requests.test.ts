@@ -6,6 +6,7 @@ import {
   ask,
   boughtBefore,
   copyDemoVault,
+  dropPasskey,
   claim,
   clearSearch,
   countUse,
@@ -13,6 +14,7 @@ import {
   findHousehold,
   forgetSubscription,
   getLimit,
+  getPasskey,
   getSearch,
   getTotal,
   getVault,
@@ -21,6 +23,7 @@ import {
   replaceLinks,
   paidAsk,
   record,
+  savePasskey,
   saveSearch,
   saveSubscription,
   saveVault,
@@ -651,4 +654,25 @@ it("logs a count it can't write, and doesn't throw", async () => {
 
   await expect(countUse({ finds: 1, searches: 2 })).resolves.toBeUndefined();
   expect(log).toHaveBeenCalledWith(expect.stringMatching(/^usage status=failed reason=.*ECONNREFUSED/));
+});
+
+it("keeps the first passkey a household saves, and drops only its own", async () => {
+  const [ana, ben] = [await startHousehold("rose-ana", "sam-ana"), await startHousehold("rose-ben", "sam-ben")];
+  expect(await getPasskey(ana)).toBeNull();
+
+  expect(await savePasskey(ana, "cred-ana", new Uint8Array([1, 2, 3]))).toBe(true);
+  expect(await savePasskey(ana, "cred-leaker", new Uint8Array([9]))).toBe(false);
+  expect(await savePasskey(ben, "cred-ben", new Uint8Array([4]))).toBe(true);
+  expect(await getPasskey(ana)).toEqual({ credentialId: "cred-ana", publicKey: new Uint8Array([1, 2, 3]) });
+
+  await dropPasskey(ana);
+  expect(await getPasskey(ana)).toBeNull();
+  expect(await getPasskey(ben)).toEqual({ credentialId: "cred-ben", publicKey: new Uint8Array([4]) });
+});
+
+it("keeps the passkey through New links", async () => {
+  const ana = await startHousehold("rose-ana", "sam-ana");
+  await savePasskey(ana, "cred-ana", new Uint8Array([1]));
+  await replaceLinks(ana, "sam-ana", "rose-new", "sam-new");
+  expect(await getPasskey(ana)).toEqual({ credentialId: "cred-ana", publicKey: new Uint8Array([1]) });
 });
