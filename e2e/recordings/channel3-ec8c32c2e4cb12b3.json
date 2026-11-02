@@ -1,0 +1,1200 @@
+{
+  "request": {
+    "query": "batteries for clock",
+    "limit": 10
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "X1c418N",
+        "title": "377 Batteries",
+        "description": "Energizer 377 Batteries are reliable silver oxide button cell batteries designed to provide long-lasting power for small electronic devices. With a voltage of 1.55V, these batteries are ideal for use in calculators, key fobs, heart rate monitors, glucose monitors, and various toys. They are designed for stability and can be stored for up to five years in a cool, dry place. These batteries serve as replacements for various models including 376/377, 377BP, D377, SB-AW, SR626SW, and SR66.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/8c1ab33d-b1fd-468a-9a21-1924e4a79226?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=BQlp",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Retail packaging for Energizer 377 silver oxide button cell batteries."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "silver oxide"
+        ],
+        "key_features": [
+          "1 pack of Energizer 377 Batteries",
+          "Ideal for calculators, key fobs, heart rate monitors, or glucose monitors",
+          "Lasts up to 5 years in storage",
+          "Silver oxide chemistry with 1.55 volts",
+          "Replacement for variety of button batteries including 376/377, 377BP, D377, SB-AW, SR626SW and SR66",
+          "Zero-mercury silver oxide button battery",
+          "Suitable for medical devices, calculators, toys, and watches",
+          "High-energy density, long life power source",
+          "Up to 8 years shelf life",
+          "Powers Small Electronic Devices"
+        ],
+        "colors": [],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-BQlp-bQpm8C?o=01KDENAJVAB8CWTWCGZ4JJPXJF&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "truevalue.com",
+            "price": {
+              "price": 6.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 0.18,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.75,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.5,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.01,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-1Evq-bQpm8C?o=01M3RDPPT660XXM37DZ5D0GZ2J&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "walgreens.com",
+            "price": {
+              "price": 8.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.014,
+            "dimensions": {
+              "length": {
+                "number": 3.45,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.6,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.45,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.05,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-p1PB-bQpm8C?o=01KYXQYYHJ0SJP88K9NJKKV9JY&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 17.67,
+              "compare_at_price": 17.68,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.005,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Silver-oxide (Ag2O)",
+            "Lithium-ion (Li-ion)"
+          ],
+          "battery-type": [
+            "Disposable",
+            "Rechargeable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ],
+          "connector-type": [
+            "JST-XH"
+          ]
+        },
+        "ratings": {
+          "value": 4.76,
+          "count": 645,
+          "source_count": 4
+        }
+      },
+      {
+        "id": "Qgp1mpj",
+        "title": "Batteries",
+        "description": "This is a product listing for Energizer batteries. The image shows a clear plastic container holding several Energizer AA batteries. The batteries are labeled with the Energizer brand name and indicate they are alkaline batteries with an expiration date of 03-2016.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/ff1226b4-f291-4d15-bee8-d7c9a66a31b2?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/976c9155-3097-49ec-91ba-feb552349883?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "A handheld soap dispenser and brush set with a soap dish."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/c8889ff6-a83c-4c21-882d-8d6d8e34b819?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/1d6fff12-0528-42c4-a373-ba97753c5fa3?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Handheld soap dispenser and brush set with a soap dish."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic",
+          "alkaline"
+        ],
+        "key_features": [
+          "Drop-front opening allows for easy access to shoes",
+          "Clear window provides visibility of shoes",
+          "Ventilation holes promote air circulation",
+          "Keeps shoes dust-free and protected",
+          "Durable construction for reliable use",
+          "Long-lasting power",
+          "Convenient storage case included",
+          "AA size",
+          "Alkaline batteries",
+          "24 count AA batteries"
+        ],
+        "colors": [
+          {
+            "hex": "#b5b4b4",
+            "percentage": 0.2952
+          },
+          {
+            "hex": "#8c8a8a",
+            "percentage": 0.1894
+          },
+          {
+            "hex": "#282524",
+            "percentage": 0.1421
+          },
+          {
+            "hex": "#23b9bb",
+            "percentage": 0.1066
+          },
+          {
+            "hex": "#d7d8d8",
+            "percentage": 0.1062
+          },
+          {
+            "hex": "#435454",
+            "percentage": 0.0815
+          },
+          {
+            "hex": "#4a7f80",
+            "percentage": 0.079
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/Qgp1mpj-dMiw-bQpm8C?o=01KR9AAA2DFSQ2TAS9NJJKX699&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 9.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "pattern": [
+            "Solid"
+          ],
+          "material": [
+            "Metal"
+          ]
+        },
+        "ratings": {
+          "value": 4.7,
+          "count": 646,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "1l6Oy9Y",
+        "title": "AA Batteries",
+        "description": "PROCELL AA batteries offer constant power for low-drain devices. These batteries are designed to meet stringent industry standards and are suitable for professional use, offering reliable performance and a long operating life. They are economically packaged and designed to withstand a wide range of temperatures, from -4°F to 140°F.",
+        "brands": [
+          {
+            "id": "I2u2",
+            "name": "Procell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/75a2a570-e4f1-42d5-94bc-08dc1ca8070c?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "cleaned_url": "https://cdn.trychannel3.com/2500f667-be5e-4fd6-bd96-986c283007c5?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "PROCELL CR123 battery packaging showing new look and constant power"
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2652ccf0-c251-4968-8024-f37c5752ddfa?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "cleaned_url": "https://cdn.trychannel3.com/eb767513-ea9c-47ce-a4ec-916ef3996c76?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "PROCELL CR123 battery package showing date-coded and large count information"
+          },
+          {
+            "url": "https://cdn.trychannel3.com/821c7f50-d533-4d45-bf85-2838d080d4de?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "PROCELL quality warranty badge"
+          },
+          {
+            "url": "https://cdn.trychannel3.com/5641e2a0-bd04-4e66-9c1b-506a015ecda8?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=1ooq",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "PROCELL operating temperature range"
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [
+          "Constant Power",
+          "For Low Drain Devices",
+          "Designed to meet stringent battery standards",
+          "Low self-discharge with long operating life",
+          "Economically packaged",
+          "High resistance to extreme temperatures from -4 degrees F to 140 degrees F"
+        ],
+        "colors": [
+          {
+            "hex": "#6d7176",
+            "percentage": 0.3898
+          },
+          {
+            "hex": "#b6babf",
+            "percentage": 0.2528
+          },
+          {
+            "hex": "#d8dce1",
+            "percentage": 0.2512
+          },
+          {
+            "hex": "#4c5158",
+            "percentage": 0.1062
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/1l6Oy9Y-1ooq-bQpm8C?o=01KVDE3CHFC4TDTCCK0RJP07XA&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "cpooutlets.com",
+            "price": {
+              "price": 36.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 7.94,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.44,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.69,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.48,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-features": [
+            "Heat resistant"
+          ],
+          "battery-size": [
+            "CR123A"
+          ],
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "material": [
+            "Metal"
+          ],
+          "product-certifications-standards": [
+            "Restriction of hazardous substances (RoHS) compliant"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "EFpBqSC",
+        "title": "Batteries",
+        "description": "This product is a pack of Energizer AA batteries. These are alkaline batteries, perfect for powering everyday devices. They come in a clear plastic case for easy storage and organization.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/1cd11615-ec9c-4715-9e7c-7c75d53ca832?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Close-up of a white rectangular light fixture on a perforated white surface."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9d0b726e-f784-4af2-a607-b03c9e0c615c?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of a white rectangular light fixture on a perforated white surface."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "AA Batteries",
+          "Alkaline",
+          "Packaged in a clear case"
+        ],
+        "colors": [
+          {
+            "hex": "#eeeef0",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/EFpBqSC-dMiw-bQpm8C?o=01KR3D8GF0G172R016C0VG1AVG&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 3.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": {
+          "value": 4.8,
+          "count": 77,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "VfRk2nj",
+        "title": "Batteries",
+        "description": "A pack of Energizer AAA batteries in a clear plastic case, perfect for storing and organizing your batteries. These batteries are known for their reliable performance.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b1912674-c773-4dbd-bdce-96243d1baf27?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "Clear plastic shallow large turntable holding various cleaning bottles."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Stores and organizes AAA batteries",
+          "Clear plastic case for visibility",
+          "Reliable Energizer battery performance"
+        ],
+        "colors": [],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/VfRk2nj-dMiw-bQpm8C?o=01KR9C2NKNXBX8NTY0H5GG3R9W&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 34.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": {
+          "value": 4.9,
+          "count": 14,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "hQp6juc",
+        "title": "Batteries",
+        "description": "Keep your devices powered up with these high-quality Energizer AAA batteries. Perfect for everyday use, these batteries offer reliable and long-lasting performance.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b5d43501-cc7b-4a08-b9dc-6addbace57e7?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "White over-the-door hook rack holding a tan handbag and a grey scarf."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "AAA size batteries",
+          "Long-lasting power",
+          "Reliable performance",
+          "Compact storage case"
+        ],
+        "colors": [],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/hQp6juc-dMiw-bQpm8C?o=01KR905VM1F6VZCE779GKR4D6T&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 18.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Metal"
+          ]
+        },
+        "ratings": {
+          "value": 4.3,
+          "count": 9,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "yzaHUUk",
+        "title": "Batteries",
+        "description": "This Yamazaki Tower Rolling Wire Basket is a versatile and stylish storage solution made from durable all-steel construction. Its low profile and compact design make it ideal for tight spaces, fitting easily under washers and dryers or tucking away in closets. Equipped with four rolling casters for effortless mobility and a convenient side handle for easy transport, this basket is perfect for managing laundry, linens, or other household items. It has a weight capacity of 11 lbs and requires light assembly.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/4a8892bc-39d5-44d9-a98a-c7b3f49f9683?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/8a110d78-3fa5-400f-a930-6387b94efd9b?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White wire tower rolling basket on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/571f4b02-5fbf-4c7f-a5f9-f0b3bf2e2522?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/f24e12b0-9757-4b2e-b6e6-9144cccfef79?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=dMiw",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Black wire tower rolling basket on a white background."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "steel"
+        ],
+        "key_features": [
+          "Reliable performance",
+          "Long-lasting power",
+          "Alkaline batteries",
+          "All-steel construction",
+          "Low profile design",
+          "Fits in tight spaces",
+          "Fits under washer and dryer",
+          "Side handle for easy movement",
+          "Includes 4 rolling casters",
+          "Capacity: 11 lbs"
+        ],
+        "colors": [
+          {
+            "hex": "#fafafa",
+            "percentage": 0.9674
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/yzaHUUk-dMiw-bQpm8C?o=01KR8WGS0XB81EZ473794Z32EE&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 19.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": {
+          "value": 4.5,
+          "count": 42,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "5Hrq8eu",
+        "title": "Vaxis Charger For Litecomm Batteries",
+        "description": "The Vaxis L220417 is a battery charger designed to simultaneously charge up to eight Vaxis Litecomm 901 batteries. It features eight dedicated charging bays and provides a full recharge in approximately 2.5 hours. The package includes the charger and a required AC power adapter.",
+        "brands": [
+          {
+            "id": "QZcJ",
+            "name": "Vaxis"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/5a135aff-3a42-44ae-bec5-fbc413d3da4a?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/5a135aff-3a42-44ae-bec5-fbc413d3da4a?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black Vaxis charger with power cord and adapter on white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/297e6430-4100-4ace-95a8-a10175bc3a85?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Black Vaxis charger with power cord and adapter on white background."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-battery-chargers",
+          "title": "General Purpose Battery Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "battery-accessories",
+              "title": "Battery Accessories"
+            },
+            {
+              "slug": "general-purpose-battery-chargers",
+              "title": "General Purpose Battery Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Charges 8 Vaxis Litecomm 901 Batteries",
+          "2.5 Hour Recharging Time",
+          "Includes AC Adapter"
+        ],
+        "colors": [
+          {
+            "hex": "#2e2d31",
+            "percentage": 0.6237
+          },
+          {
+            "hex": "#47474a",
+            "percentage": 0.1435
+          },
+          {
+            "hex": "#d4d4d5",
+            "percentage": 0.1434
+          },
+          {
+            "hex": "#848486",
+            "percentage": 0.0894
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/5Hrq8eu-oHaU-bQpm8C?o=01M3QMHJ6C9MDJCBF1RJVNERSX&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 39.9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 7.3,
+                "unit": "in"
+              },
+              "width": {
+                "number": 6.4,
+                "unit": "in"
+              },
+              "height": {
+                "number": 1.9,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.73,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": {
+          "options": [
+            {
+              "name": "Size",
+              "values": [
+                {
+                  "label": "3 Batteries",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/d6446954-2c13-4c7a-8201-9024ac520013",
+                  "product_id": "nsjhrBi"
+                },
+                {
+                  "label": "8 Batteries",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/5a135aff-3a42-44ae-bec5-fbc413d3da4a",
+                  "product_id": "5Hrq8eu"
+                }
+              ]
+            }
+          ],
+          "selected": [
+            {
+              "name": "Size",
+              "label": "8 Batteries"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "power-source": [
+            "AC-powered"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "dSZvY1L",
+        "title": "Charger for NP-F Batteries",
+        "description": "The Dracast Charger for NP-F Batteries is a universal AC power charger (100-240 VAC) designed specifically for NP-F type batteries used in Dracast lighting fixtures. It features a single-bay design and is compatible with Sony L Series/NP-F batteries, including the NP-F5xx, NP-F7xx, and NP-F9xx series.",
+        "brands": [
+          {
+            "id": "MxzW",
+            "name": "Dracast"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/c1219877-faa8-43c2-913b-4b2637436acf?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black battery charger with USB-C cable connector shown from above."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/4410095f-9ee0-467a-a770-8eb8f145b81e?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/4410095f-9ee0-467a-a770-8eb8f145b81e?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Black battery charger with USB-C cable connector shown from above."
+          }
+        ],
+        "category": {
+          "slug": "camera-battery-chargers",
+          "title": "Camera Battery Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "battery-accessories",
+              "title": "Battery Accessories"
+            },
+            {
+              "slug": "camera-battery-chargers",
+              "title": "Camera Battery Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "For Dracast Lighting Fixtures",
+          "100-240 VAC",
+          "Compatible with NP-F5xx/7xx/9xx series batteries",
+          "Universal AC power"
+        ],
+        "colors": [
+          {
+            "hex": "#262826",
+            "percentage": 0.923
+          },
+          {
+            "hex": "#686866",
+            "percentage": 0.077
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/dSZvY1L-oHaU-bQpm8C?o=01M3RTS96TVQ7BDC5Y12RQ3X21&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 9,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 6,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3.5,
+                "unit": "in"
+              },
+              "height": {
+                "number": 2.25,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 8,
+                "unit": "oz"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "power-source": [
+            "AC-powered"
+          ],
+          "charging-interface-type": [
+            "DC barrel connector"
+          ],
+          "connector-gender": [
+            "Female"
+          ],
+          "plug-type": [
+            "US"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "n2aHwah",
+        "title": "DICENTIS Charger for Five Batteries",
+        "description": "The Bosch DICENTIS Charger for Five Batteries (F.01U.298.809) is a professional-grade, multi-bay charging station designed specifically for DICENTIS system batteries. It features five horizontal charging slots, ensuring efficient power management for multiple units simultaneously. The device is housed in a durable black plastic chassis with integrated ventilation grilles on the top section to prevent overheating during operation.",
+        "brands": [
+          {
+            "id": "EF31",
+            "name": "Bosch"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/7bddee95-6648-4341-971d-61b49b8c962d?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/7bddee95-6648-4341-971d-61b49b8c962d?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Frontal three-quarter view of a black Bosch DICENTIS five-bay battery charger."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/283358a6-3dec-4bca-9ff0-7ffd9d83c53c?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/283358a6-3dec-4bca-9ff0-7ffd9d83c53c?aid=01M6D4138QKVZ7FAHB2N30GK27&mid=oHaU",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Three-quarter view of a black Bosch DICENTIS five-bay battery charger on a white background."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-battery-chargers",
+          "title": "General Purpose Battery Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "battery-accessories",
+              "title": "Battery Accessories"
+            },
+            {
+              "slug": "general-purpose-battery-chargers",
+              "title": "General Purpose Battery Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Multi-bay charging with five horizontal slots",
+          "Designed for DICENTIS system batteries",
+          "Integrated ventilation grilles for heat dissipation"
+        ],
+        "colors": [
+          {
+            "hex": "#424244",
+            "percentage": 0.5087
+          },
+          {
+            "hex": "#171718",
+            "percentage": 0.2447
+          },
+          {
+            "hex": "#5e5e5f",
+            "percentage": 0.1439
+          },
+          {
+            "hex": "#8b8a8a",
+            "percentage": 0.1027
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/n2aHwah-oHaU-bQpm8C?o=01M3NKBKQDWJT0GEFXDZVW3QYJ&aid=01M6D4138QKVZ7FAHB2N30GK27",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 1295.95,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOjIxM2E2NmVkNTU1ZmFjNmEiLCAib2Zmc2V0IjogMTB9"
+  }
+}

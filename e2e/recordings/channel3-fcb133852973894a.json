@@ -1,0 +1,1476 @@
+{
+  "request": {
+    "query": "CR2032 3V lithium coin battery",
+    "limit": 10,
+    "filters": {
+      "price": {
+        "max_price": 25
+      }
+    }
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "12TIjoA",
+        "title": "Energizer CR2032 Lithium Coin Battery",
+        "description": "Energizer CR2032 3V Lithium Coin Battery, featuring a 240 mAh capacity and specialized child safety measures including Color Alert+, a secure packaging design, and a bitter coating to deter ingestion.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/bed940ae-f455-4bd7-a2e3-cf950eef9f24?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "product_information",
+            "alt_text": "Energizer CR2032 lithium coin battery packaging with safety warnings."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/3d9a79dd-ad99-4e4f-9648-57e1f8e2c1f8?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Energizer CR2032 lithium coin battery packaging with safety warnings."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium/Manganese Dioxide"
+        ],
+        "key_features": [
+          "3V Output Voltage",
+          "240 mAh typical capacity",
+          "Color Alert+ child safety feature",
+          "Bitter coating to discourage ingestion",
+          "Child secure packaging"
+        ],
+        "colors": [
+          {
+            "hex": "#f5f5f4",
+            "percentage": 0.2534
+          },
+          {
+            "hex": "#cdced1",
+            "percentage": 0.144
+          },
+          {
+            "hex": "#717a92",
+            "percentage": 0.1428
+          },
+          {
+            "hex": "#4c638f",
+            "percentage": 0.1323
+          },
+          {
+            "hex": "#3d4b6e",
+            "percentage": 0.1185
+          },
+          {
+            "hex": "#1d1614",
+            "percentage": 0.1185
+          },
+          {
+            "hex": "#a2a5af",
+            "percentage": 0.0905
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/12TIjoA-oHaU-bQpm8C?o=01M3D7RTWEYHZRP6Y1C9G1PVV8&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 6.95,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 0.01,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ],
+          "battery-technology": [
+            "Lithium-manganese dioxide (LiMnO2)"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "0UF1rsf",
+        "title": "Panasonic CR2032 3 Volt Lithium Coin Cell Battery - 4 Pack",
+        "description": "The Panasonic CR2032 Lithium Coin Battery (4-pack) provides reliable, long-lasting 3V power for a wide variety of small electronic devices such as car FOBs, calculators, watches, fitness trackers, and medical instruments. Designed to perform in extreme temperatures ranging from 14 to 140°F, these batteries feature a low self-discharge rate, allowing them to maintain power for up to 8 years when properly stored. The packaging is child-resistant and meets essential safety standards, including Reese's Law.",
+        "brands": [
+          {
+            "id": "vlUR",
+            "name": "Panasonic"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/db882e70-1acb-4dd8-9aaa-5e016239d949?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=yqJJ",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Hand holding a battery while a car is in the background."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "lithium"
+        ],
+        "key_features": [
+          "3.0 Volt output",
+          "Child-resistant safety standards based packaging",
+          "Long storage life (up to 8 years)",
+          "Wide operating temperature range (14°F to 140°F)",
+          "Meets IEC 60086-4:2019, ANSI C18.3M Part 2:2024, CFR 16, Part 1700.20, and CFR 16, Part 1263 (Reeses Law)",
+          "Operating temperature range: -22°F to 140°F",
+          "No added mercury",
+          "Compatible with watches, calculators, remote controls, and medical devices",
+          "Low self-discharge rate"
+        ],
+        "colors": [
+          {
+            "hex": "#e1b3a2",
+            "percentage": 0.1616
+          },
+          {
+            "hex": "#6c5d61",
+            "percentage": 0.1493
+          },
+          {
+            "hex": "#1e130c",
+            "percentage": 0.1488
+          },
+          {
+            "hex": "#d79880",
+            "percentage": 0.1302
+          },
+          {
+            "hex": "#a68981",
+            "percentage": 0.118
+          },
+          {
+            "hex": "#f5ded3",
+            "percentage": 0.1082
+          },
+          {
+            "hex": "#986c5b",
+            "percentage": 0.1022
+          },
+          {
+            "hex": "#4b342d",
+            "percentage": 0.0817
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/0UF1rsf-yqJJ-bQpm8C?o=01M3698JM0XW7ZTBQ4N9RDW7AX&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "microcenter.com",
+            "price": {
+              "price": 3.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/0UF1rsf-oHaU-bQpm8C?o=01M3JBWCCM5VQS4XR9BGZ3KCZG&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 6.3,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 0.04,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/0UF1rsf-LPzf-bQpm8C?o=01M60JMPKHFZD0NW9TNJY3M84D&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "newegg.com",
+            "price": {
+              "price": 9.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.007,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-features": [
+            "Cold resistant",
+            "Heat resistant"
+          ],
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-size": [
+            "CR2032"
+          ],
+          "material": [
+            "Metal",
+            "Synthetic"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "uaO0I2A",
+        "title": "CR2032 3V Lithium Coin Battery",
+        "description": "The Duracell CR2032 3V Lithium Coin Battery is a high-quality, durable power source specifically engineered for small, low-drain electronic devices. It is ideal for use in key fobs, scales, glucometers, watches, calculators, and fitness devices, providing consistent performance even in extreme temperatures. This reliable battery comes with a 10-year guarantee, ensuring long-lasting power for home medical and electronic devices.",
+        "brands": [
+          {
+            "id": "NZDS",
+            "name": "Duracell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b69cf232-1174-49c9-b7a4-700793f56a81?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=T9Fg",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "product_information",
+            "alt_text": "Packaging box for a Duracell CR2032 coin battery showing brand and specifications."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [
+          "Designed for use in glucometers, electronics, security and fitness devices",
+          "Fits key fobs, scales, and more",
+          "Dependable power for home medical devices",
+          "10-year guarantee",
+          "Consistent power in extreme temperatures"
+        ],
+        "colors": [
+          {
+            "hex": "#020101",
+            "percentage": 0.5337
+          },
+          {
+            "hex": "#c87640",
+            "percentage": 0.1611
+          },
+          {
+            "hex": "#f1ede7",
+            "percentage": 0.133
+          },
+          {
+            "hex": "#d5aa86",
+            "percentage": 0.1036
+          },
+          {
+            "hex": "#5b3a29",
+            "percentage": 0.0685
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/uaO0I2A-T9Fg-bQpm8C?o=01M3TYQBKP3ACWN53ER4ZNYE41&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "adorama.com",
+            "price": {
+              "price": 4.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.025,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "tZL762Z",
+        "title": "Maxell CR2032 3V Lithium Coin Battery",
+        "description": "The Maxell CR2032 3V Lithium Coin Battery is a high-density button cell designed for electronics such as sensors, activity trackers, and medical devices. It features a lithium manganese dioxide chemistry with a typical capacity of 220mAh and a 3V output, which is approximately double the voltage of alkaline or silver oxide batteries. This battery is engineered for high-voltage response and superior leakage resistance, even under conditions of high temperature and acceleration.",
+        "brands": [
+          {
+            "id": "mDFV",
+            "name": "Maxell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/6c2308d3-be64-4ad5-9030-fb0e7a9f5f29?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/6c2308d3-be64-4ad5-9030-fb0e7a9f5f29?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Blister pack of five Maxell CR2032 3V lithium coin batteries on a patterned background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/4f57f87f-9452-4908-a2e8-40539a8a8cee?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "Blister pack of one Maxell CR2032 3V lithium coin battery on a patterned background."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium Manganese Dioxide"
+        ],
+        "key_features": [
+          "Lithium Manganese Dioxide Battery",
+          "For Electronics",
+          "High-Voltage Response",
+          "Superior Leakage Resistance"
+        ],
+        "colors": [
+          {
+            "hex": "#302d29",
+            "percentage": 0.2914
+          },
+          {
+            "hex": "#5e5858",
+            "percentage": 0.1417
+          },
+          {
+            "hex": "#a4a6a4",
+            "percentage": 0.1368
+          },
+          {
+            "hex": "#908686",
+            "percentage": 0.1273
+          },
+          {
+            "hex": "#6d7474",
+            "percentage": 0.1221
+          },
+          {
+            "hex": "#c9cbca",
+            "percentage": 0.1199
+          },
+          {
+            "hex": "#603433",
+            "percentage": 0.0608
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/tZL762Z-oHaU-bQpm8C?o=01M3T2X814FS7HPXWT4VD4F4ZH&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 4.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 5.45,
+                "unit": "in"
+              },
+              "width": {
+                "number": 2,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.2,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.045,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-technology": [
+            "Lithium-manganese dioxide (LiMnO2)"
+          ],
+          "battery-size": [
+            "CR2032"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "q2d8SiT",
+        "title": "Watson CR2032 3V Lithium Coin Battery",
+        "description": "Power your smaller devices with this Watson CR2032 3V Lithium Coin Battery. Featuring a CR2032 coin size and 240mAh of power capacity, it is an ideal power source for car key fobs, motherboard CMOS, tracking tags, and more. Designed for long-lasting performance, this battery offers low self-discharge and leak protection for a lifespan of up to 3 years.",
+        "brands": [
+          {
+            "id": "qvde",
+            "name": "Watson"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/d983b5fb-dc12-48d5-96d9-6f95bd2149b9?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/d983b5fb-dc12-48d5-96d9-6f95bd2149b9?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Cardboard packaging for a Watson CR2032 coin battery."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium Manganese Dioxide"
+        ],
+        "key_features": [
+          "CR2032 Battery Size",
+          "Lithium Manganese Dioxide Chemistry",
+          "3V Output & 240mAh of Power Capacity",
+          "Up to 3-Year Storage Life",
+          "Low Self-Discharge",
+          "Leak Protection Construction",
+          "Child-Safe Packaging"
+        ],
+        "colors": [
+          {
+            "hex": "#d5d8db",
+            "percentage": 0.434
+          },
+          {
+            "hex": "#045b93",
+            "percentage": 0.4074
+          },
+          {
+            "hex": "#346f97",
+            "percentage": 0.099
+          },
+          {
+            "hex": "#9db5c6",
+            "percentage": 0.0596
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/q2d8SiT-oHaU-bQpm8C?o=01M63C4NA0JFHNWYY5EB9FTVFA&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 1.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 3.15,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.7,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.2,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.01,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Lithium-manganese dioxide (LiMnO2)"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "SvtP429",
+        "title": "CR2032 3V Lithium Coin Cell Battery 1 pack",
+        "description": "The Panasonic CR2032 is a 3V lithium coin cell battery designed to provide reliable, long-lasting power for a wide variety of small electronic devices. It features a low self-discharge rate, allowing it to maintain power for up to 8 years when stored properly, and operates effectively in extreme temperatures ranging from 14 to 140°F. For safety, it comes in child-resistant packaging that meets various safety standards, including Reese's Law.",
+        "brands": [
+          {
+            "id": "vlUR",
+            "name": "Panasonic"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/05d5db88-76e0-457b-a6bd-ee7cd63a8207?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Front view of Panasonic CR2032 Lithium coin battery packaging."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ee9f1cf0-1c3d-4377-81bf-572ac0851719?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/ee9f1cf0-1c3d-4377-81bf-572ac0851719?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "Front view of Panasonic CR2032 Lithium coin battery packaging."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [
+          "3V Output",
+          "Operating Temperature: 14 to 140°F",
+          "8-Year Storage Life",
+          "Child-Resistant Packaging",
+          "3V Lithium Coin Cell",
+          "Long-lasting power",
+          "Suitable for calculators and remote keyless entry systems",
+          "Long-lasting lithium chemical composition",
+          "Coin cell/button battery design",
+          "Ideal for various consumer electronics"
+        ],
+        "colors": [
+          {
+            "hex": "#cb261e",
+            "percentage": 0.2136
+          },
+          {
+            "hex": "#fefeff",
+            "percentage": 0.1835
+          },
+          {
+            "hex": "#e15125",
+            "percentage": 0.1315
+          },
+          {
+            "hex": "#d08a4c",
+            "percentage": 0.1166
+          },
+          {
+            "hex": "#e6c082",
+            "percentage": 0.1012
+          },
+          {
+            "hex": "#690e0b",
+            "percentage": 0.0889
+          },
+          {
+            "hex": "#683126",
+            "percentage": 0.083
+          },
+          {
+            "hex": "#fbf4e1",
+            "percentage": 0.0817
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/SvtP429-oHaU-bQpm8C?o=01M3GSKA2V08E041754PG6JG7G&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 3.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 0.02,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "CR2032"
+          ],
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-type": [
+            "Disposable"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "KGYjjx6",
+        "title": "Watson CR2032 3V Lithium Coin Battery (10-Pack)",
+        "description": "Power your smaller devices with this 10-pack of Watson CR2032 3V Lithium Coin Batteries. Featuring a 240mAh power capacity and Lithium Manganese Dioxide chemistry, these batteries are ideal for car key fobs, motherboard CMOS, tracking tags, and more. They are designed for long-lasting performance with low self-discharge and leak protection, offering a storage life of up to 3 years.",
+        "brands": [
+          {
+            "id": "qvde",
+            "name": "Watson"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/a9bf3b30-8720-493d-89a5-6a62e3a928df?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "product_information",
+            "alt_text": "Blister pack of 10 Watson CR2032 coin batteries."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/96fc1d6e-045a-4f76-a7c4-2649b3004390?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Blister pack of 10 Watson CR2032 coin batteries."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium Manganese Dioxide"
+        ],
+        "key_features": [
+          "CR2032 Battery Size",
+          "Lithium Manganese Dioxide Chemistry",
+          "3V Output & 240mAh of Power Capacity",
+          "Up to 3-Year Storage Life",
+          "Low Self-Discharge",
+          "Leak Protection Construction",
+          "Child-Safe Packaging"
+        ],
+        "colors": [
+          {
+            "hex": "#055994",
+            "percentage": 0.4028
+          },
+          {
+            "hex": "#bac0c7",
+            "percentage": 0.4027
+          },
+          {
+            "hex": "#226491",
+            "percentage": 0.1163
+          },
+          {
+            "hex": "#598db2",
+            "percentage": 0.0783
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/KGYjjx6-oHaU-bQpm8C?o=01M5Z7512XV0DKJQCWBDYBJ46B&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 5.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 8.95,
+                "unit": "in"
+              },
+              "width": {
+                "number": 5.85,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.15,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.11,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Lithium-manganese dioxide (LiMnO2)"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "KsnWQqS",
+        "title": "CR2032 3V Lithium Coin Cell Battery 10 Pack",
+        "description": "Panasonic CR2032 3V Lithium Coin Cell Batteries are designed for high reliability and long-term stability. These ultra-compact batteries maintain 90% of their original capacity even after 10 years due to a chemically stable combination of lithium and manganese dioxide. They are ideal for small devices such as digital watches, car keys, memory back-ups, laser pens, fitness appliances, and medical devices like tensiometers and clinical thermometers.",
+        "brands": [
+          {
+            "id": "vlUR",
+            "name": "Panasonic"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/5ce29ec6-5257-481e-a865-c9ce6d71001b?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/5ce29ec6-5257-481e-a865-c9ce6d71001b?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaged CR2032 lithium coin batteries with Panasonic branding."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/35c2efdb-58db-4c5e-bf4d-442f7f449b80?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=oHaU",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Hand using a tool with Lithium Coin batteries in a car."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium",
+          "Manganese dioxide"
+        ],
+        "key_features": [
+          "10-year shelf life (maintains 90% capacity)",
+          "3V high voltage in ultra-compact design",
+          "Chemically stable lithium and manganese dioxide composition",
+          "UL safety standard certified",
+          "Suitable for car keys, digital watches, and medical devices",
+          "Child-Safe Packaging",
+          "10 batteries per pack",
+          "CR2032 size"
+        ],
+        "colors": [
+          {
+            "hex": "#c52e20",
+            "percentage": 0.2778
+          },
+          {
+            "hex": "#a59a8d",
+            "percentage": 0.1721
+          },
+          {
+            "hex": "#9f1714",
+            "percentage": 0.1551
+          },
+          {
+            "hex": "#e25c2d",
+            "percentage": 0.1244
+          },
+          {
+            "hex": "#4f120f",
+            "percentage": 0.1024
+          },
+          {
+            "hex": "#d6cdab",
+            "percentage": 0.0887
+          },
+          {
+            "hex": "#85776b",
+            "percentage": 0.0795
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/KsnWQqS-oHaU-bQpm8C?o=01M3N0WX2641BKBS1AM6XZJCF1&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bhphotovideo.com",
+            "price": {
+              "price": 6.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": {
+                "number": 6.85,
+                "unit": "in"
+              },
+              "width": {
+                "number": 4.55,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.25,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.1,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "CR2032"
+          ],
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-type": [
+            "Disposable",
+            "Standalone (included)"
+          ],
+          "product-certifications-standards": [
+            "UL certified"
+          ]
+        },
+        "ratings": {
+          "value": 4.88,
+          "count": 8,
+          "source_count": 2
+        }
+      },
+      {
+        "id": "tY1casS",
+        "title": "Eveready CR2032 Lithium Coin Batteries, 10-Pack",
+        "description": "Eveready CR2032 Lithium Coin Batteries are reliable 3V power cells designed for low-drain electronics. This 10-pack is ideal for essential small devices such as key fobs, watches, calculators, fitness trackers, thermometers, medical devices, and remotes. These batteries feature a long shelf life, ensuring they are ready for backup storage or emergency use.",
+        "brands": [
+          {
+            "id": "Wkvr",
+            "name": "Eveready"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/15cd76f5-f03a-4fee-9d6b-bebc5ab66f07?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=Sp6I",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "product_information",
+            "alt_text": "Red 10-pack of Eveready CR2032 lithium coin batteries."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [
+          "Includes ten 3V lithium coin cells",
+          "Reliable energy for low-drain devices",
+          "Compatible with key fobs, watches, calculators, kitchen scales, fitness trackers, thermometers, medical devices, toys, and remotes",
+          "Durable construction to help prevent leaks",
+          "Long shelf life for backup storage"
+        ],
+        "colors": [
+          {
+            "hex": "#f32627",
+            "percentage": 0.441
+          },
+          {
+            "hex": "#e73333",
+            "percentage": 0.2209
+          },
+          {
+            "hex": "#c7c1be",
+            "percentage": 0.1493
+          },
+          {
+            "hex": "#c33c3d",
+            "percentage": 0.1103
+          },
+          {
+            "hex": "#c76e6f",
+            "percentage": 0.0786
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/tY1casS-Sp6I-bQpm8C?o=01M3XCHCJ55JBG718MN7ABRK17&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "northerntool.com",
+            "price": {
+              "price": 2.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 9,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3,
+                "unit": "in"
+              },
+              "height": {
+                "number": 1,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.125,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "CZZdcwZ",
+        "title": "ENERGIZER Lithium 2032/CR2032 ECR2032BP Coin Cell Battery",
+        "description": "This is a single pack of Energizer CR2032 3V lithium coin cell batteries. Designed for reliable, long-lasting power, these batteries are suitable for various small electronics like key fobs, remote controls, glucose monitors, and toys. They maintain performance in extreme temperatures ranging from -22°F to 140°F and can hold power for up to 10 years in storage. The packaging is designed to be child-resistant to help prevent accidental ingestion.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/46b31e70-191f-4425-9658-7df879e46a48?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=XV5b",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/46b31e70-191f-4425-9658-7df879e46a48?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=XV5b",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Packaged Energizer CR2032 lithium coin battery in blue and white."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/3d4b56e7-32a9-4255-966f-b80ab70e0802?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=XV5b",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Silver and blue packaged Energizer CR2032 lithium coin battery."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ad73c419-1513-4cb0-bd7c-a9b7413675a4?aid=01M6D4344GW7092EQ13Y8VZNH5&mid=XV5b",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Packaging of Energizer 2032 battery with warnings and text."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [
+          "Battery Voltage: 3V",
+          "Number in Package: 1",
+          "3V lithium coin batteries perform in extreme temperatures from -22 F to 140 F",
+          "Long lasting toy, health monitor and remote batteries",
+          "Coin cell batteries hold power for up to 10 years in storage",
+          "CR2032 3V lithium coin battery enclosed in child-resistant packaging to help keep kids safe from ingestion",
+          "Replacement for 5004LC, BR2032, DL2032, ECR2032, and ST-T15",
+          "Single Use portable power",
+          "Clam Pack/Plastic packaging",
+          "Capacity: 220mAh"
+        ],
+        "colors": [
+          {
+            "hex": "#92c3e3",
+            "percentage": 0.2973
+          },
+          {
+            "hex": "#fefffe",
+            "percentage": 0.1608
+          },
+          {
+            "hex": "#488fc2",
+            "percentage": 0.1454
+          },
+          {
+            "hex": "#131920",
+            "percentage": 0.1301
+          },
+          {
+            "hex": "#769fbe",
+            "percentage": 0.1007
+          },
+          {
+            "hex": "#395f85",
+            "percentage": 0.0981
+          },
+          {
+            "hex": "#d0e2f0",
+            "percentage": 0.0677
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-XV5b-bQpm8C?o=01M6AK9D92T0VTP42CQ8FEFPVD&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "campsaver.com",
+            "price": {
+              "price": 2.89,
+              "compare_at_price": 5.99,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-KojF-bQpm8C?o=01M15HSRMTF1KXF2KRH9BT0BJ7&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "menards.com",
+            "price": {
+              "price": 3.52,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 0.1875,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-wAe3-bQpm8C?o=01KBPD9JDDGXFEKSFY9Q4J024R&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "acehardware.com",
+            "price": {
+              "price": 6.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.014,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-BQlp-bQpm8C?o=01M5NT57PTZ9ZX9W1RACAXBN6N&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "truevalue.com",
+            "price": {
+              "price": 7.79,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": {
+                "number": 3.2,
+                "unit": "mm"
+              },
+              "weight": null
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-d8bL-bQpm8C?o=01M1N4RHSXT3AEPW5X9SKH9RC2&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "shop.advanceautoparts.com",
+            "price": {
+              "price": 9.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/CZZdcwZ-p1PB-bQpm8C?o=01KY05GKWTZ1C9MWD2WCPRTDJY&aid=01M6D4344GW7092EQ13Y8VZNH5",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 27.04,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.005,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "CR2032"
+          ],
+          "battery-type": [
+            "Disposable",
+            "Rechargeable"
+          ],
+          "battery-technology": [
+            "Lithium-manganese dioxide (LiMnO2)",
+            "Lithium"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "material": [
+            "Metal",
+            "Plastic"
+          ],
+          "battery-features": [
+            "Heat resistant",
+            "Cold resistant"
+          ]
+        },
+        "ratings": {
+          "value": 4.9,
+          "count": 1316,
+          "source_count": 2
+        }
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOjYzNGU0ODg5NDE3Yzc2YTEiLCAib2Zmc2V0IjogMTB9"
+  }
+}

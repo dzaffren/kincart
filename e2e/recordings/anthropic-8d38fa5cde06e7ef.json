@@ -1,0 +1,176 @@
+{
+  "request": {
+    "model": "claude-haiku-5-5",
+    "max_tokens": 4000,
+    "system": "You help an older person choose something to buy. Each listing under their price limit comes with its photo, if it has one. A listing sells the main thing in its photo, whatever its words say. First leave out every listing that is not the product they asked for: a case, holder, organizer, charger, cable or other part for it, even when its photo shows the product inside it, since the product's own printed retail pack is the only packaging that counts as the product; another size or type than they said; and any listing whose photo shows something other than its name and words say, even when the words fit. Judge a listing with no photo by its name and words alone. Any brand or pack size of the product counts. From the listings left, pick up to three that fit what they asked, best first. Fewer than three is fine, and none if none is left. Never pick a listing that you would describe as only a part, or whose photo shows something else. For each pick write one short, plain sentence each: what it is, why it fits what they asked, and one thing to watch for, such as size, pack count, fit or delivery. Use only what the listing says. Never mention a price or the shop. Refer to listings only by their id. Then say whether any listing above their limit is the thing they asked for.",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "They asked: \"CR2032 coin battery\"\n\nUnder their price limit, pick from these:"
+          },
+          {
+            "type": "text",
+            "text": "Listing 12TIjoA: {\"name\":\"Energizer CR2032 Lithium Coin Battery\",\"details\":\"Energizer CR2032 3V Lithium Coin Battery, featuring a 240 mAh capacity and specialized child safety measures including Color Alert+, a secure packaging design, and a bitter coating to deter ingestion.\\nbattery-type: Disposable\\nbattery-size: CR2032\\nbattery-technology: Lithium-manganese dioxide (LiMnO2)\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing aJi2eDh: {\"name\":\"Energizer CR2032 3v Lithium Button Cell Batteries\",\"details\":\"A bulk pack of Energizer CR2032 3V lithium button cell batteries. These high-power batteries are designed for long service life and ideal temperature resistance, making them suitable for various small electronic devices.\\nbattery-size: CR2032\\nbattery-technology: Lithium\\nbattery-type: Disposable\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing uaO0I2A: {\"name\":\"CR2032 3V Lithium Coin Battery\",\"details\":\"The Duracell CR2032 3V Lithium Coin Battery is a high-quality, durable power source specifically engineered for small, low-drain electronic devices. It is ideal for use in key fobs, scales, glucometers, watches, calculators, and fitness devices, providing consistent performance even in extreme tempe\\nbattery-technology: Lithium\\nbattery-type: Disposable\\nbattery-size: CR2032\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing tZL762Z: {\"name\":\"Maxell CR2032 3V Lithium Coin Battery\",\"details\":\"The Maxell CR2032 3V Lithium Coin Battery is a high-density button cell designed for electronics such as sensors, activity trackers, and medical devices. It features a lithium manganese dioxide chemistry with a typical capacity of 220mAh and a 3V output, which is approximately double the voltage of \\nbattery-type: Disposable\\nbattery-technology: Lithium-manganese dioxide (LiMnO2)\\nbattery-size: CR2032\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing q2d8SiT: {\"name\":\"Watson CR2032 3V Lithium Coin Battery\",\"details\":\"Power your smaller devices with this Watson CR2032 3V Lithium Coin Battery. Featuring a CR2032 coin size and 240mAh of power capacity, it is an ideal power source for car key fobs, motherboard CMOS, tracking tags, and more. Designed for long-lasting performance, this battery offers low self-discharg\\nbattery-technology: Lithium-manganese dioxide (LiMnO2)\\nbattery-type: Disposable\\nbattery-size: CR2032\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing SvtP429: {\"name\":\"CR2032 3V Lithium Coin Cell Battery 1 pack\",\"details\":\"The Panasonic CR2032 is a 3V lithium coin cell battery designed to provide reliable, long-lasting power for a wide variety of small electronic devices. It features a low self-discharge rate, allowing it to maintain power for up to 8 years when stored properly, and operates effectively in extreme tem\\nbattery-size: CR2032\\nbattery-technology: Lithium\\nbattery-type: Disposable\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing KGYjjx6: {\"name\":\"Watson CR2032 3V Lithium Coin Battery (10-Pack)\",\"details\":\"Power your smaller devices with this 10-pack of Watson CR2032 3V Lithium Coin Batteries. Featuring a 240mAh power capacity and Lithium Manganese Dioxide chemistry, these batteries are ideal for car key fobs, motherboard CMOS, tracking tags, and more. They are designed for long-lasting performance wi\\nbattery-technology: Lithium-manganese dioxide (LiMnO2)\\nbattery-type: Disposable\\nbattery-size: CR2032\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing KsnWQqS: {\"name\":\"CR2032 3V Lithium Coin Cell Battery 10 Pack\",\"details\":\"Panasonic CR2032 3V Lithium Coin Cell Batteries are designed for high reliability and long-term stability. These ultra-compact batteries maintain 90% of their original capacity even after 10 years due to a chemically stable combination of lithium and manganese dioxide. They are ideal for small devic\\nbattery-size: CR2032\\nbattery-technology: Lithium\\nbattery-type: Disposable, Standalone (included)\\nproduct-certifications-standards: UL certified\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing 0UF1rsf: {\"name\":\"Panasonic CR2032 3 Volt Lithium Coin Cell Battery - 4 Pack\",\"details\":\"The Panasonic CR2032 Lithium Coin Battery (4-pack) provides reliable, long-lasting 3V power for a wide variety of small electronic devices such as car FOBs, calculators, watches, fitness trackers, and medical instruments. Designed to perform in extreme temperatures ranging from 14 to 140°F, these ba\\nbattery-type: Disposable\\nbattery-features: Cold resistant, Heat resistant\\nbattery-technology: Lithium\\nbattery-size: CR2032\\nmaterial: Metal, Synthetic\\npattern: Solid\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Listing tY1casS: {\"name\":\"Eveready CR2032 Lithium Coin Batteries, 10-Pack\",\"details\":\"Eveready CR2032 Lithium Coin Batteries are reliable 3V power cells designed for low-drain electronics. This 10-pack is ideal for essential small devices such as key fobs, watches, calculators, fitness trackers, thermometers, medical devices, and remotes. These batteries feature a long shelf life, en\\nbattery-technology: Lithium\\nbattery-type: Disposable\\nbattery-size: CR2032\"}"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "text",
+            "text": "Above their price limit, not to pick from:\n[]"
+          }
+        ]
+      }
+    ],
+    "output_config": {
+      "effort": "low",
+      "format": {
+        "type": "json_schema",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "picks",
+            "aboveLimit"
+          ],
+          "properties": {
+            "picks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "what",
+                  "why",
+                  "watch"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "what": {
+                    "type": "string"
+                  },
+                  "why": {
+                    "type": "string"
+                  },
+                  "watch": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "aboveLimit": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "reply": {
+    "model": "claude-haiku-5-5",
+    "id": "msg_011CgdNj2Vt8Jg2ZyzyvTs6a",
+    "type": "message",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "",
+        "signature": "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"
+      },
+      {
+        "type": "text",
+        "text": "{\"picks\":[{\"id\":\"12TIjoA\",\"what\":\"A single Energizer CR2032 3-volt lithium coin battery.\",\"why\":\"It is the CR2032 coin battery you asked for, in a single pack.\",\"watch\":\"It has child-safety features, so check that it fits the device before you buy.\"},{\"id\":\"uaO0I2A\",\"what\":\"A single Duracell CR2032 3-volt lithium coin battery.\",\"why\":\"It is the CR2032 coin battery you asked for, in a single pack.\",\"watch\":\"Check that your device takes a CR2032 battery before you buy.\"},{\"id\":\"SvtP429\",\"what\":\"A single Panasonic CR2032 3-volt lithium coin cell battery.\",\"why\":\"It is the CR2032 coin battery you asked for, in a single pack.\",\"watch\":\"Check that your device takes a CR2032 battery before you buy.\"}],\"aboveLimit\":false}"
+      }
+    ],
+    "container": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "stop_details": null,
+    "usage": {
+      "input_tokens": 5818,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 909,
+      "output_tokens_details": {
+        "thinking_tokens": 613
+      },
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "diagnostics": null
+  }
+}

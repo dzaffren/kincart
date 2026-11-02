@@ -1,0 +1,1416 @@
+{
+  "request": {
+    "query": "batteries for clock",
+    "limit": 10,
+    "filters": {
+      "price": {
+        "max_price": 50
+      }
+    }
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "Y466rCo",
+        "title": "Wall Clock",
+        "description": "This is a modern, round wall clock designed for use in offices, homes, classrooms, or gyms. It features a silent, non-ticking sweep movement to ensure a quiet environment. The clock has a light wood grain face with clear, readable numbers and a protective front glass cover. It is battery-operated (requires 1 AA battery) and measures 8 inches in diameter.",
+        "brands": [
+          {
+            "id": "BYdk",
+            "name": "REGALWOVEN"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b266a6d6-3d6c-4c86-b579-c38e5a89a069?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/7cb77068-7601-4008-a5d4-62dc1c836e54?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Round light wood grain wall clock face with black hands."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9dfe2b90-06d9-4055-a661-91e5b4d2ad82?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/73d6a5cf-c6ae-4917-b3d7-14cbdbbe2052?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Back view of the black wall clock casing with battery compartment."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/83cd16e1-6795-4f85-aadc-37042262b708?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/fd4fd991-d26b-48e2-b4e8-cdc31cbd63ae?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Dark wood grain wall clock hanging on a wall near books and plants."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/0a584f89-0ac8-40b9-9525-a0997b43866d?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/4df16bae-95a0-4e52-962c-8fea3b4ee505?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Silent wall clock showing 'No Ticking' in a bedroom."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/09a5c266-97fe-4e60-bd4f-bb43c9c0ad0e?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "cleaned_url": "https://cdn.trychannel3.com/50664e61-e220-4328-8747-a8dccf201b63?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Z87s",
+            "is_main_image": false,
+            "shot_type": "scale_reference",
+            "alt_text": "Wall clock showing dimensions 8inch/20cm."
+          }
+        ],
+        "category": {
+          "slug": "wall-clocks",
+          "title": "Wall Clocks",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "decor",
+              "title": "Decor"
+            },
+            {
+              "slug": "clocks",
+              "title": "Clocks"
+            },
+            {
+              "slug": "wall-clocks",
+              "title": "Wall Clocks"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "plastic",
+          "glass"
+        ],
+        "key_features": [
+          "Silent, non-ticking sweep movement",
+          "Battery powered (1 AA battery, not included)",
+          "Clear, readable display with large numbers",
+          "Front glass cover for protection",
+          "8-inch diameter"
+        ],
+        "colors": [
+          {
+            "hex": "#f1e9e2",
+            "percentage": 0.9352
+          },
+          {
+            "hex": "#817b76",
+            "percentage": 0.0648
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/Y466rCo-Z87s-bQpm8C?o=01M1E74DCB0R5GZXC96TQ4PP09&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "kohls.com",
+            "price": {
+              "price": 21.1,
+              "compare_at_price": 24.02,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": {
+                "number": 8,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "numeral-style": [
+            "Arabic numerals"
+          ],
+          "display-mode": [
+            "Analog"
+          ],
+          "stand-display-type": [
+            "Wall-mounted"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "material": [
+            "Plastic",
+            "Glass"
+          ],
+          "clock-movement-type": [
+            "Quartz"
+          ],
+          "shape": [
+            "Round"
+          ],
+          "battery-type": [
+            "Standalone (not-included)"
+          ],
+          "power-source": [
+            "Battery-powered"
+          ],
+          "pattern": [
+            "Texture"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "bBpGz7o",
+        "title": "2032 Batteries",
+        "description": "Energizer 2032 Lithium Coin Batteries provide reliable, long lasting power for your important devices. These lithium 2032 batteries perform in extreme temperatures ranging from -22 F to 140 F for dependable power, even in the toughest conditions....",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/eb0475bd-d8ee-4f50-9f3a-832f1a6ab772?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=d8bL",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/67de4e9c-e1e5-437a-8064-b9594fec400d?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=d8bL",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Blister pack of six Energizer 2032 Lithium coin batteries."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Lithium"
+        ],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#c3c6c7",
+            "percentage": 0.2609
+          },
+          {
+            "hex": "#586d8d",
+            "percentage": 0.2413
+          },
+          {
+            "hex": "#345c8a",
+            "percentage": 0.1644
+          },
+          {
+            "hex": "#1b1a1b",
+            "percentage": 0.139
+          },
+          {
+            "hex": "#8391a6",
+            "percentage": 0.1029
+          },
+          {
+            "hex": "#334055",
+            "percentage": 0.0915
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/bBpGz7o-d8bL-bQpm8C?o=01M1N4PVQCW3P11XH9JHE2DNV6&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "shop.advanceautoparts.com",
+            "price": {
+              "price": 19.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Lithium"
+          ],
+          "battery-size": [
+            "CR2032"
+          ],
+          "battery-type": [
+            "Disposable"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "cFaJCOY",
+        "title": "Sorbus 16 Inch Battery Operated Analog Large Wall Clock",
+        "description": "The Sorbus 16-inch Large Numeral Decorative Wall Clock is a sophisticated and oversized analog clock designed to complement various home decor styles. Featuring a classic numeral design in white with gold-colored hands and a grey/white frame, it serves as both a functional timekeeper and a stylish wall accessory. This lightweight, battery-operated clock is easy to hang and suitable for multiple rooms, including the living room, kitchen, dining room, office, and hallway.",
+        "brands": [
+          {
+            "id": "r0tW",
+            "name": "Sorbus"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/95d9c07a-5969-4d54-a0f2-f68d70652ff2?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=p1PB",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/95d9c07a-5969-4d54-a0f2-f68d70652ff2?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=p1PB",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White numeral wall clock with gold hands on a white background."
+          }
+        ],
+        "category": {
+          "slug": "wall-clocks",
+          "title": "Wall Clocks",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "decor",
+              "title": "Decor"
+            },
+            {
+              "slug": "clocks",
+              "title": "Clocks"
+            },
+            {
+              "slug": "wall-clocks",
+              "title": "Wall Clocks"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "metal"
+        ],
+        "key_features": [
+          "16-inch diameter oversized design",
+          "Durable metal construction",
+          "Battery operated (Quartz movement)",
+          "Requires 1 AA battery (not included)",
+          "Classic numeral design suitable for multiple room types",
+          "Accurate analog time display",
+          "Lightweight design for easy hanging",
+          "FUNCTION and STYLE: Make a statement with this oversized analog clock - Fits most decor styles - Complete an empty wall or complement a decorative space such as a mantel or kitchen table",
+          "MULTIPURPOSE WALL CLOCKS: Use in the kitchen, dining room, living room, hallway, bar, above a fireplace, bathroom, office, bedroom, and more"
+        ],
+        "colors": [
+          {
+            "hex": "#f4f4f2",
+            "percentage": 0.6437
+          },
+          {
+            "hex": "#d2d1d1",
+            "percentage": 0.2539
+          },
+          {
+            "hex": "#8a8789",
+            "percentage": 0.1024
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/cFaJCOY-p1PB-bQpm8C?o=01M4CFD1Z9T8VB45MQXRY2BC8F&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 39.99,
+              "compare_at_price": 79.99,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.005,
+            "dimensions": {
+              "length": null,
+              "width": {
+                "number": 16,
+                "unit": "in"
+              },
+              "height": {
+                "number": 16,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/cFaJCOY-Qqxu-bQpm8C?o=01M5D3YKE3MB9DQ36RKBHS4GDK&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "lowes.com",
+            "price": {
+              "price": 40.99,
+              "compare_at_price": 81.98,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/cFaJCOY-Z87s-bQpm8C?o=01M4DX8JE7W4QM66XXBKGS6FH0&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "kohls.com",
+            "price": {
+              "price": 55.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.021,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": {
+                "number": 40,
+                "unit": "cm"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": {
+          "options": [
+            {
+              "name": "Color",
+              "values": [
+                {
+                  "label": "Black",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/04e57924-4d79-4a9f-acae-158eb76f094a",
+                  "product_id": "th1RSib"
+                },
+                {
+                  "label": "White",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/95d9c07a-5969-4d54-a0f2-f68d70652ff2",
+                  "product_id": "cFaJCOY"
+                },
+                {
+                  "label": "Brown",
+                  "exists": true,
+                  "available": null,
+                  "thumbnail_url": "https://cdn.trychannel3.com/01931896-0925-449c-8baf-0fd5bf7c86ce",
+                  "product_id": "d9CJqFB"
+                }
+              ]
+            }
+          ],
+          "selected": [
+            {
+              "name": "Color",
+              "label": "White"
+            }
+          ]
+        },
+        "structured_attributes": {
+          "display-mode": [
+            "Analog"
+          ],
+          "shape": [
+            "Round"
+          ],
+          "stand-display-type": [
+            "Wall-mounted"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "power-source": [
+            "Battery-powered"
+          ],
+          "numeral-style": [
+            "Arabic numerals"
+          ],
+          "material": [
+            "Metal"
+          ],
+          "clock-movement-type": [
+            "Quartz"
+          ],
+          "battery-type": [
+            "Standalone (not-included)"
+          ],
+          "battery-size": [
+            "AA"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "VTM1581",
+        "title": "Loud Alarm Clock for Heavy Sleepers",
+        "description": "This battery-powered digital alarm clock is designed for heavy sleepers, featuring a progressive ringtone that gradually increases in volume for a gentler wake-up experience. It boasts a large LED display that shows the time, date, and temperature (switchable between Celsius and Fahrenheit), and supports both 12 and 24-hour formats. The clock is encased in a shock-proof silicone cover, making it durable and portable, and includes a soft backlight for nighttime viewing activated by the snooze-light button.",
+        "brands": [
+          {
+            "id": "mcss",
+            "name": "Unique Bargains"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/cd3e8cea-ae17-482b-961f-1e0f303f95ab?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/1e573219-7e09-4aa9-82c0-63aabea51c21?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Large white digital alarm clock showing 10:30 and 27°C."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/1fb7b57c-393b-4be8-a5fa-2be9993d0d05?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Alarm clock on a white table next to a plant and mug."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/e1a3f46c-2d75-4054-b3ca-d780c30313de?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/e09a16e7-1ee3-4b32-a712-4a67d1447374?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Alarm clock in a bedroom setting showing snooze function."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ec66b4e5-675d-40d4-95fe-339ee34b3614?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/5dbaced8-8247-40b6-a439-e15701a28c30?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Alarm clock showing day and night display modes."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/f9e00f88-1f40-4458-9441-022fb38021e4?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Alarm clock placed on kitchen counter and shelf."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/fe2b6db9-e809-4696-97b2-21109931169d?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "scale_reference",
+            "alt_text": "Dimensions of the alarm clock: 5.9\" W x 1.77\" D x 2.75\" H."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b9cd2f31-dae6-484e-99e8-67689e3eab85?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/4201d188-7870-4217-afd2-ed361a3126ee?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Alarm clock on a wooden nightstand in a bedroom."
+          }
+        ],
+        "category": {
+          "slug": "alarm-clocks",
+          "title": "Alarm Clocks",
+          "path": [
+            {
+              "slug": "home-garden",
+              "title": "Home & Garden"
+            },
+            {
+              "slug": "decor",
+              "title": "Decor"
+            },
+            {
+              "slug": "clocks",
+              "title": "Clocks"
+            },
+            {
+              "slug": "alarm-clocks",
+              "title": "Alarm Clocks"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "silicone"
+        ],
+        "key_features": [
+          "Progressive ringtone design for a gentle wake-up",
+          "Large LED display showing time, date, and temperature",
+          "Battery powered (3 AAA batteries, not included)",
+          "Shock-proof silicone cover",
+          "Snooze function with 5-minute interval",
+          "Soft backlight for nighttime viewing",
+          "Supports 12/24-hour display"
+        ],
+        "colors": [
+          {
+            "hex": "#faf5e9",
+            "percentage": 0.4977
+          },
+          {
+            "hex": "#ccc7b8",
+            "percentage": 0.4197
+          },
+          {
+            "hex": "#4a453f",
+            "percentage": 0.0826
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/VTM1581-Qqxu-bQpm8C?o=01M16T7YXE7GHP8XNTAKVGTGPH&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "lowes.com",
+            "price": {
+              "price": 21.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": {
+              "length": {
+                "number": 5.9,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.77,
+                "unit": "in"
+              },
+              "height": {
+                "number": 2.75,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "stand-display-type": [
+            "Tabletop"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "display-technology": [
+            "LED"
+          ],
+          "alert-type": [
+            "Sound alarms"
+          ],
+          "battery-size": [
+            "AAA"
+          ],
+          "battery-type": [
+            "Standalone (not-included)"
+          ],
+          "clock-movement-type": [
+            "Digital"
+          ],
+          "display-mode": [
+            "Digital"
+          ],
+          "time-format": [
+            "12-hour and 24-hour"
+          ],
+          "power-source": [
+            "Battery-powered"
+          ],
+          "material": [
+            "Silicone"
+          ],
+          "numeral-style": [
+            "Digital digits"
+          ],
+          "shape": [
+            "Rectangular"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "X1c418N",
+        "title": "377 Batteries",
+        "description": "Energizer 377 Batteries are reliable silver oxide button cell batteries designed to provide long-lasting power for small electronic devices. With a voltage of 1.55V, these batteries are ideal for use in calculators, key fobs, heart rate monitors, glucose monitors, and various toys. They are designed for stability and can be stored for up to five years in a cool, dry place. These batteries serve as replacements for various models including 376/377, 377BP, D377, SB-AW, SR626SW, and SR66.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/8c1ab33d-b1fd-468a-9a21-1924e4a79226?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=BQlp",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Retail packaging for Energizer 377 silver oxide button cell batteries."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "silver oxide"
+        ],
+        "key_features": [
+          "1 pack of Energizer 377 Batteries",
+          "Ideal for calculators, key fobs, heart rate monitors, or glucose monitors",
+          "Lasts up to 5 years in storage",
+          "Silver oxide chemistry with 1.55 volts",
+          "Replacement for variety of button batteries including 376/377, 377BP, D377, SB-AW, SR626SW and SR66",
+          "Zero-mercury silver oxide button battery",
+          "Suitable for medical devices, calculators, toys, and watches",
+          "High-energy density, long life power source",
+          "Up to 8 years shelf life",
+          "Powers Small Electronic Devices"
+        ],
+        "colors": [],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-BQlp-bQpm8C?o=01KDENAJVAB8CWTWCGZ4JJPXJF&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "truevalue.com",
+            "price": {
+              "price": 6.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 0.18,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.75,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.5,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.01,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-1Evq-bQpm8C?o=01M3RDPPT660XXM37DZ5D0GZ2J&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "walgreens.com",
+            "price": {
+              "price": 8.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.014,
+            "dimensions": {
+              "length": {
+                "number": 3.45,
+                "unit": "in"
+              },
+              "width": {
+                "number": 1.6,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.45,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.05,
+                "unit": "lb"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/X1c418N-p1PB-bQpm8C?o=01KYXQYYHJ0SJP88K9NJKKV9JY&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 17.67,
+              "compare_at_price": 17.68,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.005,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Silver-oxide (Ag2O)",
+            "Lithium-ion (Li-ion)"
+          ],
+          "battery-type": [
+            "Disposable",
+            "Rechargeable"
+          ],
+          "battery-size": [
+            "CR2032"
+          ],
+          "connector-type": [
+            "JST-XH"
+          ]
+        },
+        "ratings": {
+          "value": 4.76,
+          "count": 645,
+          "source_count": 4
+        }
+      },
+      {
+        "id": "VISeFk2",
+        "title": "AA Batteries",
+        "description": "Duracell Coppertop AA alkaline batteries built in the with US and global parts contain Duracell’s exclusive POWER BOOST™ Ingredients which deliver dependable long-lasting power to your everyday devices throughout the home like toys baby devices home and kitchen accessories flashlights medical devices clocks and more. Our Duracell Coppertop AA alkaline batteries are guaranteed for 12 years in storage so you can rest assured they will be ready when you need them. From storm prep to holiday needs Duracell is the # 1 trusted battery brand.",
+        "brands": [
+          {
+            "id": "NZDS",
+            "name": "Duracell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/e835e79f-cb28-4240-a0fd-753e59d29a62?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=BsaX",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/e835e79f-cb28-4240-a0fd-753e59d29a62?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=BsaX",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Duracell AA alkaline battery packaging with PowerBoost branding."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Alkaline"
+        ],
+        "key_features": [
+          "Long-lasting power",
+          "Guaranteed for 12 years in storage",
+          "Suitable for toys, baby devices, home/kitchen accessories, flashlights, medical devices, and clocks"
+        ],
+        "colors": [
+          {
+            "hex": "#303535",
+            "percentage": 0.3885
+          },
+          {
+            "hex": "#600d10",
+            "percentage": 0.1687
+          },
+          {
+            "hex": "#f5f4f3",
+            "percentage": 0.1342
+          },
+          {
+            "hex": "#c2906d",
+            "percentage": 0.1217
+          },
+          {
+            "hex": "#181818",
+            "percentage": 0.0892
+          },
+          {
+            "hex": "#725748",
+            "percentage": 0.0816
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/VISeFk2-BsaX-bQpm8C?o=01M385TE0F6PGZH36A53DRR7N5&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "walmart.com",
+            "price": {
+              "price": 7.57,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "material": [
+            "Cardboard"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "FJIhrJI",
+        "title": "AAA Batteries",
+        "description": "Keep a reliable supply on hand with this 36-pack of Maxell AAA batteries. These alkaline cells power many household devices and come in a cardboard box for simple storage.",
+        "brands": [
+          {
+            "id": "mDFV",
+            "name": "Maxell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/23114d78-34e0-4c42-a1fa-8fad1ffcc30e?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=p1PB",
+            "cleaned_url": "https://cdn.trychannel3.com/fa894af7-187e-49ec-96f6-5804cd3f6b5c?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=p1PB",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Maxell AAA Alkaline batteries 36-pack value pack packaging."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Alkaline AAA batteries supply reliable power to a wide variety of household electronics.",
+          "36-pack provides a steady supply for your household electronics."
+        ],
+        "colors": [
+          {
+            "hex": "#2d90c0",
+            "percentage": 0.1694
+          },
+          {
+            "hex": "#8f9087",
+            "percentage": 0.163
+          },
+          {
+            "hex": "#d9ebec",
+            "percentage": 0.1555
+          },
+          {
+            "hex": "#d1cec3",
+            "percentage": 0.1385
+          },
+          {
+            "hex": "#487081",
+            "percentage": 0.1025
+          },
+          {
+            "hex": "#384e5a",
+            "percentage": 0.1002
+          },
+          {
+            "hex": "#98d0e6",
+            "percentage": 0.0921
+          },
+          {
+            "hex": "#7caebe",
+            "percentage": 0.0787
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/FJIhrJI-p1PB-bQpm8C?o=01KY06BWSXYB1BP9V40Y5PS7Y6&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 36.43,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.004,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "AAA"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ]
+        },
+        "ratings": {
+          "value": 4.7,
+          "count": 82,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "Qgp1mpj",
+        "title": "Batteries",
+        "description": "This is a product listing for Energizer batteries. The image shows a clear plastic container holding several Energizer AA batteries. The batteries are labeled with the Energizer brand name and indicate they are alkaline batteries with an expiration date of 03-2016.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/ff1226b4-f291-4d15-bee8-d7c9a66a31b2?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/976c9155-3097-49ec-91ba-feb552349883?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "A handheld soap dispenser and brush set with a soap dish."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/c8889ff6-a83c-4c21-882d-8d6d8e34b819?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/1d6fff12-0528-42c4-a373-ba97753c5fa3?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Handheld soap dispenser and brush set with a soap dish."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic",
+          "alkaline"
+        ],
+        "key_features": [
+          "Drop-front opening allows for easy access to shoes",
+          "Clear window provides visibility of shoes",
+          "Ventilation holes promote air circulation",
+          "Keeps shoes dust-free and protected",
+          "Durable construction for reliable use",
+          "Long-lasting power",
+          "Convenient storage case included",
+          "AA size",
+          "Alkaline batteries",
+          "24 count AA batteries"
+        ],
+        "colors": [
+          {
+            "hex": "#b5b4b4",
+            "percentage": 0.2952
+          },
+          {
+            "hex": "#8c8a8a",
+            "percentage": 0.1894
+          },
+          {
+            "hex": "#282524",
+            "percentage": 0.1421
+          },
+          {
+            "hex": "#23b9bb",
+            "percentage": 0.1066
+          },
+          {
+            "hex": "#d7d8d8",
+            "percentage": 0.1062
+          },
+          {
+            "hex": "#435454",
+            "percentage": 0.0815
+          },
+          {
+            "hex": "#4a7f80",
+            "percentage": 0.079
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/Qgp1mpj-dMiw-bQpm8C?o=01KR9AAA2DFSQ2TAS9NJJKX699&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 9.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "pattern": [
+            "Solid"
+          ],
+          "material": [
+            "Metal"
+          ]
+        },
+        "ratings": {
+          "value": 4.7,
+          "count": 646,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "EFpBqSC",
+        "title": "Batteries",
+        "description": "This product is a pack of Energizer AA batteries. These are alkaline batteries, perfect for powering everyday devices. They come in a clear plastic case for easy storage and organization.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/1cd11615-ec9c-4715-9e7c-7c75d53ca832?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Close-up of a white rectangular light fixture on a perforated white surface."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9d0b726e-f784-4af2-a607-b03c9e0c615c?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of a white rectangular light fixture on a perforated white surface."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "AA Batteries",
+          "Alkaline",
+          "Packaged in a clear case"
+        ],
+        "colors": [
+          {
+            "hex": "#eeeef0",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/EFpBqSC-dMiw-bQpm8C?o=01KR3D8GF0G172R016C0VG1AVG&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 3.49,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Plastic"
+          ]
+        },
+        "ratings": {
+          "value": 4.8,
+          "count": 77,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "d5JmRKt",
+        "title": "Lithium Batteries",
+        "description": "A 2-pack of E-Circuit CR2016 lithium button cell batteries. These 3V batteries are designed for use in small electronics such as watches and calculators.",
+        "brands": [
+          {
+            "id": "tMh5",
+            "name": "Dollar Tree"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/461d50ef-f463-48ff-af08-d1fea68bcb55?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=9YX0",
+            "cleaned_url": "https://cdn.trychannel3.com/403e6098-46f1-4bfe-bd3e-3a3c5e8fc26d?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=9YX0",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaging for E-Circuit CR2016 Lithium Button Cell Batteries."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/5eaad983-d379-4b8b-8fe3-852db8e3647d?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=9YX0",
+            "cleaned_url": "https://cdn.trychannel3.com/a2e2d0cf-2627-439f-baeb-d41d538e85e0?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=9YX0",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Two individual CR2016 lithium button cell batteries showing the positive terminal."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/a2a1cc62-4a63-4a9d-8ece-f1a6c22909d2?aid=01M6D413KGQ26PYHZNT8ERK9A0&mid=9YX0",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Specification and safety warnings for E-Circuit lithium batteries."
+          }
+        ],
+        "category": {
+          "slug": "watch-batteries",
+          "title": "Watch Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "watch-batteries",
+              "title": "Watch Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "CR2016 model",
+          "3V voltage",
+          "2 batteries per pack",
+          "Suitable for watches and calculators"
+        ],
+        "colors": [
+          {
+            "hex": "#252c31",
+            "percentage": 0.5089
+          },
+          {
+            "hex": "#658491",
+            "percentage": 0.1324
+          },
+          {
+            "hex": "#3b4950",
+            "percentage": 0.1297
+          },
+          {
+            "hex": "#55666f",
+            "percentage": 0.1164
+          },
+          {
+            "hex": "#b2cedb",
+            "percentage": 0.1125
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/d5JmRKt-9YX0-bQpm8C?o=01M1FPWE96BZDKWMSD3MDFCSNT&aid=01M6D413KGQ26PYHZNT8ERK9A0",
+            "domain": "dollartree.com",
+            "price": {
+              "price": 1.25,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "pattern": [
+            "Solid"
+          ],
+          "material": [
+            "Metal"
+          ],
+          "battery-size": [
+            "CR1216"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-technology": [
+            "Lithium"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOmM3MjFmZjBkYTdlM2MwYWIiLCAib2Zmc2V0IjogMTB9"
+  }
+}
