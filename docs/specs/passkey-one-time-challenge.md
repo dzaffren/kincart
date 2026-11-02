@@ -107,7 +107,7 @@ flowchart TB
     end
     subgraph lib["lib/shop"]
         PK["passkey.ts: checkGet / checkCreate"]
-        RQ["requests.ts: askChallenge / useChallenge"]
+        RQ["requests.ts: askChallenge / spendChallenge"]
     end
     DB[("passkey_challenges")]
     PC -- "action: on, off, ok or links" --> PO
@@ -146,7 +146,7 @@ sequenceDiagram
 | ---- | ------------ | --- |
 | `db/migrations/0017_passkey_challenges.up.sql` (new) | `CREATE TABLE passkey_challenges (challenge text PRIMARY KEY, household_id bigint NOT NULL REFERENCES households (id) ON DELETE CASCADE, action text NOT NULL CHECK (action IN ('on', 'off', 'ok', 'links')), made_at timestamptz NOT NULL DEFAULT now())` | All scenarios: the server's record of each challenge |
 | `db/migrations/0017_passkey_challenges.down.sql` (new) | `DROP TABLE IF EXISTS passkey_challenges` | The reverse path |
-| `lib/shop/requests.ts:139` | Add `askChallenge(household, action, challenge)`: one statement that deletes the household's rows over 5 minutes and inserts the new one. Add `useChallenge(household, action, challenge)`: `DELETE ... RETURNING`, true when a row came back | Scenarios 1 and 3: one use, 5 minutes |
+| `lib/shop/requests.ts:139` | Add `askChallenge(household, action, challenge)`: one statement that deletes the household's rows over 5 minutes and inserts the new one. Add `spendChallenge(household, action, challenge)`: `DELETE ... RETURNING`, true when a row came back | Scenarios 1 and 3: one use, 5 minutes |
 | `lib/shop/passkey.ts:32` and `:48` | `checkCreate` and `checkGet` take no challenge. They pass a function as `expectedChallenge` that keeps the answer's challenge and returns true. They return the challenge with the result, so the caller deletes the row only after the signature has passed | All scenarios; the library takes a function (`verifyAuthenticationResponse.d.ts:24`, `verifyRegistrationResponse.d.ts:25` in 14.0.3) |
 | `app/(shop)/actions.ts:107` | `passkeyOptions(token, action)`: same who checks, then `askChallenge` in place of the cookie. Drop `CHALLENGE`, `challengeCookie` and `takeChallenge` (`:143`–`:154`) | Scenario 2 needs the action; the cookie goes (O6) |
 | `app/(shop)/actions.ts:125`, `:134`, `:157` | `turnOnPasskey` uses action `on`; `confirmed(household, action, answer)` replaces the token argument with the action. `makeLinks` (`:90`) passes `links`, `answer` (`:376`) passes `ok`, `turnOffPasskey` passes `off` | Scenarios 1 to 3 |
@@ -182,7 +182,7 @@ erDiagram
 | ----- | ------------ |
 | `passkey_challenges` table | O1: only a server record stops a replay. Scenarios 1 and 3 |
 | `action` column | O2 and scenario 2 |
-| `askChallenge` / `useChallenge` | the two statements; `requests.ts` holds every other SQL statement |
+| `askChallenge` / `spendChallenge` | the two statements; `requests.ts` holds every other SQL statement |
 | `for` prop on `GuardedForm` | scenario 2: the form must say which action it asks for |
 
 ### Non-functionals

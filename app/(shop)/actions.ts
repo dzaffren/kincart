@@ -26,6 +26,7 @@ import { hashOf, newLink, whoIs } from "../../lib/shop/people";
 import { parseSubscription, pushOn } from "../../lib/shop/push";
 import {
   ask,
+  askChallenge,
   claim,
   clearSearch,
   copyDemoVault,
@@ -47,6 +48,8 @@ import {
   setTotal as saveTotal,
   startHousehold,
   takeUse,
+  spendChallenge,
+  type PasskeyAction,
 } from "../../lib/shop/requests";
 import { origin } from "./origin";
 import { beginLink, setupCookie } from "./paypalLink";
@@ -87,7 +90,7 @@ const HOUSEHOLD_COOKIE = { httpOnly: true, secure: true, sameSite: "lax", path: 
 export async function makeLinks(token: string, formData: FormData): Promise<void> {
   const who = await whoIs(token);
   if (who?.person !== "sam" || who.household === 1) return;
-  if (!(await confirmed(who.household, token, formData.get("passkey")))) {
+  if (!(await confirmed(who.household, "links", formData.get("passkey")))) {
     console.log(`passkey household=${who.household} status=refused for=links`);
     redirect(`/h/${token}?links=new&refused=links`);
   }
@@ -102,31 +105,35 @@ export async function makeLinks(token: string, formData: FormData): Promise<void
   redirect(`/h/${sam}`);
 }
 
-// Confirm each OK, for Sam of a household other than 1 (D122). Each request for the phone gets a new challenge,
-// kept for 5 minutes in a cookie sent only to Sam's link, and cleared once checked (D124).
+// Confirm each OK, for Sam of a household other than 1 (D122). Each request for the phone gets a new challenge
+// for that one action, kept on the server for 5 minutes and used up once checked (D131).
 export async function passkeyOptions(
   token: string,
+  action: PasskeyAction,
 ): Promise<
   | { kind: "create"; options: PublicKeyCredentialCreationOptionsJSON }
   | { kind: "get"; options: PublicKeyCredentialRequestOptionsJSON }
   | null
 > {
   const who = await whoIs(token);
-  if (who?.person !== "sam" || who.household === 1) return null;
+  if (who?.person !== "sam" || who.household === 1 || !ACTIONS.includes(action)) return null;
   const passkey = await getPasskey(who.household);
   const at = await origin();
   const asked = passkey
     ? ({ kind: "get", options: await getOptions(at, passkey.credentialId) } as const)
     : ({ kind: "create", options: await createOptions(at) } as const);
-  (await cookies()).set(CHALLENGE, asked.options.challenge, challengeCookie(token, 5 * 60));
+  await askChallenge(who.household, action, asked.options.challenge);
   return asked;
 }
 
 export async function turnOnPasskey(token: string, answer: string): Promise<boolean> {
   const who = await whoIs(token);
   if (who?.person !== "sam" || who.household === 1) return false;
-  const passkey = await checkCreate(answer, await takeChallenge(token), await origin());
-  const saved = !!passkey && (await savePasskey(who.household, passkey.credentialId, passkey.publicKey));
+  const passkey = await checkCreate(answer, await origin());
+  const saved =
+    !!passkey &&
+    (await spendChallenge(who.household, "on", passkey.challenge)) &&
+    (await savePasskey(who.household, passkey.credentialId, passkey.publicKey));
   console.log(`passkey household=${who.household} status=${saved ? "on" : "refused for=on"}`);
   return saved;
 }
@@ -134,31 +141,20 @@ export async function turnOnPasskey(token: string, answer: string): Promise<bool
 export async function turnOffPasskey(token: string, answer: string): Promise<boolean> {
   const who = await whoIs(token);
   if (who?.person !== "sam" || who.household === 1) return false;
-  const off = (await getPasskey(who.household)) !== null && (await confirmed(who.household, token, answer));
+  const off = (await getPasskey(who.household)) !== null && (await confirmed(who.household, "off", answer));
   if (off) await dropPasskey(who.household);
   console.log(`passkey household=${who.household} status=${off ? "off" : "refused for=off"}`);
   return off;
 }
 
-const CHALLENGE = "passkey_challenge";
+const ACTIONS: PasskeyAction[] = ["on", "off", "ok", "links"];
 
-function challengeCookie(token: string, maxAge: number) {
-  return { httpOnly: true, secure: true, sameSite: "lax", path: `/h/${token}`, maxAge } as const;
-}
-
-async function takeChallenge(token: string): Promise<string> {
-  const jar = await cookies();
-  const challenge = jar.get(CHALLENGE)?.value ?? "";
-  jar.set(CHALLENGE, "", challengeCookie(token, 0));
-  return challenge;
-}
-
-// True with no passkey on, or with the phone's signed answer to this browser's challenge.
-async function confirmed(household: number, token: string, answer: FormDataEntryValue | null): Promise<boolean> {
+// True with no passkey on, or with the phone's signed answer to an unused challenge for this action.
+async function confirmed(household: number, action: PasskeyAction, answer: FormDataEntryValue | null): Promise<boolean> {
   const passkey = await getPasskey(household);
   if (!passkey) return true;
-  const challenge = await takeChallenge(token);
-  return !!challenge && (await checkGet(answer, passkey, challenge, await origin()));
+  const challenge = await checkGet(answer, passkey, await origin());
+  return !!challenge && (await spendChallenge(household, action, challenge));
 }
 
 export async function startLink(token: string): Promise<void> {
@@ -373,7 +369,7 @@ export async function answer(token: string, requestId: number, formData: FormDat
     console.log(`purchase id=${requestId} status=declined`);
     sendPing(who.household, "declined", declined);
   } else if (choice === "ok") {
-    if (!(await confirmed(who.household, token, formData.get("passkey")))) {
+    if (!(await confirmed(who.household, "ok", formData.get("passkey")))) {
       console.log(`passkey household=${who.household} status=refused for=ok`);
       redirect(`${page}${page.includes("?") ? "&" : "?"}refused=ok`);
     }

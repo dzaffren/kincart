@@ -30,10 +30,11 @@ async function downFile(file: string) {
   await sql(await readFile(new URL(`../db/migrations/${file}`, import.meta.url), "utf8"));
 }
 
-// Steps back past 0016, 0015, 0014, 0013, 0012, 0011, 0010, 0009 and 0008 to the households migration.
+// Steps back past 0017, 0016, 0015, 0014, 0013, 0012, 0011, 0010, 0009 and 0008 to the households migration.
 async function downToHouseholds() {
   await migrate("down", url);
   for (const file of [
+    "0016_sam_passkeys.down.sql",
     "0015_sam_finds_another.down.sql",
     "0014_ask_again.down.sql",
     "0013_find_another.down.sql",
@@ -74,6 +75,7 @@ it("migrates up, back down, and up again", async () => {
     "address_uses",
     "usage_days",
     "sam_passkeys",
+    "passkey_challenges",
   ]) {
     expect(await tableExists(table)).toBe(true);
   }
@@ -94,6 +96,10 @@ it("migrates up, back down, and up again", async () => {
   expect(await columnExists("rose_search", "by_sam")).toBe(true);
 
   await migrate("down", url);
+  expect(await tableExists("passkey_challenges")).toBe(false);
+  expect(await tableExists("sam_passkeys")).toBe(true);
+
+  await downFile("0016_sam_passkeys.down.sql");
   expect(await tableExists("sam_passkeys")).toBe(false);
   expect(await columnExists("rose_search", "by_sam")).toBe(true);
 

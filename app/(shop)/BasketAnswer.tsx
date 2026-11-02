@@ -37,7 +37,7 @@ export function BasketAnswer({ lines, askedAt, answer, busy, unticked = [], limi
       <h1>
         {RELATIVE} would like {things(lines.length)}
       </h1>
-      <GuardedForm className="flow" action={answer} guard={guard}>
+      <GuardedForm className="flow" action={answer} guard={guard} for="ok">
         {inPhone && <input type="hidden" name="in" value="phone" />}
         {busy ? (
           <>

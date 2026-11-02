@@ -28,36 +28,42 @@ export async function getOptions(origin: string, credentialId: string): Promise<
   });
 }
 
-// The phone's answer to Turn on, as the page sent it. Anything the library can't verify saves nothing.
-export async function checkCreate(answer: unknown, challenge: string, origin: string): Promise<Passkey | null> {
+// The phone's answer to Turn on, as the page sent it, with the challenge it signed. The caller then uses that
+// challenge up (D132). Anything the library can't verify saves nothing.
+export async function checkCreate(answer: unknown, origin: string): Promise<(Passkey & { challenge: string }) | null> {
+  let challenge = "";
   try {
     const { verified, registrationInfo } = await verifyRegistrationResponse({
       response: parsed(answer),
-      expectedChallenge: challenge,
+      expectedChallenge: (signed) => !!(challenge = signed),
       expectedOrigin: origin,
       expectedRPID: new URL(origin).hostname,
       requireUserVerification: true,
     });
-    return verified ? { credentialId: registrationInfo.credential.id, publicKey: registrationInfo.credential.publicKey } : null;
+    return verified
+      ? { credentialId: registrationInfo.credential.id, publicKey: registrationInfo.credential.publicKey, challenge }
+      : null;
   } catch {
     return null;
   }
 }
 
-// The phone's signed answer for one OK, Make new links or Turn off. Any throw refuses, so a fault never pays.
-export async function checkGet(answer: unknown, passkey: Passkey, challenge: string, origin: string): Promise<boolean> {
+// The challenge that the phone's answer for one OK, Make new links or Turn off signed, once the signature passes.
+// The caller then uses it up (D132). Any throw refuses, so a fault never pays.
+export async function checkGet(answer: unknown, passkey: Passkey, origin: string): Promise<string | null> {
+  let challenge = "";
   try {
     const { verified } = await verifyAuthenticationResponse({
       response: parsed(answer),
-      expectedChallenge: challenge,
+      expectedChallenge: (signed) => !!(challenge = signed),
       expectedOrigin: origin,
       expectedRPID: new URL(origin).hostname,
       credential: { id: passkey.credentialId, publicKey: passkey.publicKey, counter: 0 },
       requireUserVerification: true,
     });
-    return verified;
+    return verified ? challenge : null;
   } catch {
-    return false;
+    return null;
   }
 }
 

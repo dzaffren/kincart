@@ -2,6 +2,7 @@
 
 import { browserSupportsWebAuthn, startAuthentication, startRegistration } from "@simplewebauthn/browser";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
+import type { PasskeyAction } from "../../lib/shop/requests";
 import { passkeyOptions, turnOffPasskey, turnOnPasskey } from "./actions";
 import { PasskeySection, type PasskeyState } from "./Passkey";
 
@@ -21,7 +22,7 @@ export function PasskeyControl({ token, on }: { token: string; on: boolean }) {
   async function toggle() {
     if (state.busy) return;
     setLast({ kind: state.kind, busy: true });
-    const answer = await phoneAnswer(token);
+    const answer = await phoneAnswer(token, state.kind === "off" ? "on" : "off");
     if (state.kind === "off") {
       const saved = !!answer && (await turnOnPasskey(token, answer).catch(() => false));
       setLast(saved ? { kind: "on", saved } : { kind: "off", error: true });
@@ -35,21 +36,23 @@ export function PasskeyControl({ token, on }: { token: string; on: boolean }) {
   return <PasskeySection state={state} toggle={toggle} />;
 }
 
-// With the passkey on, every send but No first gets the phone's signed answer. A cancel sends none, and the
-// server refuses it.
+// With the passkey on, every send but No first gets the phone's signed answer for this form's action. A cancel
+// sends none, and the server refuses it.
 export function GuardedForm({
   guard,
+  for: asked,
   action,
   className,
   children,
 }: {
   guard?: string;
+  for: "ok" | "links";
   action?: Action;
   className: string;
   children: ReactNode;
 }) {
   async function confirmFirst(formData: FormData) {
-    if (formData.get("answer") !== "no") formData.set("passkey", await phoneAnswer(guard!));
+    if (formData.get("answer") !== "no") formData.set("passkey", await phoneAnswer(guard!, asked));
     await action?.(formData);
   }
 
@@ -63,9 +66,9 @@ export function GuardedForm({
 const noSubscription = () => () => {};
 
 // The phone's answer as JSON, or "" when it has no passkey, Sam cancels, or the browser can't ask.
-async function phoneAnswer(token: string): Promise<string> {
+async function phoneAnswer(token: string, action: PasskeyAction): Promise<string> {
   try {
-    const asked = await passkeyOptions(token);
+    const asked = await passkeyOptions(token, action);
     if (!asked) return "";
     const answer =
       asked.kind === "create"
