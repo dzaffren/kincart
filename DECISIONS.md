@@ -853,7 +853,7 @@ Status: active
 Why: it ties a signed answer to this OK with no new table, as D121 did for Rose's new link. A replay needs Sam's own browser.
 Rejected: a Neon table of one-time challenges (holds against a stolen cookie, but adds a table and its clean-up).
 Source: docs/specs/confirm-ok.md
-Status: active
+Status: superseded by D131
 
 ## D125 · 2026-10-26 · Inside the home page's phones, an OK with the passkey on opens Sam's page in a new tab
 
@@ -897,4 +897,19 @@ Why: with every photo's bytes left out, two photo Finds with no words send the s
 Rejected: photo bytes left out of every key (D129, which this supersedes; two photo Finds collide), every photo's bytes in the key (listing photos come from Channel3's CDN and can change), a counter for calls with the same key (a run of one test would replay another test's reply).
 Supersedes: D129
 Source: docs/specs/ci-without-channel3.md
+Status: active
+
+## D131 · 2026-11-02 · Each passkey challenge is a Neon row with its household, action and time, and works once within 5 minutes
+
+Why: the v1.3.0 pentest proved D124's cookie lets a used answer back in, since the caller chooses the cookie. A row the server deletes on use stops that. Naming the action stops an answer for Turn off from paying an OK.
+Rejected: the httpOnly cookie of D124 (a captured answer replays with no expiry), the cookie as well as the row (an attacker sets any cookie, so it adds nothing), a challenge good for any action (one captured answer could pay instead of turning the passkey off).
+Supersedes: D124
+Source: docs/specs/passkey-one-time-challenge.md
+Status: active
+
+## D132 · 2026-11-02 · The row is deleted after the signature passes, and a household's rows over 5 minutes go when it asks for the next one
+
+Why: a delete with RETURNING lets only one of two copies of an answer pass. Clearing old rows in the same statement as the next ask keeps the table to a few rows for each household, with no job to run.
+Rejected: a daily Vercel cron (one more moving part on Hobby, for a tiny table), deleting the row before the signature check (any junk answer with Sam's challenge would use up Sam's tap).
+Source: docs/specs/passkey-one-time-challenge.md
 Status: active
