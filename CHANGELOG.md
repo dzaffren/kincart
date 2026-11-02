@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-02
+
 ### Security
 
 - A passkey answer from Sam's phone that was already used, or is over 5 minutes old, or was asked for another action, no longer passes Sam's OK, Make new links or Turn off.
@@ -98,7 +100,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - After tapping Ask Sam with nothing picked, Rose sees "Pick at least one first." at the top of the page without scrolling.
 
-[unreleased]: https://github.com/dzaffren/kincart/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/dzaffren/kincart/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/dzaffren/kincart/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/dzaffren/kincart/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/dzaffren/kincart/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dzaffren/kincart/compare/v1.0.0...v1.1.0

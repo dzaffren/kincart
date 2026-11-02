@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.3.0 · **Updated:** 2026-11-02 by /ship passkey-one-time-challenge
+**Status:** Active · **Release:** v1.3.1 · **Updated:** 2026-11-02 by /ship passkey-one-time-challenge
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
