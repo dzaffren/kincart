@@ -201,7 +201,7 @@ Recorded as D127, D128, D129, D130.
 
 2026-11-02 · 2 raw findings, 1 survived, 1 fixed.
 
-- quality · `scripts/fake-apis.mjs:92` · listen on 3999 alone, dropping the unread FAKE_APIS_PORT · `7893a39`
+- quality · `scripts/fake-apis.mjs:92` · listen on 3999 alone, dropping the unread FAKE_APIS_PORT · `2448e46`
 
 ## Open items
 
