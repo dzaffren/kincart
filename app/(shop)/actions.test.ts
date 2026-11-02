@@ -1735,6 +1735,40 @@ it("refuses an OK whose challenge is over 5 minutes old, and pays on the next ta
   expect((await latest(household))?.status).toBe("paid");
 });
 
+it("refuses an answer asked for Turn off when it comes with an OK or Make new links, and pays with an OK's own", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  await saveVault(household, "8tm05472xk4815307");
+  await ask(household, glasses);
+  const { id } = (await latest(household))!;
+
+  const forOff = await signedBy(ownSam, key, "off");
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: forOff })))).toBe(`/h/${ownSam}?refused=ok`);
+  expect(await redirectOf(makeLinks(ownSam, form({ passkey: forOff })))).toBe(`/h/${ownSam}?links=new&refused=links`);
+  expect(await whoIs(ownSam)).toEqual({ household, person: "sam" });
+  expect((await latest(household))?.status).toBe("waiting");
+  expect(fetch).not.toHaveBeenCalled();
+
+  paypalAnswers(completed);
+  expect(await redirectOf(answer(ownSam, id, form({ answer: "ok", passkey: await signedBy(ownSam, key, "ok") })))).toBe(`/h/${ownSam}`);
+  expect((await latest(household))?.status).toBe("paid");
+});
+
+it("lets Sam's two tabs each ask, for new links and for Turn off, and both go through", async () => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const { ownSam, household, key } = await passkeyOn();
+  const forLinks = await signedBy(ownSam, key, "links");
+  const forOff = await signedBy(ownSam, key, "off");
+
+  const page = await redirectOf(makeLinks(ownSam, form({ passkey: forLinks })));
+  const newSam = page.slice("/h/".length);
+  expect(await whoIs(newSam)).toEqual({ household, person: "sam" });
+  expect(await getPasskey(household)).not.toBeNull();
+
+  expect(await turnOffPasskey(newSam, forOff)).toBe(true);
+  expect(await getPasskey(household)).toBeNull();
+});
+
 it("keeps a home page phone's ?in=phone after Sam's answer, so its next OK still opens a new tab", async () => {
   vi.spyOn(console, "log").mockImplementation(() => {});
   const { ownSam, household } = await passkeyOn();
