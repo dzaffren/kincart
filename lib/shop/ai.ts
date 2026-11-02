@@ -133,7 +133,8 @@ async function haiku<T>(
   maxTokens: number,
   timeoutMs = 10000,
 ): Promise<T> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  // The e2e sends this to its fake server, which answers from recorded replies (D127).
+  const response = await fetch(`${process.env.ANTHROPIC_URL ?? "https://api.anthropic.com"}/v1/messages`, {
     method: "POST",
     headers: {
       "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",

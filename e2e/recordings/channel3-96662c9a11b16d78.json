@@ -1,0 +1,1362 @@
+{
+  "request": {
+    "query": "phone charger",
+    "limit": 10,
+    "filters": {
+      "price": {
+        "max_price": 50
+      }
+    }
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "PKNzv2Q",
+        "title": "Universal Braided Phone Charger",
+        "description": "Power up with confidence using the Energizer 60W 4-in-1 Braided Cable. Designed for speed and strength, this 6.5ft cable delivers up to 60withoutf fast charging, perfect for laptops, tablets, smartphones, and more. With four versatile connectors (2x...",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/46e5a0e1-b530-4c11-a158-aa4fdd56c2bd?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/8eacec7c-1dec-42e4-9560-b20fc9c0c2fc?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Box packaging for an Energizer 6ft universal braided phone charger cable."
+          }
+        ],
+        "category": {
+          "slug": "power-adapters-chargers",
+          "title": "Power Adapters & Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "braided"
+        ],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#a0a1a1",
+            "percentage": 0.3074
+          },
+          {
+            "hex": "#646565",
+            "percentage": 0.2697
+          },
+          {
+            "hex": "#0a0a0a",
+            "percentage": 0.1224
+          },
+          {
+            "hex": "#3a3a3a",
+            "percentage": 0.114
+          },
+          {
+            "hex": "#808080",
+            "percentage": 0.1087
+          },
+          {
+            "hex": "#c9c9c9",
+            "percentage": 0.0778
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/PKNzv2Q-d8bL-bQpm8C?o=01M1N4V6GP50PHTMGG6W1GDMZ5&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "shop.advanceautoparts.com",
+            "price": {
+              "price": 29.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "compatible-device": [
+            "Smartphone",
+            "Tablet"
+          ],
+          "charging-method": [
+            "USB"
+          ],
+          "usb-connector-type": [
+            "USB Type-A",
+            "USB Type-C"
+          ],
+          "material": [
+            "Fabric"
+          ],
+          "power-source": [
+            "USB"
+          ],
+          "charging-interface-type": [
+            "USB type-A",
+            "USB type-C",
+            "Lightning"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "zMpeLk7",
+        "title": "Magnetic Wireless Charger",
+        "description": "Experience fast, effortless charging with the Energizer 15W MagSafe Magnetic Wireless Charger. Delivering up to 15withoutf power, this Qi-certified charger offers a secure magnetic connection for MagSafe-compatible iPhones, ensuring optimal...",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/6b03bfde-1052-4390-9414-6ab0e9a0e6f9?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/42d31068-63bb-4b28-bf2d-b3b195dd3ef7?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Box packaging for Energizer Magnetic Wireless Charger with MagSafe logo."
+          }
+        ],
+        "category": {
+          "slug": "wireless-chargers",
+          "title": "Wireless Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wireless-chargers",
+              "title": "Wireless Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#b9cfbc",
+            "percentage": 0.1451
+          },
+          {
+            "hex": "#2d4159",
+            "percentage": 0.139
+          },
+          {
+            "hex": "#7c9f91",
+            "percentage": 0.1367
+          },
+          {
+            "hex": "#af2b39",
+            "percentage": 0.1348
+          },
+          {
+            "hex": "#e3dfe0",
+            "percentage": 0.1276
+          },
+          {
+            "hex": "#111120",
+            "percentage": 0.1217
+          },
+          {
+            "hex": "#bba8ac",
+            "percentage": 0.1097
+          },
+          {
+            "hex": "#955e6e",
+            "percentage": 0.0854
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/zMpeLk7-d8bL-bQpm8C?o=01M1N4V1J7BFDT7HBFAVQ37YGR&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "shop.advanceautoparts.com",
+            "price": {
+              "price": 24.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "charging-interface-type": [
+            "Wireless charging"
+          ],
+          "magsafe-compatibility": [
+            "MagSafe compatible"
+          ],
+          "charging-method": [
+            "Wireless"
+          ],
+          "wireless-charging-standard": [
+            "Qi"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "iKJrvmd",
+        "title": "Cell Phone AC/DC Charger",
+        "description": "Power up while on the go. The AC DC charger will help you keep all your electronics charged while you are on the road. Keeping your mobile phone charged is essential, especially in bad weather conditions. Just plug the AC DC charger into your...",
+        "brands": [
+          {
+            "id": "Lrt2",
+            "name": "Koolatron"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/15d0bbd0-b6ed-4ca7-9531-2cec43bada46?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/15d0bbd0-b6ed-4ca7-9531-2cec43bada46?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=d8bL",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black AC/DC phone charger with power cord and adapter block."
+          }
+        ],
+        "category": {
+          "slug": "wall-chargers",
+          "title": "Wall Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wall-chargers",
+              "title": "Wall Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#424243",
+            "percentage": 0.5299
+          },
+          {
+            "hex": "#1a1a1a",
+            "percentage": 0.2473
+          },
+          {
+            "hex": "#5b5b5d",
+            "percentage": 0.1129
+          },
+          {
+            "hex": "#99989b",
+            "percentage": 0.1099
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/iKJrvmd-d8bL-bQpm8C?o=01M1HC0Y2WQWS1MHPYKS5R086B&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "shop.advanceautoparts.com",
+            "price": {
+              "price": 34.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.056,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Metal"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "power-source": [
+            "AC-powered"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "5uQjFZE",
+        "title": "Wireless Phone Charger",
+        "description": "This compact and lightweight wireless phone charger is designed for use on a workspace or bedside table. It features an LED light system that changes color to indicate charging status: red for standby, blue for charging, and green for fast charging. The charger is compatible with various smartphones, including iPhone XR and Samsung Galaxy S9, and comes with a Micro USB charging cable.",
+        "brands": [
+          {
+            "id": "Xcll",
+            "name": "Pottery Barn Teen"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/db5774ad-b896-4f22-aed9-4c2b66b7e32d?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=xsd7",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "White wireless phone charger pad on a black surface."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/29c8f14a-d7d0-416f-a148-65d06e7d573d?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=xsd7",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Smartphone screen showing a discount offer and a charging cable."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/5c57cc81-0fb4-425b-a53b-33126ce295dd?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=xsd7",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Pink/red glowing wireless charging pad on a black surface."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/35977984-0e4f-4041-8f7c-e7a5b867072f?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=xsd7",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Pink/red glowing wireless charging pad with dark center on a black surface."
+          }
+        ],
+        "category": {
+          "slug": "wireless-chargers",
+          "title": "Wireless Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wireless-chargers",
+              "title": "Wireless Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "ABS",
+          "silicone",
+          "PCBA board"
+        ],
+        "key_features": [
+          "Wireless charging",
+          "LED status indicator: Red (Standby), Blue (Charging), Green (Fast charging)",
+          "Compact and lightweight design",
+          "Includes Micro USB charging cable",
+          "Compatible with iPhone XR, Samsung Galaxy S9, Huawei Mate20, Mix3, etc."
+        ],
+        "colors": [
+          {
+            "hex": "#4b4a4a",
+            "percentage": 0.4979
+          },
+          {
+            "hex": "#636263",
+            "percentage": 0.4338
+          },
+          {
+            "hex": "#a1a0a2",
+            "percentage": 0.0683
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/5uQjFZE-xsd7-bQpm8C?o=01M2DS9BBX7GHCD3RAFWB4H42B&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "pbteen.com",
+            "price": {
+              "price": 35.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": {
+                "number": 4,
+                "unit": "in"
+              },
+              "width": {
+                "number": 4,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.75,
+                "unit": "in"
+              },
+              "weight": {
+                "number": 0.25,
+                "unit": "lb"
+              }
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "power-source": [
+            "USB"
+          ],
+          "battery-type": [
+            "Contained-undetachable"
+          ],
+          "wireless-charging-standard": [
+            "Qi"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "material": [
+            "Plastic",
+            "Rubber"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "8UljxBt",
+        "title": "Magnetic Wireless Vent Mount Phone Charger",
+        "description": "The Magnetic Wireless Phone Charger & Holder by Mad Man is a versatile automotive accessory designed for convenient, hands-free phone use. This mount securely clips to your vehicle's air vent, using a powerful magnetic connection to hold your smartphone in place. It provides seamless wireless charging while ensuring safety with advanced protection against overcharging, static interference, and temperature fluctuations.",
+        "brands": [
+          {
+            "id": "e0RH",
+            "name": "Mad Man"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/da20a3b6-2353-4f4c-a706-fa84c55ef59a?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "cleaned_url": "https://cdn.trychannel3.com/c0d83524-1c68-47c6-b49e-513f587b8cd3?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black magnetic wireless vent mount charger with white outline."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b3632dea-1853-4d02-8abc-3416cb7092af?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "cleaned_url": "https://cdn.trychannel3.com/0233a4eb-041f-4844-9805-20b28c1ae923?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Blue smartphone attached to a black magnetic charger mount."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/d3aab841-0370-4732-bc4e-48c39a20ac20?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "cleaned_url": "https://cdn.trychannel3.com/f3a6fb5c-c964-4b20-9862-9a7706647ffb?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=YhUx",
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "Box packaging for the magnetic wireless vent mount phone charger."
+          }
+        ],
+        "category": {
+          "slug": "wireless-chargers",
+          "title": "Wireless Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wireless-chargers",
+              "title": "Wireless Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "Wireless charging capabilities",
+          "Magnetic phone securement",
+          "Vent mount clip design",
+          "Protection against overcharging",
+          "Static interference protection",
+          "Temperature fluctuation protection"
+        ],
+        "colors": [
+          {
+            "hex": "#353439",
+            "percentage": 0.7851
+          },
+          {
+            "hex": "#babab9",
+            "percentage": 0.1627
+          },
+          {
+            "hex": "#5d5c5e",
+            "percentage": 0.0522
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/8UljxBt-YhUx-bQpm8C?o=01M0MQ9AMEMTWP1JFN725YM7GA&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "mad-man.com",
+            "price": {
+              "price": 29.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "charger-style": [
+            "Car mount"
+          ],
+          "charging-method": [
+            "Wireless"
+          ],
+          "charging-interface-type": [
+            "Wireless charging"
+          ],
+          "mounting-type": [
+            "Mobile"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "QagWb9H",
+        "title": "Cell Phone Charger",
+        "description": "This DeWalt USB Power Delivery (PD) charger is designed for rapid recharging of compatible electronic devices via its Type-C port, delivering up to 30W of power. Its rugged black and yellow housing, characteristic of DeWalt tools, suggests durability for use in various environments.",
+        "brands": [
+          {
+            "id": "vscq",
+            "name": "DEWALT"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/9eef272c-adc6-48a8-88e8-7de3b0596e2a?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Dewalt cell phone charger box with heavy duty branding."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/b5f681dc-0e06-4ecc-8b1d-761301f1fb85?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Dewalt PD USB-C fast charger plugged into a wall outlet."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9142e9bf-6549-4c37-adb2-dcaa72a8548d?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing how to find the right cable for charging devices."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2ef8b87a-ee12-4468-b552-d92f68ffd9d9?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Dewalt charger plugged into a wall charging a smartphone."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/1cd6ac73-0c3d-4c21-9083-d64fa4e0ab47?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing wide compatibility with USB-C and Lightning cables."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8894f75e-017f-4aa3-9942-c367279c4d3b?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Dewalt foldable prongs USB-C PD charger from an angle."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/d011fda6-12ec-40b1-b80b-740628ec9cca?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Close-up of the ruggedized Dewalt cell phone charger exterior."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/4fe82571-2aaa-47ee-9314-1ff99016c949?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Dewalt charger plugged into a wall socket on wooden surface."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/894a629a-7ccc-4dc2-8b69-f5b51a7f0f06?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "packaging",
+            "alt_text": "Dewalt cell phone charger box packaging with specifications."
+          }
+        ],
+        "category": {
+          "slug": "wall-chargers",
+          "title": "Wall Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wall-chargers",
+              "title": "Wall Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Plastic"
+        ],
+        "key_features": [
+          "Rapidly recharges devices",
+          "Features a USB Type-C port",
+          "Uses Power Delivery (PD) technology",
+          "Delivers up to 30W of power",
+          "Charges wide variety of devices including smartphones, tablets or laptops",
+          "Folding power plug for easy convenient storage and travel"
+        ],
+        "colors": [
+          {
+            "hex": "#33302e",
+            "percentage": 0.4506
+          },
+          {
+            "hex": "#eeb026",
+            "percentage": 0.3042
+          },
+          {
+            "hex": "#faca51",
+            "percentage": 0.1013
+          },
+          {
+            "hex": "#19191a",
+            "percentage": 0.0888
+          },
+          {
+            "hex": "#806836",
+            "percentage": 0.055
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/QagWb9H-wAe3-bQpm8C?o=01KBPCKHKJSM27N590F9WEJ4AJ&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "acehardware.com",
+            "price": {
+              "price": 27.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.014,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "charging-interface-type": [
+            "USB type-C"
+          ],
+          "charging-method": [
+            "Wired"
+          ],
+          "usb-connector-type": [
+            "USB Type-C"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "power-source": [
+            "AC-powered"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "GNjsE3B",
+        "title": "4 Port Car Cell Phone Charger",
+        "description": "This DeWalt 4-Port Mobile USB PD Charger is designed for rapid charging of multiple devices on the go. It features Quick Charge 3.0 and Power Delivery technologies, offering optimized charging speeds up to 30W for USB-C devices. The charger is built with durable PVC material and comes in a black and yellow color scheme.",
+        "brands": [
+          {
+            "id": "vscq",
+            "name": "DEWALT"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/9471fab3-da4b-412a-903a-69d17f71d956?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "cleaned_url": "https://cdn.trychannel3.com/e1d1efdb-c963-4bcf-8488-e141aac0b416?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=wAe3",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Dewalt 4-port mobile USB PD car charger box and charger unit."
+          }
+        ],
+        "category": {
+          "slug": "car-chargers",
+          "title": "Car Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "car-chargers",
+              "title": "Car Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "PVC"
+        ],
+        "key_features": [
+          "60W of available power enables 4 USB devices to charge at the same time",
+          "Fast charge speed to Android and iOS devices",
+          "Quick charge-enabled USB-A port charges up to 50% within 30 minutes",
+          "PD-compatible USB-C port provides 18W of charging power"
+        ],
+        "colors": [
+          {
+            "hex": "#f6b016",
+            "percentage": 0.5314
+          },
+          {
+            "hex": "#372d24",
+            "percentage": 0.143
+          },
+          {
+            "hex": "#fad360",
+            "percentage": 0.1293
+          },
+          {
+            "hex": "#1b1917",
+            "percentage": 0.1152
+          },
+          {
+            "hex": "#65543a",
+            "percentage": 0.0811
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/GNjsE3B-wAe3-bQpm8C?o=01KBP7RE0P5274MYPAEPHDNEKN&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "acehardware.com",
+            "price": {
+              "price": 41.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.014,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "charging-interface-type": [
+            "USB type-C"
+          ],
+          "charger-style": [
+            "Car mount"
+          ],
+          "charging-method": [
+            "USB"
+          ],
+          "usb-connector-type": [
+            "USB Type-C"
+          ],
+          "power-source": [
+            "Vehicle electrical system"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "2gnC0ws",
+        "title": "Anker iPhone 17/16 Charger, 2 Pack 20W Fast USB C Charger Block Green",
+        "description": "2-Pack 20W USB-C fast charger block for iPhone 17/16/16 Pro Max/15 series and more in Green. Includes two charging blocks (and cables as described in listing), compact and portable with USB-C output for fast charging.",
+        "brands": [
+          {
+            "id": "KDuu",
+            "name": "Nebula Robotics"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/48e3f478-9753-42f5-9eb5-b6556b7f6b77?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Two green Anker USB-C charger blocks and multiple cables."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/bde1bc70-cfcb-48da-a77c-614668e2f578?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Anker charger block plugged in, showing simultaneous charging capability."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8088674d-bc66-4c33-b2ba-5f693341aaa6?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "cleaned_url": "https://cdn.trychannel3.com/c3a84163-fed0-4bf9-8234-318fcd60c40c?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Anker charger fast charging an iPhone to 54% in 30 minutes."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/587fdd77-a7b3-4a48-bf6a-f7adc783e6c2?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "cleaned_url": "https://cdn.trychannel3.com/335deb5a-a8cd-4154-8824-4820c3d0dd13?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "is_main_image": false,
+            "shot_type": "detail",
+            "alt_text": "Anker charger blocks and plug showing compact and portable design."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/d0228acc-e088-4232-9fe6-6ffff4f01136?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=p1PB",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing universal compatibility for various devices."
+          }
+        ],
+        "category": {
+          "slug": "wall-chargers",
+          "title": "Wall Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wall-chargers",
+              "title": "Wall Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "2-Pack",
+          "20W Fast USB-C Charger Block",
+          "Compatible with iPhone 17/16/16 Pro Max/15 Series and more",
+          "Green color"
+        ],
+        "colors": [
+          {
+            "hex": "#d0e5bd",
+            "percentage": 0.9233
+          },
+          {
+            "hex": "#899989",
+            "percentage": 0.0767
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/2gnC0ws-p1PB-bQpm8C?o=01KY2G8CS7SPGVKBGB31NF2RND&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 16.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.004,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "usb-connector-type": [
+            "USB Type-C"
+          ],
+          "mounting-type": [
+            "Portable"
+          ],
+          "charging-interface-type": [
+            "USB type-C"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "compatible-device": [
+            "Smartphone",
+            "Tablet"
+          ],
+          "charging-method": [
+            "USB"
+          ],
+          "power-source": [
+            "AC-powered"
+          ]
+        },
+        "ratings": {
+          "value": 5,
+          "count": 8,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "dP0zeob",
+        "title": "Samsung Compatible USB-A Wall Charger Kit with 6ft USB-A to USB-C Cable, 5V/2A",
+        "description": "The 4XEM Samsung Compatible USB-A Wall Charger Kit is a complete charging solution featuring a 5V/2A adaptive wall charger and a 6ft USB-A to USB-C cable. Designed for durability with reinforced molded ends, the kit supports fast charging and data synchronization at USB 2.0 speeds (480Mbps). The wall charger is universal, with an input voltage range of 100-240 VAC, and the reversible USB-C connector ensures easy connectivity for devices like the Samsung Galaxy S20.",
+        "brands": [
+          {
+            "id": "Urz7",
+            "name": "4XEM"
+          },
+          {
+            "id": "Mbqx",
+            "name": "Samsung"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/6fb6a6b7-2ef4-4928-b2af-af27192fc59e?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "cleaned_url": "https://cdn.trychannel3.com/081ac536-efbb-4c2c-86cc-f7c9fb318b66?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Black USB charging kit with adapter and cables on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/4a516739-ff5d-46b3-9062-59fee3794a09?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/4a516739-ff5d-46b3-9062-59fee3794a09?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Two black USB charging cables, one USB-A and one USB-C."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/f8b2bdcd-37c7-4ef6-a0b1-9350604f176c?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/f8b2bdcd-37c7-4ef6-a0b1-9350604f176c?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=TgS4",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Black USB charging wall adapter block with USB port."
+          }
+        ],
+        "category": {
+          "slug": "power-adapters-chargers",
+          "title": "Power Adapters & Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            }
+          ],
+          "has_children": true
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [],
+        "key_features": [
+          "2A 5V adaptive fast charging rate",
+          "6ft USB-A to USB-C cable",
+          "USB 2.0 data transfer speeds (480Mbps)",
+          "Universal input voltage range (100-240 VAC)",
+          "Reinforced molded ends for increased durability",
+          "Reversible USB-C connector design",
+          "Charging kit/bundle",
+          "Dimensions: 0.85\"H x 1.43\"W x 2\"D",
+          "Features power NEMA 1-15P on the first end and USB-A on the second end connectors, and detachable USB-C",
+          "Compatible with most smartphones"
+        ],
+        "colors": [
+          {
+            "hex": "#19181c",
+            "percentage": 0.7188
+          },
+          {
+            "hex": "#3c3a40",
+            "percentage": 0.1954
+          },
+          {
+            "hex": "#828081",
+            "percentage": 0.0858
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/dP0zeob-TgS4-bQpm8C?o=01M4A3FY2F7VS4T3TWSXW52B34&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "cdw.com",
+            "price": {
+              "price": 22.99,
+              "compare_at_price": 24.99,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": {
+              "length": null,
+              "width": null,
+              "height": null,
+              "weight": {
+                "number": 70,
+                "unit": "g"
+              }
+            }
+          },
+          {
+            "url": "https://buy.trychannel3.com/dP0zeob-LFnL-bQpm8C?o=01KR49NBVMWPE0FQ56RV56PZ5T&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "staples.com",
+            "price": {
+              "price": 27.39,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.03,
+            "dimensions": {
+              "length": {
+                "number": 6,
+                "unit": "ft"
+              },
+              "width": {
+                "number": 1.43,
+                "unit": "in"
+              },
+              "height": {
+                "number": 0.85,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "power-source": [
+            "USB",
+            "AC-powered"
+          ],
+          "charging-interface-type": [
+            "USB type-C",
+            "USB type-A"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "charging-method": [
+            "USB",
+            "Wired"
+          ],
+          "usb-connector-type": [
+            "USB Type-A",
+            "USB Type-C"
+          ],
+          "plug-type": [
+            "US"
+          ],
+          "connector-gender": [
+            "Female to male"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "GvrqHif",
+        "title": "Wireless Non-Slip Car Fast Phone Charger Pad",
+        "description": "The BowLift Wireless Non-Slip Car Fast Phone Charger Pad is a convenient charging solution designed for car storage drawers and carrying cases. Made from soft, strong, and sticky silicone material, it provides a secure, non-slip surface to keep your phone in place while driving. The pad supports QI standard wireless charging with power outputs of 5W, 7.5W, and 10W, making it compatible with a wide range of smartphones, including Apple iPhone and Samsung Galaxy series. For a custom fit, the silicone material can be trimmed to match the specific size of your car's interior space.",
+        "brands": [
+          {
+            "id": "VW8y",
+            "name": "Bowlift"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/3d9f6d12-bd39-4320-8523-449e0463c08d?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=83Z3",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Smartphone charging pad on a car dashboard."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/c20efb39-e28c-42ca-b795-5e1079c06083?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=83Z3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Diagram of charger pad components and features."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/ba384b93-8914-4887-aa3b-ae63ab731f08?aid=01M6D3YK9221SJPM8K6MEYYPA3&mid=83Z3",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Diagram showing the separate design of the wireless charger pad."
+          }
+        ],
+        "category": {
+          "slug": "wireless-chargers",
+          "title": "Wireless Chargers",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "power-adapters-chargers",
+              "title": "Power Adapters & Chargers"
+            },
+            {
+              "slug": "wireless-chargers",
+              "title": "Wireless Chargers"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "silicone"
+        ],
+        "key_features": [
+          "Wireless charging",
+          "Non-slip silicone material",
+          "Fast charging (up to 10W)",
+          "QI standard compatible",
+          "Trimmable for custom fit"
+        ],
+        "colors": [
+          {
+            "hex": "#35373a",
+            "percentage": 0.2188
+          },
+          {
+            "hex": "#4b6179",
+            "percentage": 0.1845
+          },
+          {
+            "hex": "#fae1d7",
+            "percentage": 0.152
+          },
+          {
+            "hex": "#0c0c0d",
+            "percentage": 0.1445
+          },
+          {
+            "hex": "#a8757d",
+            "percentage": 0.1099
+          },
+          {
+            "hex": "#ba2864",
+            "percentage": 0.0998
+          },
+          {
+            "hex": "#b8c0c6",
+            "percentage": 0.0736
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/GvrqHif-83Z3-bQpm8C?o=01M2S39JKX5RWW9679MAWNVPB8&aid=01M6D3YK9221SJPM8K6MEYYPA3",
+            "domain": "bowlift.com",
+            "price": {
+              "price": 43.99,
+              "compare_at_price": 87.98,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "charging-interface-type": [
+            "Wireless charging"
+          ],
+          "compatible-device": [
+            "Smartphone"
+          ],
+          "charging-method": [
+            "USB"
+          ],
+          "charger-style": [
+            "Pad"
+          ],
+          "mounting-type": [
+            "Portable"
+          ],
+          "power-source": [
+            "USB"
+          ],
+          "material": [
+            "Silicone"
+          ],
+          "wireless-charging-standard": [
+            "Qi"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOmRlOGM3ZGMyODdiM2NhYTciLCAib2Zmc2V0IjogMTB9"
+  }
+}

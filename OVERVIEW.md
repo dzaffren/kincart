@@ -1,6 +1,6 @@
 # PayPalHackathon
 
-**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-10-26 by /ship new-links
+**Status:** Active · **Release:** v1.2.0 · **Updated:** 2026-11-02 by /ship ci-without-channel3
 
 A shop-together helper for the PayPal AI hackathon: an older person asks for something, AI finds and explains options, a family helper approves from their own phone, and PayPal pays.
 Used by older shoppers and the relative who helps them pay online.
@@ -25,8 +25,8 @@ Used by older shoppers and the relative who helps them pay online.
 - `public/` — `sw.js`, the service worker that shows a push and opens the link on tap, and the KinCart icons.
 - `docs/design/design-system/` — the design tokens, and the showcase look, that the shop pages and `/status` load.
 - `db/migrations/` and `scripts/migrate.mjs` — plain SQL migrations and the runner.
-- `e2e/` — Playwright tests.
-- `.github/workflows/ci.yml` — tests on every push; migrates Neon after a green main.
+- `e2e/` — Playwright tests, and `e2e/recordings/`, the Channel3 and Claude replies that `scripts/fake-apis.mjs` plays back to them.
+- `.github/workflows/ci.yml` — tests on every PR and every push to main; migrates Neon after a green main.
 
 ## Slices
 
@@ -55,6 +55,7 @@ Used by older shoppers and the relative who helps them pay online.
 | security-headers | Shipped | Every KinCart page tells the browser to refuse a frame from another site, and to send no page address to other sites. The home page's own phones still show Rose's and Sam's pages. | docs/specs/security-headers.md |
 | sam-finds-another | Shipped | After a No or a thing left out, Sam taps Find another on Sam's own page, and KinCart looks again for Rose. Rose's page says Sam asked, and Rose's phone buzzes when the search ends. | docs/specs/sam-finds-another.md |
 | new-links | Shipped | Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys. | docs/specs/new-links.md |
+| ci-without-channel3 | Shipped | CI's e2e gets Channel3's and Claude's answers from recorded replies, so a push spends no Channel3 credits. | docs/specs/ci-without-channel3.md |
 
 ## More
 

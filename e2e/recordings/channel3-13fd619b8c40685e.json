@@ -1,0 +1,1264 @@
+{
+  "request": {
+    "query": "Aa Batteries",
+    "limit": 10
+  },
+  "reply": {
+    "products": [
+      {
+        "id": "zZmNCMH",
+        "title": "AA Batteries",
+        "description": "This product is a set of Energizer AA batteries, packaged in a clear plastic case for convenient storage and organization. The batteries are alkaline and suitable for general use. The case keeps them protected and easy to find.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b9433fbd-7bb6-4625-a441-d172c91109fe?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "Pack of Energizer batteries in clear plastic packaging."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "plastic"
+        ],
+        "key_features": [
+          "Clear plastic case for storage",
+          "Includes Energizer AA batteries",
+          "Alkaline",
+          "Organized Storage",
+          "long-lasting power",
+          "leak-proof construction",
+          "ideal for everyday devices"
+        ],
+        "colors": [],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/zZmNCMH-dMiw-bQpm8C?o=01KR3BE2GPERT3P8TS0WZCEKHN&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 33,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Wood"
+          ]
+        },
+        "ratings": {
+          "value": 2,
+          "count": 1,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "dwSkyf8",
+        "title": "AA Batteries",
+        "description": "This product includes a pack of Energizer AA batteries in a clear plastic case. The batteries are alkaline and have an expiration date of 03-2016 printed on them.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/7f61f072-0557-4f11-b5d2-4ab30b0a55ef?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "Textured board with mounting brackets, card, and folded item on beige fabric."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [],
+        "key_features": [],
+        "colors": [
+          {
+            "hex": "#4b4842",
+            "percentage": 0.4115
+          },
+          {
+            "hex": "#a29890",
+            "percentage": 0.2812
+          },
+          {
+            "hex": "#1e1c1c",
+            "percentage": 0.1093
+          },
+          {
+            "hex": "#ccbfb8",
+            "percentage": 0.1018
+          },
+          {
+            "hex": "#67625d",
+            "percentage": 0.0962
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/dwSkyf8-dMiw-bQpm8C?o=01KQW8QMDWCE3XNT6B9618AY7K&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 65.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Linen",
+            "Fabric"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": {
+          "value": 3.3,
+          "count": 3,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "DS63zXS",
+        "title": "Duracell AA Batteries - 4 packs of 36 (Case of 144)",
+        "description": "Duracell Coppertop AA alkaline batteries provide dependable, long-lasting 1.5V power for various everyday household and portable electronics. These batteries are formulated with Power Boost™ ingredients and are built in the USA using US and global parts. This bulk case includes 144 batteries, organized as 4 packs of 36, and are guaranteed for up to 10 years in storage.",
+        "brands": [
+          {
+            "id": "NZDS",
+            "name": "Duracell"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/b71b5486-d96d-442c-a740-cad94bbcd68f?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=9Hkm",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/b71b5486-d96d-442c-a740-cad94bbcd68f?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=9Hkm",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Four black boxes of Duracell AA batteries in a row."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Reliable AA alkaline batteries for everyday devices",
+          "Formulated with Duracell Power Boost™ ingredients",
+          "Built in the USA with US & global parts",
+          "Designed for consistent, long-lasting performance",
+          "Guaranteed 10 years in storage"
+        ],
+        "colors": [
+          {
+            "hex": "#161716",
+            "percentage": 0.6468
+          },
+          {
+            "hex": "#d6ad82",
+            "percentage": 0.1424
+          },
+          {
+            "hex": "#31271d",
+            "percentage": 0.1131
+          },
+          {
+            "hex": "#6e5948",
+            "percentage": 0.0976
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/DS63zXS-9Hkm-bQpm8C?o=01M31EP8PBN4C3X7PPA0PTX1JJ&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "jbtools.com",
+            "price": {
+              "price": 94.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.007,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "battery-size": [
+            "AA"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "8u6McSd",
+        "title": "AA Batteries",
+        "description": "Power an array of household electronics with this Rayovac AA batteries 30-pack. The reclosable package makes it easy to remove the batteries you need and re-store the rest, while the 30-pack provides plenty to have extras on hand. These batteries are made in the USA and come with a 10-year power guarantee. They are alkaline and suitable for various household electronics.",
+        "brands": [
+          {
+            "id": "SQ2S",
+            "name": "Rayovac"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/4a7c1740-a32c-443b-b080-ec6582998277?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=p1PB",
+            "cleaned_url": "https://cdn.trychannel3.com/3422e4a0-06c2-40e5-b404-53184c0c3fe5?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=p1PB",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Pack of 30 AA Rayovac batteries in clear plastic packaging."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "Alkaline"
+        ],
+        "key_features": [
+          "AA size",
+          "30 count",
+          "Reclosable storage pack",
+          "10 Year Power Guarantee",
+          "Alkaline",
+          "Made in the USA"
+        ],
+        "colors": [
+          {
+            "hex": "#acaca8",
+            "percentage": 0.2915
+          },
+          {
+            "hex": "#797976",
+            "percentage": 0.1321
+          },
+          {
+            "hex": "#4b678f",
+            "percentage": 0.1267
+          },
+          {
+            "hex": "#3e4554",
+            "percentage": 0.1186
+          },
+          {
+            "hex": "#263556",
+            "percentage": 0.118
+          },
+          {
+            "hex": "#e0e0d5",
+            "percentage": 0.11
+          },
+          {
+            "hex": "#8694a1",
+            "percentage": 0.1032
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/8u6McSd-p1PB-bQpm8C?o=01KYC8EVQMDC107D6KW8R2RP9J&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "bestbuy.com",
+            "price": {
+              "price": 53.59,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.004,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "AA"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "pattern": [
+            "Solid"
+          ]
+        },
+        "ratings": {
+          "value": 4.6,
+          "count": 3804,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "1aF2iFr",
+        "title": "AA Batteries",
+        "description": "This OXO Good Grips soap dispensing palm brush is designed for efficient dishwashing. It features a comfortable, non-slip grip, a convenient pump button for dispensing soap directly from the handle, and durable nylon bristles for scrubbing away dirt and grime. It is perfect for cleaning dishes, pots, pans, and glassware, and its compact design makes it easy to store. Replaceable brush heads ensure extended use.",
+        "brands": [
+          {
+            "id": "gHH8",
+            "name": "Energizer"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/7eaf63cc-ad84-4442-9b3d-271577e6c1ba?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "Group shot of assorted colored picture frames with white matting."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/33fe6d4d-948c-4a90-9a61-9ac47af5ac78?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "cleaned_url": "https://cdn.trychannel3.com/244f08a2-66d5-45d3-aad5-ac2baaf40966?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Gold picture frame with white matting on a white background."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/c56386fd-2bb5-48f1-b4c7-0fc4c24b2cc9?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=dMiw",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Group shot of assorted colored picture frames with white matting and a signature."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": "adult",
+        "materials": [
+          "nylon",
+          "rubber",
+          "plastic"
+        ],
+        "key_features": [
+          "100th Anniversary Special Edition",
+          "AA Batteries",
+          "Long-lasting power",
+          "Reliable performance",
+          "Bulk pack",
+          "Self-adhesive backing",
+          "Custom spaces designed to fit your specific needs",
+          "Installation services to ensure everything is set up perfectly",
+          "Professionally organized closets to streamline your mornings",
+          "Organizes AA and AAA batteries"
+        ],
+        "colors": [
+          {
+            "hex": "#ebebea",
+            "percentage": 1
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/1aF2iFr-dMiw-bQpm8C?o=01KRBD57FF8K26K75P8BKNF3R3&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "containerstore.com",
+            "price": {
+              "price": 9.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.07,
+            "dimensions": {
+              "length": {
+                "number": 3.375,
+                "unit": "in"
+              },
+              "width": {
+                "number": 3.375,
+                "unit": "in"
+              },
+              "height": {
+                "number": 3.25,
+                "unit": "in"
+              },
+              "weight": null
+            }
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "pattern": [
+            "Striped"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "material": [
+            "Plastic"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "battery-type": [
+            "Disposable"
+          ]
+        },
+        "ratings": {
+          "value": 4.9,
+          "count": 11,
+          "source_count": 1
+        }
+      },
+      {
+        "id": "VRZqvHA",
+        "title": "ACDelco Alkaline AA Batteries (48-Pack)",
+        "description": "These ACDelco Super Alkaline AA batteries (Model AC255) are designed for high-drain digital devices, offering long-lasting, dependable power. With a 10-year shelf life and leak protection, they provide trusted quality and great value in a convenient 48-pack.",
+        "brands": [
+          {
+            "id": "20lt",
+            "name": "ACDelco"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/bdfdb304-7f1f-47c6-8091-20171398e922?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "lifestyle",
+            "alt_text": "Pack of 48 ACDelco AA batteries in a clear plastic package."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2a01e0dd-1eae-4fce-90df-c5d7df16409d?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Group shot of 48 ACDelco AA batteries."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/cf45bc7c-1d82-48ff-8acd-1da02145bfb3?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Pack of ACDelco AA alkaline batteries in packaging."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/f1c01e5a-8759-4213-afab-18e7ac95df58?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/f1c01e5a-8759-4213-afab-18e7ac95df58?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Single ACDelco AA battery emphasizing trusted and dependable."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/e728ebcd-414a-436d-a595-b3ebc4652b46?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/e728ebcd-414a-436d-a595-b3ebc4652b46?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Infographic showing maximum longevity and leak protection features."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/0c983bf1-ddaa-4bad-a9e9-cabe6eac172c?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Graphic showing maximum power for various devices."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/8f832193-e8d1-43f7-9fff-e0cb82933d7e?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Graph showing voltage drop over time for batteries."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/7aa2b841-2317-4e14-aa89-96505f4e5211?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/7aa2b841-2317-4e14-aa89-96505f4e5211?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Single ACDelco AA battery with 10-year storage guarantee."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Ideal for high-drain digital devices",
+          "10 Years shelf life",
+          "Long lasting",
+          "Leak protection",
+          "Trusted quality for 110+ years"
+        ],
+        "colors": [
+          {
+            "hex": "#edf1f2",
+            "percentage": 0.2679
+          },
+          {
+            "hex": "#24568d",
+            "percentage": 0.1369
+          },
+          {
+            "hex": "#6782a4",
+            "percentage": 0.134
+          },
+          {
+            "hex": "#a3adb7",
+            "percentage": 0.1302
+          },
+          {
+            "hex": "#9b8f92",
+            "percentage": 0.1262
+          },
+          {
+            "hex": "#914d5e",
+            "percentage": 0.1034
+          },
+          {
+            "hex": "#c8c0b9",
+            "percentage": 0.1013
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/VRZqvHA-Qqxu-bQpm8C?o=01M5Q82NER3KK9C8QFHG4YQNT6&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "lowes.com",
+            "price": {
+              "price": 21.56,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "material": [
+            "Metal"
+          ],
+          "pattern": [
+            "Solid"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "battery-type": [
+            "Disposable"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "pmldx2E",
+        "title": "ACDelco Alkaline AA Batteries (100-Pack)",
+        "description": "A bulk 100-pack of ACDelco Alkaline AA batteries, designed for high-drain digital devices. These batteries feature a 10-year shelf life and are trusted for long-lasting performance.",
+        "brands": [
+          {
+            "id": "20lt",
+            "name": "ACDelco"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/45f3ac6f-2d19-4ee2-90c2-06b5165b31bf?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": "https://cdn.trychannel3.com/cleaned/v1/45f3ac6f-2d19-4ee2-90c2-06b5165b31bf?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "is_main_image": true,
+            "shot_type": "hero",
+            "alt_text": "Pack of 100 ACDelco AA Alkaline batteries in a cardboard box."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/9ae67e70-d8ab-43d1-9a72-16e2d28f9bc7?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Pack of 100 ACDelco AA Alkaline batteries with AA100 text on the box."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/36f4966d-c8cd-423b-8c50-a8253b53c17f?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=Qqxu",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Infographic showing a 10-year storage guarantee for the batteries."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Ideal for high-drain digital devices",
+          "10 Years shelf life",
+          "Long lasting",
+          "Trusted quality for 110+ years",
+          "Best value for your money"
+        ],
+        "colors": [
+          {
+            "hex": "#ccd4d3",
+            "percentage": 0.2674
+          },
+          {
+            "hex": "#a8a49e",
+            "percentage": 0.2083
+          },
+          {
+            "hex": "#ebf0ea",
+            "percentage": 0.1213
+          },
+          {
+            "hex": "#5351b3",
+            "percentage": 0.1162
+          },
+          {
+            "hex": "#aebcc3",
+            "percentage": 0.1158
+          },
+          {
+            "hex": "#6a7ab3",
+            "percentage": 0.0997
+          },
+          {
+            "hex": "#8097b3",
+            "percentage": 0.0712
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/pmldx2E-Qqxu-bQpm8C?o=01M5QAB7QE9DDTERTPZ3F7X1VH&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "lowes.com",
+            "price": {
+              "price": 30.72,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.035,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "AA"
+          ],
+          "material": [
+            "Metal"
+          ],
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "YpLbPHn",
+        "title": "AA Batteries",
+        "description": "A 4-pack of Rayovac AA alkaline batteries designed with High Energy™ to provide long-lasting power for various appliances. These batteries are budget-friendly and manufactured in the USA.",
+        "brands": [
+          {
+            "id": "SQ2S",
+            "name": "Rayovac"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/ad21e862-6a5c-453c-8a37-dafb4f3ed25a?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": "https://cdn.trychannel3.com/d315fc97-21c9-4a75-88c6-666767e6432a?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Rayovac AA batteries 4-pack packaging with blue battery pack visible."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/0cac6b4b-c7fb-4341-86f9-ecf71c1f3278?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "product_information",
+            "alt_text": "Rayovac Power Guarantee battery specification packaging."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/91e0411e-11f6-423f-be71-9bd2999b34b9?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": "https://cdn.trychannel3.com/e169ebe4-b22c-4d19-8666-3ae189f1cdda?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "is_main_image": false,
+            "shot_type": "hero",
+            "alt_text": "Hand holding Rayovac AAA battery pack with blue batteries inside."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Long lasting High Energy™",
+          "Includes 4 x AA batteries",
+          "Country of Origin: USA"
+        ],
+        "colors": [
+          {
+            "hex": "#bf363f",
+            "percentage": 0.1889
+          },
+          {
+            "hex": "#df1b2a",
+            "percentage": 0.1453
+          },
+          {
+            "hex": "#314972",
+            "percentage": 0.1436
+          },
+          {
+            "hex": "#1870a5",
+            "percentage": 0.1402
+          },
+          {
+            "hex": "#75b0d0",
+            "percentage": 0.1292
+          },
+          {
+            "hex": "#e1d6db",
+            "percentage": 0.1233
+          },
+          {
+            "hex": "#837b92",
+            "percentage": 0.0909
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/YpLbPHn-FLYH-bQpm8C?o=01M10NRZ0XZ2P0JN0NVSYA8DTT&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "fivebelow.com",
+            "price": {
+              "price": 7,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-type": [
+            "Disposable"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "8EozTBY",
+        "title": "AA Batteries - 4 pack",
+        "description": "Peavey AA alkaline batteries delivered in a 4-pack, designed for reliable power in everyday household devices. Leak-proof construction and long-lasting performance make them suitable for toys, remotes, and other common devices. Sold as a 4-pack for easy replacement and value.",
+        "brands": [
+          {
+            "id": "M7NE",
+            "name": "Peavey"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/6298e973-8c49-47e2-8a76-a46967b08324?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=T9Fg",
+            "cleaned_url": null,
+            "is_main_image": true,
+            "shot_type": "product_information",
+            "alt_text": "Four black Peavey AA batteries in a pack."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [
+          "alkaline"
+        ],
+        "key_features": [
+          "Peavey AA alkaline batteries deliver reliable power for your everyday devices.",
+          "Enjoy long-lasting performance in toys, remotes, and more with these AA batteries.",
+          "Get great value with this 4-pack of Peavey AA batteries, perfect for household use.",
+          "These common size AA batteries are leak-proof, protecting your devices from damage.",
+          "Keep your devices running smoothly with these Peavey AA batteries, a great power solution.",
+          "Designed for performing musicians"
+        ],
+        "colors": [
+          {
+            "hex": "#1c1c1e",
+            "percentage": 0.3983
+          },
+          {
+            "hex": "#414447",
+            "percentage": 0.2018
+          },
+          {
+            "hex": "#d3c7c7",
+            "percentage": 0.1351
+          },
+          {
+            "hex": "#3a2b2d",
+            "percentage": 0.0951
+          },
+          {
+            "hex": "#834c4e",
+            "percentage": 0.0882
+          },
+          {
+            "hex": "#8e7577",
+            "percentage": 0.0816
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/8EozTBY-T9Fg-bQpm8C?o=01KNMCKE8JEHXZRNA5T71SY64M&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "adorama.com",
+            "price": {
+              "price": 7.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0.025,
+            "dimensions": null
+          },
+          {
+            "url": "https://buy.trychannel3.com/8EozTBY-F4Jl-bQpm8C?o=01M3B2EWJD1KK2QHXDFTNG36RA&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "peavey.com",
+            "price": {
+              "price": 8.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-size": [
+            "AA"
+          ],
+          "battery-type": [
+            "Disposable",
+            "Standalone (included)"
+          ],
+          "battery-technology": [
+            "Alkaline"
+          ]
+        },
+        "ratings": null
+      },
+      {
+        "id": "IlaZSsn",
+        "title": "Aa Batteries",
+        "description": "Stay prepared with this 4-pack of Rayovac High Energy AA alkaline batteries. Designed for long-lasting power, these batteries are ideal for various electronic devices, ensuring your gadgets keep running without emergency trips to the store.",
+        "brands": [
+          {
+            "id": "SQ2S",
+            "name": "Rayovac"
+          }
+        ],
+        "images": [
+          {
+            "url": "https://cdn.trychannel3.com/a4f8ad2e-2bb1-4992-bd29-060436ee64c1?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": "https://cdn.trychannel3.com/ec4ca2fb-c2f6-4af1-9899-48d3619c42de?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "is_main_image": true,
+            "shot_type": "packaging",
+            "alt_text": "Packaged Rayovac AA batteries 4-pack box."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/2930fff1-dfc7-41f3-88aa-3f41e8e37a67?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "lifestyle",
+            "alt_text": "Four blue and silver Rayovac AA batteries lined up."
+          },
+          {
+            "url": "https://cdn.trychannel3.com/993920c5-bb30-4ff0-9ca8-585734c0d551?aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T&mid=FLYH",
+            "cleaned_url": null,
+            "is_main_image": false,
+            "shot_type": "in_use",
+            "alt_text": "Hand holding a blue and silver Rayovac AA battery."
+          }
+        ],
+        "category": {
+          "slug": "general-purpose-batteries",
+          "title": "General Purpose Batteries",
+          "path": [
+            {
+              "slug": "electronics",
+              "title": "Electronics"
+            },
+            {
+              "slug": "electronics-accessories",
+              "title": "Electronics Accessories"
+            },
+            {
+              "slug": "power",
+              "title": "Power"
+            },
+            {
+              "slug": "batteries",
+              "title": "Batteries"
+            },
+            {
+              "slug": "general-purpose-batteries",
+              "title": "General Purpose Batteries"
+            }
+          ],
+          "has_children": false
+        },
+        "gender": null,
+        "age": null,
+        "materials": [],
+        "key_features": [
+          "High energy alkaline batteries",
+          "Long lasting guaranteed",
+          "10 year power guarantee in storage",
+          "Includes 4 AA batteries"
+        ],
+        "colors": [
+          {
+            "hex": "#435c80",
+            "percentage": 0.1902
+          },
+          {
+            "hex": "#6c84a1",
+            "percentage": 0.1563
+          },
+          {
+            "hex": "#f7f3f2",
+            "percentage": 0.1468
+          },
+          {
+            "hex": "#b85446",
+            "percentage": 0.1434
+          },
+          {
+            "hex": "#303c58",
+            "percentage": 0.1334
+          },
+          {
+            "hex": "#c5d6e6",
+            "percentage": 0.1154
+          },
+          {
+            "hex": "#b09da3",
+            "percentage": 0.0915
+          }
+        ],
+        "offers": [
+          {
+            "url": "https://buy.trychannel3.com/IlaZSsn-FLYH-bQpm8C?o=01M149G6204HKKP3TK3H2X208Y&aid=01M6D3Y2CGZ3HEW2GJXA2KQG1T",
+            "domain": "fivebelow.com",
+            "price": {
+              "price": 3.99,
+              "compare_at_price": null,
+              "currency": "USD"
+            },
+            "availability": "InStock",
+            "condition": "new",
+            "max_commission_rate": 0,
+            "dimensions": null
+          }
+        ],
+        "variants": null,
+        "structured_attributes": {
+          "battery-technology": [
+            "Alkaline"
+          ],
+          "battery-size": [
+            "AA"
+          ],
+          "battery-type": [
+            "Disposable"
+          ]
+        },
+        "ratings": null
+      }
+    ],
+    "next_page_token": "eyJjYWNoZV9rZXkiOiAic2VhcmNoOmMxM2VhNGE1ODZjNjczYWEiLCAib2Zmc2V0IjogMTB9"
+  }
+}

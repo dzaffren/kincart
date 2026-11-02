@@ -43,6 +43,7 @@ Used by older shoppers and the relative who helps them pay online.
 - Every KinCart page tells the browser to refuse a frame from another site, and to send no page address to other sites. The home page's own phones still show Rose's and Sam's pages.
 - After a No or a thing left out, Sam taps Find another on Sam's own page, and KinCart looks again for Rose. Rose's page says Sam asked, and Rose's phone buzzes when the search ends.
 - Sam taps Make new links when a link leaks. Both old links stop working at once, Sam gets Rose's new link to send, and the household keeps its PayPal, limits and past buys.
+- CI's e2e gets Channel3's and Claude's answers from recorded replies, so a push spends no Channel3 credits.
 
 ## Docs
 
@@ -90,4 +91,4 @@ You need Node 24, pnpm 9, and Postgres 17: either a free Neon database or Docker
 
 Notifications: on Android, tap Turn on notifications on the page. On iPhone (iOS 16.4 or later) they only work from the Home Screen: open the link in Safari, tap Share, then Add to Home Screen, then open KinCart from the Home Screen and turn them on there. A phone needs https for this, so try it on the Vercel deployment, not `pnpm dev`. In PayPal itself these pings would be PayPal app notifications; web push stands in for them here.
 
-Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, `PAYPAL_E2E_VAULT_ID`, the Claude and Channel3 keys, `ADDRESS_KEY`, the three VAPID variables, and Playwright's browsers from `pnpm exec playwright install chromium firefox`; stop `pnpm dev` first). The e2e makes real sandbox charges against a saved PayPal, real Channel3 searches and Claude calls, and real pushes through Mozilla's push service. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.
+Checks: `pnpm lint`, `pnpm test` (needs `DATABASE_URL`), `pnpm test:e2e` (also needs the PayPal keys, the two link tokens, `PAYPAL_E2E_VAULT_ID`, the Claude and Channel3 keys, `ADDRESS_KEY`, the three VAPID variables, and Playwright's browsers from `pnpm exec playwright install chromium firefox`; stop `pnpm dev` first). The e2e makes real sandbox charges against a saved PayPal and real pushes through Mozilla's push service. Channel3 and Claude answer from replies recorded in `e2e/recordings/`, so a run spends no credits; a call with no recording fails its test and logs `no recording:` with what it was. After a prompt or search change, `pnpm test:e2e:record` fills in what's missing with real calls, using the Channel3 and Claude keys in `.env.local`. To get one, link Rose's PayPal once as above, then read it with `psql "$DATABASE_URL" -c 'SELECT payment_token FROM paypal_vault'`.
