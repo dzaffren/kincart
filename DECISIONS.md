@@ -854,4 +854,12 @@ Status: active
 Why: Chrome's JPEG encoding and Channel3's CDN can change a photo's bytes, so bytes in the key would miss on a new runner. A miss that answers 500 keeps CI from spending credits by accident.
 Rejected: the exact body as the key (a new Chrome breaks every photo test), falling back to the real service on a miss (credits leak again), recorded photos (loosens D95's host check).
 Source: docs/specs/ci-without-channel3.md
+Status: superseded by D130
+
+## D130 · 2026-11-02 · The fake server keeps a fingerprint of Rose's own photos in a call's key, and leaves listing photos out
+
+Why: with every photo's bytes left out, two photo Finds with no words send the same text, and the blank-wall Find replayed the written list's reply. Rose's photos come from the fixed files in e2e/photos/, shrunk by Playwright's own Chromium.
+Rejected: photo bytes left out of every key (D129, which this supersedes; two photo Finds collide), every photo's bytes in the key (listing photos come from Channel3's CDN and can change), a counter for calls with the same key (a run of one test would replay another test's reply).
+Supersedes: D129
+Source: docs/specs/ci-without-channel3.md
 Status: active

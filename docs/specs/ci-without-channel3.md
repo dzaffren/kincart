@@ -1,6 +1,6 @@
 # CI without Channel3
 
-**Version:** v1 · **Status:** Refined · **Type:** Technical · **Project type:** Web UI
+**Version:** v1 · **Status:** Built · **Type:** Technical · **Project type:** Web UI
 
 **Depends on:** None
 **Page:** none. Skipped: you read the `.md` directly.
@@ -88,7 +88,7 @@ Scenario: The replies are recorded once, by hand
 
 The two clients read their base URL from the env, and fall back to the real host. Playwright starts a fake server on port 3999 before the KinCart build, and gives the build that server's URL. The fake server answers each call from a recorded reply in `e2e/recordings/`. With `RECORD=1`, it forwards a call that has no recording to the real service, with the real key from `.env.local`, and saves the reply.
 
-Relies on: D10, D11, D20, D94, D95, and the drafted D127, D128, D129. D127 supersedes D24.
+Relies on: D10, D11, D20, D94, D95, and the drafted D127, D128, D129, D130. D127 supersedes D24, and D130 supersedes D129.
 
 ```mermaid
 flowchart TB
@@ -117,7 +117,7 @@ sequenceDiagram
     F->>R: channel3-<hash>.json
     R-->>F: recorded products
     F-->>K: 200 products
-    K->>F: POST /v1/messages (photo bytes left out of the key)
+    K->>F: POST /v1/messages (listing photo bytes left out of the key)
     F->>R: anthropic-<hash>.json
     alt recorded
         R-->>F: recorded reply
@@ -128,7 +128,7 @@ sequenceDiagram
     end
 ```
 
-The key for a recording is the SHA-256 of the call's service and its body. For a Claude call, each image's `data` becomes `"<image>"` first, so only the text and the number of photos count (O7). The browser shrinks Rose's photos as JPEG (D70), and Chrome versions can encode a little differently, so photo bytes can't be in the key.
+The key for a recording is the SHA-256 of the call's service and its body. For a Claude call, each listing photo becomes `{type: "image"}` first, so only its text counts (O7). Each of Rose's photos, the image after a `Photo n:` label, becomes a SHA-256 of its bytes instead (D130): they come from the fixed files in `e2e/photos/`, and without them two photo Finds with no words would match the same recording (O9).
 
 ### Changes
 
@@ -137,7 +137,7 @@ The key for a recording is the SHA-256 of the call's service and its body. For a
 | `lib/shop/search.ts:26` | The search URL is `${process.env.CHANNEL3_URL ?? "https://api.trychannel3.com"}/v1/search` | scenario 1 |
 | `lib/shop/ai.ts:136` | The messages URL is `${process.env.ANTHROPIC_URL ?? "https://api.anthropic.com"}/v1/messages` | scenario 1 |
 | `scripts/fake-apis.mjs` | New. A `node:http` server: `POST /v1/search` and `POST /v1/messages`, answered from `e2e/recordings/`. A miss answers 500 and logs `no recording: <service> <text>`. With `RECORD=1`, a miss goes to the real host with the real key and is saved | scenarios 1, 2, 4 |
-| `scripts/fake-apis.test.ts` | New. Starts the server on a free port: a recorded call replays, a miss answers 500 with its log line, and photo bytes don't change the key | scenario 2 |
+| `scripts/fake-apis.test.ts` | New. Starts the server on a free port: a recorded call replays, a miss answers 500 with its log line, listing photo bytes don't change the key, and Rose's photos do | scenario 2 |
 | `e2e/recordings/` | New. One JSON file for each recorded reply, with the call's text beside the reply so a reviewer can read what it answers | scenario 1 |
 | `playwright.config.ts:24` | `webServer` becomes a list: the fake server first, then KinCart with `env` set to `CHANNEL3_URL` and `ANTHROPIC_URL` on `http://localhost:3999`, and both API keys set to `recorded` | scenario 1 |
 | `.github/workflows/ci.yml:3` | `push` runs on `branches: [main]` only. `CHANNEL3_API_KEY` becomes `recorded`, not a secret | scenarios 1, 3 |
@@ -195,7 +195,7 @@ Single chunk.
 
 ### Decisions to record
 
-Recorded as D127, D128, D129.
+Recorded as D127, D128, D129, D130.
 
 ## Open items
 
@@ -206,9 +206,10 @@ Recorded as D127, D128, D129.
 | O3  | A push to a branch with a PR runs CI twice                                                                   | question | spec p1   | user  | Resolved | `push` runs on main only, and branches run through `pull_request`. Keeping both was turned down. 2026-10-27 |
 | O4  | What happens when an e2e call has no recorded reply                                                          | question | spec p1   | user  | Resolved | The fake server answers 500, and the log names the request. Falling back to the real service was turned down. 2026-10-27 |
 | O5  | Where the recorded Channel3 replies come from, while the key is out of credits until Nov 1                   | question | spec p1   | user  | Resolved | You get a new Channel3 API key, and one recording run uses it. Hand-built replies and waiting for Nov 1 were turned down. 2026-10-27 |
-| O6  | Each Claude call's text is the same on every e2e run, so a recorded reply always matches                     | unproven | spec p3   | build | Resolved | `/build` checks it on the first replay run. A call whose text changes each run then matches on fewer fields, as a decided-alone row. A `/poc` first was turned down. 2026-10-27 |
+| O6  | Each Claude call's text is the same on every e2e run, so a recorded reply always matches                     | unproven | spec p3   | build | Resolved | `/build` checks it on the first replay run. A call whose text changes each run then matches on fewer fields, as a decided-alone row. A `/poc` first was turned down. 2026-10-27. Checked 2026-11-02: two replay runs after recording passed 33 of 33 with no `no recording:` line |
 | O7  | Whether listing photos download from the real CDN in the e2e                                                 | question | spec p3   | user  | Resolved | Yes, from cdn.trychannel3.com, which costs no credits. The fake server leaves photo bytes out of a Claude call's key (D129). Recorded photos were turned down. 2026-10-27 |
 | O8  | Scenario 4's recording run needs the new Channel3 key in `.env.local` as `CHANNEL3_API_KEY`, and the key needs credits. `.env.local` was last changed on Oct 23, so the key there is the old one, with 0 credits left. Everything else is built: with no recordings, the 9 Find e2e fail on `no recording:` lines, the 17 others pass, and no call reached Channel3 | question | build | user | Resolved | Keep the key in `.env.local`. Channel3's credits reset on Nov 1, and credits count per organization, so the old key's organization has credits again. A 402 during the run saves nothing and logs `not recorded:`. 2026-11-02 |
+| O9  | The first recording run failed the blank-wall photo test: with photo bytes left out of the key, it and the written-list test both sent `Photo 1: Photo 2: They typed nothing.`, so the blank wall replayed the list's 4 things. Rose's own photos now keep a fingerprint in the key, and listing photos still don't (D130, superseding D129). Other choice: a counter for calls with the same key, which breaks running one test alone | decision | build | claude | Decided alone | Fingerprint of Rose's photos. 2026-11-02 |
 
 _Never delete this section or its rows. See references/ledger.md._
 
