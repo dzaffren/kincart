@@ -1,6 +1,6 @@
 # PayPalHackathon · architecture
 
-**Status:** Active · **Updated:** 2026-10-23 by /ship security-headers
+**Status:** Active · **Updated:** 2026-11-02 by /ship ci-without-channel3
 
 ## Context
 
@@ -19,6 +19,7 @@ flowchart LR
     APP -- "encrypted, signed pushes" --> PS[Apple / Google / Mozilla push services]
     PS -- "buzzes" --> R & S
     GH[GitHub Actions] -- "runs migrations on green main" --> NEON
+    GH -- "e2e: Channel3 and Claude calls" --> FAKE["scripts/fake-apis.mjs, replies from e2e/recordings/"]
     GH -- "test + migrate results" --> VC[Vercel Deployment Checks]
     VC -- "promotes the deploy" --> APP
 ```
@@ -51,6 +52,7 @@ flowchart TB
 | Headers | `next.config.ts` | Adds `frame-ancestors 'self'`, `X-Frame-Options: SAMEORIGIN` and `Referrer-Policy: same-origin` to every response, so only KinCart frames its pages and other sites get no page address |
 | Service worker | `public/sw.js` | Registered under each person's link; shows a push and opens that link on tap |
 | Migrations | `db/migrations/`, `scripts/migrate.mjs` | Plain SQL up and down files, and the runner behind `pnpm db:up` and `db:down` |
-| CI | `.github/workflows/ci.yml` | `test` job on every push and PR; `migrate` job on main after `test` passes |
-| E2E | `e2e/` | Playwright tests at phone width unless a test sets a laptop window, one worker: `/status`, Rose's ask through Sam's OK or No to the receipt, Rose's Find with real Channel3 and Claude calls, from words, one photo or several, a three-thing basket that Sam trims before paying, Find another after Sam's No, Ask again after Sam pays, a cane over Sam's limit that Sam's OK pays, a basket stopped by Sam's total limit, a real push to Sam and back to Rose in Firefox, two judges each in their own household, an address past its daily Find and Try KinCart limits, the usage counts on `/status`, a judge on a laptop playing Rose and Sam side by side while a phone loads neither frame, and Sam's page refused in another site's frame |
+| CI | `.github/workflows/ci.yml` | `test` job on every PR and every push to main; `migrate` job on main after `test` passes |
+| E2E | `e2e/` | Playwright tests at phone width unless a test sets a laptop window, one worker: `/status`, Rose's ask through Sam's OK or No to the receipt, Rose's Find with Channel3 and Claude answered from recorded replies, from words, one photo or several, a three-thing basket that Sam trims before paying, Find another after Sam's No, Ask again after Sam pays, a cane over Sam's limit that Sam's OK pays, a basket stopped by Sam's total limit, a real push to Sam and back to Rose in Firefox, two judges each in their own household, an address past its daily Find and Try KinCart limits, the usage counts on `/status`, a judge on a laptop playing Rose and Sam side by side while a phone loads neither frame, and Sam's page refused in another site's frame |
+| Fake APIs | `scripts/fake-apis.mjs`, `e2e/recordings/` | Stands in for Channel3 and Claude on port 3999 in the e2e. Answers each call from a recorded reply, keyed on its text and on a fingerprint of Rose's own photos; a call with no recording answers 500 and logs `no recording:`. With `RECORD=1`, it makes the real call and saves the reply |
 | Recorded set | `lib/shop/picks/` | Real Channel3 products and photos for 7 asks, each listing labelled wrong or right by its photo. `lib/shop/picks.test.ts` runs each ask through `find()` 3 times against real Haiku in `pnpm test`, and fails on any wrong pick. Two Ask again cases run `findRebuy()` 3 times each: a wrong listing labelled as bought last time never shows, and a right one comes first |

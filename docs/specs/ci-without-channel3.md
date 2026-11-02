@@ -1,6 +1,6 @@
 # CI without Channel3
 
-**Version:** v1 · **Status:** Built · **Type:** Technical · **Project type:** Web UI
+**Version:** v1 · **Status:** Shipped · **Type:** Technical · **Project type:** Web UI
 
 **Depends on:** None
 **Page:** none. Skipped: you read the `.md` directly.
